@@ -1,0 +1,244 @@
+m4trace:acinclude.m4:44: -1- AC_DEFUN([UA_CXX_STREAMBUF], [
+  AC_CACHE_CHECK([flavour of std::streambuf], ua_cv_cxx_streambuf, 
+  [
+    AC_LANG_SAVE
+    AC_LANG_CPLUSPLUS
+    cat > conftest.$ac_ext <<EOF
+#include <iostream>
+using std::streambuf;
+
+class Test : public std::streambuf
+{
+   void test(std::streambuf *a) { a->sync(); }
+};
+EOF
+
+    if AC_TRY_EVAL(ac_compile); then
+      ua_cv_cxx_streambuf="old"
+    else
+      ua_cv_cxx_streambuf="new"
+    fi
+    AC_LANG_RESTORE
+  ])
+
+  if test $ua_cv_cxx_streambuf = old; then
+    AC_DEFINE(CXX_OLD_STREAMBUF,1,[Define if the library implementation of streambuf have public interface to override])
+  fi
+])
+m4trace:acinclude.m4:76: -1- AC_DEFUN([UA_CXX_SLIST], [
+  AC_CHECK_HEADER(slist, [AC_DEFINE(HAVE_SLIST,1,[Define if slist is not in ext])],
+  [
+    AC_CHECK_HEADER(ext/slist,
+      [
+	AC_DEFINE(HAVE_EXT_SLIST,1,[Define if slist is in ext])
+	AC_CACHE_CHECK([slist namespace], ua_cv_cxx_slist_namespace,
+        [
+  	  AC_LANG_SAVE
+          AC_LANG_CPLUSPLUS
+
+          cat > conftest.$ac_ext <<EOF
+#include <ext/slist>
+__gnu_cxx::slist<int> test;
+EOF
+          if AC_TRY_EVAL(ac_compile); then
+      	    ua_cv_cxx_slist_namespace="__gnu_cxx"
+          else
+            ua_cv_cxx_slist_namespace=""
+          fi
+          AC_LANG_RESTORE
+        ])
+
+	if test -n $ua_cv_cxx_slist_namespace; then
+	  AC_DEFINE_UNQUOTED(CXX_SLIST_NAMESPACE,$ua_cv_cxx_slist_namespace,[Define to the namespace of slist (if not in std)])
+	fi
+     ])
+   ])  
+])
+m4trace:configure.ac:8: -1- m4_pattern_forbid([^_?A[CHUM]_])
+m4trace:configure.ac:8: -1- m4_pattern_forbid([_AC_])
+m4trace:configure.ac:8: -1- m4_pattern_forbid([^LIBOBJS$], [do not use LIBOBJS directly, use AC_LIBOBJ (see section `AC_LIBOBJ vs LIBOBJS'])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^AS_FLAGS$])
+m4trace:configure.ac:8: -1- m4_pattern_forbid([^_?m4_])
+m4trace:configure.ac:8: -1- m4_pattern_forbid([^dnl$])
+m4trace:configure.ac:8: -1- m4_pattern_forbid([^_?AS_])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^SHELL$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PATH_SEPARATOR$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_NAME$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_TARNAME$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_VERSION$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_STRING$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_BUGREPORT$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^exec_prefix$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^prefix$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^program_transform_name$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^bindir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^sbindir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^libexecdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^datarootdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^datadir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^sysconfdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^sharedstatedir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^localstatedir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^includedir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^oldincludedir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^docdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^infodir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^htmldir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^dvidir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^pdfdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^psdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^libdir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^localedir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^mandir$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_NAME$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_TARNAME$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_VERSION$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_STRING$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^PACKAGE_BUGREPORT$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^DEFS$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^ECHO_C$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^ECHO_N$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^ECHO_T$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^LIBS$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^build_alias$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^host_alias$])
+m4trace:configure.ac:8: -1- m4_pattern_allow([^target_alias$])
+m4trace:configure.ac:11: -1- m4_pattern_allow([^MODULE_LIBS$])
+m4trace:configure.ac:12: -1- m4_pattern_allow([^DBM_VERSION$])
+m4trace:configure.ac:13: -1- m4_pattern_allow([^TIGA_VERSION$])
+m4trace:configure.ac:17: -1- _m4_warn([obsolete], [The macro `AC_LANG_CPLUSPLUS' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/c.m4:105: AC_LANG_CPLUSPLUS is expanded from...
+configure.ac:17: the top level])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^build$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^build_cpu$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^build_vendor$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^build_os$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^host$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^host_cpu$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^host_vendor$])
+m4trace:configure.ac:21: -1- m4_pattern_allow([^host_os$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^target$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^target_cpu$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^target_vendor$])
+m4trace:configure.ac:22: -1- m4_pattern_allow([^target_os$])
+m4trace:configure.ac:35: -1- m4_pattern_allow([^OS$])
+m4trace:configure.ac:36: -1- m4_pattern_allow([^LINKFLAGS$])
+m4trace:configure.ac:37: -1- m4_pattern_allow([^EXTRALIBS$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CC$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CFLAGS$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^LDFLAGS$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^LIBS$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CPPFLAGS$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CC$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CC$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CC$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^CC$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^ac_ct_CC$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^EXEEXT$])
+m4trace:configure.ac:71: -1- m4_pattern_allow([^OBJEXT$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^CXX$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^CXXFLAGS$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^LDFLAGS$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^LIBS$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^CPPFLAGS$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^CXX$])
+m4trace:configure.ac:72: -1- m4_pattern_allow([^ac_ct_CXX$])
+m4trace:configure.ac:73: -1- m4_pattern_allow([^LEX$])
+m4trace:configure.ac:73: -1- m4_pattern_allow([^LEX_OUTPUT_ROOT$])
+m4trace:configure.ac:73: -1- m4_pattern_allow([^LEXLIB$])
+m4trace:configure.ac:73: -1- m4_pattern_allow([^YYTEXT_POINTER$])
+m4trace:configure.ac:74: -1- m4_pattern_allow([^YACC$])
+m4trace:configure.ac:74: -1- m4_pattern_allow([^YACC$])
+m4trace:configure.ac:74: -1- m4_pattern_allow([^YFLAGS$])
+m4trace:configure.ac:75: -1- m4_pattern_allow([^RANLIB$])
+m4trace:configure.ac:76: -1- m4_pattern_allow([^INSTALL_PROGRAM$])
+m4trace:configure.ac:76: -1- m4_pattern_allow([^INSTALL_SCRIPT$])
+m4trace:configure.ac:76: -1- m4_pattern_allow([^INSTALL_DATA$])
+m4trace:configure.ac:79: -1- m4_pattern_allow([^XML_CONFIG$])
+m4trace:configure.ac:80: -1- m4_pattern_allow([^GPERF$])
+m4trace:configure.ac:81: -1- m4_pattern_allow([^MAKEDEP$])
+m4trace:configure.ac:82: -1- m4_pattern_allow([^AR$])
+m4trace:configure.ac:83: -1- m4_pattern_allow([^STRIP$])
+m4trace:configure.ac:87: -1- m4_pattern_allow([^XMLSTATIC$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^CXXCPP$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^CPPFLAGS$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^CXXCPP$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^GREP$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^GREP$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^EGREP$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^EGREP$])
+m4trace:configure.ac:93: -1- m4_pattern_allow([^STDC_HEADERS$])
+m4trace:configure.ac:102: -1- UA_CXX_SLIST
+m4trace:configure.ac:102: -1- m4_pattern_allow([^HAVE_SLIST$])
+m4trace:configure.ac:102: -1- m4_pattern_allow([^HAVE_EXT_SLIST$])
+m4trace:configure.ac:102: -1- _m4_warn([obsolete], [The macro `AC_LANG_SAVE' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/lang.m4:170: AC_LANG_SAVE is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1905: AC_CACHE_VAL is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1918: AC_CACHE_CHECK is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/headers.m4:92: AC_CHECK_HEADER is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/headers.m4:92: AC_CHECK_HEADER is expanded from...
+acinclude.m4:76: UA_CXX_SLIST is expanded from...
+configure.ac:102: the top level])
+m4trace:configure.ac:102: -1- _m4_warn([obsolete], [The macro `AC_LANG_CPLUSPLUS' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/c.m4:105: AC_LANG_CPLUSPLUS is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1905: AC_CACHE_VAL is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1918: AC_CACHE_CHECK is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/headers.m4:92: AC_CHECK_HEADER is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/headers.m4:92: AC_CHECK_HEADER is expanded from...
+acinclude.m4:76: UA_CXX_SLIST is expanded from...
+configure.ac:102: the top level])
+m4trace:configure.ac:102: -1- _m4_warn([obsolete], [The macro `AC_LANG_RESTORE' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/lang.m4:176: AC_LANG_RESTORE is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1905: AC_CACHE_VAL is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1918: AC_CACHE_CHECK is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/headers.m4:92: AC_CHECK_HEADER is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/headers.m4:92: AC_CHECK_HEADER is expanded from...
+acinclude.m4:76: UA_CXX_SLIST is expanded from...
+configure.ac:102: the top level])
+m4trace:configure.ac:102: -1- m4_pattern_allow([^CXX_SLIST_NAMESPACE$])
+m4trace:configure.ac:103: -1- UA_CXX_STREAMBUF
+m4trace:configure.ac:103: -1- _m4_warn([obsolete], [The macro `AC_LANG_SAVE' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/lang.m4:170: AC_LANG_SAVE is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1905: AC_CACHE_VAL is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1918: AC_CACHE_CHECK is expanded from...
+acinclude.m4:44: UA_CXX_STREAMBUF is expanded from...
+configure.ac:103: the top level])
+m4trace:configure.ac:103: -1- _m4_warn([obsolete], [The macro `AC_LANG_CPLUSPLUS' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/c.m4:105: AC_LANG_CPLUSPLUS is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1905: AC_CACHE_VAL is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1918: AC_CACHE_CHECK is expanded from...
+acinclude.m4:44: UA_CXX_STREAMBUF is expanded from...
+configure.ac:103: the top level])
+m4trace:configure.ac:103: -1- _m4_warn([obsolete], [The macro `AC_LANG_RESTORE' is obsolete.
+You should run autoupdate.], [/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/lang.m4:176: AC_LANG_RESTORE is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/m4sugar/m4sh.m4:523: AS_IF is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1905: AC_CACHE_VAL is expanded from...
+/var/tmp/autoconf/autoconf-15~401/SRC/autoconf/lib/autoconf/general.m4:1918: AC_CACHE_CHECK is expanded from...
+acinclude.m4:44: UA_CXX_STREAMBUF is expanded from...
+configure.ac:103: the top level])
+m4trace:configure.ac:103: -1- m4_pattern_allow([^CXX_OLD_STREAMBUF$])
+m4trace:configure.ac:109: -1- m4_pattern_allow([^INTEL_ARCH$])
+m4trace:configure.ac:112: -1- m4_pattern_allow([^INTEL_ARCH$])
+m4trace:configure.ac:122: -1- m4_pattern_allow([^COMPILER_STRING$])
+m4trace:configure.ac:126: -1- m4_pattern_allow([^COMPILER_STRING$])
+m4trace:configure.ac:129: -1- m4_pattern_allow([^COMPILER_STRING$])
+m4trace:configure.ac:133: -1- m4_pattern_allow([^VERSION$])
+m4trace:configure.ac:134: -1- m4_pattern_allow([^PACKAGE_MONTH$])
+m4trace:configure.ac:135: -1- m4_pattern_allow([^PACKAGE_YEAR$])
+m4trace:configure.ac:136: -1- m4_pattern_allow([^TIGA_VERSION$])
+m4trace:configure.ac:137: -1- m4_pattern_allow([^DBM_VERSION$])
+m4trace:configure.ac:141: -1- m4_pattern_allow([^const$])
+m4trace:configure.ac:142: -1- m4_pattern_allow([^__CHAR_UNSIGNED__$])
+m4trace:configure.ac:150: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:150: -1- m4_pattern_allow([^LTLIBOBJS$])

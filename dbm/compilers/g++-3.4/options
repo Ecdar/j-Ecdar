@@ -1,0 +1,8 @@
+% -Wall
+1 : Debug @ -g -ffloat-store @
+2 : Optimized @ -DNDEBUG -O2 -ffloat-store @ -static --strip-all
+3 : Profiling @ -pg @ -pg
+4 : Mac OS universal binaries @ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc @ -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch ppc -arch i386
+5 : Solaris link flags @ @ -Wl,-Bstatic -lstdc++ -Wl,-Bdynamic
+6 : Athlon @ -march=athlon @
+7 : Pentium Pro @ -march=pentiumpro @
