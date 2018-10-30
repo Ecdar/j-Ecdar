@@ -2,57 +2,91 @@ package models;
 
 public class Location {
 
-  private Guard invariant;
-  private boolean isInitial;
-  private boolean isUrgent;
-  private boolean isUniversal;
-  private boolean isInconsistent;
+		private String name;
+		private Guard invariant;
+		private boolean isInitial;
+		private boolean isUrgent;
+		private boolean isUniversal;
+		private boolean isInconsistent;
+		public Location next;
 
-  public Location(Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
-    this.invariant = invariant;
-    this.isInitial = isInitial;
-    this.isUrgent = isUrgent;
-    this.isUniversal = isUniversal;
-    this.isInconsistent = isInconsistent;
-  }
+		public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
+				this.name = name;
+				this.invariant = invariant;
+				this.isInitial = isInitial;
+				this.isUrgent = isUrgent;
+				this.isUniversal = isUniversal;
+				this.isInconsistent = isInconsistent;
+				this.next = null;
+		}
 
-  public Guard getInvariant() {
-    return invariant;
-  }
+		public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, Location next) {
+				this.name = name;
+				this.invariant = invariant;
+				this.isInitial = isInitial;
+				this.isUrgent = isUrgent;
+				this.isUniversal = isUniversal;
+				this.isInconsistent = isInconsistent;
+				this.next = next;
+		}
 
-  public void setInvariant(Guard invariant) {
-    this.invariant = invariant;
-  }
+		public String getName() { return name; }
 
-  public boolean isInitial() {
-    return isInitial;
-  }
+		public void setName(String name) { this.name = name;}
 
-  public void setInitial(boolean initial) {
-    isInitial = initial;
-  }
+		public Guard getInvariant() {
+				return invariant;
+		}
 
-  public boolean isUrgent() {
-    return isUrgent;
-  }
+		public void setInvariant(Guard invariant) {
+				this.invariant = invariant;
+		}
 
-  public void setUrgent(boolean urgent) {
-    isUrgent = urgent;
-  }
+		public boolean isInitial() {
+				return isInitial;
+		}
 
-  public boolean isUniversal() {
-    return isUniversal;
-  }
+		public void setInitial(boolean initial) {
+				isInitial = initial;
+		}
 
-  public void setUniversal(boolean universal) {
-    isUniversal = universal;
-  }
+		public boolean isUrgent() {
+				return isUrgent;
+		}
 
-  public boolean isInconsistent() {
-    return isInconsistent;
-  }
+		public void setUrgent(boolean urgent) {
+				isUrgent = urgent;
+		}
 
-  public void setInconsistent(boolean inconsistent) {
-    isInconsistent = inconsistent;
-  }
+		public boolean isUniversal() {
+				return isUniversal;
+		}
+
+		public void setUniversal(boolean universal) {
+				isUniversal = universal;
+		}
+
+		public boolean isInconsistent() {
+				return isInconsistent;
+		}
+
+		public void setInconsistent(boolean inconsistent) {
+				isInconsistent = inconsistent;
+		}
+
+		public Location getNext() { return this.next; }
+
+		@Override
+		public String toString() {
+				String str = "Location (" + this.name;
+
+				Location nxt = this.next;
+				while (nxt != null) {
+						str += (", " + next.getName());
+						nxt = nxt.next;
+				}
+
+				str += ")";
+				return str;
+		}
 }

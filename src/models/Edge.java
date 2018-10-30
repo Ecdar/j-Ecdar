@@ -1,68 +1,96 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Edge {
 
-  private Location from;
-  private Location to;
-  private Channel chan;
-  private boolean isInput;
-  private Guard guard;
-  private Update update;
+		private Location from;
+		private Location to;
+		private Channel chan;
+		private boolean isInput;
+		private ArrayList<Guard> guards;
+		private ArrayList<Update> updates;
 
-  public Edge(Location from, Location to, Channel chan, boolean isInput, Guard guard, Update update) {
-    this.from = from;
-    this.to = to;
-    this.chan = chan;
-    this.isInput = isInput;
-    this.guard = guard;
-    this.update = update;
-  }
+		public Edge(Location from, Location to, Channel chan, boolean isInput, Guard guard, Update update) {
+				this.from = from;
+				this.to = to;
+				this.chan = chan;
+				this.isInput = isInput;
+				this.guards = new ArrayList<>(Arrays.asList(guard));
+				this.updates = new ArrayList<>(Arrays.asList(update));
+		}
 
-  public Location getFrom() {
-    return from;
-  }
+		public Edge(Location from, Location to, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
+				this.from = from;
+				this.to = to;
+				this.chan = chan;
+				this.isInput = isInput;
+				this.guards = guards;
+				this.updates = updates;
+		}
 
-  public void setFrom(Location from) {
-    this.from = from;
-  }
+		public Location getFrom() {
+				return from;
+		}
 
-  public Location getTo() {
-    return to;
-  }
+		public void setFrom(Location from) {
+				this.from = from;
+		}
 
-  public void setTo(Location to) {
-    this.to = to;
-  }
+		public Location getTo() {
+				return to;
+		}
 
-  public Channel getChannel() {
-    return chan;
-  }
+		public void setTo(Location to) {
+				this.to = to;
+		}
 
-  public void setChannel(Channel chan) {
-    this.chan = chan;
-  }
+		public Channel getChannel() {
+				return chan;
+		}
 
-  public boolean isInput() {
-    return isInput;
-  }
+		public void setChannel(Channel chan) {
+				this.chan = chan;
+		}
 
-  public void setInput(boolean input) {
-    isInput = input;
-  }
+		public boolean isInput() {
+				return isInput;
+		}
 
-  public Guard getGuard() {
-    return guard;
-  }
+		public void setInput(boolean input) {
+				isInput = input;
+		}
 
-  public void setGuard(Guard guard) {
-    this.guard = guard;
-  }
+		public ArrayList<Guard> getGuards() {
+				return guards;
+		}
 
-  public Update getUpdate() {
-    return update;
-  }
+		public Guard getGuard() { return (guards.size() == 0) ? null : guards.get(0); }
 
-  public void setUpdate(Update update) {
-    this.update = update;
-  }
+		public void setGuards(ArrayList<Guard> guards) {
+				this.guards = guards;
+		}
+
+		public ArrayList<Update> getUpdates() {
+				return updates;
+		}
+
+		public Update getUpdate() { return (updates.size() == 0) ? null : updates.get(0); }
+
+		public void setUpdates(ArrayList<Update> updates) {
+				this.updates = updates;
+		}
+
+		@Override
+		public String toString() {
+				return "Edge{" +
+								"from=" + from +
+								", to=" + to +
+								", chan=" + chan +
+								", isInput=" + isInput +
+								", guards=" + guards +
+								", updates=" + updates +
+								'}';
+		}
 }

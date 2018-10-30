@@ -2,21 +2,55 @@ package models;
 
 public class Clock {
 
-  private int value;
+		private String name;
+		private int value;
 
-  public Clock(int value) {
-    this.value = value;
-  }
+		public Clock(String name, int value) {
+				this.name = name;
+				this.value = value;
+		}
 
-  public Clock() {
-    this.value = 0;
-  }
+		public Clock(String name) {
+				this.name = name;
+				this.value = 0;
+		}
 
-  public int getValue() {
-    return value;
-  }
+		public String getName() {
+				return name;
+		}
 
-  public void setValue(int value) {
-    this.value = value;
-  }
+		public void setName(String name) {
+				this.name = name;
+		}
+
+		public int getValue() {
+				return value;
+		}
+
+		public void setValue(int value) {
+				this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+				if (o == this)
+						return true;
+				if (!(o instanceof Clock))
+						return false;
+				Clock clk = (Clock) o;
+				return clk.getName() == this.name;
+		}
+
+		// When adding a clock to a set, it shouldn't work if it has the same name as a clock that already exists in the set
+		// so the hashCode() method is used to compare them. We override it so 2 different Clock objects with the same
+		// name would have the same hash code
+		@Override
+		public int hashCode() {
+				return 10 * name.hashCode();
+		}
+
+		@Override
+		public String toString() {
+				return "Clock " + name;
+		}
 }
