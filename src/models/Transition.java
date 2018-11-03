@@ -3,7 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Edge {
+public class Transition {
 
 		private Location from;
 		private Location to;
@@ -12,7 +12,7 @@ public class Edge {
 		private ArrayList<Guard> guards;
 		private ArrayList<Update> updates;
 
-		public Edge(Location from, Location to, Channel chan, boolean isInput, Guard guard, Update update) {
+		public Transition(Location from, Location to, Channel chan, boolean isInput, Guard guard, Update update) {
 				this.from = from;
 				this.to = to;
 				this.chan = chan;
@@ -21,7 +21,7 @@ public class Edge {
 				this.updates = new ArrayList<>(Arrays.asList(update));
 		}
 
-		public Edge(Location from, Location to, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
+		public Transition(Location from, Location to, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
 				this.from = from;
 				this.to = to;
 				this.chan = chan;
@@ -84,7 +84,7 @@ public class Edge {
 
 		@Override
 		public String toString() {
-				return "Edge{" +
+				return "Transition{" +
 								"from=" + from +
 								", to=" + to +
 								", chan=" + chan +

@@ -50,36 +50,36 @@ public class Main {
 				Location l3 = new Location("l3", inv2, true, false, false, false);
 
         Guard guard1 = new Guard(y,2, false, true, false, false);
-        Edge e1 = new Edge(l5, l5, tea, false, guard1, null);
+        Transition e1 = new Transition(l5, l5, tea, false, guard1, null);
         Update upd1 = new Update(y, 0);
-        Edge e2 = new Edge(l5, l4, coin, true, null, upd1);
-        Edge e3 = new Edge(l4, l4, coin, true, new ArrayList<Guard>(), new ArrayList<Update>());
-        Edge e4 = new Edge(l4, l5, tea, false, new ArrayList<Guard>(), new ArrayList<Update>());
+        Transition e2 = new Transition(l5, l4, coin, true, null, upd1);
+        Transition e3 = new Transition(l4, l4, coin, true, new ArrayList<Guard>(), new ArrayList<Update>());
+        Transition e4 = new Transition(l4, l5, tea, false, new ArrayList<Guard>(), new ArrayList<Update>());
         Guard guard2 = new Guard(y,4, false, true, false, false);
-        Edge e5 = new Edge(l4, l5, cof, false, guard2, null);
+        Transition e5 = new Transition(l4, l5, cof, false, guard2, null);
 
 				Update upd2 = new Update(z, 0);
-				Edge e6 = new Edge(l0, l1, grant, true, null, upd2);
-				Edge e7 = new Edge(l1, l1, grant, true, new ArrayList<Guard>(), new ArrayList<Update>());
-				Edge e8 = new Edge(l1, l1, pub, true, new ArrayList<Guard>(), new ArrayList<Update>());
-				Edge e9 = new Edge(l1, l2, coin, false, new ArrayList<Guard>(), new ArrayList<Update>());
-				Edge e10 = new Edge(l2, l2, grant, true, new ArrayList<Guard>(), new ArrayList<Update>());
-				Edge e11 = new Edge(l2, l3, pub, true, null, upd2);
-				Edge e12 = new Edge(l3, l3, grant, true, new ArrayList<Guard>(), new ArrayList<Update>());
-				Edge e13 = new Edge(l3, l3, pub, true, new ArrayList<Guard>(), new ArrayList<Update>());
-				Edge e14 = new Edge(l3, l0, patent, false, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e6 = new Transition(l0, l1, grant, true, null, upd2);
+				Transition e7 = new Transition(l1, l1, grant, true, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e8 = new Transition(l1, l1, pub, true, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e9 = new Transition(l1, l2, coin, false, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e10 = new Transition(l2, l2, grant, true, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e11 = new Transition(l2, l3, pub, true, null, upd2);
+				Transition e12 = new Transition(l3, l3, grant, true, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e13 = new Transition(l3, l3, pub, true, new ArrayList<Guard>(), new ArrayList<Update>());
+				Transition e14 = new Transition(l3, l0, patent, false, new ArrayList<Guard>(), new ArrayList<Update>());
 
 
 				ArrayList<Location> locs1 = new ArrayList<>(Arrays.asList(l5, l4));
-        ArrayList<Edge> edges1 = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5));
+        ArrayList<Transition> transitions1 = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5));
         Set<Clock> clks1 = new HashSet<>(Arrays.asList(y));
 
 				ArrayList<Location> locs2 = new ArrayList<>(Arrays.asList(l0, l1, l2, l3));
-				ArrayList<Edge> edges2 = new ArrayList<>(Arrays.asList(e6, e7, e8, e9, e10, e11, e12, e13, e14));
+				ArrayList<Transition> transitions2 = new ArrayList<>(Arrays.asList(e6, e7, e8, e9, e10, e11, e12, e13, e14));
 				Set<Clock> clks2 = new HashSet<>(Arrays.asList(z));
 
-        Component machine = new Component(locs1, edges1, clks1);
-        Component administration = new Component(locs2, edges2, clks2);
+        Component machine = new Component(locs1, transitions1, clks1);
+        Component administration = new Component(locs2, transitions2, clks2);
 
 				Component composed = Composition.compose(machine, administration);
 

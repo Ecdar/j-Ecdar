@@ -7,13 +7,13 @@ import java.util.Set;
 public class Component {
 
 		private ArrayList<Location> locations;
-		private ArrayList<Edge> edges;
+		private ArrayList<Transition> transitions;
 		private Set<Clock> clocks;
 		private Set<Channel> inputAct;
 		private Set<Channel> outputAct;
 		private Location initLoc;
 
-		public Component(ArrayList<Location> locations, ArrayList<Edge> edges, Set<Clock> clocks) {
+		public Component(ArrayList<Location> locations, ArrayList<Transition> transitions, Set<Clock> clocks) {
 				this.locations = locations;
 				for (Location location : locations) {
 						if (location.isInitial()) {
@@ -30,7 +30,7 @@ public class Component {
 				}
 				this.inputAct = new HashSet<>();
 				this.outputAct = new HashSet<>();
-				setEdges(edges);
+				setTransitions(transitions);
 				this.clocks = clocks;
 		}
 
@@ -42,15 +42,15 @@ public class Component {
 				this.locations = locations;
 		}
 
-		public ArrayList<Edge> getEdges() {
-				return edges;
+		public ArrayList<Transition> getTransitions() {
+				return transitions;
 		}
 
-		public void setEdges(ArrayList<Edge> edges) {
-				this.edges = edges;
-				for (Edge edge : edges) {
-						Channel action = edge.getChannel();
-						if (edge.isInput()) {
+		public void setTransitions(ArrayList<Transition> transitions) {
+				this.transitions = transitions;
+				for (Transition transition : transitions) {
+						Channel action = transition.getChannel();
+						if (transition.isInput()) {
 								inputAct.add(action);
 						} else {
 								outputAct.add(action);

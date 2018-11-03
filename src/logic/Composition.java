@@ -11,14 +11,14 @@ public class Composition {
     public static Component compose(Component m1, Component m2) {
     		ArrayList<Location> locs1 = m1.getLocations();
 				ArrayList<Location> locs2 = m2.getLocations();
-				ArrayList<Edge> edges1 = m1.getEdges();
-				ArrayList<Edge> edges2 = m2.getEdges();
+				ArrayList<Transition> transitions1 = m1.getTransitions();
+				ArrayList<Transition> transitions2 = m2.getTransitions();
 				Set<Channel> actions1 = m1.getActions();
 				Set<Channel> actions2 = m2.getActions();
 				Set<Clock> clks1 = m1.getClocks();
 				Set<Clock> clks2 = m2.getClocks();
 				ArrayList<Location> locations = calculateLocations(locs1, locs2);
-    		return new Component(locations, calculateEdges(edges1, edges2, actions1, actions2, locs1, locs2, locations),
+    		return new Component(locations, calculateTransitions(transitions1, transitions2, actions1, actions2, locs1, locs2, locations),
 								calculateClocks(clks1, clks2));
 		}
 
@@ -36,10 +36,10 @@ public class Composition {
 				return locs;
 		}
 
-		private static ArrayList<Edge> calculateEdges(ArrayList<Edge> edges1, ArrayList<Edge> edges2, Set<Channel> actions1,
-																								 Set<Channel> actions2, ArrayList<Location> locs1,
-																								 ArrayList<Location> locs2, ArrayList<Location> locations) {
-				ArrayList<Edge> edges = new ArrayList<>();
+		private static ArrayList<Transition> calculateTransitions(ArrayList<Transition> transitions1, ArrayList<Transition> transitions2, Set<Channel> actions1,
+																												Set<Channel> actions2, ArrayList<Location> locs1,
+																												ArrayList<Location> locs2, ArrayList<Location> locations) {
+				ArrayList<Transition> transitions = new ArrayList<>();
 
 				Set<Channel> actJust1 = new HashSet<>(actions1);
 				actJust1.removeAll(actions2);
@@ -50,44 +50,44 @@ public class Composition {
 				Set<Channel> intersection = new HashSet<>(actions1);
 				intersection.retainAll(actions2);
 
-				for (Edge edge1 : edges1) {
-						if (actJust1.contains(edge1.getChannel())) {
+				for (Transition transition1 : transitions1) {
+						if (actJust1.contains(transition1.getChannel())) {
 								for (Location loc2 : locs2) {
-										Location l1 = findLocation(edge1.getFrom(), loc2, locations);
-										Location l2 = findLocation(edge1.getTo(), loc2, locations);
-										Edge newEdge = new Edge(l1, l2, edge1.getChannel(), edge1.isInput(), edge1.getGuard(), edge1.getUpdate());
-										edges.add(newEdge);
+										Location l1 = findLocation(transition1.getFrom(), loc2, locations);
+										Location l2 = findLocation(transition1.getTo(), loc2, locations);
+										Transition newTransition = new Transition(l1, l2, transition1.getChannel(), transition1.isInput(), transition1.getGuard(), transition1.getUpdate());
+										transitions.add(newTransition);
 								}
 						}
 
-						if (intersection.contains(edge1.getChannel())) {
-								for (Edge edge2 : edges2) {
-										if (edge1.getChannel() == edge2.getChannel()) {
-												Location l1 = findLocation(edge1.getFrom(), edge2.getFrom(), locations);
-												Location l2 = findLocation(edge1.getTo(), edge2.getTo(), locations);
-												ArrayList<Guard> guards = new ArrayList<>(edge1.getGuards());
-												guards.addAll(edge2.getGuards());
-												ArrayList<Update> updates = new ArrayList<>(edge1.getUpdates());
-												updates.addAll(edge2.getUpdates());
-												Edge newEdge = new Edge(l1, l2, edge1.getChannel(), false, guards, updates);
-												edges.add(newEdge);
+						if (intersection.contains(transition1.getChannel())) {
+								for (Transition transition2 : transitions2) {
+										if (transition1.getChannel() == transition2.getChannel()) {
+												Location l1 = findLocation(transition1.getFrom(), transition2.getFrom(), locations);
+												Location l2 = findLocation(transition1.getTo(), transition2.getTo(), locations);
+												ArrayList<Guard> guards = new ArrayList<>(transition1.getGuards());
+												guards.addAll(transition2.getGuards());
+												ArrayList<Update> updates = new ArrayList<>(transition1.getUpdates());
+												updates.addAll(transition2.getUpdates());
+												Transition newTransition = new Transition(l1, l2, transition1.getChannel(), false, guards, updates);
+												transitions.add(newTransition);
 										}
 								}
 						}
 				}
 
-				for (Edge edge2 : edges2) {
-						if (actJust2.contains(edge2.getChannel())) {
+				for (Transition transition2 : transitions2) {
+						if (actJust2.contains(transition2.getChannel())) {
 								for (Location loc1 : locs1) {
-										Location l1 = findLocation(loc1, edge2.getFrom(), locations);
-										Location l2 = findLocation(loc1, edge2.getTo(), locations);
-										Edge newEdge = new Edge(l1, l2, edge2.getChannel(), edge2.isInput(), edge2.getGuard(), edge2.getUpdate());
-										edges.add(newEdge);
+										Location l1 = findLocation(loc1, transition2.getFrom(), locations);
+										Location l2 = findLocation(loc1, transition2.getTo(), locations);
+										Transition newTransition = new Transition(l1, l2, transition2.getChannel(), transition2.isInput(), transition2.getGuard(), transition2.getUpdate());
+										transitions.add(newTransition);
 								}
 						}
 				}
 
-				return edges;
+				return transitions;
 		}
 
     private static Set<Clock> calculateClocks(Set<Clock> clk1, Set<Clock> clk2) throws IllegalArgumentException {
