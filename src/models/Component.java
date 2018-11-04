@@ -17,15 +17,8 @@ public class Component {
 				this.locations = locations;
 				for (Location location : locations) {
 						if (location.isInitial()) {
-								if (location.next == null) {
-										initLoc = location;
-										break;
-								} else {
-										if (location.next.isInitial()) {
-												initLoc = location;
-												break;
-										}
-								}
+								initLoc = location;
+								break;
 						}
 				}
 				this.inputAct = new HashSet<>();

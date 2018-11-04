@@ -30,3 +30,5 @@ Generated library files
 *.dylib
 *.so
 *.dll
+
+.DS_Store

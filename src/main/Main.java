@@ -1,6 +1,5 @@
 package main;
 
-import logic.Composition;
 import models.*;
 import lib.*;
 import java.io.File;
@@ -19,13 +18,9 @@ public class Main {
         File lib = new File(fileName);
         System.load(lib.getAbsolutePath());
 
-        int res1 = DBMLib.boundbool2raw(5, true);
-        int res2 = DBMLib.boundbool2raw(5, false);
-        int res3 = DBMLib.raw2bound(10);
-
-				System.out.println("boundbool2raw: " + res1);
-        System.out.println("boundbool2raw: " + res2);
-        System.out.println("raw2bound: " + res3);
+				int[] dbm = new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        int[] newDbm = DBMLib.dbm_init(dbm, 3);
+        for (int x : newDbm) System.out.println(x);
     }
 
     private static void compositionTest() {
@@ -80,8 +75,6 @@ public class Main {
 
         Component machine = new Component(locs1, transitions1, clks1);
         Component administration = new Component(locs2, transitions2, clks2);
-
-				Component composed = Composition.compose(machine, administration);
 
 		}
 }

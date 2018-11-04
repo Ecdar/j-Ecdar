@@ -8,7 +8,6 @@ public class Location {
 		private boolean isUrgent;
 		private boolean isUniversal;
 		private boolean isInconsistent;
-		public Location next;
 
 		public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
 				this.name = name;
@@ -17,17 +16,6 @@ public class Location {
 				this.isUrgent = isUrgent;
 				this.isUniversal = isUniversal;
 				this.isInconsistent = isInconsistent;
-				this.next = null;
-		}
-
-		public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, Location next) {
-				this.name = name;
-				this.invariant = invariant;
-				this.isInitial = isInitial;
-				this.isUrgent = isUrgent;
-				this.isUniversal = isUniversal;
-				this.isInconsistent = isInconsistent;
-				this.next = next;
 		}
 
 		public String getName() { return name; }
@@ -74,19 +62,8 @@ public class Location {
 				isInconsistent = inconsistent;
 		}
 
-		public Location getNext() { return this.next; }
-
 		@Override
 		public String toString() {
-				String str = "Location (" + this.name;
-
-				Location nxt = this.next;
-				while (nxt != null) {
-						str += (", " + next.getName());
-						nxt = nxt.next;
-				}
-
-				str += ")";
-				return str;
+				return "Location " + this.name;
 		}
 }

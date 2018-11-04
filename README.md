@@ -3,7 +3,8 @@
 You can read about calling C++ code from Java here: https://www.ibm.com/developerworks/java/tutorials/j-jni/j-jni.html
 
 How to run:
-1. Build the library. You have to be in the src folder. Depends on OS, for Mac it's something like "gcc -I"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers" lib_DBMLib.cpp -o libDBM.dylib"
+1. Build the library. You have to be in the src folder. Depends on OS, for Mac it's something like "g++ -I"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers" lib_DBMLib.cpp ../dbm/libs/*.a -o libDBM.dylib" (the .a files are static libraries generated from dbm)
+
 2. Run from IntelliJ.
 
 

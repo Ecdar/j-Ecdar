@@ -23,6 +23,30 @@ JNIEXPORT jint JNICALL Java_lib_DBMLib_boundbool2raw
 JNIEXPORT jint JNICALL Java_lib_DBMLib_raw2bound
   (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    constraint
+ * Signature: (IIIZ)Llib/Constraint;
+ */
+JNIEXPORT jobject JNICALL Java_lib_DBMLib_constraint
+  (JNIEnv *, jclass, jint, jint, jint, jboolean);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_init
+ * Signature: ([II)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1init
+  (JNIEnv *, jclass, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_zero
+ * Signature: ([II)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero
+  (JNIEnv *, jclass, jintArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

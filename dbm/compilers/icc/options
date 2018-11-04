@@ -1,8 +1,0 @@
-% -w2 -wd188,279,310,444,869,981,1361 -DNMONITOR
-1 : Debug @ -g -ffloat-store @
-2 : Optimized inter-procedure calls @ -DNDEBUG -O2 -ffloat-store -tpp7 -ip -ipo -ipo_obj -rcd -unroll0 -xK @ -static
-3 : Optimized @ -DNDEBUG -O2 -ffloat-store -tpp7 -ip -rcd -unroll0 -xK @ -static
-4 : Auto-parallelization @ -parallel @
-5 : Loop unrolling @ -unroll2 @
-6 : Profile guided optimization - instrumentation @ -prof_genx -prof_dir /tmp/icc-prof @
-7 : Profile guided optimization - feedback @ -prof_use -prof_dir /tmp/icc-prof @
