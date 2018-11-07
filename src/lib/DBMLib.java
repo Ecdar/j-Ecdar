@@ -8,4 +8,9 @@ public class DBMLib {
     public static native Constraint constraint(int i, int j, int bound, boolean isStrict);
     public static native int[] dbm_init(int[] dbm, int dim);
     public static native int[] dbm_zero(int[] dbm, int dim);
+		public static native int[] dbm_constrain1(int[] dbm, int dim, int i, int j, int constraint, boolean strict);
+		public static native int[] dbm_up(int[] dbm, int dim);
+		public static native boolean dbm_isSubsetEq(int[] dbm1, int[] dbm2, int dim);
+		public static native int[] dbm_updateValue(int[] dbm, int dim, int x, int value);
+		public static native boolean dbm_isValid(int[] dbm, int dim);
 }

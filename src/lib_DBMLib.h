@@ -47,6 +47,46 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1init
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero
   (JNIEnv *, jclass, jintArray, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_constrain1
+ * Signature: ([IIIIIZ)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1
+  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint, jboolean);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_up
+ * Signature: ([II)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1up
+  (JNIEnv *, jclass, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_isSubsetEq
+ * Signature: ([I[II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isSubsetEq
+  (JNIEnv *, jclass, jintArray, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_updateValue
+ * Signature: ([IIII)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue
+  (JNIEnv *, jclass, jintArray, jint, jint, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_isValid
+ * Signature: ([II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isValid
+  (JNIEnv *, jclass, jintArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

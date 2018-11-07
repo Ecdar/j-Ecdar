@@ -39,6 +39,15 @@ public class Component {
 				return transitions;
 		}
 
+		public ArrayList<Transition> getTransitionsFromLocation(Location loc) {
+				ArrayList<Transition> trans = new ArrayList<>();
+
+				trans.addAll(transitions);
+				trans.removeIf(n -> n.getFrom() != loc);
+
+				return trans;
+		}
+
 		public void setTransitions(ArrayList<Transition> transitions) {
 				this.transitions = transitions;
 				for (Transition transition : transitions) {

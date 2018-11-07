@@ -59,4 +59,49 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero(JNIEnv *env, jclass cls, j
     return helper_functions::cToJint(env, converted, len);
 }
 
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
+    jint j, jint bound, jboolean strict) {
+    jsize len = env->GetArrayLength(dbm);
+    auto converted = helper_functions::jintToC(env, dbm, len);
+
+    //raw_t constraint = dbm_boundbool2raw(bound, strict);
+    dbm_constrain1(converted, dim, i, j, bound);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1up(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_up(converted, dim);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isSubsetEq(JNIEnv *env, jclass cls, jintArray dbm1, jintArray dbm2, jint dim) {
+    jsize len = env->GetArrayLength(dbm2);
+
+    auto converted1 = helper_functions::jintToC(env, dbm1, len);
+    auto converted2 = helper_functions::jintToC(env, dbm2, len);
+
+    return dbm_isSubsetEq(converted1, converted2, dim);
+}
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint x, jint value) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_updateValue(converted, dim, x, value);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isValid(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    return dbm_isValid(converted, dim);
+}
+
 int main() { return 0; }

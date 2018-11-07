@@ -17,8 +17,10 @@ public class Transition {
 				this.to = to;
 				this.chan = chan;
 				this.isInput = isInput;
-				this.guards = new ArrayList<>(Arrays.asList(guard));
-				this.updates = new ArrayList<>(Arrays.asList(update));
+				this.guards = new ArrayList<>();
+				if (guard != null) guards.add(guard);
+				this.updates = new ArrayList<>();
+				if (update != null) updates.add(update);
 		}
 
 		public Transition(Location from, Location to, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {

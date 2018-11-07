@@ -33,12 +33,10 @@ public class Clock {
 
 		@Override
 		public boolean equals(Object o) {
-				if (o == this)
-						return true;
-				if (!(o instanceof Clock))
-						return false;
-				Clock clk = (Clock) o;
-				return clk.getName() == this.name;
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				Clock clock = (Clock) o;
+				return name == clock.getName();
 		}
 
 		// When adding a clock to a set, it shouldn't work if it has the same name as a clock that already exists in the set

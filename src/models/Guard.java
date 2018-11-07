@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Objects;
+
 public class Guard {
 
 		private Clock clock;
@@ -64,5 +66,41 @@ public class Guard {
 
 		public void setLte(boolean lte) {
 				this.lte = lte;
+		}
+
+		public boolean isStrict() { return (gte || lte); }
+
+		public int lowerBound() {
+				if (!(gt || gte)) {
+					return 0;
+				} else {
+						return value;
+				}
+		}
+
+		public int upperBound() {
+				if (!(lt || lte)) {
+						return Integer.MAX_VALUE;
+				} else {
+						return value;
+				}
+		}
+
+		@Override
+		public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				Guard guard = (Guard) o;
+				return value == guard.value &&
+								gt == guard.gt &&
+								gte == guard.gte &&
+								lt == guard.lt &&
+								lte == guard.lte &&
+								clock.getName() == guard.clock.getName();
+		}
+
+		@Override
+		public int hashCode() {
+				return Objects.hash(clock, value, gt, gte, lt, lte);
 		}
 }

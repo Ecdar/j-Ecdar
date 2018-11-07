@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Objects;
+
 public class Location {
 
 		private String name;
@@ -65,5 +67,23 @@ public class Location {
 		@Override
 		public String toString() {
 				return "Location " + this.name;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+				if (this == o) return true;
+				if (o == null || getClass() != o.getClass()) return false;
+				Location location = (Location) o;
+				return isInitial == location.isInitial &&
+								isUrgent == location.isUrgent &&
+								isUniversal == location.isUniversal &&
+								isInconsistent == location.isInconsistent &&
+								name == location.name &&
+								invariant.equals(location.invariant);
+		}
+
+		@Override
+		public int hashCode() {
+				return Objects.hash(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent);
 		}
 }

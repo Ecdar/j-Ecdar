@@ -1,8 +1,7 @@
 package main;
 
+import logic.Composition;
 import models.*;
-import lib.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,17 +10,8 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) {
-
-        compositionTest();
-
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
-
-				int[] dbm = new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        int[] newDbm = DBMLib.dbm_init(dbm, 3);
-        for (int x : newDbm) System.out.println(x);
-    }
+				compositionTest();
+		}
 
     private static void compositionTest() {
         Clock y = new Clock("y");
@@ -75,6 +65,7 @@ public class Main {
 
         Component machine = new Component(locs1, transitions1, clks1);
         Component administration = new Component(locs2, transitions2, clks2);
-
+        ArrayList<Component> machines = new ArrayList<>(Arrays.asList(administration, machine));
+				Composition.compose(machines);
 		}
 }
