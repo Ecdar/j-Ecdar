@@ -18,7 +18,7 @@ public class Composition {
 				Set<Clock> clks1 = m1.getClocks();
 				Set<Clock> clks2 = m2.getClocks();
 				ArrayList<Location> locations = calculateLocations(locs1, locs2);
-    		return new Component(locations, calculateTransitions(transitions1, transitions2, actions1, actions2, locs1, locs2, locations),
+    		return new Component("",locations, calculateTransitions(transitions1, transitions2, actions1, actions2, locs1, locs2, locations),
 								calculateClocks(clks1, clks2));
 		}
 

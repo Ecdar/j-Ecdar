@@ -78,8 +78,8 @@ public class Main {
 				ArrayList<Transition> transitions2 = new ArrayList<>(Arrays.asList(e6, e7, e8, e9, e10, e11, e12, e13, e14));
 				Set<Clock> clks2 = new HashSet<>(Arrays.asList(z));
 
-        Component machine = new Component(locs1, transitions1, clks1);
-        Component administration = new Component(locs2, transitions2, clks2);
+        Component machine = new Component("",locs1, transitions1, clks1);
+        Component administration = new Component("",locs2, transitions2, clks2);
 
 				Component composed = Composition.compose(machine, administration);
 

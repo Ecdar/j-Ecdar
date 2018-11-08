@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Component {
-
+		private String name;
 		private ArrayList<Location> locations;
 		private ArrayList<Transition> transitions;
 		private Set<Clock> clocks;
@@ -13,7 +13,8 @@ public class Component {
 		private Set<Channel> outputAct;
 		private Location initLoc;
 
-		public Component(ArrayList<Location> locations, ArrayList<Transition> transitions, Set<Clock> clocks) {
+		public Component(String name, ArrayList<Location> locations, ArrayList<Transition> transitions, Set<Clock> clocks) {
+				this.name = name;
 				this.locations = locations;
 				for (Location location : locations) {
 						if (location.isInitial()) {
@@ -85,5 +86,8 @@ public class Component {
 				actions.addAll(this.outputAct);
 
 				return actions;
+		}
+		public String getName(){
+			return name;
 		}
 }
