@@ -22,16 +22,32 @@ public class Parser {
     public static void main(String[] args) {
         ArrayList<String> locations = new ArrayList<>();
 
-        locations.add("/Users/Widok/Documents/GlobalDeclarations.json");
+        /*locations.add("/Users/Widok/Documents/GlobalDeclarations.json");
         locations.add("/Users/Widok/Documents/Imp.json");
         locations.add("/Users/Widok/Documents/G.json");
-        locations.add("/Users/Widok/Documents/A_Good.json");
+        locations.add("/Users/Widok/Documents/A_Good.json");*/
+
+        locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/GlobalDeclarations.json");
+        locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine.json");
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Administration.json");
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Researcher.json");
 
         objectList = parseFiles(locations);
         ArrayList<Component> components = distrubuteObjects(objectList);
-        printStuff(components);
-
+        //printStuff(components);
     }
+
+    public static ArrayList<Component> parse() {
+				ArrayList<String> locations = new ArrayList<>();
+
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/GlobalDeclarations.json");
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Administration.json");
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine.json");
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Researcher.json");
+
+				objectList = parseFiles(locations);
+				return distrubuteObjects(objectList);
+		}
 
     private static void printStuff(ArrayList<Component> components) {
     		for (Component component : components)  {
@@ -128,13 +144,25 @@ public class Parser {
         ArrayList<Location> returnLocList = new ArrayList<>();
         for (Object obj : locationList) {
             JSONObject jsonObject = (JSONObject) obj;
-            boolean isInitial = "INITIAL".equals(jsonObject.get("type").toString());
-            boolean isUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
+						boolean isInitial, isUniversal, isInconsistent;
+						isInitial = isUniversal = isInconsistent = false;
+            switch (jsonObject.get("type").toString()) {
+								case "INITIAL":
+										isInitial = true;
+										break;
+								case "UNIVERSAL":
+										isUniversal = true;
+										break;
+								case "INCONSISTENT":
+										isInconsistent = true;
+										break;
+						}
+            boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
 						Guard invariant = ("".equals(jsonObject.get("invariant").toString()) ? null :
 										addGuards(jsonObject.get("invariant").toString()).get(0));
-           	Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, isUrgent,
-										false, false);
+           	Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
+										isUniversal, isInconsistent);
             returnLocList.add(loc);
         }
         return returnLocList;
@@ -206,8 +234,10 @@ public class Parser {
                     break;
                 }
             }
-            Transition transition = new Transition(sourceLocation, targetLocation, chan, isInput, guards, updates);
-            transitions.add(transition);
+            if (chan != null) {
+								Transition transition = new Transition(sourceLocation, targetLocation, chan, isInput, guards, updates);
+								transitions.add(transition);
+						}
         }
         return transitions;
     }
@@ -217,7 +247,9 @@ public class Parser {
         String[] listOfInv = update.split(";");
         for (String str : listOfInv) {
             String[] s = str.split("=");
-            Update upd = new Update(findClock(s[0]), Integer.parseInt(s[1]));
+            for (int i = 0; i < s.length; i++)
+            		s[i] = s[i].replaceAll(" ", "");
+						Update upd = new Update(findClock(s[0]), Integer.parseInt(s[1]));
             updates.add(upd);
         }
         return updates;

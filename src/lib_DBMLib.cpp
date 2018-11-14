@@ -10,14 +10,18 @@ namespace helper_functions
         raw_t *t = new raw_t[len];
         jint *arr = env->GetIntArrayElements(dbm, 0);
         for (int i = 0; i < len; i++)
-            t[i] = (raw_t) arr[i];
+            t[i] = dbm_boundbool2raw((raw_t) arr[i], true);
         return t;
     }
 
     jintArray& cToJint(JNIEnv *env, raw_t *t, jsize len) {
         // convert updated array to jintArray
         jintArray newT = env->NewIntArray(len);
-        env->SetIntArrayRegion(newT, 0, len, t);
+        int *arr = new int[len];
+        for (int i = 0; i < len; i++) {
+            arr[i] = dbm_raw2bound(t[i]);
+        }
+        env->SetIntArrayRegion(newT, 0, len, arr);
         return newT;
     }
 }
@@ -64,8 +68,8 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass 
     jsize len = env->GetArrayLength(dbm);
     auto converted = helper_functions::jintToC(env, dbm, len);
 
-    //raw_t constraint = dbm_boundbool2raw(bound, strict);
-    dbm_constrain1(converted, dim, i, j, bound);
+    raw_t constraint = dbm_boundbool2raw(bound, strict);
+    dbm_constrain1(converted, dim, i, j, constraint);
 
     return helper_functions::cToJint(env, converted, len);
 }

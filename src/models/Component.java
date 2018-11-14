@@ -53,6 +53,14 @@ public class Component {
 				return trans;
 		}
 
+		public ArrayList<Transition> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
+				ArrayList<Transition> trans = getTransitionsFromLocation(loc);
+
+				trans.removeIf(n -> !n.getChannel().getName().equals(signal.getName()));
+
+				return trans;
+		}
+
 		public void setTransitions(ArrayList<Transition> transitions) {
 				this.transitions = transitions;
 				for (Transition transition : transitions) {

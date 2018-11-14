@@ -2,23 +2,81 @@ package logic;
 
 import lib.DBMLib;
 import models.*;
+import parser.Parser;
 
 import java.io.File;
 import java.util.*;
 
 public class Composition {
+		private ArrayList<Component> machines;
+		private ArrayList<Clock> clocks;
+		private Set<Channel> inputsOutside, outputsOutside, syncs;
+		private int dbmSize;
 
-		public static void compose(ArrayList<Component> machines) {
+		public Composition(ArrayList<Component> machines) {
+				this.machines = machines;
+				this.clocks = getClocks();
+				this.dbmSize = clocks.size() + 1;
+				inputsOutside = new HashSet<>();
+				outputsOutside = new HashSet<>();
+				syncs = new HashSet<>();
+
+				for (int i = 0; i < machines.size(); i++) {
+						Set<Channel> inputsOfI, outputsOfI, sync, outputsOfOthers, inputsOfOthers;
+						inputsOfI = new HashSet<>();
+						outputsOfI = new HashSet<>();
+						sync = new HashSet<>();
+						outputsOfOthers = new HashSet<>();
+						inputsOfOthers  = new HashSet<>();
+						inputsOfI.addAll(machines.get(i).getInputAct());
+						outputsOfI.addAll(machines.get(i).getOutputAct());
+						sync.addAll(machines.get(i).getOutputAct());
+
+						for (int j = 0; j < machines.size(); j++) {
+								if (i != j) {
+										// check if output actions overlap
+										Set<Channel> diff = new HashSet<>();
+										diff.addAll(machines.get(i).getOutputAct());
+										diff.retainAll(machines.get(j).getOutputAct());
+										if (!diff.isEmpty()) {
+												throw new IllegalArgumentException("machines cannot be composed");
+										}
+
+										outputsOfOthers.addAll(machines.get(j).getOutputAct());
+
+										inputsOfOthers.addAll(machines.get(j).getInputAct());
+
+										Set<Channel> syncCopy = new HashSet<>();
+										syncCopy.addAll(sync);
+										syncCopy.retainAll(machines.get(j).getInputAct());
+										syncs.addAll(syncCopy);
+								}
+						}
+
+						// set difference
+						inputsOfI.removeAll(outputsOfOthers);
+						outputsOfI.removeAll(inputsOfOthers);
+
+						inputsOutside.addAll(inputsOfI);
+						outputsOutside.addAll(outputsOfI);
+				}
+
+				// load DBM library
+				String fileName = "src/" + System.mapLibraryName("DBM");
+				File lib = new File(fileName);
+				System.load(lib.getAbsolutePath());
+		}
+
+		public void compose() {
 				// load library
 				String fileName = "src/" + System.mapLibraryName("DBM");
 				File lib = new File(fileName);
 				System.load(lib.getAbsolutePath());
 
-				State initialState = computeInitial(machines);
+				State initialState = computeInitial();
 
 				ArrayList<State> passed = new ArrayList<>();
 				Deque<State> waiting = new ArrayDeque<>();
-				ArrayList<Clock> clocks = getClocks(machines);
 				ArrayList<StateTransition> stateTransitions = new ArrayList<>();
 				waiting.push(initialState);
 
@@ -64,7 +122,7 @@ public class Composition {
 						// delay
 						int[] dbm = delay(state.getZone());
 						// apply invariants
-						dbm = applyInvariantsOrGuards(dbm, clocks, getInvariants(state.getLocations()));
+						dbm = applyInvariantsOrGuards(dbm, getInvariants(state.getLocations()));
 						state.setZone(dbm);
 
 						if (!passedContainsState(passed, state)) {
@@ -84,9 +142,9 @@ public class Composition {
 														ArrayList<Guard> guards = transition.getGuards();
 														ArrayList<Update> updates = transition.getUpdates();
 														// apply guards
-														dbm = applyInvariantsOrGuards(dbm, clocks, guards);
+														dbm = applyInvariantsOrGuards(dbm, guards);
 														// apply resets
-														dbm = applyResets(dbm, clocks, updates);
+														dbm = applyResets(dbm, updates);
 														State newState = new State(newLocations, dbm);
 														if (!waiting.contains(newState) || !passedContainsState(passed, newState)) {
 																waiting.push(newState);
@@ -119,9 +177,9 @@ public class Composition {
 																				updates.addAll(transitionJ.getUpdates());
 
 																				// apply guards
-																				dbm = applyInvariantsOrGuards(dbm, clocks, guards);
+																				dbm = applyInvariantsOrGuards(dbm, guards);
 																				// apply resets
-																				dbm = applyResets(dbm, clocks, updates);
+																				dbm = applyResets(dbm, updates);
 																				State newState = new State(newLocations, dbm);
 																				if (!waiting.contains(newState) || !passedContainsState(passed, newState)) {
 																						waiting.push(newState);
@@ -139,25 +197,93 @@ public class Composition {
 				}
 		}
 
-		private static State computeInitial(ArrayList<Component> machines) {
+		public ArrayList<State> getNextStates(State state, Channel channel) {
+				ArrayList<State> states = new ArrayList<>();
+				ArrayList<Location> locations = state.getLocations();
+
+				for (int i = 0; i < machines.size(); i++) {
+						ArrayList<Transition> transitions = machines.get(i).getTransitionsFromLocationAndSignal(state.getLocations().get(i), channel);
+
+						for (Transition transition : transitions) {
+								if (inputsOutside.contains(channel) || outputsOutside.contains(channel)) {
+										ArrayList<Location> newLocations = new ArrayList<>();
+										for (int j = 0; j < machines.size(); j++) {
+												if (i != j) {
+														newLocations.add(locations.get(j));
+												} else {
+														newLocations.add(transition.getTo());
+												}
+										}
+										int[] dbm = state.getZone();
+										// apply guards
+										if (!transition.getGuards().isEmpty()) dbm = applyInvariantsOrGuards(dbm, transition.getGuards());
+										// apply resets
+										if (!transition.getUpdates().isEmpty()) dbm = applyResets(dbm, transition.getUpdates());
+										// delay
+										dbm = delay(dbm);
+										// apply invariants
+										if (!getInvariants(newLocations).isEmpty()) dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
+
+										// construct new state and add it to list
+										State newState = new State(newLocations, dbm);
+										states.add(newState);
+								} else if (syncs.contains(channel)) {
+										if (machines.get(i).getOutputAct().contains(channel)) {
+												for (int j = 0; j < machines.size(); j++) {
+														if (machines.get(j).getInputAct().contains(channel)) {
+																ArrayList<Transition> transitionsFromJ = machines.get(j).getTransitionsFromLocationAndSignal(locations.get(j), channel);
+																for (Transition t : transitionsFromJ) {
+																		ArrayList<Location> newLocations = new ArrayList<>();
+																		newLocations.addAll(locations);
+																		newLocations.set(i, transition.getTo());
+																		newLocations.set(j, t.getTo());
+																		int[] dbm = state.getZone();
+
+																		ArrayList<Guard> guards = new ArrayList<>();
+																		ArrayList<Update> updates = new ArrayList<>();
+																		guards.addAll(transition.getGuards());
+																		updates.addAll(transition.getUpdates());
+																		guards.addAll(t.getGuards());
+																		updates.addAll(t.getUpdates());
+
+																		// apply guards
+																		if (!guards.isEmpty()) dbm = applyInvariantsOrGuards(dbm, guards);
+																		// apply resets
+																		if (!updates.isEmpty()) dbm = applyResets(dbm, updates);
+																		// delay
+																		dbm = delay(dbm);
+																		// apply invariants
+																		if (!getInvariants(newLocations).isEmpty()) dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
+
+																		State newState = new State(newLocations, dbm);
+																		states.add(newState);
+																}
+														}
+												}
+										}
+								}
+						}
+				}
+
+				return states;
+		}
+
+		public State computeInitial() {
 				ArrayList<Location> initialLocations = new ArrayList<>();
-				ArrayList<Clock> allClocks = new ArrayList<>();
-				ArrayList<Guard> invariants = new ArrayList<>();
+
 				for (Component machine : machines) {
 						Location init = machine.getInitLoc();
 						initialLocations.add(init);
-						Set<Clock> clocks = machine.getClocks();
-						for (Clock clock : clocks) {
-								clock.setValue(0);
-								allClocks.add(clock);
-						}
-						if (init.getInvariant() != null) invariants.add(init.getInvariant());
 				}
-				int[] zone = initializeDBM(allClocks);
+
+				int[] zone = initializeDBM();
+				zone = delay(zone);
+				zone = applyInvariantsOrGuards(zone, getInvariants(initialLocations));
+
 				return new State(initialLocations, zone);
 		}
 
-		private static boolean passedContainsState(ArrayList<State> passed, State state) {
+		private boolean passedContainsState(ArrayList<State> passed, State state) {
 				// keep only states that have the same locations
 				ArrayList<State> passedCopy = new ArrayList<>();
 				passedCopy.addAll(passed);
@@ -173,7 +299,7 @@ public class Composition {
 				return false;
 		}
 
-		private static boolean stateTransitionsContainsTransition(ArrayList<StateTransition> transitions, StateTransition transition) {
+		private boolean stateTransitionsContainsTransition(ArrayList<StateTransition> transitions, StateTransition transition) {
 				for (StateTransition stateTransition : transitions) {
 						if (stateTransition.equals(transition))
 								return true;
@@ -181,18 +307,17 @@ public class Composition {
 				return false;
 		}
 
-		private static ArrayList<Clock> getClocks(ArrayList<Component> components) {
+		public ArrayList<Clock> getClocks() {
 				ArrayList<Clock> allClocks = new ArrayList<>();
 
-				for (Component component : components) {
-						Set<Clock> clocks = component.getClocks();
-						allClocks.addAll(clocks);
+				for (Component component : machines) {
+						allClocks.addAll(component.getClocks());
 				}
 
 				return allClocks;
 		}
 
-		private static ArrayList<Guard> getInvariants(ArrayList<Location> locations) {
+		private ArrayList<Guard> getInvariants(ArrayList<Location> locations) {
 				ArrayList<Guard> invariants = new ArrayList<>();
 
 				for (Location location : locations) {
@@ -203,59 +328,66 @@ public class Composition {
 				return invariants;
 		}
 
-		private static int[] initializeDBM(ArrayList<Clock> clocks) {
+		private int[] initializeDBM() {
 				// we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
 				// clocks x1 to xn are clocks derived from our components, while x0 is a reference clock needed by the library
-				int size = clocks.size() + 1;
 				// initially dbm is an array of 0's, which is what we need
-				return new int[size*size];
+				return new int[dbmSize*dbmSize];
 		}
 
-		private static int[] delay(int[] dbm) {
-				return DBMLib.dbm_up(dbm, (int) Math.sqrt(dbm.length));
+		private int[] delay(int[] dbm) {
+				return DBMLib.dbm_up(dbm, dbmSize);
 		}
 
-		private static int[] applyInvariantsOrGuards(int[] dbm, ArrayList<Clock> clocks, ArrayList<Guard> guards) {
-				int size = (int) Math.sqrt(dbm.length);
-
+		private int[] applyInvariantsOrGuards(int[] dbm, ArrayList<Guard> guards) {
 				// take 2 guards at a time in order to determine constraint (x-y and y-x)
 				for (int i = 0; i < guards.size(); i++) {
+						// get guard and then its index in the clock array so you know the index in the DBM
+						Guard g1 = guards.get(i); int a = clocks.indexOf(g1.getClock());
+						dbm = buildConstraintWithX0(dbm, dbmSize, (a+1), g1);
+
 						for (int j = (i + 1); j < guards.size(); j++) {
-								// get guard and then its index in the clock array so you know the index in the DBM
-								Guard g1 = guards.get(i); int a = clocks.indexOf(g1.getClock());
 								Guard g2 = guards.get(j); int b = clocks.indexOf(g2.getClock());
 
 								// add constraints to dbm
-								dbm = buildConstraint(dbm, size, (a+1), (b+1), g1, g2);
-								dbm = buildConstraint(dbm, size, (b+1), (a+1), g2, g1);
+								dbm = buildConstraint(dbm, dbmSize, (a+1), (b+1), g1, g2);
+								dbm = buildConstraint(dbm, dbmSize, (b+1), (a+1), g2, g1);
 
 						}
 				}
 				return dbm;
 		}
 
-		private static int[] applyResets(int[] dbm, ArrayList<Clock> clocks, ArrayList<Update> resets) {
-				int size = (int) Math.sqrt(dbm.length);
-
+		private int[] applyResets(int[] dbm, ArrayList<Update> resets) {
 				for (Update reset : resets) {
 						int index = clocks.indexOf(reset.getClock());
 
-						dbm = DBMLib.dbm_updateValue(dbm, size, (index+1), reset.getValue());
+						dbm = DBMLib.dbm_updateValue(dbm, dbmSize, (index+1), reset.getValue());
 				}
 
 				return dbm;
 		}
 
-		private static int[] buildConstraint(int[] dbm, int size, int i, int j, Guard g1, Guard g2) {
+		private int[] buildConstraint(int[] dbm, int size, int i, int j, Guard g1, Guard g2) {
 				// determine constraint between 2 guards on clocks x and y by taking x's upper bound - y's lower bound
 				int bound = (g1.upperBound() == Integer.MAX_VALUE) ? Integer.MAX_VALUE : g1.upperBound() - g2.lowerBound();
 				// if either guard is strict, the constraint is also strict
 				boolean strict = (g1.isStrict() || g2.isStrict());
-
-				return DBMLib.dbm_constrain1(dbm, size, i, j, bound, strict);
+				if (!strict && bound != Integer.MAX_VALUE) bound++;
+				return DBMLib.dbm_constrain1(dbm, size, i, j, bound, true);
 		}
 
-		private static void printDBM(int[] dbm) {
+		private int[] buildConstraintWithX0(int[] dbm, int size, int i, Guard g) {
+				boolean strict = g.isStrict();
+				int lowerBound = g.lowerBound();
+				int upperBound = g.upperBound();
+				if (!strict && upperBound != Integer.MAX_VALUE) upperBound++;
+				dbm = DBMLib.dbm_constrain1(dbm, size, 0, i, lowerBound, true);
+				dbm = DBMLib.dbm_constrain1(dbm, size, i, 0, upperBound, true);
+				return dbm;
+		}
+
+		private void printDBM(int[] dbm) {
 				for (int x : dbm) System.out.print(x + "  ");
 				System.out.println();
 		}

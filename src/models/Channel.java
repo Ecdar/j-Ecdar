@@ -27,7 +27,7 @@ public class Channel {
 				if (this == o) return true;
 				if (o == null || getClass() != o.getClass()) return false;
 				Channel channel = (Channel) o;
-				return name == channel.name;
+				return name.equals(channel.name);
 		}
 
 		@Override
