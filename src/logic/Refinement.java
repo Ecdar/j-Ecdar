@@ -7,11 +7,11 @@ import java.io.File;
 import java.util.*;
 
 public class Refinement {
-		private SimpleTransitionSystem ts1, ts2;
+		private TransitionSystem ts1, ts2;
 		private Deque<State[]> waiting;
 		private ArrayList<State[]> passed;
 
-		public Refinement(SimpleTransitionSystem ts1, SimpleTransitionSystem ts2) {
+		public Refinement(TransitionSystem ts1, TransitionSystem ts2) {
 				this.ts1 = ts1;
 				this.ts2 = ts2;
 				this.waiting = new ArrayDeque<>();

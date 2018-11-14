@@ -1,11 +1,12 @@
 package main;
 
-import logic.Composition;
+import logic.ComposedTransitionSystem;
+import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.*;
 import parser.Parser;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
 
 public class Main {
 
@@ -16,14 +17,10 @@ public class Main {
     private static void compositionTest() {
     		ArrayList<Component> machines = Parser.parse();
 
-				Composition composition = new Composition(machines);
-				State init = composition.computeInitial();
-				Set<Channel> channels = new HashSet<>();
-				for (Component component : machines) {
-						channels.addAll(component.getActions());
-				}
-				for (Channel channel : channels) {
-						ArrayList<State> next = composition.getNextStates(init, channel);
-				}
+    		ComposedTransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(machines.get(0), machines.get(1), machines.get(2))));
+				SimpleTransitionSystem ts2 = new SimpleTransitionSystem(machines.get(3));
+
+				Refinement ref = new Refinement(ts1, ts2);
+				ref.check();
     }
 }
