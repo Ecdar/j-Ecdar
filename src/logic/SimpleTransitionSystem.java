@@ -26,8 +26,6 @@ public class SimpleTransitionSystem extends TransitionSystem {
 				Location init = component.getInitLoc();
 				// size of DBM is clock count + 1 (x0 is reference clock)
 				int[] dbm = initializeDBM();
-				// delay
-				dbm = delay(dbm);
 				// apply invariant
 				if (init.getInvariant() != null)
 						dbm = applyInvariantsOrGuards(dbm, new ArrayList<>(Arrays.asList(init.getInvariant())));
@@ -44,8 +42,6 @@ public class SimpleTransitionSystem extends TransitionSystem {
 						dbm = applyInvariantsOrGuards(dbm, transition.getGuards());
 						// apply resets
 						dbm = applyResets(dbm, transition.getUpdates());
-						// delay
-						dbm = delay(dbm);
 						// apply invariant
 						if (newLocation.getInvariant() != null)
 								dbm = applyInvariantsOrGuards(dbm, new ArrayList<>(Arrays.asList(newLocation.getInvariant())));

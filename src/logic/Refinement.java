@@ -24,9 +24,7 @@ public class Refinement {
 		}
 
 		public boolean check() {
-				boolean refines = true;
-
-				while (!waiting.isEmpty() && refines) {
+				while (!waiting.isEmpty()) {
 						State[] curr = waiting.pop();
 
 						if (!passedContainsState(curr)) {
@@ -39,13 +37,14 @@ public class Refinement {
 										if (!next1.isEmpty()) {
 												ArrayList<State> next2 = ts2.getNextStates(curr[1], output);
 												if (next2.isEmpty()) {
-														refines = false;
-														break;
+														return false;
 												} else {
 														for (State st1 : next1) {
 																for (State st2 : next2) {
-																		State[] newState = new State[]{st1, st2};
-																		waiting.add(newState);
+																		//if(DBMLib.dbm_isValid(st1.getZone(), ts1.getDbmSize()) && DBMLib.dbm_isValid(st2.getZone(), ts2.getDbmSize())) {
+																				State[] newState = new State[]{st1, st2};
+																				waiting.add(newState);
+																		//}
 																}
 														}
 												}
@@ -57,21 +56,24 @@ public class Refinement {
 										if (!next2.isEmpty()) {
 												ArrayList<State> next1 = ts1.getNextStates(curr[0], input);
 												if (next1.isEmpty()) {
-														refines = false;
-														break;
+														return false;
 												} else {
 														for (State st1 : next1) {
 																for (State st2 : next2) {
-																		State[] newState = new State[]{st1, st2};
-																		waiting.add(newState);
+																		//if(DBMLib.dbm_isValid(st1.getZone(), ts1.getDbmSize()) && DBMLib.dbm_isValid(st2.getZone(), ts2.getDbmSize())) {
+																				State[] newState = new State[]{st1, st2};
+																				waiting.add(newState);
+																		//}
 																}
 														}
 												}
 										}
 								}
+
+								//TODO check delay
 						}
 				}
-				return refines;
+				return true;
 		}
 
 		private boolean passedContainsState(State[] state) {

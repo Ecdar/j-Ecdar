@@ -17,22 +17,18 @@ public class ComposedTransitionSystem extends TransitionSystem {
 
 				for (int i = 0; i < machines.size(); i++) {
 						Set<Channel> inputsOfI, outputsOfI, sync, outputsOfOthers, inputsOfOthers;
-						inputsOfI = new HashSet<>();
-						outputsOfI = new HashSet<>();
-						sync = new HashSet<>();
+						inputsOfI = new HashSet<>(machines.get(i).getInputAct());
+						outputsOfI = new HashSet<>(machines.get(i).getOutputAct());
+						sync = new HashSet<>(machines.get(i).getOutputAct());
 						outputsOfOthers = new HashSet<>();
 						inputsOfOthers  = new HashSet<>();
-						inputsOfI.addAll(machines.get(i).getInputAct());
-						outputsOfI.addAll(machines.get(i).getOutputAct());
-						sync.addAll(machines.get(i).getOutputAct());
 						inputs.addAll(inputsOfI);
 						outputs.addAll(outputsOfI);
 
 						for (int j = 0; j < machines.size(); j++) {
 								if (i != j) {
 										// check if output actions overlap
-										Set<Channel> diff = new HashSet<>();
-										diff.addAll(machines.get(i).getOutputAct());
+										Set<Channel> diff = new HashSet<>(machines.get(i).getOutputAct());
 										diff.retainAll(machines.get(j).getOutputAct());
 										if (!diff.isEmpty()) {
 												throw new IllegalArgumentException("machines cannot be composed");
@@ -42,8 +38,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
 
 										inputsOfOthers.addAll(machines.get(j).getInputAct());
 
-										Set<Channel> syncCopy = new HashSet<>();
-										syncCopy.addAll(sync);
+										Set<Channel> syncCopy = new HashSet<>(sync);
 										syncCopy.retainAll(machines.get(j).getInputAct());
 										syncs.addAll(syncCopy);
 								}
@@ -71,13 +66,13 @@ public class ComposedTransitionSystem extends TransitionSystem {
 				ArrayList<State> states = new ArrayList<>();
 				ArrayList<Location> locations = state.getLocations();
 
-				for (int i = 0; i < machines.size(); i++) {
-						ArrayList<Transition> transitions = machines.get(i).getTransitionsFromLocationAndSignal(state.getLocations().get(i), channel);
+				if (outputsOutside.contains(channel)) {
+						for (int i = 0; i < locations.size(); i++) {
+								ArrayList<Transition> transitions = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
 
-						for (Transition transition : transitions) {
-								if (inputsOutside.contains(channel) || outputsOutside.contains(channel)) {
+								for (Transition transition : transitions) {
 										ArrayList<Location> newLocations = new ArrayList<>();
-										for (int j = 0; j < machines.size(); j++) {
+										for (int j = 0; j < locations.size(); j++) {
 												if (i != j) {
 														newLocations.add(locations.get(j));
 												} else {
@@ -86,52 +81,94 @@ public class ComposedTransitionSystem extends TransitionSystem {
 										}
 										int[] dbm = state.getZone();
 										// apply guards
-										if (!transition.getGuards().isEmpty()) dbm = applyInvariantsOrGuards(dbm, transition.getGuards());
+										if (!transition.getGuards().isEmpty())
+												dbm = applyInvariantsOrGuards(dbm, transition.getGuards());
 										// apply resets
 										if (!transition.getUpdates().isEmpty()) dbm = applyResets(dbm, transition.getUpdates());
-										// delay
-										dbm = delay(dbm);
 										// apply invariants
-										if (!getInvariants(newLocations).isEmpty()) dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
+										if (!getInvariants(newLocations).isEmpty())
+												dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
 
 										// construct new state and add it to list
 										State newState = new State(newLocations, dbm);
 										states.add(newState);
-								} else if (syncs.contains(channel)) {
-										if (machines.get(i).getOutputAct().contains(channel)) {
-												for (int j = 0; j < machines.size(); j++) {
-														if (machines.get(j).getInputAct().contains(channel)) {
-																ArrayList<Transition> transitionsFromJ = machines.get(j).getTransitionsFromLocationAndSignal(locations.get(j), channel);
-																for (Transition t : transitionsFromJ) {
-																		ArrayList<Location> newLocations = new ArrayList<>();
-																		newLocations.addAll(locations);
-																		newLocations.set(i, transition.getTo());
-																		newLocations.set(j, t.getTo());
-																		int[] dbm = state.getZone();
+								}
+						}
+				} else if (inputsOutside.contains(channel) || (syncs.contains(channel))) {
+						ArrayList<ArrayList<Location>> newLocationsArr = new ArrayList<>();
+						ArrayList<ArrayList<Transition>> transitionsArr = new ArrayList<>();
 
-																		ArrayList<Guard> guards = new ArrayList<>();
-																		ArrayList<Update> updates = new ArrayList<>();
-																		guards.addAll(transition.getGuards());
-																		updates.addAll(transition.getUpdates());
-																		guards.addAll(t.getGuards());
-																		updates.addAll(t.getUpdates());
+						for (int j = 0; j < locations.size(); j++) {
+								ArrayList<Transition> transitionsForJ = machines.get(j).getTransitionsFromLocationAndSignal(locations.get(j), channel);
+								if (j == 0) {
+										// no inputs to locations.get(j), so we keep the same location
+										if (transitionsForJ.isEmpty()) {
+												newLocationsArr.add(new ArrayList<>(Arrays.asList(locations.get(j))));
+												transitionsArr.add(new ArrayList<>());
+										} else {
+												for (Transition t : transitionsForJ) {
+														newLocationsArr.add(new ArrayList<>(Arrays.asList(t.getTo())));
+														transitionsArr.add(new ArrayList<>(Arrays.asList(t)));
+												}
+										}
+								} else {
+										if (transitionsForJ.isEmpty()) {
+												for (ArrayList<Location> locationArr : newLocationsArr) {
+														locationArr.add(locations.get(j));
+												}
+										} else {
+												ArrayList<ArrayList<Location>> newLocationsArrCopy = new ArrayList<>();
+												for (ArrayList<Location> locs : newLocationsArr) {
+														ArrayList<Location> newLocs = new ArrayList<>(locs);
+														newLocationsArrCopy.add(newLocs);
+												}
+												ArrayList<ArrayList<Transition>> transitionsArrCopy = new ArrayList<>(transitionsArr);
+												for (ArrayList<Transition> transitions : transitionsArr) {
+														ArrayList<Transition> newTransitions = new ArrayList<>(transitions);
+														transitionsArrCopy.add(newTransitions);
+												}
 
-																		// apply guards
-																		if (!guards.isEmpty()) dbm = applyInvariantsOrGuards(dbm, guards);
-																		// apply resets
-																		if (!updates.isEmpty()) dbm = applyResets(dbm, updates);
-																		// delay
-																		dbm = delay(dbm);
-																		// apply invariants
-																		if (!getInvariants(newLocations).isEmpty()) dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
-
-																		State newState = new State(newLocations, dbm);
-																		states.add(newState);
+												for (int x = 0; x < transitionsForJ.size(); x++) {
+														Transition t = transitionsForJ.get(x);
+														for (int y = 0; y < newLocationsArrCopy.size(); y++) {
+																if (x == 0) {
+																		newLocationsArr.get(y).add(t.getTo());
+																} else {
+																		ArrayList<Location> newLocationArr = new ArrayList<>(newLocationsArrCopy.get(y));
+																		ArrayList<Transition> newTransitionArr = new ArrayList<>(transitionsArrCopy.get(y));
+																		newLocationArr.add(t.getTo());
+																		newTransitionArr.add(t);
+																		newLocationsArr.add(newLocationArr);
+																		transitionsArr.add(newTransitionArr);
 																}
 														}
 												}
 										}
 								}
+						}
+
+						for (int n = 0; n < newLocationsArr.size(); n++) {
+								ArrayList<Location> newLocations = newLocationsArr.get(n);
+								ArrayList<Guard> guards = new ArrayList<>();
+								ArrayList<Update> updates = new ArrayList<>();
+								for (Transition t : transitionsArr.get(n)) {
+										guards.addAll(t.getGuards());
+										updates.addAll(t.getUpdates());
+								}
+
+								int[] dbm = state.getZone();
+								// apply guards
+								if (!guards.isEmpty())
+										dbm = applyInvariantsOrGuards(dbm, guards);
+								// apply resets
+								if (!updates.isEmpty()) dbm = applyResets(dbm, updates);
+								// apply invariants
+								if (!getInvariants(newLocations).isEmpty())
+										dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
+
+								// construct new state and add it to list
+								State newState = new State(newLocations, dbm);
+								states.add(newState);
 						}
 				}
 
@@ -147,7 +184,6 @@ public class ComposedTransitionSystem extends TransitionSystem {
 				}
 
 				int[] zone = initializeDBM();
-				zone = delay(zone);
 				zone = applyInvariantsOrGuards(zone, getInvariants(initialLocations));
 
 				return new State(initialLocations, zone);

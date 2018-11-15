@@ -45,6 +45,7 @@ public class Parser {
 				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine.json");
 				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Researcher.json");
 				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Spec.json");
+				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine3.json");
 
 				objectList = parseFiles(locations);
 				return distrubuteObjects(objectList);
