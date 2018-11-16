@@ -45,9 +45,34 @@ public class SimpleTransitionSystem extends TransitionSystem {
 						// apply invariant
 						if (newLocation.getInvariant() != null)
 								dbm = applyInvariantsOrGuards(dbm, new ArrayList<>(Arrays.asList(newLocation.getInvariant())));
-						State newState = new State(new ArrayList<>(Arrays.asList(newLocation)), dbm);
-						states.add(newState);
+						if (isDbmValid(dbm)) {
+								State newState = new State(new ArrayList<>(Arrays.asList(newLocation)), dbm);
+								states.add(newState);
+						}
 				}
 				return states;
+		}
+
+		public ArrayList<StateTransition> getTransitionsFrom(State currentState, Channel channel) {
+				ArrayList<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
+				ArrayList<StateTransition> stateTransitions = new ArrayList<>();
+
+				for (Transition transition : transitions) {
+						Location newLocation = transition.getTo();
+						int[] dbm = currentState.getZone();
+						// apply guards
+						dbm = applyInvariantsOrGuards(dbm, transition.getGuards());
+						// apply resets
+						dbm = applyResets(dbm, transition.getUpdates());
+						// apply invariant
+						if (newLocation.getInvariant() != null)
+								dbm = applyInvariantsOrGuards(dbm, new ArrayList<>(Arrays.asList(newLocation.getInvariant())));
+						if (isDbmValid(dbm)) {
+								State newState = new State(new ArrayList<>(Arrays.asList(newLocation)), dbm);
+								StateTransition stateTransition = new StateTransition(currentState, newState, channel, transition.isInput(), transition.getGuards(), transition.getUpdates());
+								stateTransitions.add(stateTransition);
+						}
+				}
+				return stateTransitions;
 		}
 }

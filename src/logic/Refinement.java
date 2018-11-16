@@ -3,6 +3,7 @@ package logic;
 import lib.DBMLib;
 import models.Channel;
 import models.State;
+import models.StateTransition;
 import java.io.File;
 import java.util.*;
 
@@ -33,18 +34,22 @@ public class Refinement {
 								Set<Channel> outputs1 = ts1.getOutputs();
 
 								for (Channel output : outputs1) {
-										ArrayList<State> next1 = ts1.getNextStates(curr[0], output);
+										ArrayList<StateTransition> next1 = ts1.getTransitionsFrom(curr[0], output);
 										if (!next1.isEmpty()) {
-												ArrayList<State> next2 = ts2.getNextStates(curr[1], output);
+												ArrayList<StateTransition> next2 = ts2.getTransitionsFrom(curr[1], output);
 												if (next2.isEmpty()) {
 														return false;
 												} else {
-														for (State st1 : next1) {
-																for (State st2 : next2) {
-																		//if(DBMLib.dbm_isValid(st1.getZone(), ts1.getDbmSize()) && DBMLib.dbm_isValid(st2.getZone(), ts2.getDbmSize())) {
-																				State[] newState = new State[]{st1, st2};
+														for (StateTransition st1 : next1) {
+																for (StateTransition st2 : next2) {
+																		// check guards
+																		int[] zone1 = st1.getFrom().getZone(); zone1 = ts1.applyInvariantsOrGuards(zone1, st1.getGuards());
+																		int[] zone2 = st2.getFrom().getZone(); zone2 = ts2.applyInvariantsOrGuards(zone2, st2.getGuards());
+
+																		if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize)) {
+																				State[] newState = new State[]{st1.getTo(), st2.getTo()};
 																				waiting.add(newState);
-																		//}
+																		}
 																}
 														}
 												}
@@ -52,18 +57,22 @@ public class Refinement {
 								}
 
 								for (Channel input : inputs2) {
-										ArrayList<State> next2 = ts2.getNextStates(curr[1], input);
+										ArrayList<StateTransition> next2 = ts2.getTransitionsFrom(curr[1], input);
 										if (!next2.isEmpty()) {
-												ArrayList<State> next1 = ts1.getNextStates(curr[0], input);
+												ArrayList<StateTransition> next1 = ts1.getTransitionsFrom(curr[0], input);
 												if (next1.isEmpty()) {
 														return false;
 												} else {
-														for (State st1 : next1) {
-																for (State st2 : next2) {
-																		//if(DBMLib.dbm_isValid(st1.getZone(), ts1.getDbmSize()) && DBMLib.dbm_isValid(st2.getZone(), ts2.getDbmSize())) {
-																				State[] newState = new State[]{st1, st2};
+														for (StateTransition st1 : next1) {
+																for (StateTransition st2 : next2) {
+																		// check guards
+																		int[] zone1 = st1.getFrom().getZone(); zone1 = ts1.applyInvariantsOrGuards(zone1, st1.getGuards());
+																		int[] zone2 = st2.getFrom().getZone(); zone2 = ts2.applyInvariantsOrGuards(zone2, st2.getGuards());
+
+																		if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize)) {
+																				State[] newState = new State[]{st1.getTo(), st2.getTo()};
 																				waiting.add(newState);
-																		//}
+																		}
 																}
 														}
 												}
