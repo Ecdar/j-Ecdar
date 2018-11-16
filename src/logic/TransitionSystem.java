@@ -37,11 +37,6 @@ public abstract class TransitionSystem {
 
 		public abstract Set<Channel> getOutputs();
 
-		public ArrayList<State> getNextStates(State currentState, String signal) {
-				Channel channel = new Channel(signal);
-				return getNextStates(currentState, channel);
-		}
-
 		public abstract ArrayList<State> getNextStates(State currentState, Channel channel);
 
 		public abstract ArrayList<StateTransition> getTransitionsFrom(State currentState, Channel channel);
@@ -57,6 +52,32 @@ public abstract class TransitionSystem {
 
 		protected boolean isDbmValid(int[] dbm) {
 				return DBMLib.dbm_isValid(dbm, dbmSize);
+		}
+
+		protected int[] buildConstraintsForGuard(int[] dbm, int i, Guard g) {
+				boolean strict = g.isStrict();
+				int max = 1073741823;
+
+				int lowerBoundI = g.lowerBound();
+				int upperBoundI = (g.upperBound() == Integer.MAX_VALUE) ? max : g.upperBound();
+
+				if (strict) {
+						if (upperBoundI < max) upperBoundI++;
+
+						lowerBoundI--;
+				}
+
+				for (int a = 0; a < dbmSize; a++) {
+						if (a != i && a == 0) {
+								int lowerBoundA = dbm[a] * (-1);
+								int upperBoundA = dbm[a * dbmSize];
+
+								dbm = DBMLib.dbm_constrain1(dbm, dbmSize, i, a, (upperBoundI == max) ? max : upperBoundI - lowerBoundA, false);
+								dbm = DBMLib.dbm_constrain1(dbm, dbmSize, a, i, (upperBoundA == max) ? max : upperBoundA - lowerBoundI, false);
+						}
+				}
+
+				return dbm;
 		}
 
 		protected int[] buildConstraintWithX0(int[] dbm, int i, Guard g) {
@@ -79,38 +100,11 @@ public abstract class TransitionSystem {
 				return dbm;
 		}
 
-		protected int[] buildConstraint(int[] dbm, int i, int j, Guard g1, Guard g2) {
-				int upperBound1, lowerBound2;
-				int max = 1073741823;
-				upperBound1 = (g1.upperBound() == Integer.MAX_VALUE) ? max : g1.upperBound();
-				lowerBound2 = g2.lowerBound();
-
-				if (g1.isStrict()) {
-						if (upperBound1 < max) upperBound1++;
-				}
-				if (g2.isStrict()) {
-						lowerBound2--;
-				}
-				// determine constraint between 2 guards on clocks x and y by taking x's upper bound - y's lower bound
-				int bound = (upperBound1 == max) ? max : upperBound1 - lowerBound2;
-
-				return DBMLib.dbm_constrain1(dbm, dbmSize, i, j, bound, false);
-		}
-
 		protected int[] applyInvariantsOrGuards(int[] dbm, ArrayList<Guard> guards) {
 				for (int i = 0; i < guards.size(); i++) {
 						// get guard and then its index in the clock array so you know the index in the DBM
 						Guard g1 = guards.get(i); int a = getClocks().indexOf(g1.getClock());
-						dbm = buildConstraintWithX0(dbm, (a+1), g1);
-
-						// take 2 guards at a time in order to determine constraint (x-y and y-x)
-						for (int j = (i + 1); j < guards.size(); j++) {
-								Guard g2 = guards.get(j); int b = getClocks().indexOf(g2.getClock());
-
-								// add constraints to dbm
-								dbm = buildConstraint(dbm, (a+1), (b+1), g1, g2);
-								dbm = buildConstraint(dbm, (b+1), (a+1), g2, g1);
-						}
+						dbm = buildConstraintsForGuard(dbm, (a + 1), g1);
 				}
 				return dbm;
 		}

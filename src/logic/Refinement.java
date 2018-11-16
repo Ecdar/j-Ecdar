@@ -37,21 +37,18 @@ public class Refinement {
 								for (Channel output : outputs1) {
 										ArrayList<StateTransition> next1 = ts1.getTransitionsFrom(curr[0], output);
 										if (!next1.isEmpty()) {
-												ArrayList<StateTransition> next2 = ts2.getTransitionsFrom(curr[1], output);
-												if (next2.isEmpty()) {
-														return false;
+												// ignore if machine 2 doesn't have output
+												if (ts2.getOutputs().contains(output)) {
+														ArrayList<StateTransition> next2 = ts2.getTransitionsFrom(curr[1], output);
+														if (next2.isEmpty()) {
+																return false;
+														} else {
+																waiting.addAll(getNewStates(next1, next2));
+														}
 												} else {
 														for (StateTransition st1 : next1) {
-																for (StateTransition st2 : next2) {
-																		// check guards
-																		int[] zone1 = st1.getFrom().getZone(); zone1 = ts1.applyInvariantsOrGuards(zone1, st1.getGuards());
-																		int[] zone2 = st2.getFrom().getZone(); zone2 = ts2.applyInvariantsOrGuards(zone2, st2.getGuards());
-
-																		if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize)) {
-																				State[] newState = new State[]{st1.getTo(), st2.getTo()};
-																				waiting.add(newState);
-																		}
-																}
+																State[] newState = new State[]{st1.getTo(), curr[1]};
+																waiting.add(newState);
 														}
 												}
 										}
@@ -60,21 +57,18 @@ public class Refinement {
 								for (Channel input : inputs2) {
 										ArrayList<StateTransition> next2 = ts2.getTransitionsFrom(curr[1], input);
 										if (!next2.isEmpty()) {
-												ArrayList<StateTransition> next1 = ts1.getTransitionsFrom(curr[0], input);
-												if (next1.isEmpty()) {
-														return false;
+												// ignore if machine 1 doesn't have input
+												if (ts1.getInputs().contains(input)) {
+														ArrayList<StateTransition> next1 = ts1.getTransitionsFrom(curr[0], input);
+														if (next1.isEmpty()) {
+																return false;
+														} else {
+																waiting.addAll(getNewStates(next1, next2));
+														}
 												} else {
-														for (StateTransition st1 : next1) {
-																for (StateTransition st2 : next2) {
-																		// check guards
-																		int[] zone1 = st1.getFrom().getZone(); zone1 = ts1.applyInvariantsOrGuards(zone1, st1.getGuards());
-																		int[] zone2 = st2.getFrom().getZone(); zone2 = ts2.applyInvariantsOrGuards(zone2, st2.getGuards());
-
-																		if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize)) {
-																				State[] newState = new State[]{st1.getTo(), st2.getTo()};
-																				waiting.add(newState);
-																		}
-																}
+														for (StateTransition st2 : next2) {
+																State[] newState = new State[]{curr[0], st2.getTo()};
+																waiting.add(newState);
 														}
 												}
 										}
@@ -89,6 +83,25 @@ public class Refinement {
 						}
 				}
 				return true;
+		}
+
+		private ArrayList<State[]> getNewStates(ArrayList<StateTransition> next1, ArrayList<StateTransition> next2) {
+				ArrayList<State[]> states = new ArrayList<>();
+
+				for (StateTransition st1 : next1) {
+						for (StateTransition st2 : next2) {
+								// check guards
+								int[] zone1 = st1.getFrom().getZone(); zone1 = ts1.applyInvariantsOrGuards(zone1, st1.getGuards());
+								int[] zone2 = st2.getFrom().getZone(); zone2 = ts2.applyInvariantsOrGuards(zone2, st2.getGuards());
+
+								if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize)) {
+										State[] newState = new State[]{st1.getTo(), st2.getTo()};
+										states.add(newState);
+								}
+						}
+				}
+
+				return states;
 		}
 
 		private boolean passedContainsState(State[] state) {

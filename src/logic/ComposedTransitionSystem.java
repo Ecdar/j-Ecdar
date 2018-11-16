@@ -218,48 +218,62 @@ public class ComposedTransitionSystem extends TransitionSystem {
 						ArrayList<ArrayList<Location>> newLocationsArr = new ArrayList<>();
 						ArrayList<ArrayList<Transition>> transitionsArr = new ArrayList<>();
 
-						for (int j = 0; j < locations.size(); j++) {
-								ArrayList<Transition> transitionsForJ = machines.get(j).getTransitionsFromLocationAndSignal(locations.get(j), channel);
-								if (j == 0) {
-										// no inputs to locations.get(j), so we keep the same location
-										if (transitionsForJ.isEmpty()) {
-												newLocationsArr.add(new ArrayList<>(Arrays.asList(locations.get(j))));
-												transitionsArr.add(new ArrayList<>());
-										} else {
-												for (Transition t : transitionsForJ) {
-														newLocationsArr.add(new ArrayList<>(Arrays.asList(t.getTo())));
-														transitionsArr.add(new ArrayList<>(Arrays.asList(t)));
-												}
+						boolean check = true;
+						// for syncs, we must make sure we have an output first
+						if (syncs.contains(channel)) {
+								for (int i = 0; i < machines.size(); i++) {
+										if (machines.get(i).getOutputAct().contains(channel)) {
+												ArrayList<Transition> transitionsForJ = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+												if (transitionsForJ.isEmpty())
+														check = false;
 										}
-								} else {
-										if (transitionsForJ.isEmpty()) {
-												for (ArrayList<Location> locationArr : newLocationsArr) {
-														locationArr.add(locations.get(j));
+								}
+						}
+
+						if (check) {
+								for (int j = 0; j < locations.size(); j++) {
+										ArrayList<Transition> transitionsForJ = machines.get(j).getTransitionsFromLocationAndSignal(locations.get(j), channel);
+										if (j == 0) {
+												// no inputs to locations.get(j), so we keep the same location
+												if (transitionsForJ.isEmpty()) {
+														newLocationsArr.add(new ArrayList<>(Arrays.asList(locations.get(j))));
+														transitionsArr.add(new ArrayList<>());
+												} else {
+														for (Transition t : transitionsForJ) {
+																newLocationsArr.add(new ArrayList<>(Arrays.asList(t.getTo())));
+																transitionsArr.add(new ArrayList<>(Arrays.asList(t)));
+														}
 												}
 										} else {
-												ArrayList<ArrayList<Location>> newLocationsArrCopy = new ArrayList<>();
-												for (ArrayList<Location> locs : newLocationsArr) {
-														ArrayList<Location> newLocs = new ArrayList<>(locs);
-														newLocationsArrCopy.add(newLocs);
-												}
-												ArrayList<ArrayList<Transition>> transitionsArrCopy = new ArrayList<>(transitionsArr);
-												for (ArrayList<Transition> transitions : transitionsArr) {
-														ArrayList<Transition> newTransitions = new ArrayList<>(transitions);
-														transitionsArrCopy.add(newTransitions);
-												}
+												if (transitionsForJ.isEmpty()) {
+														for (ArrayList<Location> locationArr : newLocationsArr) {
+																locationArr.add(locations.get(j));
+														}
+												} else {
+														ArrayList<ArrayList<Location>> newLocationsArrCopy = new ArrayList<>();
+														for (ArrayList<Location> locs : newLocationsArr) {
+																ArrayList<Location> newLocs = new ArrayList<>(locs);
+																newLocationsArrCopy.add(newLocs);
+														}
+														ArrayList<ArrayList<Transition>> transitionsArrCopy = new ArrayList<>(transitionsArr);
+														for (ArrayList<Transition> transitions : transitionsArr) {
+																ArrayList<Transition> newTransitions = new ArrayList<>(transitions);
+																transitionsArrCopy.add(newTransitions);
+														}
 
-												for (int x = 0; x < transitionsForJ.size(); x++) {
-														Transition t = transitionsForJ.get(x);
-														for (int y = 0; y < newLocationsArrCopy.size(); y++) {
-																if (x == 0) {
-																		newLocationsArr.get(y).add(t.getTo());
-																} else {
-																		ArrayList<Location> newLocationArr = new ArrayList<>(newLocationsArrCopy.get(y));
-																		ArrayList<Transition> newTransitionArr = new ArrayList<>(transitionsArrCopy.get(y));
-																		newLocationArr.add(t.getTo());
-																		newTransitionArr.add(t);
-																		newLocationsArr.add(newLocationArr);
-																		transitionsArr.add(newTransitionArr);
+														for (int x = 0; x < transitionsForJ.size(); x++) {
+																Transition t = transitionsForJ.get(x);
+																for (int y = 0; y < newLocationsArrCopy.size(); y++) {
+																		if (x == 0) {
+																				newLocationsArr.get(y).add(t.getTo());
+																		} else {
+																				ArrayList<Location> newLocationArr = new ArrayList<>(newLocationsArrCopy.get(y));
+																				ArrayList<Transition> newTransitionArr = new ArrayList<>(transitionsArrCopy.get(y));
+																				newLocationArr.add(t.getTo());
+																				newTransitionArr.add(t);
+																				newLocationsArr.add(newLocationArr);
+																				transitionsArr.add(newTransitionArr);
+																		}
 																}
 														}
 												}
