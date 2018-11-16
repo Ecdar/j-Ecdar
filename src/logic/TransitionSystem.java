@@ -68,8 +68,10 @@ public abstract class TransitionSystem {
 				if (strict) {
 						if (upperBound < max) upperBound++;
 
-						if (lowerBound > 0) lowerBound--;
+						lowerBound--;
 				}
+
+				lowerBound = lowerBound * (-1);
 
 				dbm = DBMLib.dbm_constrain1(dbm, dbmSize, 0, i, lowerBound, false);
 				dbm = DBMLib.dbm_constrain1(dbm, dbmSize, i, 0, upperBound, false);
@@ -87,7 +89,7 @@ public abstract class TransitionSystem {
 						if (upperBound1 < max) upperBound1++;
 				}
 				if (g2.isStrict()) {
-						if (lowerBound2 > 0) lowerBound2--;
+						lowerBound2--;
 				}
 				// determine constraint between 2 guards on clocks x and y by taking x's upper bound - y's lower bound
 				int bound = (upperBound1 == max) ? max : upperBound1 - lowerBound2;

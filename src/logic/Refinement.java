@@ -24,6 +24,7 @@ public class Refinement {
 				System.load(lib.getAbsolutePath());
 		}
 
+		// TODO handle dbms of different sizes
 		public boolean check() {
 				while (!waiting.isEmpty()) {
 						State[] curr = waiting.pop();
@@ -79,7 +80,12 @@ public class Refinement {
 										}
 								}
 
-								//TODO check delay
+								// check if both can delay
+								int[] zone1 = curr[0].getZone(); zone1 = ts1.delay(zone1);
+								int[] zone2 = curr[1].getZone(); zone2 = ts2.delay(zone2);
+
+								if (!DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize))
+										return false;
 						}
 				}
 				return true;

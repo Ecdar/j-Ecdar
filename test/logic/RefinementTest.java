@@ -55,8 +55,20 @@ public class RefinementTest {
 
 		@Test
 		public void testMachine3RefinesMachine3() {
-				Component machine3 = machines.get(3);
+				Component machine3 = machines.get(4);
 				Refinement ref = selfRefinesSelf(machine3);
+				assertTrue(ref.check());
+		}
+
+		@Test
+		public void testMachine3RefinesMachine() {
+				Component machine = machines.get(1);
+				Component machine3 = machines.get(4);
+
+				SimpleTransitionSystem ts1 = new SimpleTransitionSystem(machine3);
+				SimpleTransitionSystem ts2 = new SimpleTransitionSystem(machine);
+
+				Refinement ref = new Refinement(ts1, ts2);
 				assertTrue(ref.check());
 		}
 
