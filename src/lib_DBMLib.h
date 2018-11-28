@@ -25,14 +25,6 @@ JNIEXPORT jint JNICALL Java_lib_DBMLib_raw2bound
 
 /*
  * Class:     lib_DBMLib
- * Method:    constraint
- * Signature: (IIIZ)Llib/Constraint;
- */
-JNIEXPORT jobject JNICALL Java_lib_DBMLib_constraint
-  (JNIEnv *, jclass, jint, jint, jint, jboolean);
-
-/*
- * Class:     lib_DBMLib
  * Method:    dbm_init
  * Signature: ([II)[I
  */

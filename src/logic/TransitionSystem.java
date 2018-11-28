@@ -39,8 +39,6 @@ public abstract class TransitionSystem {
 
 		public abstract ArrayList<State> getNextStates(State currentState, Channel channel);
 
-		public abstract ArrayList<StateTransition> getTransitionsFrom(State currentState, Channel channel);
-
 		protected int[] initializeDBM() {
 				// we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
 				// clocks x1 to xn are clocks derived from our components, while x0 is a reference clock needed by the library
