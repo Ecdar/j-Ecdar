@@ -23,20 +23,20 @@ public class Refinement {
 				System.load(lib.getAbsolutePath());
 		}
 
-		// TODO handle dbms of different sizes
 		public boolean check() {
+				Set<Channel> inputs2 = ts2.getInputs();
+				Set<Channel> outputs1 = ts1.getOutputs();
+
 				while (!waiting.isEmpty()) {
 						State[] curr = waiting.pop();
 
 						if (!passedContainsState(curr)) {
 								passed.add(curr);
-								Set<Channel> inputs2 = ts2.getInputs();
-								Set<Channel> outputs1 = ts1.getOutputs();
 
 								for (Channel output : outputs1) {
 										ArrayList<State> next1 = ts1.getNextStates(curr[0], output);
 										if (!next1.isEmpty()) {
-												ArrayList<State> next2 = ts1.getNextStates(curr[1], output);
+												ArrayList<State> next2 = ts2.getNextStates(curr[1], output);
 												if (next2.isEmpty()) {
 														return false;
 												} else {
@@ -55,14 +55,7 @@ public class Refinement {
 														waiting.addAll(getNewStates(next1, next2));
 												}
 										}
-								}
-
-								// check if both can delay
-								int[] zone1 = curr[0].getZone(); zone1 = ts1.delay(zone1);
-								int[] zone2 = curr[1].getZone(); zone2 = ts2.delay(zone2);
-
-								if (!DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize))
-										return false;
+								};
 						}
 				}
 				return true;

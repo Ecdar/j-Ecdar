@@ -64,8 +64,8 @@ public class Parser {
 														loc.getInvariant().getValue());
 						}
 						for (Transition tran : component.getTransitions()){
-								System.out.println("transition from: " + tran.getFrom().getName());
-								System.out.println("transition to: " + tran.getTo().getName());
+								System.out.println("transition from: " + tran.getSource().getName());
+								System.out.println("transition to: " + tran.getTarget().getName());
 								if (tran.getChannel() != null)
 										System.out.println("channel: " + tran.getChannel().getName());
 								if (tran.getGuards() != null)

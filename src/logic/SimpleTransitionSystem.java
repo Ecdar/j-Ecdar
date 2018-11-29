@@ -36,7 +36,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
 				ArrayList<State> states = new ArrayList<>();
 				ArrayList<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
 				for (Transition transition : transitions) {
-						Location newLocation = transition.getTo();
+						Location newLocation = transition.getSource();
 						int[] dbm = currentState.getZone();
 						// apply guards
 						dbm = applyInvariantsOrGuards(dbm, transition.getGuards());

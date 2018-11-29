@@ -48,7 +48,7 @@ public class Component {
 				ArrayList<Transition> trans = new ArrayList<>();
 
 				trans.addAll(transitions);
-				trans.removeIf(n -> n.getFrom() != loc);
+				trans.removeIf(n -> n.getSource() != loc);
 
 				return trans;
 		}

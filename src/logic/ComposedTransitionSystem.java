@@ -77,7 +77,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
 												if (i != j) {
 														newLocations.add(locations.get(j));
 												} else {
-														newLocations.add(transition.getTo());
+														newLocations.add(transition.getTarget());
 												}
 										}
 										int[] dbm = currentState.getZone();
@@ -97,7 +97,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
 								}
 						}
 				} else if (inputsOutside.contains(channel) || (syncs.contains(channel))) {
-						ArrayList<ArrayList<Location>> newLocationsArr = new ArrayList<>();
+						ArrayList<ArrayList<Location>> locationsArr = new ArrayList<>();
 						ArrayList<ArrayList<Transition>> transitionsArr = new ArrayList<>();
 
 						boolean check = true;
@@ -118,22 +118,22 @@ public class ComposedTransitionSystem extends TransitionSystem {
 										if (j == 0) {
 												// no inputs to locations.get(j), so we keep the same location
 												if (transitionsForJ.isEmpty()) {
-														newLocationsArr.add(new ArrayList<>(Arrays.asList(locations.get(j))));
+														locationsArr.add(new ArrayList<>(Arrays.asList(locations.get(j))));
 														transitionsArr.add(new ArrayList<>());
 												} else {
 														for (Transition t : transitionsForJ) {
-																newLocationsArr.add(new ArrayList<>(Arrays.asList(t.getTo())));
+																locationsArr.add(new ArrayList<>(Arrays.asList(t.getTarget())));
 																transitionsArr.add(new ArrayList<>(Arrays.asList(t)));
 														}
 												}
 										} else {
 												if (transitionsForJ.isEmpty()) {
-														for (ArrayList<Location> locationArr : newLocationsArr) {
+														for (ArrayList<Location> locationArr : locationsArr) {
 																locationArr.add(locations.get(j));
 														}
 												} else {
 														ArrayList<ArrayList<Location>> newLocationsArrCopy = new ArrayList<>();
-														for (ArrayList<Location> locs : newLocationsArr) {
+														for (ArrayList<Location> locs : locationsArr) {
 																ArrayList<Location> newLocs = new ArrayList<>(locs);
 																newLocationsArrCopy.add(newLocs);
 														}
@@ -147,13 +147,13 @@ public class ComposedTransitionSystem extends TransitionSystem {
 																Transition t = transitionsForJ.get(x);
 																for (int y = 0; y < newLocationsArrCopy.size(); y++) {
 																		if (x == 0) {
-																				newLocationsArr.get(y).add(t.getTo());
+																				locationsArr.get(y).add(t.getTarget());
 																		} else {
 																				ArrayList<Location> newLocationArr = new ArrayList<>(newLocationsArrCopy.get(y));
 																				ArrayList<Transition> newTransitionArr = new ArrayList<>(transitionsArrCopy.get(y));
-																				newLocationArr.add(t.getTo());
+																				newLocationArr.add(t.getTarget());
 																				newTransitionArr.add(t);
-																				newLocationsArr.add(newLocationArr);
+																				locationsArr.add(newLocationArr);
 																				transitionsArr.add(newTransitionArr);
 																		}
 																}
@@ -163,8 +163,8 @@ public class ComposedTransitionSystem extends TransitionSystem {
 								}
 						}
 
-						for (int n = 0; n < newLocationsArr.size(); n++) {
-								ArrayList<Location> newLocations = newLocationsArr.get(n);
+						for (int n = 0; n < locationsArr.size(); n++) {
+								ArrayList<Location> newLocations = locationsArr.get(n);
 								ArrayList<Guard> guards = new ArrayList<>();
 								ArrayList<Update> updates = new ArrayList<>();
 								for (Transition t : transitionsArr.get(n)) {

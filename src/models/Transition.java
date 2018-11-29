@@ -5,16 +5,16 @@ import java.util.Arrays;
 
 public class Transition {
 
-		private Location from;
-		private Location to;
+		private Location source;
+		private Location target;
 		private Channel chan;
 		private boolean isInput;
 		private ArrayList<Guard> guards;
 		private ArrayList<Update> updates;
 
-		public Transition(Location from, Location to, Channel chan, boolean isInput, Guard guard, Update update) {
-				this.from = from;
-				this.to = to;
+		public Transition(Location source, Location target, Channel chan, boolean isInput, Guard guard, Update update) {
+				this.source = source;
+				this.target = target;
 				this.chan = chan;
 				this.isInput = isInput;
 				this.guards = new ArrayList<>();
@@ -23,29 +23,29 @@ public class Transition {
 				if (update != null) updates.add(update);
 		}
 
-		public Transition(Location from, Location to, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
-				this.from = from;
-				this.to = to;
+		public Transition(Location source, Location target, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
+				this.source = source;
+				this.target = target;
 				this.chan = chan;
 				this.isInput = isInput;
 				this.guards = guards;
 				this.updates = updates;
 		}
 
-		public Location getFrom() {
-				return from;
+		public Location getSource() {
+				return source;
 		}
 
-		public void setFrom(Location from) {
-				this.from = from;
+		public void setSource(Location source) {
+				this.source = source;
 		}
 
-		public Location getTo() {
-				return to;
+		public Location getTarget() {
+				return target;
 		}
 
-		public void setTo(Location to) {
-				this.to = to;
+		public void setTarget(Location target) {
+				this.target = target;
 		}
 
 		public Channel getChannel() {
@@ -87,8 +87,8 @@ public class Transition {
 		@Override
 		public String toString() {
 				return "Transition{" +
-								"from=" + from +
-								", to=" + to +
+								"source=" + source +
+								", target=" + target +
 								", chan=" + chan +
 								", isInput=" + isInput +
 								", guards=" + guards +
