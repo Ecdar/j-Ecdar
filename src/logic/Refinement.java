@@ -81,8 +81,7 @@ public class Refinement {
 
 		private boolean passedContainsState(State[] state) {
 				// keep only states that have the same locations
-				ArrayList<State[]> passedCopy = new ArrayList<>();
-				passedCopy.addAll(passed);
+				ArrayList<State[]> passedCopy = new ArrayList<>(passed);
 				passedCopy.removeIf(n -> !(Arrays.equals(n[0].getLocations().toArray(), state[0].getLocations().toArray()) &&
 								Arrays.equals(n[1].getLocations().toArray(), state[1].getLocations().toArray())));
 

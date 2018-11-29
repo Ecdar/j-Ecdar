@@ -28,40 +28,12 @@ public class Location {
 				return invariant;
 		}
 
-		public void setInvariant(Guard invariant) {
-				this.invariant = invariant;
-		}
-
 		public boolean isInitial() {
 				return isInitial;
 		}
 
 		public void setInitial(boolean initial) {
 				isInitial = initial;
-		}
-
-		public boolean isUrgent() {
-				return isUrgent;
-		}
-
-		public void setUrgent(boolean urgent) {
-				isUrgent = urgent;
-		}
-
-		public boolean isUniversal() {
-				return isUniversal;
-		}
-
-		public void setUniversal(boolean universal) {
-				isUniversal = universal;
-		}
-
-		public boolean isInconsistent() {
-				return isInconsistent;
-		}
-
-		public void setInconsistent(boolean inconsistent) {
-				isInconsistent = inconsistent;
 		}
 
 		@Override
@@ -78,7 +50,7 @@ public class Location {
 								isUrgent == location.isUrgent &&
 								isUniversal == location.isUniversal &&
 								isInconsistent == location.isInconsistent &&
-								name == location.name &&
+								name.equals(location.name) &&
 								invariant.equals(location.invariant);
 		}
 

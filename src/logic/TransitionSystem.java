@@ -78,26 +78,6 @@ public abstract class TransitionSystem {
 				return dbm;
 		}
 
-		protected int[] buildConstraintWithX0(int[] dbm, int i, Guard g) {
-				boolean strict = g.isStrict();
-				int max = 1073741823;
-				int lowerBound = g.lowerBound();
-				int upperBound = (g.upperBound() == Integer.MAX_VALUE) ? max : g.upperBound();
-
-				if (strict) {
-						if (upperBound < max) upperBound++;
-
-						lowerBound--;
-				}
-
-				lowerBound = lowerBound * (-1);
-
-				dbm = DBMLib.dbm_constrain1(dbm, dbmSize, 0, i, lowerBound, false);
-				dbm = DBMLib.dbm_constrain1(dbm, dbmSize, i, 0, upperBound, false);
-
-				return dbm;
-		}
-
 		protected int[] applyInvariantsOrGuards(int[] dbm, ArrayList<Guard> guards) {
 				for (int i = 0; i < guards.size(); i++) {
 						// get guard and then its index in the clock array so you know the index in the DBM

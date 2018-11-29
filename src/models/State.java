@@ -17,10 +17,6 @@ public class State {
 				return locations;
 		}
 
-		public void setLocations(ArrayList<Location> locations) {
-				this.locations = locations;
-		}
-
 		public int[] getZone() {
 				return zone;
 		}

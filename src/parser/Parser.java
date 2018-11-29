@@ -175,30 +175,32 @@ public class Parser {
         String[] listOfInv = invariant.split(";");
         for (String str : listOfInv) {
         		String symbol = "";
-        		boolean lt, lte, gt, gte;
-        		lt = lte = gt = gte = false;
+        		boolean strict, greater;
+        		strict = false;
+        		greater = false;
 
 						if (str.contains("<=")) {
 								symbol = "<=";
-								lte = true;
+								strict = true;
 						}
 						if (str.contains(">=")) {
 								symbol = ">=";
-								gte = true;
+								strict = true;
+								greater = true;
 						}
 						if (str.contains("<") && !str.contains("=")) {
 								symbol = "<";
-								lt = true;
 						}
 						if (str.contains(">") && !str.contains("=")) {
 								symbol = ">";
-								gt = true;
+								greater = true;
 						}
+
 						String[] s = str.split(symbol);
 						for (int x = 0; x < s.length; x++) {
 								s[x] = s[x].replaceAll(" ", "");
 						}
-						guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), gt, gte, lt, lte));
+						guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
         }
         return guards;
     }

@@ -36,18 +36,13 @@ public class Component {
 				return locations;
 		}
 
-		public void setLocations(ArrayList<Location> locations) {
-				this.locations = locations;
-		}
-
 		public ArrayList<Transition> getTransitions() {
 				return transitions;
 		}
 
-		public ArrayList<Transition> getTransitionsFromLocation(Location loc) {
-				ArrayList<Transition> trans = new ArrayList<>();
+		private ArrayList<Transition> getTransitionsFromLocation(Location loc) {
+				ArrayList<Transition> trans = new ArrayList<>(transitions);
 
-				trans.addAll(transitions);
 				trans.removeIf(n -> n.getSource() != loc);
 
 				return trans;
@@ -61,7 +56,7 @@ public class Component {
 				return trans;
 		}
 
-		public void setTransitions(ArrayList<Transition> transitions) {
+		private void setTransitions(ArrayList<Transition> transitions) {
 				this.transitions = transitions;
 				for (Transition transition : transitions) {
 						Channel action = transition.getChannel();
@@ -91,14 +86,5 @@ public class Component {
 
 		public Set<Channel> getOutputAct() {
 				return outputAct;
-		}
-
-		public Set<Channel> getActions() {
-				Set<Channel> actions = new HashSet<>();
-
-				actions.addAll(this.inputAct);
-				actions.addAll(this.outputAct);
-
-				return actions;
 		}
 }

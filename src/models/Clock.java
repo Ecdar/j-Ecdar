@@ -36,7 +36,7 @@ public class Clock {
 				if (this == o) return true;
 				if (o == null || getClass() != o.getClass()) return false;
 				Clock clock = (Clock) o;
-				return name == clock.getName();
+				return name.equals(clock.getName());
 		}
 
 		// When adding a clock to a set, it shouldn't work if it has the same name as a clock that already exists in the set

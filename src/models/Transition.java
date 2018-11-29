@@ -12,17 +12,6 @@ public class Transition {
 		private ArrayList<Guard> guards;
 		private ArrayList<Update> updates;
 
-		public Transition(Location source, Location target, Channel chan, boolean isInput, Guard guard, Update update) {
-				this.source = source;
-				this.target = target;
-				this.chan = chan;
-				this.isInput = isInput;
-				this.guards = new ArrayList<>();
-				if (guard != null) guards.add(guard);
-				this.updates = new ArrayList<>();
-				if (update != null) updates.add(update);
-		}
-
 		public Transition(Location source, Location target, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
 				this.source = source;
 				this.target = target;
@@ -42,10 +31,6 @@ public class Transition {
 
 		public Location getTarget() {
 				return target;
-		}
-
-		public void setTarget(Location target) {
-				this.target = target;
 		}
 
 		public Channel getChannel() {
@@ -68,21 +53,11 @@ public class Transition {
 				return guards;
 		}
 
-		public Guard getGuard() { return (guards.size() == 0) ? null : guards.get(0); }
-
-		public void setGuards(ArrayList<Guard> guards) {
-				this.guards = guards;
-		}
-
 		public ArrayList<Update> getUpdates() {
 				return updates;
 		}
 
 		public Update getUpdate() { return (updates.size() == 0) ? null : updates.get(0); }
-
-		public void setUpdates(ArrayList<Update> updates) {
-				this.updates = updates;
-		}
 
 		@Override
 		public String toString() {
