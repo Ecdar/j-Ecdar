@@ -1,19 +1,27 @@
 package models;
 
-import java.util.ArrayList;
+import lib.DBMLib;
+import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class State {
-		private ArrayList<Location> locations;
+		private List<Location> locations;
 		private int[] zone;
+		private int zoneSize;
 
-		public State(ArrayList<Location> locations, int[] zone) {
+		public State(List<Location> locations, int[] zone) {
 				this.locations = locations;
 				this.zone = zone;
+				this.zoneSize = (int) Math.sqrt(zone.length);
+
+				String fileName = "src/" + System.mapLibraryName("DBM");
+				File lib = new File(fileName);
+				System.load(lib.getAbsolutePath());
 		}
 
-		public ArrayList<Location> getLocations() {
+		public List<Location> getLocations() {
 				return locations;
 		}
 
@@ -21,8 +29,8 @@ public class State {
 				return zone;
 		}
 
-		public void setZone(int[] zone) {
-				this.zone = zone;
+		public void delay() {
+				this.zone = DBMLib.dbm_up(zone, zoneSize);
 		}
 
 		@Override

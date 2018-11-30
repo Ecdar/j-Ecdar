@@ -1,7 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class Transition {
 
@@ -9,10 +8,10 @@ public class Transition {
 		private Location target;
 		private Channel chan;
 		private boolean isInput;
-		private ArrayList<Guard> guards;
-		private ArrayList<Update> updates;
+		private List<Guard> guards;
+		private List<Update> updates;
 
-		public Transition(Location source, Location target, Channel chan, boolean isInput, ArrayList<Guard> guards, ArrayList<Update> updates) {
+		public Transition(Location source, Location target, Channel chan, boolean isInput, List<Guard> guards, List<Update> updates) {
 				this.source = source;
 				this.target = target;
 				this.chan = chan;
@@ -25,10 +24,6 @@ public class Transition {
 				return source;
 		}
 
-		public void setSource(Location source) {
-				this.source = source;
-		}
-
 		public Location getTarget() {
 				return target;
 		}
@@ -37,27 +32,17 @@ public class Transition {
 				return chan;
 		}
 
-		public void setChannel(Channel chan) {
-				this.chan = chan;
-		}
-
 		public boolean isInput() {
 				return isInput;
 		}
 
-		public void setInput(boolean input) {
-				isInput = input;
-		}
-
-		public ArrayList<Guard> getGuards() {
+		public List<Guard> getGuards() {
 				return guards;
 		}
 
-		public ArrayList<Update> getUpdates() {
+		public List<Update> getUpdates() {
 				return updates;
 		}
-
-		public Update getUpdate() { return (updates.size() == 0) ? null : updates.get(0); }
 
 		@Override
 		public String toString() {

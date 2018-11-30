@@ -1,9 +1,8 @@
 package logic;
 
 import models.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SimpleTransitionSystem extends TransitionSystem {
 
@@ -22,34 +21,14 @@ public class SimpleTransitionSystem extends TransitionSystem {
 				return component.getOutputAct();
 		}
 
-		public State getInitialState() {
-				Location init = component.getInitLoc();
-				// size of DBM is clock count + 1 (x0 is reference clock)
-				int[] dbm = initializeDBM();
-				// apply invariant
-				if (init.getInvariant() != null)
-						dbm = applyInvariantsOrGuards(dbm, new ArrayList<>(Arrays.asList(init.getInvariant())));
-				return new State(new ArrayList<>(Arrays.asList(component.getInitLoc())), dbm);
-		}
+		public Set<Channel> getSyncs() { return new HashSet<>(); }
 
-		public ArrayList<State> getNextStates(State currentState, Channel channel) {
-				ArrayList<State> states = new ArrayList<>();
-				ArrayList<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
-				for (Transition transition : transitions) {
-						Location newLocation = transition.getSource();
-						int[] dbm = currentState.getZone();
-						// apply guards
-						dbm = applyInvariantsOrGuards(dbm, transition.getGuards());
-						// apply resets
-						dbm = applyResets(dbm, transition.getUpdates());
-						// apply invariant
-						if (newLocation.getInvariant() != null)
-								dbm = applyInvariantsOrGuards(dbm, new ArrayList<>(Arrays.asList(newLocation.getInvariant())));
-						if (isDbmValid(dbm)) {
-								State newState = new State(new ArrayList<>(Arrays.asList(newLocation)), dbm);
-								states.add(newState);
-						}
-				}
-				return states;
+		public List<State> getNextStates(State currentState, Channel channel) {
+				List<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
+
+				List<List<Location>> locationsArr = transitions.stream().map(transition -> new ArrayList<>(Arrays.asList(transition.getTarget()))).collect(Collectors.toList());
+				List<List<Transition>> transitionsArr = transitions.stream().map(transition -> new ArrayList<>(Arrays.asList(transition))).collect(Collectors.toList());
+
+				return new ArrayList<>(addNewStates(currentState.getZone(), locationsArr, transitionsArr));
 		}
 }

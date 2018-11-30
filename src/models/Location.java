@@ -22,18 +22,12 @@ public class Location {
 
 		public String getName() { return name; }
 
-		public void setName(String name) { this.name = name;}
-
 		public Guard getInvariant() {
 				return invariant;
 		}
 
 		public boolean isInitial() {
 				return isInitial;
-		}
-
-		public void setInitial(boolean initial) {
-				isInitial = initial;
 		}
 
 		@Override

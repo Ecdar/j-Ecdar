@@ -16,16 +16,8 @@ public class Update {
 				return clock;
 		}
 
-		public void setClock(Clock clock) {
-				this.clock = clock;
-		}
-
 		public int getValue() {
 				return value;
-		}
-
-		public void setValue(int value) {
-				this.value = value;
 		}
 
 		@Override

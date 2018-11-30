@@ -9,7 +9,7 @@ import java.util.*;
 public class Refinement {
 		private TransitionSystem ts1, ts2;
 		private Deque<State[]> waiting;
-		private ArrayList<State[]> passed;
+		private List<State[]> passed;
 
 		public Refinement(TransitionSystem ts1, TransitionSystem ts2) {
 				this.ts1 = ts1;
@@ -34,9 +34,9 @@ public class Refinement {
 								passed.add(curr);
 
 								for (Channel output : outputs1) {
-										ArrayList<State> next1 = ts1.getNextStates(curr[0], output);
+										List<State> next1 = ts1.getNextStates(curr[0], output);
 										if (!next1.isEmpty()) {
-												ArrayList<State> next2 = ts2.getNextStates(curr[1], output);
+												List<State> next2 = ts2.getNextStates(curr[1], output);
 												if (next2.isEmpty()) {
 														return false;
 												} else {
@@ -46,30 +46,32 @@ public class Refinement {
 								}
 
 								for (Channel input : inputs2) {
-										ArrayList<State> next2 = ts2.getNextStates(curr[1], input);
+										List<State> next2 = ts2.getNextStates(curr[1], input);
 										if (!next2.isEmpty()) {
-												ArrayList<State> next1 = ts1.getNextStates(curr[0], input);
+												List<State> next1 = ts1.getNextStates(curr[0], input);
 												if (next1.isEmpty()) {
 														return false;
 												} else {
 														waiting.addAll(getNewStates(next1, next2));
 												}
 										}
-								};
+								}
 						}
 				}
 				return true;
 		}
 
-		private ArrayList<State[]> getNewStates(ArrayList<State> next1, ArrayList<State> next2) {
-				ArrayList<State[]> states = new ArrayList<>();
+		private List<State[]> getNewStates(List<State> next1, List<State> next2) {
+				List<State[]> states = new ArrayList<>();
 
 				for (State st1 : next1) {
 						for (State st2 : next2) {
 								int[] zone1 = st1.getZone();
 								int[] zone2 = st2.getZone();
 
-								if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.dbmSize)) {
+								if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.getDbmSize())) {
+										st1.delay();
+										st2.delay();
 										State[] newState = new State[]{st1, st2};
 										states.add(newState);
 								}
@@ -81,7 +83,7 @@ public class Refinement {
 
 		private boolean passedContainsState(State[] state) {
 				// keep only states that have the same locations
-				ArrayList<State[]> passedCopy = new ArrayList<>(passed);
+				List<State[]> passedCopy = new ArrayList<>(passed);
 				passedCopy.removeIf(n -> !(Arrays.equals(n[0].getLocations().toArray(), state[0].getLocations().toArray()) &&
 								Arrays.equals(n[1].getLocations().toArray(), state[1].getLocations().toArray())));
 

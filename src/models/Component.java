@@ -2,18 +2,19 @@ package models;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Component {
 		private String name;
-		private ArrayList<Location> locations;
-		private ArrayList<Transition> transitions;
+		private List<Location> locations;
+		private List<Transition> transitions;
 		private Set<Clock> clocks;
 		private Set<Channel> inputAct;
 		private Set<Channel> outputAct;
 		private Location initLoc;
 
-		public Component(String name, ArrayList<Location> locations, ArrayList<Transition> transitions, Set<Clock> clocks) {
+		public Component(String name, List<Location> locations, List<Transition> transitions, Set<Clock> clocks) {
 				this.name = name;
 				this.locations = locations;
 				for (Location location : locations) {
@@ -32,31 +33,31 @@ public class Component {
 				return name;
 		}
 
-		public ArrayList<Location> getLocations() {
+		public List<Location> getLocations() {
 				return locations;
 		}
 
-		public ArrayList<Transition> getTransitions() {
+		public List<Transition> getTransitions() {
 				return transitions;
 		}
 
-		private ArrayList<Transition> getTransitionsFromLocation(Location loc) {
-				ArrayList<Transition> trans = new ArrayList<>(transitions);
+		private List<Transition> getTransitionsFromLocation(Location loc) {
+				List<Transition> trans = new ArrayList<>(transitions);
 
 				trans.removeIf(n -> n.getSource() != loc);
 
 				return trans;
 		}
 
-		public ArrayList<Transition> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
-				ArrayList<Transition> trans = getTransitionsFromLocation(loc);
+		public List<Transition> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
+				List<Transition> trans = getTransitionsFromLocation(loc);
 
 				trans.removeIf(n -> !n.getChannel().getName().equals(signal.getName()));
 
 				return trans;
 		}
 
-		private void setTransitions(ArrayList<Transition> transitions) {
+		private void setTransitions(List<Transition> transitions) {
 				this.transitions = transitions;
 				for (Transition transition : transitions) {
 						Channel action = transition.getChannel();
@@ -70,10 +71,6 @@ public class Component {
 
 		public Set<Clock> getClocks() {
 				return clocks;
-		}
-
-		public void setClocks(Set<Clock> clocks) {
-				this.clocks = clocks;
 		}
 
 		public Location getInitLoc() {

@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class RefinementTest {
 
-		static ArrayList<Component> machines;
+		private static ArrayList<Component> machines;
 
 		@BeforeClass
 		public static void setUpBeforeClass() throws Exception {
@@ -65,8 +65,8 @@ public class RefinementTest {
 				Component machine = machines.get(1);
 				Component machine3 = machines.get(4);
 
-				SimpleTransitionSystem ts1 = new SimpleTransitionSystem(machine3);
-				SimpleTransitionSystem ts2 = new SimpleTransitionSystem(machine);
+				TransitionSystem ts1 = new SimpleTransitionSystem(machine3);
+				TransitionSystem ts2 = new SimpleTransitionSystem(machine);
 
 				Refinement ref = new Refinement(ts1, ts2);
 				assertTrue(ref.check());
@@ -79,8 +79,8 @@ public class RefinementTest {
 				Component researcher = machines.get(2);
 				Component spec = machines.get(3);
 
-				ComposedTransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
-				SimpleTransitionSystem ts2 = new SimpleTransitionSystem(spec);
+				TransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
+				TransitionSystem ts2 = new SimpleTransitionSystem(spec);
 
 				Refinement ref = new Refinement(ts1, ts2);
 				assertTrue(ref.check());
@@ -92,16 +92,16 @@ public class RefinementTest {
 				Component machine = machines.get(1);
 				Component researcher = machines.get(2);
 
-				ComposedTransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
-				ComposedTransitionSystem ts2 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(machine, researcher, adm)));
+				TransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
+				TransitionSystem ts2 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(machine, researcher, adm)));
 
 				Refinement ref = new Refinement(ts1, ts2);
 				assertTrue(ref.check());
 		}
 
 		private Refinement selfRefinesSelf(Component component) {
-				SimpleTransitionSystem ts1 = new SimpleTransitionSystem(component);
-				SimpleTransitionSystem ts2 = new SimpleTransitionSystem(component);
+				TransitionSystem ts1 = new SimpleTransitionSystem(component);
+				TransitionSystem ts2 = new SimpleTransitionSystem(component);
 				return new Refinement(ts1, ts2);
 		}
 }
