@@ -3,6 +3,7 @@ package logic;
 import lib.DBMLib;
 import models.Channel;
 import models.State;
+import models.StateTransition;
 import java.io.File;
 import java.util.*;
 
@@ -31,12 +32,15 @@ public class Refinement {
 						State[] curr = waiting.pop();
 
 						if (!passedContainsState(curr)) {
-								passed.add(curr);
+								// need to make deep copy
+								State newState1 = new State(curr[0].getLocations(), curr[0].getZone());
+								State newState2 = new State(curr[1].getLocations(), curr[1].getZone());
+								passed.add(new State[] {newState1, newState2});
 
 								for (Channel output : outputs1) {
-										List<State> next1 = ts1.getNextStates(curr[0], output);
+										List<StateTransition> next1 = ts1.getNextTransitions(curr[0], output);
 										if (!next1.isEmpty()) {
-												List<State> next2 = ts2.getNextStates(curr[1], output);
+												List<StateTransition> next2 = ts2.getNextTransitions(curr[1], output);
 												if (next2.isEmpty()) {
 														return false;
 												} else {
@@ -46,9 +50,9 @@ public class Refinement {
 								}
 
 								for (Channel input : inputs2) {
-										List<State> next2 = ts2.getNextStates(curr[1], input);
+										List<StateTransition> next2 = ts2.getNextTransitions(curr[1], input);
 										if (!next2.isEmpty()) {
-												List<State> next1 = ts1.getNextStates(curr[0], input);
+												List<StateTransition> next1 = ts1.getNextTransitions(curr[0], input);
 												if (next1.isEmpty()) {
 														return false;
 												} else {
@@ -61,19 +65,33 @@ public class Refinement {
 				return true;
 		}
 
-		private List<State[]> getNewStates(List<State> next1, List<State> next2) {
+		private List<State[]> getNewStates(List<StateTransition> next1, List<StateTransition> next2) {
 				List<State[]> states = new ArrayList<>();
 
-				for (State st1 : next1) {
-						for (State st2 : next2) {
-								int[] zone1 = st1.getZone();
-								int[] zone2 = st2.getZone();
+				for (StateTransition t1 : next1) {
+						for (StateTransition t2 : next2) {
+								State source1 = new State(t1.getSource().getLocations(), t1.getSource().getZone());
+								State source2 = new State(t2.getSource().getLocations(), t2.getSource().getZone());
 
-								if (DBMLib.dbm_isSubsetEq(zone1, zone2, ts1.getDbmSize())) {
-										st1.delay();
-										st2.delay();
-										State[] newState = new State[]{st1, st2};
-										states.add(newState);
+								source1.applyGuards(t1.getGuards(), ts1.getClocks());
+								source2.applyGuards(t2.getGuards(), ts2.getClocks());
+
+								int maxSource1 = source1.getMaxValuation(); int maxSource2 = source2.getMaxValuation();
+								int minSource1 = source1.getMinValuation(); int minSource2 = source2.getMinValuation();
+
+								if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
+										State target1 = new State(t1.getTarget().getLocations(), t1.getTarget().getZone());
+										State target2 = new State(t2.getTarget().getLocations(), t2.getTarget().getZone());
+
+										target1.delay(); target2.delay();
+										target1.applyInvariants(ts1.getClocks());
+										target2.applyInvariants(ts2.getClocks());
+
+										int maxTarget1 = target1.getMaxValuation(); int maxTarget2 = target2.getMaxValuation();
+										if (maxTarget1 <= maxTarget2) {
+												State[] newState = new State[]{target1, target2};
+												states.add(newState);
+										}
 								}
 						}
 				}

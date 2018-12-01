@@ -62,7 +62,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
 
 		public Set<Channel> getSyncs() { return syncs; }
 
-		public List<State> getNextStates(State currentState, Channel channel) {
+		public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
 				List<Location> locations = currentState.getLocations();
 				List<List<Location>> locationsArr = new ArrayList<>();
 				List<List<Transition>> transitionsArr = new ArrayList<>();
@@ -105,7 +105,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
 						}
 				}
 
-				return new ArrayList<>(addNewStates(currentState.getZone(), locationsArr, transitionsArr));
+				return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
 		}
 
 		private <T> List<List<T>> cartesianProduct(List<List<T>> lists) {

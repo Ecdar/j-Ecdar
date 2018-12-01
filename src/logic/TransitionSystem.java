@@ -30,7 +30,7 @@ public abstract class TransitionSystem {
 				return dbmSize;
 		}
 
-		private List<Clock> getClocks() {
+		public List<Clock> getClocks() {
 				return clocks;
 		}
 
@@ -43,43 +43,44 @@ public abstract class TransitionSystem {
 				}
 
 				int[] zone = initializeDBM();
-				zone = applyInvariantsOrGuards(zone, getInvariants(initialLocations));
-				zone = delay(zone);
+				State state = new State(initialLocations, zone);
+				state.applyInvariants(clocks);
+				state.delay();
 
-				return new State(initialLocations, zone);
+				return state;
 		}
 
-		List<State> addNewStates(int[] zone, List<List<Location>> locationsArr, List<List<Transition>> transitionsArr) {
-				List<State> states = new ArrayList<>();
+		List<StateTransition> addNewStateTransitions(State currentState, List<List<Location>> locationsArr, List<List<Transition>> transitionsArr) {
+				List<StateTransition> stateTransitions = new ArrayList<>();
 
 				for (int n = 0; n < locationsArr.size(); n++) {
 						List<Location> newLocations = locationsArr.get(n);
+						List<Transition> transitions = (transitionsArr.get(n) == null) ? new ArrayList<>() : transitionsArr.get(n);
 						List<Guard> guards = new ArrayList<>();
 						List<Update> updates = new ArrayList<>();
-						for (Transition t : transitionsArr.get(n)) {
+						for (Transition t : transitions) {
 								if (t != null) {
 										guards.addAll(t.getGuards());
 										updates.addAll(t.getUpdates());
 								}
 						}
 
-						int[] dbm = zone;
+						// construct new state
+						State state = new State(newLocations, currentState.getZone());
 						// apply guards
 						if (!guards.isEmpty())
-								dbm = applyInvariantsOrGuards(dbm, guards);
+								state.applyGuards(guards, clocks);
 						// apply resets
-						if (!updates.isEmpty()) dbm = applyResets(dbm, updates);
-						// apply invariants
-						if (!getInvariants(newLocations).isEmpty())
-								dbm = applyInvariantsOrGuards(dbm, getInvariants(newLocations));
+						if (!updates.isEmpty()) state.applyResets(updates, clocks);
 
-						// construct new state and add it to list
-						if (isDbmValid(dbm)) {
-								states.add(new State(newLocations, dbm));
+						// add new state to list
+						if (isDbmValid(state.getZone())) {
+								StateTransition stateTransition = new StateTransition(currentState, state, transitions);
+								stateTransitions.add(stateTransition);
 						}
 				}
 
-				return states;
+				return stateTransitions;
 		}
 
 		public abstract Set<Channel> getInputs();
@@ -88,7 +89,7 @@ public abstract class TransitionSystem {
 
 		public abstract Set<Channel> getSyncs();
 
-		public abstract List<State> getNextStates(State currentState, Channel channel);
+		public abstract List<StateTransition> getNextTransitions(State currentState, Channel channel);
 
 		int[] initializeDBM() {
 				// we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
@@ -101,58 +102,5 @@ public abstract class TransitionSystem {
 
 		boolean isDbmValid(int[] dbm) {
 				return DBMLib.dbm_isValid(dbm, dbmSize);
-		}
-
-		private int[] buildConstraintsForGuard(int[] dbm, int i, Guard g) {
-				int max = 1073741823;
-
-				int lowerBoundI = g.getLowerBound();
-				int upperBoundI = g.getUpperBound();
-
-				for (int a = 0; a < dbmSize; a++) {
-						if (a != i && a == 0) {
-								int lowerBoundA = dbm[a] * (-1);
-								int upperBoundA = dbm[a * dbmSize];
-
-								dbm = DBMLib.dbm_constrain1(dbm, dbmSize, i, a, (upperBoundI == max) ? max : upperBoundI - lowerBoundA, false);
-								dbm = DBMLib.dbm_constrain1(dbm, dbmSize, a, i, (upperBoundA == max) ? max : upperBoundA - lowerBoundI, false);
-						}
-				}
-
-				return dbm;
-		}
-
-		List<Guard> getInvariants(List<Location> locations) {
-				List<Guard> invariants = new ArrayList<>();
-
-				for (Location location : locations) {
-						Guard invariant = location.getInvariant();
-						if (invariant != null) invariants.add(invariant);
-				}
-
-				return invariants;
-		}
-
-		int[] applyInvariantsOrGuards(int[] dbm, List<Guard> guards) {
-				for (Guard guard : guards) {
-						// get guard and then its index in the clock array so you know the index in the DBM
-						int a = getClocks().indexOf(guard.getClock());
-						dbm = buildConstraintsForGuard(dbm, (a + 1), guard);
-				}
-				return dbm;
-		}
-
-		int[] applyResets(int[] dbm, List<Update> resets) {
-				for (Update reset : resets) {
-						int index = clocks.indexOf(reset.getClock());
-
-						dbm = DBMLib.dbm_updateValue(dbm, dbmSize, (index + 1), reset.getValue());
-				}
-
-				return dbm;
-		}
-
-		int[] delay(int[] dbm) {
-				return DBMLib.dbm_up(dbm, dbmSize);
 		}
 }

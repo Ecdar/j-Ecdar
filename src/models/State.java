@@ -2,6 +2,7 @@ package models;
 
 import lib.DBMLib;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -29,8 +30,74 @@ public class State {
 				return zone;
 		}
 
+		private void buildConstraintsForGuard(int i, Guard g) {
+				int lowerBoundI = g.getLowerBound();
+				int upperBoundI = g.getUpperBound();
+
+				zone = DBMLib.dbm_constrain1(zone, zoneSize, 0, i, (-1) * lowerBoundI, false);
+				zone = DBMLib.dbm_constrain1(zone, zoneSize, i, 0, upperBoundI, false);
+		}
+
+		public int getMaxValuation() {
+				int max = 1073741823;
+
+				for (int i = 1; i < zoneSize; i++) {
+						int curr = zone[zoneSize*i];
+						if (curr < max)
+								max = curr;
+				}
+
+				return max;
+		}
+
+		public int getMinValuation() {
+				int min = 0;
+
+				for (int i = 1; i < zoneSize; i++) {
+						int curr = (-1) * zone[i];
+						if (curr > min)
+								min = curr;
+				}
+
+				return min;
+		}
+
+		public List<Guard> getInvariants() {
+				List<Guard> invariants = new ArrayList<>();
+
+				for (Location location : locations) {
+						Guard invariant = location.getInvariant();
+						if (invariant != null) invariants.add(invariant);
+				}
+
+				return invariants;
+		}
+
+		public void applyGuards(List<Guard> guards, List<Clock> clocks) {
+				for (Guard guard : guards) {
+						// get guard and then its index in the clock array so you know the index in the DBM
+						int a = clocks.indexOf(guard.getClock());
+						buildConstraintsForGuard((a + 1), guard);
+				}
+		}
+
+		public void applyInvariants(List<Clock> clocks) {
+				for (Guard invariant : getInvariants()) {
+						int a = clocks.indexOf(invariant.getClock());
+						buildConstraintsForGuard((a + 1), invariant);
+				}
+		}
+
+		public void applyResets(List<Update> resets, List<Clock> clocks) {
+				for (Update reset : resets) {
+						int index = clocks.indexOf(reset.getClock());
+
+						zone = DBMLib.dbm_updateValue(zone, zoneSize, (index + 1), reset.getValue());
+				}
+		}
+
 		public void delay() {
-				this.zone = DBMLib.dbm_up(zone, zoneSize);
+				zone = DBMLib.dbm_up(zone, zoneSize);
 		}
 
 		@Override

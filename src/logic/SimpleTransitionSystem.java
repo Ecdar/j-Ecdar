@@ -23,12 +23,12 @@ public class SimpleTransitionSystem extends TransitionSystem {
 
 		public Set<Channel> getSyncs() { return new HashSet<>(); }
 
-		public List<State> getNextStates(State currentState, Channel channel) {
+		public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
 				List<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
 
 				List<List<Location>> locationsArr = transitions.stream().map(transition -> new ArrayList<>(Arrays.asList(transition.getTarget()))).collect(Collectors.toList());
 				List<List<Transition>> transitionsArr = transitions.stream().map(transition -> new ArrayList<>(Arrays.asList(transition))).collect(Collectors.toList());
 
-				return new ArrayList<>(addNewStates(currentState.getZone(), locationsArr, transitionsArr));
+				return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
 		}
 }
