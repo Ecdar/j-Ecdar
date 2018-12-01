@@ -26,6 +26,12 @@ hs_err_pid*
 *.iml
 out/
 
+# JSON Samples
+# samples/
+
+# Static DBM Libraries
+dbm/libs/
+
 Generated library files
 *.dylib
 *.so

@@ -22,15 +22,11 @@ public class Parser {
     public static void main(String[] args) {
         ArrayList<String> locations = new ArrayList<>();
 
-        /*locations.add("/Users/Widok/Documents/GlobalDeclarations.json");
-        locations.add("/Users/Widok/Documents/Imp.json");
-        locations.add("/Users/Widok/Documents/G.json");
-        locations.add("/Users/Widok/Documents/A_Good.json");*/
-
-        locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/GlobalDeclarations.json");
-        locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Administration.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Researcher.json");
+        // Relative Path to your samples in the Project folder
+        locations.add("./samples/EcdarUniversity/GlobalDeclarations.json");
+        locations.add("./samples/EcdarUniversity/Components/Machine.json");
+		locations.add("./samples/EcdarUniversity/Components/Administration.json");
+		locations.add("./samples/EcdarUniversity/Components/Researcher.json");
 
         objectList = parseFiles(locations);
         ArrayList<Component> components = distrubuteObjects(objectList);
@@ -38,17 +34,18 @@ public class Parser {
     }
 
     public static ArrayList<Component> parse() {
-				ArrayList<String> locations = new ArrayList<>();
+        ArrayList<String> locations = new ArrayList<>();
 
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/GlobalDeclarations.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Administration.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Researcher.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Spec.json");
-				locations.add("/Users/cristina/Documents/Ecdar-2.2/samples/EcdarUniversity/Components/Machine3.json");
+        // Relative Path to your samples in the Project folder
+        locations.add("./samples/EcdarUniversity/GlobalDeclarations.json");
+        locations.add("./samples/EcdarUniversity/Components/Machine.json");
+        locations.add("./samples/EcdarUniversity/Components/Administration.json");
+        locations.add("./samples/EcdarUniversity/Components/Researcher.json");
+        locations.add("./samples/EcdarUniversity/Components/Spec.json");
+        locations.add("./samples/EcdarUniversity/Components/Machine3.json");
 
-				objectList = parseFiles(locations);
-				return distrubuteObjects(objectList);
+        objectList = parseFiles(locations);
+        return distrubuteObjects(objectList);
 		}
 
     private static void printStuff(ArrayList<Component> components) {
