@@ -25,8 +25,8 @@ public class Parser {
         // Relative Path to your samples in the Project folder
         locations.add("./samples/EcdarUniversity/GlobalDeclarations.json");
         locations.add("./samples/EcdarUniversity/Components/Machine.json");
-		locations.add("./samples/EcdarUniversity/Components/Administration.json");
-		locations.add("./samples/EcdarUniversity/Components/Researcher.json");
+				locations.add("./samples/EcdarUniversity/Components/Administration.json");
+				locations.add("./samples/EcdarUniversity/Components/Researcher.json");
 
         objectList = parseFiles(locations);
         ArrayList<Component> components = distrubuteObjects(objectList);
@@ -37,12 +37,13 @@ public class Parser {
         ArrayList<String> locations = new ArrayList<>();
 
         // Relative Path to your samples in the Project folder
-        locations.add("./samples/EcdarUniversity/GlobalDeclarations.json");
-        locations.add("./samples/EcdarUniversity/Components/Machine.json");
-        locations.add("./samples/EcdarUniversity/Components/Administration.json");
-        locations.add("./samples/EcdarUniversity/Components/Researcher.json");
-        locations.add("./samples/EcdarUniversity/Components/Spec.json");
-        locations.add("./samples/EcdarUniversity/Components/Machine3.json");
+				String base = "./samples/EcdarUniversity/";
+				locations.add(base + "GlobalDeclarations.json");
+        locations.add(base + "Components/Administration.json");
+				locations.add(base + "Components/Machine.json");
+				locations.add(base + "Components/Researcher.json");
+        locations.add(base + "Components/Spec.json");
+        locations.add(base + "Components/Machine3.json");
 
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList);
@@ -100,7 +101,7 @@ public class Parser {
                     JSONArray edgeList = (JSONArray) obj.get("edges");
                     ArrayList<Transition> transitions = addEdges(edgeList, locations);
                     // make copy of clocks, since calling componentClocks.clear() will empty it and we lose this information
-                    Component component = new Component((String)obj.get("name"), locations, transitions, new HashSet<>(componentClocks));
+                    Component component = new Component((String)obj.get("name"), locations, transitions, new ArrayList<>(componentClocks));
                     components.add(component);
                     componentClocks.clear();
                 }

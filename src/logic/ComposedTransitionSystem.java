@@ -62,16 +62,21 @@ public class ComposedTransitionSystem extends TransitionSystem {
 
 		public Set<Channel> getSyncs() { return syncs; }
 
+		// build a list of transitions from a given state and a signal
 		public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
 				List<Location> locations = currentState.getLocations();
+				// these will store the locations of the target states and the corresponding transitions
 				List<List<Location>> locationsArr = new ArrayList<>();
 				List<List<Transition>> transitionsArr = new ArrayList<>();
 
 				if (outputs.contains(channel)) {
+						// if the signal is an output, loop through the machines to find the one sending the output
 						for (int i = 0; i < locations.size(); i++) {
 								List<Transition> transitions = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
 
 								for (Transition transition : transitions) {
+										// the new locations will contain the locations of the source zone, but the location corresponding
+										// to the machine sending the output will be replaced by the location that can be reached following the output
 										List<Location> newLocations = new ArrayList<>(locations);
 										newLocations.set(i, transition.getTarget());
 
@@ -82,12 +87,17 @@ public class ComposedTransitionSystem extends TransitionSystem {
 				} else if (inputs.contains(channel) || (syncs.contains(channel))) {
 						boolean checkForInputs = checkForInputs(channel, locations);
 
+						// for syncs, we have to check if that output is being sent by a machine, otherwise we do not look at the
+						// inputs in the other machines
 						if (checkForInputs) {
 								List<List<Location>> locationsList = new ArrayList<>();
 								List<List<Transition>> transitionsList = new ArrayList<>();
+
+								// loop through the machines to get the transitions from the corresponding location
 								for (int i = 0; i < locations.size(); i++) {
 										List<Transition> transitionsForI = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
 										if (transitionsForI.isEmpty()) {
+												// if there are no transitions, only add the current location to the list and an empty transition
 												List<Location> newLocations = new ArrayList<>();
 												newLocations.add(locations.get(i));
 												locationsList.add(newLocations);
@@ -95,11 +105,13 @@ public class ComposedTransitionSystem extends TransitionSystem {
 												newTransitions.add(null);
 												transitionsList.add(newTransitions);
 										} else {
+												// otherwise, add all transitions and build the list of new locations by taking the target of each transition
 												List<Location> newLocations = transitionsForI.stream().map(Transition::getTarget).collect(Collectors.toList());
 												locationsList.add(newLocations);
 												transitionsList.add(transitionsForI);
 										}
 								}
+								// use the cartesian product to build all possible combinations between locations (same for transitions
 								locationsArr = cartesianProduct(locationsList);
 								transitionsArr = cartesianProduct(transitionsList);
 						}
@@ -108,14 +120,19 @@ public class ComposedTransitionSystem extends TransitionSystem {
 				return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
 		}
 
+		// function that takes an arbitrary number of lists and recursively calculates their cartesian product
 		private <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
 				List<List<T>> resultLists = new ArrayList<>();
 				if (lists.size() == 0) {
+						// base case; return a list containing one empty list
 						resultLists.add(new ArrayList<>());
 						return resultLists;
 				} else {
+						// take head of list
 						List<T> firstList = lists.get(0);
+						// apply function to tail of list
 						List<List<T>> remainingLists = cartesianProduct(lists.subList(1, lists.size()));
+						// combine each element of the first list with each of the remaining lists
 						for (T condition : firstList) {
 								for (List<T> remainingList : remainingLists) {
 										List<T> resultList = new ArrayList<>();
@@ -129,15 +146,20 @@ public class ComposedTransitionSystem extends TransitionSystem {
 		}
 
 		private boolean checkForInputs(Channel channel, List<Location> locations) {
+				// assume we should check for inputs
 				boolean check = true;
 
 				// for syncs, we must make sure we have an output first
 				if (syncs.contains(channel)) {
+						// loop through all machines to find the one sending the output
 						for (int i = 0; i < machines.size(); i++) {
 								if (machines.get(i).getOutputAct().contains(channel)) {
 										List<Transition> transitionsForI = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
-										if (transitionsForI.isEmpty())
+										if (transitionsForI.isEmpty()) {
+												// do not check for inputs if the state in the corresponding machine does not send that output
 												check = false;
+												break;
+										}
 								}
 						}
 				}

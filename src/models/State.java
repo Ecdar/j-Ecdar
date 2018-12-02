@@ -30,7 +30,10 @@ public class State {
 				return zone;
 		}
 
-		private void buildConstraintsForGuard(int i, Guard g) {
+		private void buildConstraintsForGuard(Guard g, List<Clock> clocks) {
+				// get the guard's index in the clock array so you know the index in the DBM
+				int i = clocks.indexOf(g.getClock()) + 1;
+
 				int lowerBoundI = g.getLowerBound();
 				int upperBoundI = g.getUpperBound();
 
@@ -76,15 +79,13 @@ public class State {
 		public void applyGuards(List<Guard> guards, List<Clock> clocks) {
 				for (Guard guard : guards) {
 						// get guard and then its index in the clock array so you know the index in the DBM
-						int a = clocks.indexOf(guard.getClock());
-						buildConstraintsForGuard((a + 1), guard);
+						buildConstraintsForGuard(guard, clocks);
 				}
 		}
 
 		public void applyInvariants(List<Clock> clocks) {
 				for (Guard invariant : getInvariants()) {
-						int a = clocks.indexOf(invariant.getClock());
-						buildConstraintsForGuard((a + 1), invariant);
+						buildConstraintsForGuard(invariant, clocks);
 				}
 		}
 

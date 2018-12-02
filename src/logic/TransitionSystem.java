@@ -53,11 +53,13 @@ public abstract class TransitionSystem {
 		List<StateTransition> addNewStateTransitions(State currentState, List<List<Location>> locationsArr, List<List<Transition>> transitionsArr) {
 				List<StateTransition> stateTransitions = new ArrayList<>();
 
+				// loop through all sets of locations and transitions
 				for (int n = 0; n < locationsArr.size(); n++) {
 						List<Location> newLocations = locationsArr.get(n);
 						List<Transition> transitions = (transitionsArr.get(n) == null) ? new ArrayList<>() : transitionsArr.get(n);
 						List<Guard> guards = new ArrayList<>();
 						List<Update> updates = new ArrayList<>();
+						// gather all the guards and resets of one set of transitions
 						for (Transition t : transitions) {
 								if (t != null) {
 										guards.addAll(t.getGuards());
@@ -65,15 +67,13 @@ public abstract class TransitionSystem {
 								}
 						}
 
-						// construct new state
+						// build the target state given the set of locations
 						State state = new State(newLocations, currentState.getZone());
-						// apply guards
-						if (!guards.isEmpty())
-								state.applyGuards(guards, clocks);
-						// apply resets
+						// get the new zone by applying guards and resets on the zone of the target state
+						if (!guards.isEmpty()) state.applyGuards(guards, clocks);
 						if (!updates.isEmpty()) state.applyResets(updates, clocks);
 
-						// add new state to list
+						// if the zone is valid, build the transition and add it to the list
 						if (isDbmValid(state.getZone())) {
 								StateTransition stateTransition = new StateTransition(currentState, state, transitions);
 								stateTransitions.add(stateTransition);

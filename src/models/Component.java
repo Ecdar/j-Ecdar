@@ -9,12 +9,12 @@ public class Component {
 		private String name;
 		private List<Location> locations;
 		private List<Transition> transitions;
-		private Set<Clock> clocks;
+		private List<Clock> clocks;
 		private Set<Channel> inputAct;
 		private Set<Channel> outputAct;
 		private Location initLoc;
 
-		public Component(String name, List<Location> locations, List<Transition> transitions, Set<Clock> clocks) {
+		public Component(String name, List<Location> locations, List<Transition> transitions, List<Clock> clocks) {
 				this.name = name;
 				this.locations = locations;
 				for (Location location : locations) {
@@ -69,7 +69,7 @@ public class Component {
 				}
 		}
 
-		public Set<Clock> getClocks() {
+		public List<Clock> getClocks() {
 				return clocks;
 		}
 
