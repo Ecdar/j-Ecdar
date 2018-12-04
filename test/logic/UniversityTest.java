@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class RefinementTest {
+public class UniversityTest {
 
 		private static Component adm, machine, researcher, spec, machine3;
 
@@ -194,7 +194,6 @@ public class RefinementTest {
 				Refinement ref = new Refinement(ts1, ts2);
 				assertTrue(ref.check());
 		}
-
 
 
 		// helper functions
