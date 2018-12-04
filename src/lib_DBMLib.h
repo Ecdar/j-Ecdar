@@ -9,14 +9,6 @@ extern "C" {
 #endif
 /*
  * Class:     lib_DBMLib
- * Method:    boundbool2raw
- * Signature: (IZ)I
- */
-JNIEXPORT jint JNICALL Java_lib_DBMLib_boundbool2raw
-  (JNIEnv *, jclass, jint, jboolean);
-
-/*
- * Class:     lib_DBMLib
  * Method:    raw2bound
  * Signature: (I)I
  */
@@ -33,19 +25,11 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1init
 
 /*
  * Class:     lib_DBMLib
- * Method:    dbm_zero
- * Signature: ([II)[I
- */
-JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero
-  (JNIEnv *, jclass, jintArray, jint);
-
-/*
- * Class:     lib_DBMLib
  * Method:    dbm_constrain1
- * Signature: ([IIIIIZ)[I
+ * Signature: ([IIIII)[I
  */
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1
-  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint, jboolean);
+  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint);
 
 /*
  * Class:     lib_DBMLib

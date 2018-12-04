@@ -24,8 +24,8 @@ public class Parser {
 
         // Relative Path to your samples in the Project folder
         locations.add("./samples/EcdarUniversity/GlobalDeclarations.json");
-        locations.add("./samples/EcdarUniversity/Components/Machine.json");
 				locations.add("./samples/EcdarUniversity/Components/Administration.json");
+				locations.add("./samples/EcdarUniversity/Components/Machine.json");
 				locations.add("./samples/EcdarUniversity/Components/Researcher.json");
 
         objectList = parseFiles(locations);
@@ -179,19 +179,19 @@ public class Parser {
 
 						if (str.contains("<=")) {
 								symbol = "<=";
-								strict = true;
 						}
 						if (str.contains(">=")) {
 								symbol = ">=";
-								strict = true;
 								greater = true;
 						}
 						if (str.contains("<") && !str.contains("=")) {
 								symbol = "<";
+								strict = true;
 						}
 						if (str.contains(">") && !str.contains("=")) {
 								symbol = ">";
 								greater = true;
+								strict = true;
 						}
 
 						String[] s = str.split(symbol);

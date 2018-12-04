@@ -51,7 +51,13 @@ public class Refinement {
 														// we found an output in machine 1 that doesn't exist in machine 2, so refinement doesn't hold
 														return false;
 												} else {
-														waiting.addAll(getNewStates(next1, next2));
+														List<State[]> newStates = getNewStates(next1, next2);
+														if (newStates.isEmpty()) {
+																// if we don't get any new states, it means we found some incompatibility
+																return false;
+														} else {
+																waiting.addAll(newStates);
+														}
 												}
 										}
 								}
@@ -65,7 +71,12 @@ public class Refinement {
 														// we found an input in machine 2 that doesn't exist in machine 1, so refinement doesn't hold
 														return false;
 												} else {
-														waiting.addAll(getNewStates(next1, next2));
+														List<State[]> newStates = getNewStates(next1, next2);
+														if (newStates.isEmpty()) {
+																return false;
+														} else {
+																waiting.addAll(newStates);
+														}
 												}
 										}
 								}

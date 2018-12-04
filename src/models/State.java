@@ -11,11 +11,13 @@ public class State {
 		private List<Location> locations;
 		private int[] zone;
 		private int zoneSize;
+		private int maxBound;
 
 		public State(List<Location> locations, int[] zone) {
 				this.locations = locations;
 				this.zone = zone;
 				this.zoneSize = (int) Math.sqrt(zone.length);
+				this.maxBound = 1073741823;
 
 				String fileName = "src/" + System.mapLibraryName("DBM");
 				File lib = new File(fileName);
@@ -30,6 +32,16 @@ public class State {
 				return zone;
 		}
 
+		public int[] getZoneValues() {
+				int[] newZone = new int[zone.length];
+
+				for (int i = 0; i < zone.length; i++) {
+						newZone[i] = DBMLib.raw2bound(zone[i]);
+				}
+
+				return newZone;
+		}
+
 		private void buildConstraintsForGuard(Guard g, List<Clock> clocks) {
 				// get the guard's index in the clock array so you know the index in the DBM
 				int i = clocks.indexOf(g.getClock()) + 1;
@@ -37,27 +49,34 @@ public class State {
 				int lowerBoundI = g.getLowerBound();
 				int upperBoundI = g.getUpperBound();
 
-				zone = DBMLib.dbm_constrain1(zone, zoneSize, 0, i, (-1) * lowerBoundI, false);
-				zone = DBMLib.dbm_constrain1(zone, zoneSize, i, 0, upperBoundI, false);
+				if (upperBoundI == maxBound) {
+						zone = DBMLib.dbm_constrain1(zone, zoneSize, 0, i, (-1) * lowerBoundI);
+				}
+
+				if (lowerBoundI == 0) {
+						zone = DBMLib.dbm_constrain1(zone, zoneSize, i, 0, upperBoundI);
+				}
 		}
 
 		public int getMaxValuation() {
-				int max = 1073741823;
+				int[] newZone = getZoneValues();
 
 				for (int i = 1; i < zoneSize; i++) {
-						int curr = zone[zoneSize*i];
-						if (curr < max)
-								max = curr;
+						int curr = newZone[zoneSize*i];
+						if (curr < maxBound)
+								maxBound = curr;
 				}
 
-				return max;
+				return maxBound;
 		}
 
 		public int getMinValuation() {
+				int[] newZone = getZoneValues();
+
 				int min = 0;
 
 				for (int i = 1; i < zoneSize; i++) {
-						int curr = (-1) * zone[i];
+						int curr = (-1) * newZone[i];
 						if (curr > min)
 								min = curr;
 				}

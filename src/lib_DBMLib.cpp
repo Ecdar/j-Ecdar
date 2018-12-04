@@ -10,37 +10,24 @@ namespace helper_functions
         raw_t *t = new raw_t[len];
         jint *arr = env->GetIntArrayElements(dbm, 0);
         for (int i = 0; i < len; i++)
-            t[i] = dbm_boundbool2raw(arr[i], false);
+            t[i] = arr[i];
         return t;
     }
 
-    jintArray& cToJint(JNIEnv *env, raw_t *t, jsize len) {
+    jintArray cToJint(JNIEnv *env, raw_t *t, jsize len) {
         // convert updated array to jintArray
         jintArray newT = env->NewIntArray(len);
         int *arr = new int[len];
         for (int i = 0; i < len; i++) {
-            arr[i] = dbm_raw2bound(t[i]);
+            arr[i] = t[i];
         }
         env->SetIntArrayRegion(newT, 0, len, arr);
         return newT;
     }
 }
 
-JNIEXPORT jint JNICALL Java_lib_DBMLib_boundbool2raw(JNIEnv *env, jclass cls, jint bound, jboolean strict) {
-    return dbm_boundbool2raw(bound, strict);
-}
-
 JNIEXPORT jint JNICALL Java_lib_DBMLib_raw2bound(JNIEnv *env, jclass cls, jint raw) {
    return dbm_raw2bound(raw);
-}
-
-JNIEXPORT jobject JNICALL Java_lib_DBMLib_constraint(JNIEnv *env, jclass cls, jint i, jint j, jint bound, jboolean isStrict) {
-
-    auto constraint = dbm_constraint2(i, j, bound, isStrict);
-    jclass clss = env->FindClass("lib/Constraint");
-    jmethodID constructor = env->GetMethodID(clss, "<init>", "(III)V");
-    jobject object = env->NewObject(clss, constructor, constraint.i, constraint.j, constraint.value);
-    return object;
 }
 
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1init(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
@@ -54,17 +41,8 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1init(JNIEnv *env, jclass cls, j
     return helper_functions::cToJint(env, converted, len);
 }
 
-JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
-    jsize len = env->GetArrayLength(dbm);
-    auto converted = helper_functions::jintToC(env, dbm, len);
-
-    dbm_zero(converted, dim);
-
-    return helper_functions::cToJint(env, converted, len);
-}
-
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
-    jint j, jint bound, jboolean strict) {
+    jint j, jint bound) {
     jsize len = env->GetArrayLength(dbm);
     auto converted = helper_functions::jintToC(env, dbm, len);
 
