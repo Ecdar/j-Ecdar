@@ -126,7 +126,6 @@ public class ComposedTransitionSystem extends TransitionSystem {
 				if (lists.size() == 0) {
 						// base case; return a list containing one empty list
 						resultLists.add(new ArrayList<>());
-						return resultLists;
 				} else {
 						// take head of list
 						List<T> firstList = lists.get(0);
