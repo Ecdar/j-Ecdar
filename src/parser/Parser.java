@@ -29,55 +29,20 @@ public class Parser {
 				locations.add("./samples/EcdarUniversity/Components/Researcher.json");
 
         objectList = parseFiles(locations);
-        ArrayList<Component> components = distrubuteObjects(objectList);
-        //printStuff(components);
+        distrubuteObjects(objectList);
     }
 
-    public static ArrayList<Component> parse() {
+    public static ArrayList<Component> parse(String base, List<String> components) {
         ArrayList<String> locations = new ArrayList<>();
 
-        // Relative Path to your samples in the Project folder
-//				String base = "./samples/EcdarUniversity/";
-//				locations.add(base + "GlobalDeclarations.json");
-//        locations.add(base + "Components/Administration.json");
-//				locations.add(base + "Components/Machine.json");
-//				locations.add(base + "Components/Researcher.json");
-//        locations.add(base + "Components/Spec.json");
-//        locations.add(base + "Components/Machine3.json");
-
-        String base = "./samples/BigRefinement/";
-				locations.add(base + "GlobalDeclarations.json");
-        locations.add(base + "Components/Comp1.json");
-				locations.add(base + "Components/Ref1.json");
+        for (String component : components) {
+        		locations.add(base + component);
+				}
 
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList);
 		}
 
-    private static void printStuff(ArrayList<Component> components) {
-    		for (Component component : components)  {
-						System.out.println("--------------------------");
-						System.out.println("Component name: " + component.getName());
-						System.out.println("Initial location: " + component.getInitLoc().getName());
-						for (Location loc : component.getLocations()) {
-								System.out.println("location: " + loc.getName());
-
-								if (loc.getInvariant() != null)
-										System.out.println("Invariant: " + loc.getInvariant().getClock().getName() + " value " +
-														loc.getInvariant().getValue());
-						}
-						for (Transition tran : component.getTransitions()){
-								System.out.println("transition from: " + tran.getSource().getName());
-								System.out.println("transition to: " + tran.getTarget().getName());
-								if (tran.getChannel() != null)
-										System.out.println("channel: " + tran.getChannel().getName());
-								if (tran.getGuards() != null)
-										System.out.println("Guard: " + tran.getGuards().get(0).getClock().getName() + " value " +
-														tran.getGuards().get(0).getValue());
-
-						}
-				}
-    }
     //---------------------------Testing-----------------
 
     private static ArrayList<JSONObject> parseFiles(ArrayList<String> locations) {

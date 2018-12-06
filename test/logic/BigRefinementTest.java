@@ -4,6 +4,8 @@ import models.Component;
 import org.junit.*;
 import parser.Parser;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -17,7 +19,13 @@ public class BigRefinementTest {
 				String fileName = "src/" + System.mapLibraryName("DBM");
 				File lib = new File(fileName);
 				System.load(lib.getAbsolutePath());
-				List<Component> machines = Parser.parse();
+
+				String base = "./samples/BigRefinement/";
+				List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
+								"Components/Comp1.json",
+								"Components/Ref1.json"));
+				List<Component> machines = Parser.parse(base, components);
+
 				comp1 = machines.get(0);
 				ref1 = machines.get(1);
 		}

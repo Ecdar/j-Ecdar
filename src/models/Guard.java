@@ -5,13 +5,11 @@ import java.util.Objects;
 public class Guard {
 
 		private Clock clock;
-		private int value;
 		private int upperBound;
 		private int lowerBound;
 
 		public Guard(Clock clock, int value, boolean greater, boolean strict) {
 				this.clock = clock;
-				this.value = value;
 				if (greater) {
 						upperBound = 1073741823;
 						lowerBound = strict ? (value + 1) : value;
@@ -25,9 +23,6 @@ public class Guard {
 				return clock;
 		}
 
-		public int getValue() {
-				return value;
-		}
 
 		public int getLowerBound() { return lowerBound; }
 
@@ -38,14 +33,13 @@ public class Guard {
 				if (this == o) return true;
 				if (o == null || getClass() != o.getClass()) return false;
 				Guard guard = (Guard) o;
-				return value == guard.value &&
-								upperBound == guard.upperBound &&
+				return upperBound == guard.upperBound &&
 								lowerBound == guard.lowerBound &&
 								clock.getName().equals(guard.clock.getName());
 		}
 
 		@Override
 		public int hashCode() {
-				return Objects.hash(clock, value, upperBound, lowerBound);
+				return Objects.hash(clock, upperBound, lowerBound);
 		}
 }

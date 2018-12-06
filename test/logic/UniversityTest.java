@@ -19,7 +19,16 @@ public class UniversityTest {
 				String fileName = "src/" + System.mapLibraryName("DBM");
 				File lib = new File(fileName);
 				System.load(lib.getAbsolutePath());
-				List<Component> machines = Parser.parse();
+
+				String base = "./samples/EcdarUniversity/";
+				List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
+								"Components/Administration.json",
+								"Components/Machine.json",
+								"Components/Researcher.json",
+								"Components/Spec.json",
+								"Components/Machine3.json"));
+				List<Component> machines = Parser.parse(base, components);
+
 				adm = machines.get(0);
 				machine = machines.get(1);
 				researcher = machines.get(2);
