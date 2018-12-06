@@ -140,7 +140,7 @@ public class Parser {
 
     private static ArrayList<Guard> addGuards(String invariant) {
         ArrayList<Guard> guards = new ArrayList<>();
-        String[] listOfInv = invariant.split(";");
+        String[] listOfInv = invariant.split("&&");
         for (String str : listOfInv) {
         		String symbol = "";
         		boolean strict, greater;
@@ -216,7 +216,7 @@ public class Parser {
 
     private static ArrayList<Update> addUpdates(String update){
         ArrayList<Update> updates = new ArrayList<>();
-        String[] listOfInv = update.split(";");
+        String[] listOfInv = update.split(",");
         for (String str : listOfInv) {
             String[] s = str.split("=");
             for (int i = 0; i < s.length; i++)
