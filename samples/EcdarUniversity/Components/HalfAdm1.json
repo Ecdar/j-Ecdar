@@ -40,6 +40,7 @@
       "guard": "",
       "update": "x\u003d0",
       "sync": "grant",
+      "isLocked": false,
       "nails": [
         {
           "x": 150.0,
@@ -65,6 +66,7 @@
       "guard": "",
       "update": "",
       "sync": "coin",
+      "isLocked": false,
       "nails": [
         {
           "x": 110.0,
@@ -83,6 +85,7 @@
       "guard": "",
       "update": "",
       "sync": "patent",
+      "isLocked": false,
       "nails": [
         {
           "x": 80.0,
@@ -108,6 +111,7 @@
       "guard": "",
       "update": "",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 120.0,
@@ -133,6 +137,7 @@
       "guard": "",
       "update": "",
       "sync": "grant",
+      "isLocked": false,
       "nails": [
         {
           "x": 170.0,
@@ -158,6 +163,7 @@
       "guard": "",
       "update": "",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 90.0,
@@ -183,6 +189,7 @@
       "guard": "",
       "update": "",
       "sync": "patent",
+      "isLocked": false,
       "nails": [
         {
           "x": 170.0,

@@ -14,9 +14,9 @@ public class Guard {
 				this.value = value;
 				if (greater) {
 						upperBound = 1073741823;
-						lowerBound = strict ? value : (value + 1);
+						lowerBound = strict ? (value + 1) : value;
 				} else {
-						upperBound = strict ? value : (value - 1);
+						upperBound = strict ? (value - 1) : value;
 						lowerBound = 0;
 				}
 		}

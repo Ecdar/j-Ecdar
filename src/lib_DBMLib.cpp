@@ -26,6 +26,10 @@ namespace helper_functions
     }
 }
 
+JNIEXPORT jint JNICALL Java_lib_DBMLib_boundbool2raw(JNIEnv *env, jclass cls, jint bound, jboolean strict) {
+    return dbm_boundbool2raw(bound, strict);
+}
+
 JNIEXPORT jint JNICALL Java_lib_DBMLib_raw2bound(JNIEnv *env, jclass cls, jint raw) {
    return dbm_raw2bound(raw);
 }
@@ -39,6 +43,13 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1init(JNIEnv *env, jclass cls, j
     dbm_init(converted, dim);
 
     return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
+    jsize len = env->GetArrayLength(dbm);
+    auto converted = helper_functions::jintToC(env, dbm, len);
+     dbm_zero(converted, dim);
+     return helper_functions::cToJint(env, converted, len);
 }
 
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,

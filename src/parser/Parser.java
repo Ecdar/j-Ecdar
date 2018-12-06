@@ -37,13 +37,18 @@ public class Parser {
         ArrayList<String> locations = new ArrayList<>();
 
         // Relative Path to your samples in the Project folder
-				String base = "./samples/EcdarUniversity/";
+//				String base = "./samples/EcdarUniversity/";
+//				locations.add(base + "GlobalDeclarations.json");
+//        locations.add(base + "Components/Administration.json");
+//				locations.add(base + "Components/Machine.json");
+//				locations.add(base + "Components/Researcher.json");
+//        locations.add(base + "Components/Spec.json");
+//        locations.add(base + "Components/Machine3.json");
+
+        String base = "./samples/BigRefinement/";
 				locations.add(base + "GlobalDeclarations.json");
-        locations.add(base + "Components/Administration.json");
-				locations.add(base + "Components/Machine.json");
-				locations.add(base + "Components/Researcher.json");
-        locations.add(base + "Components/Spec.json");
-        locations.add(base + "Components/Machine3.json");
+        locations.add(base + "Components/Comp1.json");
+				locations.add(base + "Components/Ref1.json");
 
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList);

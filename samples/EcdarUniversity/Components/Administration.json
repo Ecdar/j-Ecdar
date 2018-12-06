@@ -68,6 +68,7 @@
       "guard": "",
       "update": "z\u003d0",
       "sync": "grant",
+      "isLocked": false,
       "nails": [
         {
           "x": 180.0,
@@ -93,6 +94,7 @@
       "guard": "",
       "update": "",
       "sync": "coin",
+      "isLocked": false,
       "nails": [
         {
           "x": 310.0,
@@ -111,6 +113,7 @@
       "guard": "",
       "update": "z\u003d0",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 250.0,
@@ -136,6 +139,7 @@
       "guard": "",
       "update": "",
       "sync": "patent",
+      "isLocked": false,
       "nails": [
         {
           "x": 130.0,
@@ -154,6 +158,7 @@
       "guard": "",
       "update": "",
       "sync": "grant",
+      "isLocked": false,
       "nails": [
         {
           "x": 310.0,
@@ -179,6 +184,7 @@
       "guard": "",
       "update": "",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 350.0,
@@ -204,6 +210,7 @@
       "guard": "",
       "update": "",
       "sync": "grant",
+      "isLocked": false,
       "nails": [
         {
           "x": 350.0,
@@ -229,6 +236,7 @@
       "guard": "",
       "update": "",
       "sync": "grant",
+      "isLocked": false,
       "nails": [
         {
           "x": 130.0,
@@ -254,6 +262,7 @@
       "guard": "",
       "update": "",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 90.0,

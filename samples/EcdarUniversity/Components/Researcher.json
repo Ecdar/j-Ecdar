@@ -68,6 +68,7 @@
       "guard": "",
       "update": "",
       "sync": "cof",
+      "isLocked": false,
       "nails": [
         {
           "x": 70.0,
@@ -93,6 +94,7 @@
       "guard": "",
       "update": "",
       "sync": "tea",
+      "isLocked": false,
       "nails": [
         {
           "x": 90.0,
@@ -118,6 +120,7 @@
       "guard": "",
       "update": "",
       "sync": "cof",
+      "isLocked": false,
       "nails": [
         {
           "x": 270.0,
@@ -143,6 +146,7 @@
       "guard": "",
       "update": "",
       "sync": "tea",
+      "isLocked": false,
       "nails": [
         {
           "x": 350.0,
@@ -168,6 +172,7 @@
       "guard": "",
       "update": "x\u003d0",
       "sync": "cof",
+      "isLocked": false,
       "nails": [
         {
           "x": 240.0,
@@ -193,6 +198,7 @@
       "guard": "x\u003c\u003d15",
       "update": "x\u003d0",
       "sync": "tea",
+      "isLocked": false,
       "nails": [
         {
           "x": 290.0,
@@ -225,6 +231,7 @@
       "guard": "x\u003e\u003d2",
       "update": "x\u003d0",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 170.0,
@@ -257,6 +264,7 @@
       "guard": "x\u003e\u003d4",
       "update": "x\u003d0",
       "sync": "pub",
+      "isLocked": false,
       "nails": [
         {
           "x": 340.0,
@@ -289,6 +297,7 @@
       "guard": "",
       "update": "",
       "sync": "*",
+      "isLocked": true,
       "nails": [
         {
           "x": 410.0,
@@ -321,6 +330,7 @@
       "guard": "",
       "update": "",
       "sync": "*",
+      "isLocked": true,
       "nails": [
         {
           "x": 490.0,
@@ -353,6 +363,7 @@
       "guard": "x\u003e15",
       "update": "",
       "sync": "tea",
+      "isLocked": false,
       "nails": [
         {
           "x": 350.0,

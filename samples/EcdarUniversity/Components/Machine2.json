@@ -40,6 +40,7 @@
       "guard": "",
       "update": "",
       "sync": "coin",
+      "isLocked": false,
       "nails": [
         {
           "x": 140.0,
@@ -58,6 +59,7 @@
       "guard": "",
       "update": "",
       "sync": "coin",
+      "isLocked": false,
       "nails": [
         {
           "x": 100.0,
@@ -83,6 +85,7 @@
       "guard": "",
       "update": "",
       "sync": "tea",
+      "isLocked": false,
       "nails": [
         {
           "x": 120.0,
@@ -108,6 +111,7 @@
       "guard": "",
       "update": "",
       "sync": "cof",
+      "isLocked": false,
       "nails": [
         {
           "x": 100.0,
