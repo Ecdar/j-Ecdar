@@ -1,6 +1,6 @@
 {
   "name": "Comp1",
-  "declarations": "clock x;",
+  "declarations": "clock x, y, z, k, l;",
   "locations": [
     {
       "id": "L0",
@@ -177,7 +177,7 @@
       "targetLocation": "L1",
       "status": "INPUT",
       "select": "",
-      "guard": "x \u003c 4",
+      "guard": "x \u003c\u003d 4",
       "update": "",
       "sync": "i1",
       "isLocked": false,
@@ -186,8 +186,8 @@
           "x": 120.0,
           "y": 300.0,
           "propertyType": "GUARD",
-          "propertyX": -10.0,
-          "propertyY": -40.0
+          "propertyX": -20.0,
+          "propertyY": 20.0
         },
         {
           "x": 170.0,
@@ -203,17 +203,31 @@
       "targetLocation": "L2",
       "status": "OUTPUT",
       "select": "",
-      "guard": "",
-      "update": "",
+      "guard": "x \u003c 5 \u0026\u0026 y \u003c10 \u0026\u0026 z \u003c 14 \u0026\u0026 k \u003c12 \u0026\u0026 l \u003e\u003d 8",
+      "update": "x \u003d 0, y \u003d 0, z \u003d 0, k \u003d 0, l \u003d 0",
       "sync": "o1",
       "isLocked": false,
       "nails": [
+        {
+          "x": 300.0,
+          "y": 220.0,
+          "propertyType": "GUARD",
+          "propertyX": -170.0,
+          "propertyY": -40.0
+        },
         {
           "x": 330.0,
           "y": 170.0,
           "propertyType": "SYNCHRONIZATION",
           "propertyX": 10.0,
           "propertyY": -10.0
+        },
+        {
+          "x": 340.0,
+          "y": 150.0,
+          "propertyType": "UPDATE",
+          "propertyX": -110.0,
+          "propertyY": -30.0
         }
       ]
     },

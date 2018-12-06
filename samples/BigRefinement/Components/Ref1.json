@@ -1,6 +1,6 @@
 {
   "name": "Ref1",
-  "declarations": "clock x;",
+  "declarations": "clock x, y;",
   "locations": [
     {
       "id": "L12",
@@ -323,32 +323,6 @@
       ]
     },
     {
-      "sourceLocation": "L12",
-      "targetLocation": "L13",
-      "status": "INPUT",
-      "select": "",
-      "guard": "x \u003c 4",
-      "update": "",
-      "sync": "i1",
-      "isLocked": false,
-      "nails": [
-        {
-          "x": 100.0,
-          "y": 320.0,
-          "propertyType": "GUARD",
-          "propertyX": -20.0,
-          "propertyY": -30.0
-        },
-        {
-          "x": 140.0,
-          "y": 320.0,
-          "propertyType": "SYNCHRONIZATION",
-          "propertyX": -10.0,
-          "propertyY": -30.0
-        }
-      ]
-    },
-    {
       "sourceLocation": "L17",
       "targetLocation": "L17",
       "status": "OUTPUT",
@@ -416,6 +390,32 @@
           "propertyType": "SYNCHRONIZATION",
           "propertyX": 10.0,
           "propertyY": -10.0
+        }
+      ]
+    },
+    {
+      "sourceLocation": "L12",
+      "targetLocation": "L13",
+      "status": "INPUT",
+      "select": "",
+      "guard": "x \u003c 5",
+      "update": "",
+      "sync": "i1",
+      "isLocked": false,
+      "nails": [
+        {
+          "x": 160.0,
+          "y": 320.0,
+          "propertyType": "GUARD",
+          "propertyX": -70.0,
+          "propertyY": -30.0
+        },
+        {
+          "x": 190.0,
+          "y": 320.0,
+          "propertyType": "SYNCHRONIZATION",
+          "propertyX": -10.0,
+          "propertyY": -30.0
         }
       ]
     }
