@@ -2,6 +2,7 @@ package logic;
 
 import lib.DBMLib;
 import models.Channel;
+import models.Component;
 import models.State;
 import models.StateTransition;
 import java.io.File;
@@ -11,21 +12,32 @@ public class Refinement {
 		private TransitionSystem ts1, ts2;
 		private Deque<State[]> waiting;
 		private List<State[]> passed;
+		private boolean failed;
 
-		public Refinement(TransitionSystem ts1, TransitionSystem ts2) {
-				this.ts1 = ts1;
-				this.ts2 = ts2;
-				this.waiting = new ArrayDeque<>();
-				this.passed = new ArrayList<>();
-				// the first states we look at are the initial ones
-				waiting.push(new State[]{ts1.getInitialState(), ts2.getInitialState()});
+		public Refinement(List<Component> machines1, List<Component> machines2) {
+				try {
+						this.ts1 = machines1.size() == 1 ? new SimpleTransitionSystem(machines1.get(0)) : new ComposedTransitionSystem(machines1);
+						this.ts2 = machines2.size() == 1 ? new SimpleTransitionSystem(machines2.get(0)) : new ComposedTransitionSystem(machines2);
 
-				String fileName = "src/" + System.mapLibraryName("DBM");
-				File lib = new File(fileName);
-				System.load(lib.getAbsolutePath());
+						this.waiting = new ArrayDeque<>();
+						this.passed = new ArrayList<>();
+						// the first states we look at are the initial ones
+						waiting.push(new State[]{ts1.getInitialState(), ts2.getInitialState()});
+
+						String fileName = "src/" + System.mapLibraryName("DBM");
+						File lib = new File(fileName);
+						System.load(lib.getAbsolutePath());
+
+						failed = false;
+				} catch (IllegalArgumentException ex) {
+						failed = true;
+				}
 		}
 
 		public boolean check() {
+				// if the transitions systems could not be constructed, refinement cannot hold
+				if (failed) return false;
+
 				// get the inputs of machine 2 and the outputs of machine 1
 				Set<Channel> inputs2 = ts2.getInputs();
 				Set<Channel> outputs1 = ts1.getOutputs();
@@ -100,8 +112,8 @@ public class Refinement {
 								source2.applyGuards(t2.getGuards(), ts2.getClocks());
 
 								// based on the zone, get the min and max value of the clocks
-								int maxSource1 = source1.getMaxValuation(); int maxSource2 = source2.getMaxValuation();
-								int minSource1 = source1.getMinValuation(); int minSource2 = source2.getMinValuation();
+								int maxSource1 = source1.getMinUpperBound(); int maxSource2 = source2.getMinUpperBound();
+								int minSource1 = source1.getMinLowerBound(); int minSource2 = source2.getMinLowerBound();
 
 								// check that the zones are compatible
 								if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
@@ -114,11 +126,11 @@ public class Refinement {
 										target2.applyInvariants(ts2.getClocks());
 
 										// get the max value of the clocks
-										int maxTarget1 = target1.getMaxValuation(); int maxTarget2 = target2.getMaxValuation();
+										int maxTarget1 = target1.getMinUpperBound(); int maxTarget2 = target2.getMinUpperBound();
+										int minTarget1 = target1.getMinLowerBound(); int minTarget2 = target2.getMinLowerBound();
 
-										//add the states to waiting only if the max value of the clocks in machine 1 is less than or equal
-										// to the max value of the clocks in machine 2
-										if (maxTarget1 <= maxTarget2) {
+										// check again that the zones are compatible
+										if (maxTarget1 >= minTarget2 && maxTarget2 >= minTarget1) {
 												State[] newState = new State[]{target1, target2};
 												states.add(newState);
 										}

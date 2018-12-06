@@ -87,8 +87,6 @@ public abstract class TransitionSystem {
 
 		public abstract Set<Channel> getOutputs();
 
-		public abstract Set<Channel> getSyncs();
-
 		public abstract List<StateTransition> getNextTransitions(State currentState, Channel channel);
 
 		int[] initializeDBM() {

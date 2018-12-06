@@ -11,7 +11,7 @@ public class Guard {
 		public Guard(Clock clock, int value, boolean greater, boolean strict) {
 				this.clock = clock;
 				if (greater) {
-						upperBound = 1073741823;
+						upperBound = Integer.MAX_VALUE;
 						lowerBound = strict ? (value + 1) : value;
 				} else {
 						upperBound = strict ? (value - 1) : value;

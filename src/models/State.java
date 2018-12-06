@@ -11,13 +11,11 @@ public class State {
 		private List<Location> locations;
 		private int[] zone;
 		private int zoneSize;
-		private int maxBound;
 
 		public State(List<Location> locations, int[] zone) {
 				this.locations = locations;
 				this.zone = zone;
 				this.zoneSize = (int) Math.sqrt(zone.length);
-				this.maxBound = 1073741823;
 
 				String fileName = "src/" + System.mapLibraryName("DBM");
 				File lib = new File(fileName);
@@ -49,7 +47,7 @@ public class State {
 				int lowerBoundI = g.getLowerBound();
 				int upperBoundI = g.getUpperBound();
 
-				if (upperBoundI == maxBound) {
+				if (upperBoundI == Integer.MAX_VALUE) {
 						zone = DBMLib.dbm_constrain1(zone, zoneSize, 0, i, (-1) * lowerBoundI);
 				}
 
@@ -58,26 +56,28 @@ public class State {
 				}
 		}
 
-		public int getMaxValuation() {
+		public int getMinUpperBound() {
 				int[] newZone = getZoneValues();
+
+				int min = Integer.MAX_VALUE;
 
 				for (int i = 1; i < zoneSize; i++) {
 						int curr = newZone[zoneSize*i];
-						if (curr < maxBound)
-								maxBound = curr;
+						if (curr < min)
+								min = curr;
 				}
 
-				return maxBound;
+				return min;
 		}
 
-		public int getMinValuation() {
+		public int getMinLowerBound() {
 				int[] newZone = getZoneValues();
 
-				int min = 0;
+				int min = Integer.MAX_VALUE;
 
 				for (int i = 1; i < zoneSize; i++) {
 						int curr = (-1) * newZone[i];
-						if (curr > min)
+						if (curr < min)
 								min = curr;
 				}
 

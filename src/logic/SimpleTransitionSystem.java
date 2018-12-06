@@ -21,8 +21,6 @@ public class SimpleTransitionSystem extends TransitionSystem {
 				return component.getOutputAct();
 		}
 
-		public Set<Channel> getSyncs() { return new HashSet<>(); }
-
 		public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
 				List<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
 

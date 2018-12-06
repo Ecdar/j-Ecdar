@@ -188,20 +188,23 @@ public class UniversityTest {
 
 		@Test
 		public void testCompRefinesSpec() {
-				TransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
-				TransitionSystem ts2 = new SimpleTransitionSystem(spec);
-
-				Refinement ref = new Refinement(ts1, ts2);
+				Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(adm, machine, researcher)),
+								new ArrayList<>(Arrays.asList(spec)));
 				assertTrue(ref.check());
 		}
 
 		@Test
 		public void testCompRefinesSelf() {
-				TransitionSystem ts1 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
-				TransitionSystem ts2 = new ComposedTransitionSystem(new ArrayList<>(Arrays.asList(machine, researcher, adm)));
-
-				Refinement ref = new Refinement(ts1, ts2);
+				Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(adm, machine, researcher)),
+								new ArrayList<>(Arrays.asList(machine, researcher, adm)));
 				assertTrue(ref.check());
+		}
+
+		@Test
+		public void testUncomposable() {
+				Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(machine, machine3)),
+								new ArrayList<>(Arrays.asList(machine)));
+				assertFalse(ref.check());
 		}
 
 
@@ -211,9 +214,7 @@ public class UniversityTest {
 		}
 
 		private Refinement simpleRefinesSimple(Component component1, Component component2) {
-				TransitionSystem ts1 = new SimpleTransitionSystem(component1);
-				TransitionSystem ts2 = new SimpleTransitionSystem(component2);
-				return new Refinement(ts1, ts2);
+				return new Refinement(new ArrayList<>(Arrays.asList(component1)), new ArrayList<>(Arrays.asList(component2)));
 		}
 		//
 }

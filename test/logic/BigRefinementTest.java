@@ -36,15 +36,32 @@ public class BigRefinementTest {
 				assertTrue(ref.check());
 		}
 
+		@Test
+		public void testComp1NotRefinesRef1() {
+				Refinement ref = simpleRefinesSimple(comp1, ref1);
+				assertFalse(ref.check());
+		}
+
+		@Test
+		public void testRef1RefinesRef1() {
+				Refinement ref = selfRefinesSelf(ref1);
+				assertTrue(ref.check());
+		}
+
+		@Test
+		public void testComp1RefinesComp1() {
+				Refinement ref = selfRefinesSelf(comp1);
+				assertTrue(ref.check());
+		}
+
 		// helper functions
 		private Refinement selfRefinesSelf(Component component) {
 				return simpleRefinesSimple(component, component);
 		}
 
 		private Refinement simpleRefinesSimple(Component component1, Component component2) {
-				TransitionSystem ts1 = new SimpleTransitionSystem(component1);
-				TransitionSystem ts2 = new SimpleTransitionSystem(component2);
-				return new Refinement(ts1, ts2);
+				return new Refinement(new ArrayList<>(Arrays.asList(component1)),
+								new ArrayList<>(Arrays.asList(component2)));
 		}
 		//
 }
