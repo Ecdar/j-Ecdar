@@ -1,10 +1,7 @@
 package logic;
 
 import lib.DBMLib;
-import models.Channel;
-import models.Component;
-import models.State;
-import models.StateTransition;
+import models.*;
 import java.io.File;
 import java.util.*;
 
@@ -41,6 +38,8 @@ public class Refinement {
 				// get the inputs of machine 2 and the outputs of machine 1
 				Set<Channel> inputs2 = ts2.getInputs();
 				Set<Channel> outputs1 = ts1.getOutputs();
+				Set<Channel> actions1 = setDifference(ts1.getActions(), ts2.getActions());
+				Set<Channel> actions2 = setDifference(ts2.getActions(), ts1.getActions());
 
 				// keep looking at states from Waiting as long as it contains elements
 				while (!waiting.isEmpty()) {
@@ -55,41 +54,36 @@ public class Refinement {
 								passed.add(new State[] {newState1, newState2});
 
 								// check that for every output in machine 1 there is a corresponding output in machine 2
-								for (Channel output : outputs1) {
-										List<StateTransition> next1 = ts1.getNextTransitions(curr[0], output);
-										if (!next1.isEmpty()) {
-												List<StateTransition> next2 = ts2.getNextTransitions(curr[1], output);
-												if (next2.isEmpty()) {
-														// we found an output in machine 1 that doesn't exist in machine 2, so refinement doesn't hold
-														return false;
-												} else {
-														List<State[]> newStates = getNewStates(next1, next2);
-														if (newStates.isEmpty()) {
-																// if we don't get any new states, it means we found some incompatibility
-																return false;
-														} else {
-																waiting.addAll(newStates);
-														}
-												}
+								boolean holds1 = checkActions(outputs1, curr[0], curr[1], ts1, ts2, false);
+								if (!holds1)
+										return false;
+
+								// check that for every input in machine 2 there is a corresponding input in machine 1
+								boolean holds2 = checkActions(inputs2, curr[1], curr[0], ts2, ts1, true);
+								if (!holds2)
+										return false;
+
+								// for actions belonging only to machine 1, make a pair for each transition in machine 1 and the state in machine 2
+								for (Channel action : actions1) {
+										List<StateTransition> transitions = ts1.getNextTransitions(curr[0], action);
+										for (StateTransition stateTransition : transitions) {
+												State target = new State(stateTransition.getTarget().getLocations(), stateTransition.getTarget().getZone());
+												target.delay();
+												target.applyInvariants(ts1.getClocks());
+												State[] newState = new State[]{target, curr[1]};
+												waiting.add(newState);
 										}
 								}
 
-								// check that for every input in machine 2 there is a corresponding input in machine 1
-								for (Channel input : inputs2) {
-										List<StateTransition> next2 = ts2.getNextTransitions(curr[1], input);
-										if (!next2.isEmpty()) {
-												List<StateTransition> next1 = ts1.getNextTransitions(curr[0], input);
-												if (next1.isEmpty()) {
-														// we found an input in machine 2 that doesn't exist in machine 1, so refinement doesn't hold
-														return false;
-												} else {
-														List<State[]> newStates = getNewStates(next1, next2);
-														if (newStates.isEmpty()) {
-																return false;
-														} else {
-																waiting.addAll(newStates);
-														}
-												}
+								// for actions belonging only to machine 2, make a pair for each transition in machine 2 and the state in machine 1
+								for (Channel action : actions2) {
+										List<StateTransition> transitions = ts2.getNextTransitions(curr[1], action);
+										for (StateTransition stateTransition : transitions) {
+												State target = new State(stateTransition.getTarget().getLocations(), stateTransition.getTarget().getZone());
+												target.delay();
+												target.applyInvariants(ts2.getClocks());
+												State[] newState = new State[]{curr[0], target};
+												waiting.add(newState);
 										}
 								}
 						}
@@ -141,6 +135,28 @@ public class Refinement {
 				return states;
 		}
 
+		private boolean checkActions(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2, boolean isInput) {
+				for (Channel action : actions) {
+						List<StateTransition> next1 = sys1.getNextTransitions(state1, action);
+						if (!next1.isEmpty()) {
+								List<StateTransition> next2 = sys2.getNextTransitions(state2, action);
+								if (next2.isEmpty()) {
+										// we found an output in machine 1 that doesn't exist in machine 2, so refinement doesn't hold
+										return false;
+								} else {
+										List<State[]> newStates = isInput ? getNewStates(next2, next1) : getNewStates(next1, next2);
+										if (newStates.isEmpty()) {
+												// if we don't get any new states, it means we found some incompatibility
+												return false;
+										} else {
+												waiting.addAll(newStates);
+										}
+								}
+						}
+				}
+				return true;
+		}
+
 		private boolean passedContainsState(State[] state) {
 				// keep only states that have the same locations
 				List<State[]> passedCopy = new ArrayList<>(passed);
@@ -156,5 +172,13 @@ public class Refinement {
 				}
 
 				return false;
+		}
+
+		private Set<Channel> setDifference(Set<Channel> set1, Set<Channel> set2) {
+				Set<Channel> newSet = new HashSet<>();
+				newSet.addAll(set1);
+				newSet.removeAll(set2);
+
+				return newSet;
 		}
 }

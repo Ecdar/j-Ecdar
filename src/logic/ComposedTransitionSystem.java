@@ -60,6 +60,16 @@ public class ComposedTransitionSystem extends TransitionSystem {
 				return outputs;
 		}
 
+		public Set<Channel> getActions() {
+				Set<Channel> actions = new HashSet<>();
+
+				actions.addAll(inputs);
+				actions.addAll(outputs);
+				actions.addAll(syncs);
+
+				return actions;
+		}
+
 		// build a list of transitions from a given state and a signal
 		public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
 				List<Location> locations = currentState.getLocations();

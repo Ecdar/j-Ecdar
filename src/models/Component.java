@@ -37,10 +37,6 @@ public class Component {
 				return locations;
 		}
 
-		public List<Transition> getTransitions() {
-				return transitions;
-		}
-
 		private List<Transition> getTransitionsFromLocation(Location loc) {
 				List<Transition> trans = new ArrayList<>(transitions);
 
@@ -83,5 +79,12 @@ public class Component {
 
 		public Set<Channel> getOutputAct() {
 				return outputAct;
+		}
+
+		public Set<Channel> getActions() {
+				Set<Channel> actions = new HashSet<>();
+				actions.addAll(inputAct);
+				actions.addAll(outputAct);
+				return actions;
 		}
 }

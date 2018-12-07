@@ -43,16 +43,4 @@ public class Transition {
 		public List<Update> getUpdates() {
 				return updates;
 		}
-
-		@Override
-		public String toString() {
-				return "Transition{" +
-								"source=" + source +
-								", target=" + target +
-								", chan=" + chan +
-								", isInput=" + isInput +
-								", guards=" + guards +
-								", updates=" + updates +
-								'}';
-		}
 }

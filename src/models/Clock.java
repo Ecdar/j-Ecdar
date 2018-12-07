@@ -27,9 +27,4 @@ public class Clock {
 		public int hashCode() {
 				return 10 * name.hashCode();
 		}
-
-		@Override
-		public String toString() {
-				return "Clock " + name;
-		}
 }

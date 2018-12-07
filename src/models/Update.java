@@ -1,7 +1,5 @@
 package models;
 
-import java.util.Objects;
-
 public class Update {
 
 		private Clock clock;
@@ -18,19 +16,5 @@ public class Update {
 
 		public int getValue() {
 				return value;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-				if (this == o) return true;
-				if (o == null || getClass() != o.getClass()) return false;
-				Update update = (Update) o;
-				return value == update.value &&
-								clock.equals(update.clock);
-		}
-
-		@Override
-		public int hashCode() {
-				return Objects.hash(clock, value);
 		}
 }

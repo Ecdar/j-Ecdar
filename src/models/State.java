@@ -119,28 +119,4 @@ public class State {
 		public void delay() {
 				zone = DBMLib.dbm_up(zone, zoneSize);
 		}
-
-		@Override
-		public String toString() {
-				return "State{" +
-								"locations=" + locations +
-								", zone=" + Arrays.toString(zone) +
-								'}';
-		}
-
-		@Override
-		public boolean equals(Object o) {
-				if (this == o) return true;
-				if (o == null || getClass() != o.getClass()) return false;
-				State state = (State) o;
-				return Arrays.equals(locations.toArray(), state.locations.toArray()) &&
-								Arrays.equals(zone, state.zone);
-		}
-
-		@Override
-		public int hashCode() {
-				int result = Objects.hash(locations);
-				result = 31 * result + Arrays.hashCode(zone);
-				return result;
-		}
 }

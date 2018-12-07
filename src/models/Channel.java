@@ -14,19 +14,6 @@ public class Channel {
 		}
 
 		@Override
-		public String toString() {
-				return "Channel " + name;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-				if (this == o) return true;
-				if (o == null || getClass() != o.getClass()) return false;
-				Channel channel = (Channel) o;
-				return name.equals(channel.name);
-		}
-
-		@Override
 		public int hashCode() {
 				return Objects.hash(name);
 		}

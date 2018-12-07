@@ -14,24 +14,6 @@ public class Parser {
     private static ArrayList<Channel> globalChannels = new ArrayList<>();
     private static Set<Clock> componentClocks = new HashSet<>();
 
-    public Parser (ArrayList<String> locations){
-        objectList = parseFiles(locations);
-    }
-
-    //---------------------------Testing-----------------
-    public static void main(String[] args) {
-        ArrayList<String> locations = new ArrayList<>();
-
-        // Relative Path to your samples in the Project folder
-        locations.add("./samples/EcdarUniversity/GlobalDeclarations.json");
-				locations.add("./samples/EcdarUniversity/Components/Administration.json");
-				locations.add("./samples/EcdarUniversity/Components/Machine.json");
-				locations.add("./samples/EcdarUniversity/Components/Researcher.json");
-
-        objectList = parseFiles(locations);
-        distrubuteObjects(objectList);
-    }
-
     public static ArrayList<Component> parse(String base, List<String> components) {
         ArrayList<String> locations = new ArrayList<>();
 
