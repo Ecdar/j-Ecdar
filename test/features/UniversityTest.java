@@ -1,5 +1,6 @@
-package logic;
+package features;
 
+import logic.Refinement;
 import models.Component;
 import org.junit.*;
 import parser.Parser;
@@ -55,7 +56,7 @@ public class UniversityTest {
 		}
 
 		@Test
-		public void testAdmNotRefineSpec() {
+		public void testAdmNotRefinesSpec() {
 				Refinement ref = simpleRefinesSimple(adm, spec);
 				assertFalse(ref.check());
 		}

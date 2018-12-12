@@ -1,5 +1,7 @@
-package models;
+package logic;
 
+import models.Guard;
+import models.Transition;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class StateTransition {
 		public List<Guard> getGuards() {
 				List<Guard> guards = new ArrayList<>();
 				for (Transition t : transitions) {
-						if (t != null ) guards.addAll(t.getGuards());
+						if (t != null) guards.addAll(t.getGuards());
 				}
 				return guards;
 		}

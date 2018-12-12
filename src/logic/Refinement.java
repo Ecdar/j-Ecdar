@@ -32,14 +32,12 @@ public class Refinement {
 		}
 
 		public boolean check() {
-				// if the transitions systems could not be constructed, refinement cannot hold
+				// if the transition systems could not be constructed, refinement cannot hold
 				if (failed) return false;
 
 				// get the inputs of machine 2 and the outputs of machine 1
 				Set<Channel> inputs2 = ts2.getInputs();
 				Set<Channel> outputs1 = ts1.getOutputs();
-				Set<Channel> actions1 = setDifference(ts1.getActions(), ts2.getActions());
-				Set<Channel> actions2 = setDifference(ts2.getActions(), ts1.getActions());
 
 				// keep looking at states from Waiting as long as it contains elements
 				while (!waiting.isEmpty()) {
@@ -62,40 +60,6 @@ public class Refinement {
 								boolean holds2 = checkActions(inputs2, curr[1], curr[0], ts2, ts1, true);
 								if (!holds2)
 										return false;
-
-								// for actions belonging only to machine 1, make a pair for each transition in machine 1 and the state in machine 2
-								/*State source2 = copyState(curr[1]);
-								State target2 = copyState(curr[1]);
-								for (Channel action : actions1) {
-										List<StateTransition> transitions = ts1.getNextTransitions(curr[0], action);
-
-										for (StateTransition stateTransition : transitions) {
-												State source1 = copyState(stateTransition.getSource());
-												State target1 = copyState(stateTransition.getTarget());
-
-												State[] newState = buildStatePair(source1, source2, new ArrayList<>(), stateTransition.getGuards(), target1, target2);
-												if (newState != null) {
-														waiting.add(newState);
-												}
-										}
-								}
-
-								// for actions belonging only to machine 2, make a pair for each transition in machine 2 and the state in machine 1
-								State source1 = copyState(curr[0]);
-								State target1 = copyState(curr[0]);
-								for (Channel action : actions2) {
-										List<StateTransition> transitions = ts2.getNextTransitions(curr[1], action);
-
-										for (StateTransition stateTransition : transitions) {
-												State source22 = copyState(stateTransition.getSource());
-												State target22 = copyState(stateTransition.getTarget());
-
-												State[] newState = buildStatePair(source1, source22, stateTransition.getGuards(), new ArrayList<>(), target1, target22);
-												if (newState != null) {
-														waiting.add(newState);
-												}
-										}
-								}*/
 						}
 				}
 
@@ -196,13 +160,5 @@ public class Refinement {
 				}
 
 				return false;
-		}
-
-		private Set<Channel> setDifference(Set<Channel> set1, Set<Channel> set2) {
-				Set<Channel> newSet = new HashSet<>();
-				newSet.addAll(set1);
-				newSet.removeAll(set2);
-
-				return newSet;
 		}
 }

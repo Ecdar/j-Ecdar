@@ -1,11 +1,13 @@
-package models;
+package logic;
 
 import lib.DBMLib;
+import models.Clock;
+import models.Guard;
+import models.Location;
+import models.Update;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class State {
 		private List<Location> locations;

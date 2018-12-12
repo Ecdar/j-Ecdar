@@ -28,6 +28,8 @@ public class Location {
 				return isInitial;
 		}
 
+		public boolean isUniversal() { return isUniversal; }
+
 		@Override
 		public boolean equals(Object o) {
 				if (this == o) return true;

@@ -1,5 +1,6 @@
-package logic;
+package features;
 
+import logic.Refinement;
 import models.Component;
 import org.junit.*;
 import parser.Parser;
