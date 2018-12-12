@@ -1,9 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Component {
 		private String name;
@@ -27,6 +24,25 @@ public class Component {
 				this.outputAct = new HashSet<>();
 				setTransitions(transitions);
 				this.clocks = clocks;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+				if (this == o) return true;
+				if (!(o instanceof Component)) return false;
+				Component component = (Component) o;
+				return name.equals(component.name) &&
+								Arrays.equals(locations.toArray(), component.locations.toArray()) &&
+								Arrays.equals(transitions.toArray(), component.transitions.toArray()) &&
+								Arrays.equals(clocks.toArray(), component.clocks.toArray()) &&
+								Arrays.equals(inputAct.toArray(), component.inputAct.toArray()) &&
+								Arrays.equals(outputAct.toArray(), component.outputAct.toArray()) &&
+								initLoc.equals(component.initLoc);
+		}
+
+		@Override
+		public int hashCode() {
+				return Objects.hash(name, locations, transitions, clocks, inputAct, outputAct, initLoc);
 		}
 
 		public String getName(){

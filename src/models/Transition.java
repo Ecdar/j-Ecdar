@@ -1,6 +1,8 @@
 package models;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Transition {
 
@@ -42,5 +44,23 @@ public class Transition {
 
 		public List<Update> getUpdates() {
 				return updates;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+				if (this == o) return true;
+				if (!(o instanceof Transition)) return false;
+				Transition that = (Transition) o;
+				return isInput == that.isInput &&
+								source.equals(that.source) &&
+								target.equals(that.target) &&
+								chan.equals(that.chan) &&
+								Arrays.equals(guards.toArray(), that.guards.toArray()) &&
+								Arrays.equals(updates.toArray(), that.updates.toArray());
+		}
+
+		@Override
+		public int hashCode() {
+				return Objects.hash(source, target, chan, isInput, guards, updates);
 		}
 }

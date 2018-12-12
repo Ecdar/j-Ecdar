@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Objects;
+
 public class Guard {
 
 		private Clock clock;
@@ -25,4 +27,19 @@ public class Guard {
 		public int getLowerBound() { return lowerBound; }
 
 		public int getUpperBound() { return upperBound; }
+
+		@Override
+		public boolean equals(Object o) {
+				if (this == o) return true;
+				if (!(o instanceof Guard)) return false;
+				Guard guard = (Guard) o;
+				return upperBound == guard.upperBound &&
+								lowerBound == guard.lowerBound &&
+								clock.equals(guard.clock);
+		}
+
+		@Override
+		public int hashCode() {
+				return Objects.hash(clock, upperBound, lowerBound);
+		}
 }

@@ -48,8 +48,8 @@ public class Refinement {
 						// ignore if the zones are included in zones belonging to pairs of states that we already visited
 						if (!passedContainsState(curr)) {
 								// need to make deep copy
-								State newState1 = new State(curr[0].getLocations(), curr[0].getZone());
-								State newState2 = new State(curr[1].getLocations(), curr[1].getZone());
+								State newState1 = copyState(curr[0]);
+								State newState2 = copyState(curr[1]);
 								// mark the pair of states as visited
 								passed.add(new State[] {newState1, newState2});
 
@@ -64,28 +64,38 @@ public class Refinement {
 										return false;
 
 								// for actions belonging only to machine 1, make a pair for each transition in machine 1 and the state in machine 2
+								/*State source2 = copyState(curr[1]);
+								State target2 = copyState(curr[1]);
 								for (Channel action : actions1) {
 										List<StateTransition> transitions = ts1.getNextTransitions(curr[0], action);
+
 										for (StateTransition stateTransition : transitions) {
-												State target = new State(stateTransition.getTarget().getLocations(), stateTransition.getTarget().getZone());
-												target.delay();
-												target.applyInvariants(ts1.getClocks());
-												State[] newState = new State[]{target, curr[1]};
-												waiting.add(newState);
+												State source1 = copyState(stateTransition.getSource());
+												State target1 = copyState(stateTransition.getTarget());
+
+												State[] newState = buildStatePair(source1, source2, new ArrayList<>(), stateTransition.getGuards(), target1, target2);
+												if (newState != null) {
+														waiting.add(newState);
+												}
 										}
 								}
 
 								// for actions belonging only to machine 2, make a pair for each transition in machine 2 and the state in machine 1
+								State source1 = copyState(curr[0]);
+								State target1 = copyState(curr[0]);
 								for (Channel action : actions2) {
 										List<StateTransition> transitions = ts2.getNextTransitions(curr[1], action);
+
 										for (StateTransition stateTransition : transitions) {
-												State target = new State(stateTransition.getTarget().getLocations(), stateTransition.getTarget().getZone());
-												target.delay();
-												target.applyInvariants(ts2.getClocks());
-												State[] newState = new State[]{curr[0], target};
-												waiting.add(newState);
+												State source22 = copyState(stateTransition.getSource());
+												State target22 = copyState(stateTransition.getTarget());
+
+												State[] newState = buildStatePair(source1, source22, stateTransition.getGuards(), new ArrayList<>(), target1, target22);
+												if (newState != null) {
+														waiting.add(newState);
+												}
 										}
-								}
+								}*/
 						}
 				}
 
@@ -99,40 +109,50 @@ public class Refinement {
 
 				for (StateTransition t1 : next1) {
 						for (StateTransition t2 : next2) {
-								// get source states and apply guards on them
-								State source1 = new State(t1.getSource().getLocations(), t1.getSource().getZone());
-								State source2 = new State(t2.getSource().getLocations(), t2.getSource().getZone());
-								source1.applyGuards(t1.getGuards(), ts1.getClocks());
-								source2.applyGuards(t2.getGuards(), ts2.getClocks());
+								// get source and target states
+								State source1 = copyState(t1.getSource());
+								State source2 = copyState(t2.getSource());
+								State target1 = copyState(t1.getTarget());
+								State target2 = copyState(t2.getTarget());
 
-								// based on the zone, get the min and max value of the clocks
-								int maxSource1 = source1.getMinUpperBound(); int maxSource2 = source2.getMinUpperBound();
-								int minSource1 = source1.getMinLowerBound(); int minSource2 = source2.getMinLowerBound();
-
-								// check that the zones are compatible
-								if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
-										// get target states, delay and apply invariants
-										State target1 = new State(t1.getTarget().getLocations(), t1.getTarget().getZone());
-										State target2 = new State(t2.getTarget().getLocations(), t2.getTarget().getZone());
-
-										target1.delay(); target2.delay();
-										target1.applyInvariants(ts1.getClocks());
-										target2.applyInvariants(ts2.getClocks());
-
-										// get the max value of the clocks
-										int maxTarget1 = target1.getMinUpperBound(); int maxTarget2 = target2.getMinUpperBound();
-										int minTarget1 = target1.getMinLowerBound(); int minTarget2 = target2.getMinLowerBound();
-
-										// check again that the zones are compatible
-										if (maxTarget1 >= minTarget2 && maxTarget2 >= minTarget1) {
-												State[] newState = new State[]{target1, target2};
-												states.add(newState);
-										}
+								State[] newState = buildStatePair(source1, source2, t1.getGuards(), t2.getGuards(), target1, target2);
+								if (newState != null) {
+										states.add(newState);
 								}
 						}
 				}
 
 				return states;
+		}
+
+		private State[] buildStatePair(State source1, State source2, List<Guard> guards1, List<Guard> guards2, State target1, State target2) {
+				// apply guards on the source states
+				source1.applyGuards(guards1, ts1.getClocks());
+				source2.applyGuards(guards2, ts2.getClocks());
+
+				// based on the zone, get the min and max value of the clocks
+				int maxSource1 = source1.getMinUpperBound(); int maxSource2 = source2.getMinUpperBound();
+				int minSource1 = source1.getMinLowerBound(); int minSource2 = source2.getMinLowerBound();
+
+				// check that the zones are compatible
+				if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
+						// delay and apply invariants on target states
+
+						target1.delay(); target2.delay();
+						target1.applyInvariants(ts1.getClocks());
+						target2.applyInvariants(ts2.getClocks());
+
+						// get the max value of the clocks
+						int maxTarget1 = target1.getMinUpperBound(); int maxTarget2 = target2.getMinUpperBound();
+						int minTarget1 = target1.getMinLowerBound(); int minTarget2 = target2.getMinLowerBound();
+
+						// check again that the zones are compatible
+						if (maxTarget1 >= minTarget2 && maxTarget2 >= minTarget1) {
+								return new State[]{target1, target2};
+						}
+				}
+
+				return null;
 		}
 
 		private boolean checkActions(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2, boolean isInput) {
@@ -155,6 +175,10 @@ public class Refinement {
 						}
 				}
 				return true;
+		}
+
+		private State copyState(State state) {
+				return new State(state.getLocations(), state.getZone());
 		}
 
 		private boolean passedContainsState(State[] state) {
