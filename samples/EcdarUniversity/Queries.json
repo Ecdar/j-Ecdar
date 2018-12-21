@@ -28,5 +28,15 @@
     "query": "refinement: Machine3 \u003c\u003d Machine3",
     "comment": "",
     "isPeriodic": false
+  },
+  {
+    "query": "refinement: (HalfAdm1 \u0026\u0026 HalfAdm2) \u003c\u003d Adm2",
+    "comment": "",
+    "isPeriodic": false
+  },
+  {
+    "query": "refinement: Adm2 \u003c\u003d (HalfAdm1 \u0026\u0026 HalfAdm2)",
+    "comment": "",
+    "isPeriodic": false
   }
 ]

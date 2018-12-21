@@ -1,6 +1,7 @@
 package features;
 
 import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.Component;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -64,8 +65,8 @@ public class BigRefinementTest {
     }
 
     private Refinement simpleRefinesSimple(Component component1, Component component2) {
-        return new Refinement(new ArrayList<>(Arrays.asList(component1)),
-                new ArrayList<>(Arrays.asList(component2)));
+        return new Refinement(new SimpleTransitionSystem(component1),
+                new SimpleTransitionSystem(component2));
     }
     //
 }

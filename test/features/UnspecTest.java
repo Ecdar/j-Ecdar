@@ -1,6 +1,8 @@
 package features;
 
+import logic.Composition;
 import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.Component;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class UnspecTest {
     private static Component a, aa, b;
@@ -35,8 +37,10 @@ public class UnspecTest {
     }
 
     @Test
-    public void compRefinesB() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(a, aa)), new ArrayList<>(Arrays.asList(b)));
-        assertTrue(ref.check());
+    public void compNotRefinesB() {
+        Refinement ref = new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(a), new SimpleTransitionSystem(aa)))),
+                new SimpleTransitionSystem(b));
+        assertFalse(ref.check());
     }
 }

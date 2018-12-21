@@ -1,6 +1,9 @@
 package features;
 
+import logic.Composition;
+import logic.Conjunction;
 import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.Component;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 public class UniversityTest {
 
-    private static Component adm, machine, researcher, spec, machine3;
+    private static Component adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -30,7 +33,10 @@ public class UniversityTest {
                 "Components/Machine.json",
                 "Components/Researcher.json",
                 "Components/Spec.json",
-                "Components/Machine3.json"));
+                "Components/Machine3.json",
+                "Components/Adm2.json",
+                "Components/HalfAdm1.json",
+                "Components/HalfAdm2.json"));
         List<Component> machines = Parser.parse(base, components);
 
         adm = machines.get(0);
@@ -38,6 +44,9 @@ public class UniversityTest {
         researcher = machines.get(2);
         spec = machines.get(3);
         machine3 = machines.get(4);
+        adm2 = machines.get(5);
+        half1 = machines.get(6);
+        half2 = machines.get(7);
     }
 
     @Test
@@ -192,23 +201,51 @@ public class UniversityTest {
 
     @Test
     public void testCompRefinesSpec() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(adm, machine, researcher)),
-                new ArrayList<>(Arrays.asList(spec)));
+        Refinement ref = new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
+                new SimpleTransitionSystem(spec));
         assertTrue(ref.check());
     }
 
     @Test
     public void testCompRefinesSelf() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(adm, machine, researcher)),
-                new ArrayList<>(Arrays.asList(machine, researcher, adm)));
+        Refinement ref = new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher), new SimpleTransitionSystem(adm)))));
         assertTrue(ref.check());
     }
 
     @Test
     public void testUncomposable() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(machine, machine3)),
-                new ArrayList<>(Arrays.asList(machine)));
-        assertFalse(ref.check());
+        boolean fail = false;
+
+        try {
+            Refinement ref = new Refinement(
+                    new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(machine), new SimpleTransitionSystem(machine3)))),
+                    new SimpleTransitionSystem(machine));
+        } catch (IllegalArgumentException ex) {
+            fail = true;
+        }
+
+        assertTrue(fail);
+    }
+
+    @Test
+    public void testHalf1AndHalf2RefinesAdm2() {
+       Refinement ref = new Refinement(
+                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(half1), new SimpleTransitionSystem(half2)))),
+                new SimpleTransitionSystem(adm2));
+
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void testAdm2RefinesHalf1AndHalf2() {
+        Refinement ref = new Refinement(
+                new SimpleTransitionSystem(adm2),
+                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(half1), new SimpleTransitionSystem(half2)))));
+
+        assertTrue(ref.check());
     }
 
 
@@ -218,7 +255,7 @@ public class UniversityTest {
     }
 
     private Refinement simpleRefinesSimple(Component component1, Component component2) {
-        return new Refinement(new ArrayList<>(Arrays.asList(component1)), new ArrayList<>(Arrays.asList(component2)));
+        return new Refinement(new SimpleTransitionSystem(component1), new SimpleTransitionSystem(component2));
     }
     //
 }

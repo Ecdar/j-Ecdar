@@ -1,6 +1,8 @@
 package features;
 
+import logic.Composition;
 import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.Component;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,49 +41,53 @@ public class AGTest {
 
     @Test
     public void AGRefinesAImp() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(A, G)), new ArrayList<>(Arrays.asList(A, Imp)));
+        Refinement ref = new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(A), new SimpleTransitionSystem(G)))),
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(A), new SimpleTransitionSystem(Imp)))));
         assertTrue(ref.check());
     }
 
     @Test
     public void AImpRefinesAG() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(A, Imp)), new ArrayList<>(Arrays.asList(A, G)));
+        Refinement ref = new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(A), new SimpleTransitionSystem(Imp)))),
+                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(A), new SimpleTransitionSystem(G)))));
         assertTrue(ref.check());
     }
 
     @Test
     public void GRefinesImp() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(G)), new ArrayList<>(Arrays.asList(Imp)));
+        Refinement ref = new Refinement(new SimpleTransitionSystem(G), new SimpleTransitionSystem(Imp));
         assertTrue(ref.check());
     }
 
     @Test
     public void ImpNotRefinesG() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(Imp)), new ArrayList<>(Arrays.asList(G)));
+        Refinement ref = new Refinement(new SimpleTransitionSystem(Imp), new SimpleTransitionSystem(G));
         assertFalse(ref.check());
     }
 
     @Test
     public void GRefinesQ() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(G)), new ArrayList<>(Arrays.asList(Q)));
+        Refinement ref = new Refinement(new SimpleTransitionSystem(G), new SimpleTransitionSystem(Q));
         assertTrue(ref.check());
     }
 
     @Test
     public void QRefinesG() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(Q)), new ArrayList<>(Arrays.asList(G)));
+        Refinement ref = new Refinement(new SimpleTransitionSystem(Q), new SimpleTransitionSystem(G));
         assertTrue(ref.check());
     }
 
     @Test
     public void QRefinesImp() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(Q)), new ArrayList<>(Arrays.asList(Imp)));
+        Refinement ref = new Refinement(new SimpleTransitionSystem(Q), new SimpleTransitionSystem(Imp));
         assertTrue(ref.check());
     }
 
     @Test
     public void ImpNotRefinesQ() {
-        Refinement ref = new Refinement(new ArrayList<>(Arrays.asList(Imp)), new ArrayList<>(Arrays.asList(Q)));
+        Refinement ref = new Refinement(new SimpleTransitionSystem(Imp), new SimpleTransitionSystem(Q));
         assertFalse(ref.check());
     }
 }
