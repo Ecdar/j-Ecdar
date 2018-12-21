@@ -2,7 +2,6 @@ package logic;
 
 import lib.DBMLib;
 import models.Channel;
-import models.Component;
 import models.Guard;
 
 import java.io.File;
@@ -12,32 +11,21 @@ public class Refinement {
     private TransitionSystem ts1, ts2;
     private Deque<State[]> waiting;
     private List<State[]> passed;
-    private boolean failed;
 
-    public Refinement(List<Component> machines1, List<Component> machines2) {
-        try {
-            this.ts1 = machines1.size() == 1 ? new SimpleTransitionSystem(machines1.get(0)) : new ComposedTransitionSystem(machines1);
-            this.ts2 = machines2.size() == 1 ? new SimpleTransitionSystem(machines2.get(0)) : new ComposedTransitionSystem(machines2);
+    public Refinement(TransitionSystem system1, TransitionSystem system2) {
+        this.ts1 = system1;
+        this.ts2 = system2;
+        this.waiting = new ArrayDeque<>();
+        this.passed = new ArrayList<>();
+        // the first states we look at are the initial ones
+        waiting.push(new State[]{ts1.getInitialState(), ts2.getInitialState()});
 
-            this.waiting = new ArrayDeque<>();
-            this.passed = new ArrayList<>();
-            // the first states we look at are the initial ones
-            waiting.push(new State[]{ts1.getInitialState(), ts2.getInitialState()});
-
-            String fileName = "src/" + System.mapLibraryName("DBM");
-            File lib = new File(fileName);
-            System.load(lib.getAbsolutePath());
-
-            failed = false;
-        } catch (IllegalArgumentException ex) {
-            failed = true;
-        }
+        String fileName = "src/" + System.mapLibraryName("DBM");
+        File lib = new File(fileName);
+        System.load(lib.getAbsolutePath());
     }
 
     public boolean check() {
-        // if the transition systems could not be constructed, refinement cannot hold
-        if (failed) return false;
-
         // get the inputs of machine 2 and the outputs of machine 1
         Set<Channel> inputs2 = ts2.getInputs();
         Set<Channel> outputs1 = ts1.getOutputs();

@@ -1,49 +1,48 @@
 package logic;
 
 import models.Channel;
-import models.Component;
 import models.Location;
 import models.Transition;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ComposedTransitionSystem extends TransitionSystem {
-    private List<Component> machines;
+public class Composition extends TransitionSystem {
+    private List<TransitionSystem> systems;
     private Set<Channel> inputs, outputs, syncs;
 
-    public ComposedTransitionSystem(List<Component> machines) {
-        super(machines);
-        this.machines = machines;
+    public Composition(List<TransitionSystem> systems) {
+        super(systems.stream().map(TransitionSystem::getMachines).flatMap(t -> t.stream()).collect(Collectors.toList()));
+        this.systems = systems;
         inputs = new HashSet<>();
         outputs = new HashSet<>();
         syncs = new HashSet<>();
 
-        for (int i = 0; i < machines.size(); i++) {
+        for (int i = 0; i < systems.size(); i++) {
             Set<Channel> inputsOfI, outputsOfI, sync, outputsOfOthers, inputsOfOthers;
-            inputsOfI = new HashSet<>(machines.get(i).getInputAct());
-            outputsOfI = new HashSet<>(machines.get(i).getOutputAct());
-            sync = new HashSet<>(machines.get(i).getOutputAct());
+            inputsOfI = new HashSet<>(systems.get(i).getInputs());
+            outputsOfI = new HashSet<>(systems.get(i).getOutputs());
+            sync = new HashSet<>(systems.get(i).getOutputs());
             outputsOfOthers = new HashSet<>();
             inputsOfOthers = new HashSet<>();
             inputs.addAll(inputsOfI);
             outputs.addAll(outputsOfI);
 
-            for (int j = 0; j < machines.size(); j++) {
+            for (int j = 0; j < systems.size(); j++) {
                 if (i != j) {
                     // check if output actions overlap
-                    Set<Channel> diff = new HashSet<>(machines.get(i).getOutputAct());
-                    diff.retainAll(machines.get(j).getOutputAct());
+                    Set<Channel> diff = new HashSet<>(systems.get(i).getOutputs());
+                    diff.retainAll(systems.get(j).getOutputs());
                     if (!diff.isEmpty()) {
                         throw new IllegalArgumentException("machines cannot be composed");
                     }
 
-                    outputsOfOthers.addAll(machines.get(j).getOutputAct());
+                    outputsOfOthers.addAll(systems.get(j).getOutputs());
 
-                    inputsOfOthers.addAll(machines.get(j).getInputAct());
+                    inputsOfOthers.addAll(systems.get(j).getInputs());
 
                     Set<Channel> syncCopy = new HashSet<>(sync);
-                    syncCopy.retainAll(machines.get(j).getInputAct());
+                    syncCopy.retainAll(systems.get(j).getInputs());
                     syncs.addAll(syncCopy);
                 }
             }
@@ -74,7 +73,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
         if (outputs.contains(channel)) {
             // if the signal is an output, loop through the machines to find the one sending the output
             for (int i = 0; i < locations.size(); i++) {
-                List<Transition> transitions = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+                List<Transition> transitions = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
 
                 for (Transition transition : transitions) {
                     // the new locations will contain the locations of the source zone, but the location corresponding
@@ -97,7 +96,7 @@ public class ComposedTransitionSystem extends TransitionSystem {
 
                 // loop through the machines to get the transitions from the corresponding location
                 for (int i = 0; i < locations.size(); i++) {
-                    List<Transition> transitionsForI = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+                    List<Transition> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
                     if (transitionsForI.isEmpty()) {
                         // if there are no transitions, only add the current location to the list and an empty transition
                         List<Location> newLocations = new ArrayList<>();
@@ -113,37 +112,13 @@ public class ComposedTransitionSystem extends TransitionSystem {
                         transitionsList.add(transitionsForI);
                     }
                 }
-                // use the cartesian product to build all possible combinations between locations (same for transitions
+                // use the cartesian product to build all possible combinations between locations (same for transitions)
                 locationsArr = cartesianProduct(locationsList);
                 transitionsArr = cartesianProduct(transitionsList);
             }
         }
 
         return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
-    }
-
-    // function that takes an arbitrary number of lists and recursively calculates their cartesian product
-    private <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
-        List<List<T>> resultLists = new ArrayList<>();
-        if (lists.size() == 0) {
-            // base case; return a list containing one empty list
-            resultLists.add(new ArrayList<>());
-        } else {
-            // take head of list
-            List<T> firstList = lists.get(0);
-            // apply function to tail of list
-            List<List<T>> remainingLists = cartesianProduct(lists.subList(1, lists.size()));
-            // combine each element of the first list with each of the remaining lists
-            for (T condition : firstList) {
-                for (List<T> remainingList : remainingLists) {
-                    List<T> resultList = new ArrayList<>();
-                    resultList.add(condition);
-                    resultList.addAll(remainingList);
-                    resultLists.add(resultList);
-                }
-            }
-        }
-        return resultLists;
     }
 
     private boolean checkForInputs(Channel channel, List<Location> locations) {
@@ -153,9 +128,9 @@ public class ComposedTransitionSystem extends TransitionSystem {
         // for syncs, we must make sure we have an output first
         if (syncs.contains(channel)) {
             // loop through all machines to find the one sending the output
-            for (int i = 0; i < machines.size(); i++) {
-                if (machines.get(i).getOutputAct().contains(channel)) {
-                    List<Transition> transitionsForI = machines.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+            for (int i = 0; i < systems.size(); i++) {
+                if (systems.get(i).getOutputs().contains(channel)) {
+                    List<Transition> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
                     if (transitionsForI.isEmpty()) {
                         // do not check for inputs if the state in the corresponding machine does not send that output
                         check = false;

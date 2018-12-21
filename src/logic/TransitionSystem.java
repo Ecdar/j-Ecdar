@@ -35,6 +35,8 @@ public abstract class TransitionSystem {
         return clocks;
     }
 
+    public List<Component> getMachines() { return machines; }
+
     public State getInitialState() {
         List<Location> initialLocations = new ArrayList<>();
 
@@ -90,6 +92,18 @@ public abstract class TransitionSystem {
 
     public abstract List<StateTransition> getNextTransitions(State currentState, Channel channel);
 
+    public List<Transition> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
+        List<Component> components = getMachines();
+
+        for (Component component : components) {
+            if (component.getLocations().contains(loc)) {
+                return component.getTransitionsFromLocationAndSignal(loc, signal);
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
     int[] initializeDBM() {
         // we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
         // clocks x1 to xn are clocks derived from our components, while x0 is a reference clock needed by the library
@@ -101,5 +115,29 @@ public abstract class TransitionSystem {
 
     boolean isDbmValid(int[] dbm) {
         return DBMLib.dbm_isValid(dbm, dbmSize);
+    }
+
+    // function that takes an arbitrary number of lists and recursively calculates their cartesian product
+    <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
+        List<List<T>> resultLists = new ArrayList<>();
+        if (lists.size() == 0) {
+            // base case; return a list containing one empty list
+            resultLists.add(new ArrayList<>());
+        } else {
+            // take head of list
+            List<T> firstList = lists.get(0);
+            // apply function to tail of list
+            List<List<T>> remainingLists = cartesianProduct(lists.subList(1, lists.size()));
+            // combine each element of the first list with each of the remaining lists
+            for (T condition : firstList) {
+                for (List<T> remainingList : remainingLists) {
+                    List<T> resultList = new ArrayList<>();
+                    resultList.add(condition);
+                    resultList.addAll(remainingList);
+                    resultLists.add(resultList);
+                }
+            }
+        }
+        return resultLists;
     }
 }
