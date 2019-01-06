@@ -52,7 +52,7 @@ public class AGTest {
         Refinement ref = new Refinement(
                 new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(A), new SimpleTransitionSystem(Imp)))),
                 new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(A), new SimpleTransitionSystem(G)))));
-        assertTrue(ref.check());
+        assertFalse(ref.check());
     }
 
     @Test

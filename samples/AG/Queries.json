@@ -1,11 +1,11 @@
 [
   {
-    "query": "refinement: (A_Good || G) \u003c\u003d (A_Good || Imp)",
+    "query": "refinement: (A || G) \u003c\u003d (A || Imp)",
     "comment": "",
     "isPeriodic": false
   },
   {
-    "query": "refinement: (A_Good || Imp) \u003c\u003d (A_Good || G)",
+    "query": "refinement: (A || Imp) \u003c\u003d (A || G)",
     "comment": "",
     "isPeriodic": false
   },

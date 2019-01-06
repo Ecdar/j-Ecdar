@@ -43,12 +43,12 @@ public class Refinement {
                 passed.add(new State[]{newState1, newState2});
 
                 // check that for every output in machine 1 there is a corresponding output in machine 2
-                boolean holds1 = checkActions(outputs1, curr[0], curr[1], ts1, ts2, false);
+                boolean holds1 = checkOutputs(outputs1, curr[0], curr[1], ts1, ts2);
                 if (!holds1)
                     return false;
 
                 // check that for every input in machine 2 there is a corresponding input in machine 1
-                boolean holds2 = checkActions(inputs2, curr[1], curr[0], ts2, ts1, true);
+                boolean holds2 = checkInputs(inputs2, curr[0], curr[1], ts1, ts2);
                 if (!holds2)
                     return false;
             }
@@ -115,7 +115,29 @@ public class Refinement {
         return null;
     }
 
-    private boolean checkActions(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2, boolean isInput) {
+    private boolean checkInputs(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
+        for (Channel action : actions) {
+            List<StateTransition> next2 = sys2.getNextTransitions(state2, action);
+            if (!next2.isEmpty()) {
+                List<StateTransition> next1 = sys1.getNextTransitions(state1, action);
+                if (next1.isEmpty()) {
+                    // we found an input in machine 2 that doesn't exist in machine 1, so refinement doesn't hold
+                    return false;
+                } else {
+                    List<State[]> newStates = getNewStates(next1, next2);
+                    if (newStates.isEmpty()) {
+                        // if we don't get any new states, it means we found some incompatibility
+                        return false;
+                    } else {
+                        waiting.addAll(newStates);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkOutputs(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
         for (Channel action : actions) {
             List<StateTransition> next1 = sys1.getNextTransitions(state1, action);
             if (!next1.isEmpty()) {
@@ -124,7 +146,7 @@ public class Refinement {
                     // we found an output in machine 1 that doesn't exist in machine 2, so refinement doesn't hold
                     return false;
                 } else {
-                    List<State[]> newStates = isInput ? getNewStates(next2, next1) : getNewStates(next1, next2);
+                    List<State[]> newStates = getNewStates(next1, next2);
                     if (newStates.isEmpty()) {
                         // if we don't get any new states, it means we found some incompatibility
                         return false;
