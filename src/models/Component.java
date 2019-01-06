@@ -61,9 +61,9 @@ public class Component {
             for (Channel action : actions) {
                 trans.add(new Transition(loc, loc, action, getInputAct().contains(action), new ArrayList<>(), new ArrayList<>()));
             }
-        } else {
-            trans.removeIf(n -> n.getSource() != loc);
         }
+
+        trans.removeIf(n -> n.getSource() != loc);
 
         return trans;
     }
