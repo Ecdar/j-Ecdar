@@ -1,0 +1,17 @@
+[
+  {
+    "query": "refinement: (Test1 \u0026\u0026 Test2) \u003c\u003d Test3",
+    "comment": "",
+    "isPeriodic": false
+  },
+  {
+    "query": "refinement: (Test1 \u0026\u0026 Test3) \u003c\u003d Test2",
+    "comment": "",
+    "isPeriodic": false
+  },
+  {
+    "query": "refinement: (Test2 \u0026\u0026 Test3) \u003c\u003d Test1",
+    "comment": "",
+    "isPeriodic": false
+  }
+]

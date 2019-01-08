@@ -232,7 +232,7 @@ public class UniversityTest {
 
     @Test
     public void testHalf1AndHalf2RefinesAdm2() {
-       Refinement ref = new Refinement(
+        Refinement ref = new Refinement(
                 new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(half1), new SimpleTransitionSystem(half2)))),
                 new SimpleTransitionSystem(adm2));
 
