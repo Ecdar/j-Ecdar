@@ -46,7 +46,7 @@ public class QueryParserTest {
         half1 = machines.get(6);
         half2 = machines.get(7);
         ctrl = new Controller();
-        ctrl.parseComponents("D:\\Ecdar2-2\\samples\\EcdarUniversity");
+        ctrl.parseComponents("./samples/EcdarUniversity");
     }
     @Test
     public void testCompositionOfThree() {
@@ -119,27 +119,6 @@ public class QueryParserTest {
         TransitionSystem transitionSystem = new Composition(ts2);
 
         assertTrue(transitionSystem.equals(ctrl.runQuery("((Administration&&Machine&&Machine)||Researcher||HalfAdm1)")));
-    }
-
-    @Test
-    public void testQuery2() {
-        ArrayList<TransitionSystem> ts0 = new ArrayList<>();
-        ts0.add(new SimpleTransitionSystem(spec));
-        ts0.add(new SimpleTransitionSystem(machine));
-        TransitionSystem tsc = new Composition(ts0);
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(tsc);
-        ts.add(new SimpleTransitionSystem(adm));
-        ts.add(new SimpleTransitionSystem(machine));
-        ts.add(new SimpleTransitionSystem(machine));
-        TransitionSystem ts1 = new Conjunction(ts);
-        ArrayList<TransitionSystem> ts2 = new ArrayList<>();
-        ts2.add(ts1);
-        ts2.add(new SimpleTransitionSystem(researcher));
-        ts2.add(new SimpleTransitionSystem(half1));
-        TransitionSystem transitionSystem = new Composition(ts2);
-
-        assertTrue(transitionSystem.equals(ctrl.runQuery("(((Spec||Machine)||Administration&&Machine&&Machine)||Researcher||HalfAdm1)")));
     }
 
     @Test

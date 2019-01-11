@@ -21,7 +21,7 @@ public class Parser {
     private static Set<Clock> componentClocks = new HashSet<>();
 
     public static ArrayList<Component> parse(String folderPath) {
-        File dir = new File(folderPath + "\\Components");
+        File dir = new File(folderPath + "/Components");
         File [] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -33,7 +33,7 @@ public class Parser {
 //            System.out.println(jsonFiles);
 //        }
         ArrayList<String> locations = new ArrayList<>();
-        locations.add(folderPath + "\\GlobalDeclarations.json");
+        locations.add(folderPath + "/GlobalDeclarations.json");
         for (File jsonFiles : files) {
             locations.add(jsonFiles.toString());
         }

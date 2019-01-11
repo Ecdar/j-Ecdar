@@ -20,23 +20,14 @@ public class Main {
                     System.out.println("Version 1.0");
                     break;
                 case "path":
-                    //System.out.println();
-
-                    String base = "D:\\\\Ecdar2-2\\\\samples\\\\EcdarUniversity,refinement: (Administration || Machine || Researcher) <= Spec";
                     System.out.println(ctrl.parseFiles(console.nextLine()).get(0));
-                    //System.out.println(console.nextLine());
-
-
                     break;
                 default:
                     System.out.println("Server confirms having received: " + reader + " Invalid command");
             }
         }
-
-
-        String base = "D:\\Ecdar2-2\\samples\\EcdarUniversity," + "refinement: (Administration || Machine || Researcher) <= Spec";
-        System.out.println(ctrl.parseFiles(base).get(0));
     }
+
     private static void mapDBM(){
         String fileName = "src/" + System.mapLibraryName("DBM");
         File lib = new File(fileName);
