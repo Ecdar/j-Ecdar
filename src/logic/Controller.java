@@ -1,9 +1,12 @@
 package logic;
 
+import com.sun.rmi.rmid.ExecPermission;
+import jdk.nashorn.internal.runtime.ECMAException;
 import models.Component;
 import parser.Parser;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +35,7 @@ public class Controller {
 
     public void separateLocQuery(String locQuery) {
         ArrayList<String> temp = new ArrayList<>();
-        temp.addAll(Arrays.asList(locQuery.split(",")));
+        temp.addAll(Arrays.asList(locQuery.split(" ")));
         folderLoc = temp.get(0);
         temp.remove(0);
         Queries.addAll(temp);
@@ -151,6 +154,57 @@ public class Controller {
             }
         }
         return -1;
+    }
+    public boolean isQueryValid(String query)throws Exception {
+        try{
+            checkRefinementSyntax(query);
+            isParBalanced(query);
+            BeforeAfterParantheses(query);
+        }
+        catch (Exception e){
+            throw e;
+        }
+        return true;
+    }
+    private boolean checkRefinementSyntax(String query) throws Exception{
+        if(query.contains("<=")&& !query.contains("refinement:")){
+            throw new Exception("One must determine that it is a refinement");
+        }
+        boolean ok =!query.matches(".*<=.*<=.*");
+        if (ok){return true;}
+        else throw new Exception("There can only be one refinement");
+
+    }
+    private boolean isParBalanced(String query)throws Exception{
+        int counter = 0;
+        for (int i =0; i<query.length();i++){
+            if(query.charAt(i) == '('){counter++;}
+            if(query.charAt(i) == ')'){counter--;}
+        }
+        if(counter == 0){return true;}
+        else throw new Exception("Parentheses are not balanced");
+    }
+    private boolean BeforeAfterParantheses(String query)throws Exception {
+        String testString = "/=|&";
+
+        for (int i = 0; i < query.length(); i++) {
+            if (query.charAt(i) == '(') {
+                if (i != 0) {
+                    if (testString.indexOf(query.charAt(i - 1)) != -1) {
+
+                    } else
+                        throw new Exception("Before opening Parentheses can be either operator or second Parentheses");
+                }
+                if (i + 1 < query.length()) {
+                    if (query.charAt(i + 1) == '(' || Character.isLetter(query.charAt(i + 1)) || Character.isDigit(query.charAt(i + 1))) {
+
+                    } else
+                        throw new Exception("After opening Parentheses one must place either other Parentheses or component");
+                }
+
+            }
+        }
+        return true;
     }
 
 

@@ -22,6 +22,10 @@ public class Main {
                 case "path":
                     System.out.println(ctrl.parseFiles(console.nextLine()).get(0));
                     break;
+
+                case "qe":
+                    System.out.println(ctrl.isQueryValid(console.nextLine()));
+                    break;
                 default:
                     System.out.println("Server confirms having received: " + reader + " Invalid command");
             }
