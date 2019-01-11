@@ -73,20 +73,20 @@ public class ParserTest {
         Clock x = new Clock("x");
         Clock y = new Clock("y");
 
-        models.Guard g_l12_l17 = new Guard(x, 15,false, true);
+        models.Guard g_l12_l17 = new Guard(x, 15,false, false);
         models.Guard g_l12_l14 = new Guard(x, 20,false, true);
         models.Guard g_l12_l13 = new Guard(x, 5,false, true);
-        models.Guard g_l12_l15 = new Guard(x, 8,false, true);
+        models.Guard g_l12_l15 = new Guard(x, 8,false, false);
         models.Guard g_l12_l16 = new Guard(x, 55,false, true);
-
         models.Guard g_l15_l18 = new Guard(x, 15,true, true);
+        models.Guard inv_l15 = new Guard(x, 20, false, false);
 
         Update u1 = new Update(x, 0);
 
         Location l12 = new Location("L12", null, true, false, false, false);
         Location l13 = new Location("L13", null, false, false, false, false);
         Location l14 = new Location("L14", null, false, false, false, false);
-        Location l15 = new Location("L15", null, false, false, false, false);
+        Location l15 = new Location("L15", inv_l15, false, false, false, false);
         Location l16 = new Location("L16", null, false, false, false, false);
         Location l17 = new Location("L17", null, false, false, false, false);
         Location l18 = new Location("L18", null, false, false, false, false);
