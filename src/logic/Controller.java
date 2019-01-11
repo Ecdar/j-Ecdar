@@ -16,7 +16,6 @@ public class Controller {
     private static final int FEATURE_COMPOSITION = 1;
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
-    private int k = 0;
 
     public Controller() {
 
@@ -74,14 +73,12 @@ public class Controller {
             }
 
             if (Character.isLetter(part.charAt(i)) || Character.isDigit(part.charAt(i))) {
-
                 int j = 0;
                 boolean check = true;
                 while (check) {
                     if (i + j < part.length()) {
                         if (!Character.isLetter(part.charAt(i + j)) && !Character.isDigit(part.charAt(i + j))) {
                             transitionSystems.add(new SimpleTransitionSystem(findComponent(part.substring(i, j + i))));
-                            k++;
                             j--;
                             check = false;
                         }
@@ -91,16 +88,16 @@ public class Controller {
                     }
                     j++;
                 }
-                i = i + j;
+                i += j;
             }
 
             if(feature == -1) feature = setFeature(part.charAt(i));
         }
 
-        return returnFeature(feature, transitionSystems);
+        return getTransitionSystem(feature, transitionSystems);
     }
 
-    private TransitionSystem returnFeature(int feature, ArrayList<TransitionSystem> transitionSystems){
+    private TransitionSystem getTransitionSystem(int feature, ArrayList<TransitionSystem> transitionSystems){
         switch (feature) {
             case FEATURE_COMPOSITION:
                 return new Composition(transitionSystems);
