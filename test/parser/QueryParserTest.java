@@ -13,14 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class QueryParserTest {
     private static Controller ctrl;
     private static ArrayList<Component> components;
     private static Component adm, machine, researcher, spec, machine3, adm2, half1, half2;
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         String fileName = "src/" + System.mapLibraryName("DBM");
@@ -48,6 +47,7 @@ public class QueryParserTest {
         ctrl = new Controller();
         ctrl.parseComponents("./samples/EcdarUniversity");
     }
+
     @Test
     public void testCompositionOfThree() {
         ArrayList<TransitionSystem> ts = new ArrayList<>();
@@ -57,16 +57,19 @@ public class QueryParserTest {
         TransitionSystem transitionSystem1 = new Composition(ts);
         assertTrue(transitionSystem1.equals(ctrl.runQuery("(Administration||Machine||Researcher)")));
     }
+
     @Test
     public void testCompositionOfOne() {
         SimpleTransitionSystem ts = new SimpleTransitionSystem(spec);
         assertTrue(ts.equals(ctrl.runQuery("(Spec)")));
     }
+
     @Test
     public void testCompositionOfOneMultiBrackets() {
         SimpleTransitionSystem ts = new SimpleTransitionSystem(spec);
         assertTrue(ts.equals(ctrl.runQuery("Spec")));
     }
+
     @Test
     public void testCompositionOfThreeExtraBrackets() {
         ArrayList<TransitionSystem> ts = new ArrayList<>();
@@ -81,6 +84,7 @@ public class QueryParserTest {
 
         assertTrue(transitionSystem.equals(ctrl.runQuery("((Administration||Machine)||Researcher)")));
     }
+
     @Test
     public void testConjunctionOfThree() {
         ArrayList<TransitionSystem> ts = new ArrayList<>();
@@ -90,6 +94,7 @@ public class QueryParserTest {
         TransitionSystem transitionSystem1 = new Conjunction(ts);
         assertTrue(transitionSystem1.equals(ctrl.runQuery("(Administration&&Machine&&Researcher)")));
     }
+
     @Test
     public void testConjunctionOfThreeExtraBrackets() {
         ArrayList<TransitionSystem> ts = new ArrayList<>();
@@ -138,6 +143,7 @@ public class QueryParserTest {
 
         assertTrue(tsc.equals(ctrl.runQuery("(Researcher||Machine||(Machine&&Researcher)||Spec)")));
     }
+
     @Test
     public void testQuery4() {
         ArrayList<TransitionSystem> ts0 = new ArrayList<>();
@@ -156,11 +162,11 @@ public class QueryParserTest {
         TransitionSystem tscs = ctrl.runQuery("((Researcher&&Machine)||(Machine&&Researcher))");
         assertTrue(tsc.equals(tscs));
     }
+
     @Test
     public void testQuery5() {
         ArrayList<TransitionSystem> ts0 = new ArrayList<>();
         ts0.add(new SimpleTransitionSystem(researcher));
-
 
 
         ArrayList<TransitionSystem> ts2 = new ArrayList<>();
@@ -187,6 +193,7 @@ public class QueryParserTest {
         TransitionSystem tscs = ctrl.runQuery("(Researcher||(Machine&&Machine&&Machine)||(Spec&&(Machine||Researcher)&&Machine))");
         assertTrue(last.equals(tscs));
     }
+
     @Test
     public void Half1ConjHalf2() {
         ArrayList<TransitionSystem> ts0 = new ArrayList<>();
@@ -196,87 +203,181 @@ public class QueryParserTest {
         TransitionSystem tscs = ctrl.runQuery("(HalfAdm1&&HalfAdm2)");
         assertTrue(tsConj.equals(tscs));
     }
+
     @Test
     public void CompRefinesSpec() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void SpecRefinesSpec() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Spec)<=(Spec)");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Spec)<=(Spec)");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void MachRefinesMach() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine<=Machine");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine<=Machine");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void Mach3RefinesMach3() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine3");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine3");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void Mach3RefinesMach() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void testSpecNotRefinesAdm() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Administration");
-        assertFalse(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Administration");
+            assertFalse(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
     public void testSpecNotRefinesMachine() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Machine");
-        assertFalse(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Machine");
+            assertFalse(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
     public void testSpecNotRefinesResearcher() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Researcher");
-        assertFalse(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Researcher");
+            assertFalse(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
+
     }
 
     @Test
     public void testSpecNotRefinesMachine3() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Machine3");
-        assertFalse(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Machine3");
+            assertFalse(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void CompRefinesComp() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
+
     @Test
     public void ConjRefinesAdm2() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void Adm2RefinesConj() {
-        List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
-        assertTrue(result.get(0));
+        try {
+            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
     }
+
     @Test
     public void QueryValidity() {
         try {
             boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
             assertTrue(result);
+        } catch (Exception e) {
+            fail();
         }
-       catch (Exception e){
-
-       }
     }
-//    @Test
-//    public void QueryValidity2() {
-//        try {
-//            boolean result = ctrl.isQueryValid("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)");
-//        }
-//        catch (Exception e){
-//
-//            assertTrue(e);
-//        }
-//    }
+
+    @Test
+    public void QueryValidity2() {
+        try {
+            ctrl.isQueryValid("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            fail();
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    public void QueryValidity3() {
+        try {
+            ctrl.isQueryValid("refinement:Adm2(<=(HalfAdm1&&HalfAdm2)");
+            fail();
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    public void QueryValidity4() {
+        try {
+            ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)<=Spec");
+            fail();
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    public void QueryValidity5() {
+        try {
+            ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1(&&HalfAdm2))");
+            fail();
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    public void QueryValidity6() {
+        try {
+            ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1||(&&HalfAdm2))");
+            fail();
+        } catch (Exception e) {
+        }
+    }
 }

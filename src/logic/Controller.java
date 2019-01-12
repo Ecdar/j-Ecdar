@@ -24,11 +24,13 @@ public class Controller {
 
     }
 
-    public List<Boolean> parseFiles(String locQuery) {
+    public List<Boolean> parseFiles(String locQuery) throws Exception{
         folderLoc = "";
         cmpt.clear();
         Queries.clear();
+
         separateLocQuery(locQuery); // Separates location and Queries
+
         parseComponents(folderLoc); // Parses components and adds them to local variable cmpt
         return runQueries();
     }
@@ -46,9 +48,10 @@ public class Controller {
         return cmpt;
     }
 
-    public List<Boolean> runQueries() {
+    public List<Boolean> runQueries() throws Exception{
         List<Boolean> returnlist = new ArrayList<Boolean>();
         for (int i = 0; i < Queries.size(); i++) {
+            isQueryValid(Queries.get(i));
             Queries.set(i, Queries.get(i).replaceAll("\\s+", ""));
             if (Queries.get(i).contains("refinement")) {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
@@ -160,6 +163,7 @@ public class Controller {
             checkRefinementSyntax(query);
             isParBalanced(query);
             BeforeAfterParantheses(query);
+            checkSyntax(query);
         }
         catch (Exception e){
             throw e;
@@ -185,7 +189,7 @@ public class Controller {
         else throw new Exception("Parentheses are not balanced");
     }
     private boolean BeforeAfterParantheses(String query)throws Exception {
-        String testString = "/=|&";
+        String testString = "/=|&:";
 
         for (int i = 0; i < query.length(); i++) {
             if (query.charAt(i) == '(') {
@@ -205,6 +209,15 @@ public class Controller {
             }
         }
         return true;
+    }
+    private boolean checkSyntax(String query) throws Exception{
+        String testString = "/=|&:";
+        for (int i = 0; i < query.length(); i++) {
+        if(testString.indexOf(query.charAt(i))!=-1)
+            {return true;}
+        }
+        throw new Exception("Incorrect syntax, does not contain any feature");
+
     }
 
 
