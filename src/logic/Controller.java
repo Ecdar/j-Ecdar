@@ -172,7 +172,7 @@ public class Controller {
     }
     private boolean checkRefinementSyntax(String query) throws Exception{
         if(query.contains("<=")&& !query.contains("refinement:")){
-            throw new Exception("One must determine that it is a refinement");
+            throw new Exception("Expected: \"refinement:\"");
         }
         boolean ok =!query.matches(".*<=.*<=.*");
         if (ok){return true;}
@@ -203,7 +203,7 @@ public class Controller {
                     if (query.charAt(i + 1) == '(' || Character.isLetter(query.charAt(i + 1)) || Character.isDigit(query.charAt(i + 1))) {
 
                     } else
-                        throw new Exception("After opening Parentheses one must place either other Parentheses or component");
+                        throw new Exception("After opening Parentheses can be either other Parentheses or component");
                 }
 
             }

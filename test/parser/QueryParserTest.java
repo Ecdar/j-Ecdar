@@ -54,20 +54,23 @@ public class QueryParserTest {
         ts.add(new SimpleTransitionSystem(adm));
         ts.add(new SimpleTransitionSystem(machine));
         ts.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem transitionSystem1 = new Composition(ts);
-        assertTrue(transitionSystem1.equals(ctrl.runQuery("(Administration||Machine||Researcher)")));
+        TransitionSystem ts1 = new Composition(ts);
+        TransitionSystem ts2 = ctrl.runQuery("(Administration||Machine||Researcher)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
     public void testCompositionOfOne() {
-        SimpleTransitionSystem ts = new SimpleTransitionSystem(spec);
-        assertTrue(ts.equals(ctrl.runQuery("(Spec)")));
+        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(spec);
+        TransitionSystem ts2 = ctrl.runQuery("(Spec)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
     public void testCompositionOfOneMultiBrackets() {
-        SimpleTransitionSystem ts = new SimpleTransitionSystem(spec);
-        assertTrue(ts.equals(ctrl.runQuery("Spec")));
+        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(spec);
+        TransitionSystem ts2 = ctrl.runQuery("((Spec))");
+        assertEquals(ts1, ts2);
     }
 
     @Test
@@ -76,13 +79,13 @@ public class QueryParserTest {
         ts.add(new SimpleTransitionSystem(adm));
         ts.add(new SimpleTransitionSystem(machine));
         TransitionSystem transitionSystem1 = new Composition(ts);
-        ArrayList<TransitionSystem> ts2 = new ArrayList<>();
-        ts2.add(transitionSystem1);
-        ts2.add(new SimpleTransitionSystem(researcher));
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
+        trs2.add(transitionSystem1);
+        trs2.add(new SimpleTransitionSystem(researcher));
 
-        TransitionSystem transitionSystem = new Composition(ts2);
-
-        assertTrue(transitionSystem.equals(ctrl.runQuery("((Administration||Machine)||Researcher)")));
+        TransitionSystem ts1 = new Composition(trs2);
+        TransitionSystem ts2 = ctrl.runQuery("((Administration||Machine)||Researcher)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
@@ -91,8 +94,10 @@ public class QueryParserTest {
         ts.add(new SimpleTransitionSystem(adm));
         ts.add(new SimpleTransitionSystem(machine));
         ts.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem transitionSystem1 = new Conjunction(ts);
-        assertTrue(transitionSystem1.equals(ctrl.runQuery("(Administration&&Machine&&Researcher)")));
+
+        TransitionSystem ts1 = new Conjunction(ts);
+        TransitionSystem ts2 = ctrl.runQuery("(Administration&&Machine&&Researcher)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
@@ -101,13 +106,13 @@ public class QueryParserTest {
         ts.add(new SimpleTransitionSystem(adm));
         ts.add(new SimpleTransitionSystem(machine));
         TransitionSystem transitionSystem1 = new Conjunction(ts);
-        ArrayList<TransitionSystem> ts2 = new ArrayList<>();
-        ts2.add(transitionSystem1);
-        ts2.add(new SimpleTransitionSystem(researcher));
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
+        trs2.add(transitionSystem1);
+        trs2.add(new SimpleTransitionSystem(researcher));
 
-        TransitionSystem transitionSystem = new Composition(ts2);
-
-        assertTrue(transitionSystem.equals(ctrl.runQuery("((Administration&&Machine)||Researcher)")));
+        TransitionSystem ts1 = new Composition(trs2);
+        TransitionSystem ts2 = ctrl.runQuery("((Administration&&Machine)||Researcher)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
@@ -116,14 +121,15 @@ public class QueryParserTest {
         ts.add(new SimpleTransitionSystem(adm));
         ts.add(new SimpleTransitionSystem(machine));
         ts.add(new SimpleTransitionSystem(machine));
-        TransitionSystem ts1 = new Conjunction(ts);
-        ArrayList<TransitionSystem> ts2 = new ArrayList<>();
-        ts2.add(ts1);
-        ts2.add(new SimpleTransitionSystem(researcher));
-        ts2.add(new SimpleTransitionSystem(half1));
-        TransitionSystem transitionSystem = new Composition(ts2);
+        TransitionSystem trs1 = new Conjunction(ts);
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
+        trs2.add(trs1);
+        trs2.add(new SimpleTransitionSystem(researcher));
+        trs2.add(new SimpleTransitionSystem(half1));
 
-        assertTrue(transitionSystem.equals(ctrl.runQuery("((Administration&&Machine&&Machine)||Researcher||HalfAdm1)")));
+        TransitionSystem ts1 = new Composition(trs2);
+        TransitionSystem ts2 = ctrl.runQuery("((Administration&&Machine&&Machine)||Researcher||HalfAdm1)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
@@ -136,12 +142,13 @@ public class QueryParserTest {
         ArrayList<TransitionSystem> ts = new ArrayList<>();
         ts.add(new SimpleTransitionSystem(machine));
         ts.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem ts1 = new Conjunction(ts);
-        ts0.add(ts1);
+        TransitionSystem trs1 = new Conjunction(ts);
+        ts0.add(trs1);
         ts0.add(new SimpleTransitionSystem(spec));
-        TransitionSystem tsc = new Composition(ts0);
 
-        assertTrue(tsc.equals(ctrl.runQuery("(Researcher||Machine||(Machine&&Researcher)||Spec)")));
+        TransitionSystem ts1 = new Composition(ts0);
+        TransitionSystem ts2 = ctrl.runQuery("(Researcher||Machine||(Machine&&Researcher)||Spec)");
+        assertEquals(ts1, ts2);
     }
 
     @Test
@@ -149,32 +156,33 @@ public class QueryParserTest {
         ArrayList<TransitionSystem> ts0 = new ArrayList<>();
         ts0.add(new SimpleTransitionSystem(researcher));
         ts0.add(new SimpleTransitionSystem(machine));
-        TransitionSystem ts1 = new Conjunction(ts0);
+        TransitionSystem trs1 = new Conjunction(ts0);
 
-        ArrayList<TransitionSystem> ts2 = new ArrayList<>();
-        ts2.add(new SimpleTransitionSystem(machine));
-        ts2.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem ts3 = new Conjunction(ts2);
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
+        trs2.add(new SimpleTransitionSystem(machine));
+        trs2.add(new SimpleTransitionSystem(researcher));
+        TransitionSystem trs3 = new Conjunction(trs2);
         ArrayList<TransitionSystem> tss = new ArrayList<>();
-        tss.add(ts1);
-        tss.add(ts3);
-        TransitionSystem tsc = new Composition(tss);
-        TransitionSystem tscs = ctrl.runQuery("((Researcher&&Machine)||(Machine&&Researcher))");
-        assertTrue(tsc.equals(tscs));
+        tss.add(trs1);
+        tss.add(trs3);
+
+        TransitionSystem ts1 = new Composition(tss);
+        TransitionSystem ts2 = ctrl.runQuery("((Researcher&&Machine)||(Machine&&Researcher))");
+        assertEquals(ts1, ts2);
     }
 
     @Test
     public void testQuery5() {
-        ArrayList<TransitionSystem> ts0 = new ArrayList<>();
-        ts0.add(new SimpleTransitionSystem(researcher));
+        ArrayList<TransitionSystem> trs0 = new ArrayList<>();
+        trs0.add(new SimpleTransitionSystem(researcher));
 
 
-        ArrayList<TransitionSystem> ts2 = new ArrayList<>();
-        ts2.add(new SimpleTransitionSystem(machine));
-        ts2.add(new SimpleTransitionSystem(machine));
-        ts2.add(new SimpleTransitionSystem(machine));
-        TransitionSystem ts3 = new Conjunction(ts2);
-        ts0.add(ts3);
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
+        trs2.add(new SimpleTransitionSystem(machine));
+        trs2.add(new SimpleTransitionSystem(machine));
+        trs2.add(new SimpleTransitionSystem(machine));
+        TransitionSystem trs3 = new Conjunction(trs2);
+        trs0.add(trs3);
 
         ArrayList<TransitionSystem> tss = new ArrayList<>();
         tss.add(new SimpleTransitionSystem(spec));
@@ -188,24 +196,30 @@ public class QueryParserTest {
         tss.add(ts6);
         tss.add(new SimpleTransitionSystem(machine));
         TransitionSystem ts7 = new Conjunction(tss);
-        ts0.add(ts7);
-        TransitionSystem last = new Composition(ts0);
-        TransitionSystem tscs = ctrl.runQuery("(Researcher||(Machine&&Machine&&Machine)||(Spec&&(Machine||Researcher)&&Machine))");
-        assertTrue(last.equals(tscs));
+        trs0.add(ts7);
+
+
+        TransitionSystem ts1 = new Composition(trs0);
+        TransitionSystem ts2 = ctrl.runQuery("(Researcher||(Machine&&Machine&&Machine)||(Spec&&(Machine||Researcher)&&Machine))");
+        assertEquals(ts1, ts2);
     }
 
     @Test
     public void Half1ConjHalf2() {
-        ArrayList<TransitionSystem> ts0 = new ArrayList<>();
-        ts0.add(new SimpleTransitionSystem(half1));
-        ts0.add(new SimpleTransitionSystem(half2));
-        TransitionSystem tsConj = new Conjunction(ts0);
-        TransitionSystem tscs = ctrl.runQuery("(HalfAdm1&&HalfAdm2)");
-        assertTrue(tsConj.equals(tscs));
+        ArrayList<TransitionSystem> trs0 = new ArrayList<>();
+        trs0.add(new SimpleTransitionSystem(half1));
+        trs0.add(new SimpleTransitionSystem(half2));
+
+        TransitionSystem ts1 = new Conjunction(trs0);
+        TransitionSystem ts2 = ctrl.runQuery("(HalfAdm1&&HalfAdm2)");
+        assertEquals(ts1, ts2);
     }
 
+
+    //Test entire Controller component
+
     @Test
-    public void CompRefinesSpec() {
+    public void testCompRefinesSpec() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
             assertTrue(result.get(0));
@@ -215,7 +229,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void SpecRefinesSpec() {
+    public void testSpecRefinesSpec() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Spec)<=(Spec)");
             assertTrue(result.get(0));
@@ -225,7 +239,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void MachRefinesMach() {
+    public void testMachRefinesMach() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine<=Machine");
             assertTrue(result.get(0));
@@ -235,7 +249,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void Mach3RefinesMach3() {
+    public void testMach3RefinesMach3() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine3");
             assertTrue(result.get(0));
@@ -245,7 +259,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void Mach3RefinesMach() {
+    public void testMach3RefinesMach() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine");
             assertTrue(result.get(0));
@@ -296,7 +310,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void CompRefinesComp() {
+    public void testCompRefinesComp() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)");
             assertTrue(result.get(0));
@@ -307,7 +321,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void ConjRefinesAdm2() {
+    public void testConjRefinesAdm2() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2");
             assertTrue(result.get(0));
@@ -317,7 +331,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void Adm2RefinesConj() {
+    public void testAdm2RefinesConj() {
         try {
             List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
             assertTrue(result.get(0));
@@ -326,8 +340,10 @@ public class QueryParserTest {
         }
     }
 
+    //Query validator tests
+
     @Test
-    public void QueryValidity() {
+    public void testQueryValid() {
         try {
             boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
             assertTrue(result);
@@ -337,47 +353,52 @@ public class QueryParserTest {
     }
 
     @Test
-    public void QueryValidity2() {
+    public void testQueryNotValid1() {
         try {
             ctrl.isQueryValid("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)");
             fail();
         } catch (Exception e) {
+            assertEquals(e.getMessage(), "Expected: \"refinement:\"");
         }
     }
 
     @Test
-    public void QueryValidity3() {
+    public void testQueryNotValid2() {
         try {
             ctrl.isQueryValid("refinement:Adm2(<=(HalfAdm1&&HalfAdm2)");
             fail();
         } catch (Exception e) {
+            assertEquals(e.getMessage(), "Parentheses are not balanced");
         }
     }
 
     @Test
-    public void QueryValidity4() {
+    public void testQueryNotValid3() {
         try {
             ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)<=Spec");
             fail();
         } catch (Exception e) {
+            assertEquals(e.getMessage(), "There can only be one refinement");
         }
     }
 
     @Test
-    public void QueryValidity5() {
+    public void testQueryNotValid4() {
         try {
             ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1(&&HalfAdm2))");
             fail();
         } catch (Exception e) {
+            assertEquals(e.getMessage(), "Before opening Parentheses can be either operator or second Parentheses");
         }
     }
 
     @Test
-    public void QueryValidity6() {
+    public void testQueryNotValid5() {
         try {
             ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1||(&&HalfAdm2))");
             fail();
         } catch (Exception e) {
+            assertEquals(e.getMessage(), "After opening Parentheses can be either other Parentheses or component");
         }
     }
 }
