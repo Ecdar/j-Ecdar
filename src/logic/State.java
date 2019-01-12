@@ -91,8 +91,8 @@ public class State {
         List<Guard> invariants = new ArrayList<>();
 
         for (Location location : locations) {
-            Guard invariant = location.getInvariant();
-            if (invariant != null) invariants.add(invariant);
+            List<Guard> invariant = location.getInvariant();
+            if (invariant != null) invariants.addAll(invariant);
         }
 
         return invariants;
