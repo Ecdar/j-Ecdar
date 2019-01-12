@@ -221,7 +221,7 @@ public class QueryParserTest {
     @Test
     public void testCompRefinesSpec() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
             assertTrue(result.get(0));
         } catch (Exception e) {
             fail();
@@ -231,7 +231,7 @@ public class QueryParserTest {
     @Test
     public void testSpecRefinesSpec() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Spec)<=(Spec)");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:(Spec)<=(Spec)");
             assertTrue(result.get(0));
         } catch (Exception e) {
             fail();
@@ -241,7 +241,7 @@ public class QueryParserTest {
     @Test
     public void testMachRefinesMach() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine<=Machine");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Machine<=Machine");
             assertTrue(result.get(0));
         } catch (Exception e) {
             fail();
@@ -251,7 +251,7 @@ public class QueryParserTest {
     @Test
     public void testMach3RefinesMach3() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine3");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Machine3<=Machine3");
             assertTrue(result.get(0));
         } catch (Exception e) {
             fail();
@@ -261,7 +261,7 @@ public class QueryParserTest {
     @Test
     public void testMach3RefinesMach() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Machine3<=Machine");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Machine3<=Machine");
             assertTrue(result.get(0));
         } catch (Exception e) {
             fail();
@@ -271,7 +271,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesAdm() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Administration");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Spec<=Administration");
             assertFalse(result.get(0));
         } catch (Exception e) {
             fail();
@@ -281,7 +281,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesMachine() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Machine");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Spec<=Machine");
             assertFalse(result.get(0));
         } catch (Exception e) {
             fail();
@@ -291,7 +291,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesResearcher() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Researcher");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Spec<=Researcher");
             assertFalse(result.get(0));
         } catch (Exception e) {
             fail();
@@ -302,7 +302,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesMachine3() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Spec<=Machine3");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Spec<=Machine3");
             assertFalse(result.get(0));
         } catch (Exception e) {
             fail();
@@ -312,7 +312,7 @@ public class QueryParserTest {
     @Test
     public void testCompRefinesComp() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)");
             assertTrue(result.get(0));
         } catch (Exception e) {
             e.printStackTrace();
@@ -323,7 +323,7 @@ public class QueryParserTest {
     @Test
     public void testConjRefinesAdm2() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2");
             assertTrue(result.get(0));
         } catch (Exception e) {
             fail();
@@ -333,8 +333,28 @@ public class QueryParserTest {
     @Test
     public void testAdm2RefinesConj() {
         try {
-            List<Boolean> result = ctrl.parseFiles("./samples/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
             assertTrue(result.get(0));
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testSeveralQueries1() {
+        try {
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine");
+            assertTrue(result.get(0) && result.get(1));
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testSeveralQueries2() {
+        try {
+            List<Boolean> result = ctrl.handleRequest("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3");
+            assertTrue(result.get(0) && result.get(1));
         } catch (Exception e) {
             fail();
         }
@@ -342,10 +362,42 @@ public class QueryParserTest {
 
     //Query validator tests
 
+
     @Test
-    public void testQueryValid() {
+    public void testQueryValid2() {
         try {
-            boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            boolean result = ctrl.isQueryValid("refinement:(Administration||Researcher||Machine)<=Spec");
+            assertTrue(result);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testQueryValid3() {
+        try {
+            boolean result = ctrl.isQueryValid("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec");
+            assertTrue(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    public void testQueryValid4() {
+        try {
+            boolean result = ctrl.isQueryValid("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine1&&Machine2))<=Spec");
+            assertTrue(result);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testQueryValid5() {
+        try {
+            boolean result = ctrl.isQueryValid("refinement:((HalfAdm1&&(HA1||HA2))||Researcher||(Machine1&&Machine2))<=Spec");
             assertTrue(result);
         } catch (Exception e) {
             fail();
@@ -369,6 +421,16 @@ public class QueryParserTest {
             fail();
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Parentheses are not balanced");
+        }
+    }
+
+    @Test
+    public void testQueryValid1() {
+        try {
+            boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            assertTrue(result);
+        } catch (Exception e) {
+            fail();
         }
     }
 
