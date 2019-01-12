@@ -5,6 +5,7 @@ import models.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -139,5 +140,20 @@ public abstract class TransitionSystem {
             }
         }
         return resultLists;
+    }
+    @Override
+    public boolean equals (Object obj)
+    {
+
+        if (this==obj) return true;
+        if (this == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        TransitionSystem ts = (TransitionSystem) obj ;
+
+        return this.getMachines().equals(ts.getMachines())&&
+                this.getOutputs().equals(ts.getOutputs())&&
+                this.getInputs().equals(ts.getInputs())&&
+                this.getClocks().equals(ts.getClocks())&&
+                this.getDbmSize()==ts.getDbmSize();
     }
 }

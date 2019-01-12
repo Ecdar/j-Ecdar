@@ -5,7 +5,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +20,27 @@ public class Parser {
     private static ArrayList<Channel> globalChannels = new ArrayList<>();
     private static Set<Clock> componentClocks = new HashSet<>();
 
+    public static ArrayList<Component> parse(String folderPath) {
+        File dir = new File(folderPath + "/Components");
+        File [] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".json");
+            }
+        });
+//        System.out.println(files.length);
+//        for (File jsonFiles : files) {
+//            System.out.println(jsonFiles);
+//        }
+        ArrayList<String> locations = new ArrayList<>();
+        locations.add(folderPath + "/GlobalDeclarations.json");
+        for (File jsonFiles : files) {
+            locations.add(jsonFiles.toString());
+        }
+
+        objectList = parseFiles(locations);
+        return distrubuteObjects(objectList);
+    }
     public static ArrayList<Component> parse(String base, List<String> components) {
         ArrayList<String> locations = new ArrayList<>();
 

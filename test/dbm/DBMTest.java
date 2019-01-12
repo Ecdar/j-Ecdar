@@ -75,56 +75,56 @@ public class DBMTest {
     public void testDbmInit1() {
         t1 = new int[]{1, 1, 2147483646, 1};
         t2 = new int[]{0, 0, 0, 0};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_init(t2, 2)));
+        assertArrayEquals(t1, DBMLib.dbm_init(t2, 2));
     }
 
     @Test
     public void testDbmInit2() {
         t1 = new int[]{1, 1, 1, 2147483646, 1, 2147483646, 2147483646, 2147483646, 1};
         t2 = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_init(t2, 3)));
+        assertArrayEquals(t1, DBMLib.dbm_init(t2, 3));
     }
 
     @Test
     public void testDbmConstrain1() {
         t1 = new int[]{1, 1, 11, 1};
         t2 = new int[]{1, 1, 2147483646, 1};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_constrain1(t2, 2, 1, 0, 5)));
+        assertArrayEquals(t1, DBMLib.dbm_constrain1(t2, 2, 1, 0, 5));
     }
 
     @Test
     public void testDbmConstrain2() {
         t1 = new int[]{1, -3, 11, 1};
         t2 = new int[]{1, 1, 11, 1};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_constrain1(t2, 2, 0, 1, -2)));
+        assertArrayEquals(t1, DBMLib.dbm_constrain1(t2, 2, 0, 1, -2));
     }
 
     @Test
     public void testDbmReset1() {
         t1 = new int[]{1, 1, 1, 1};
         t2 = new int[]{1, -3, 11, 1};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_updateValue(t2, 2, 1, 0)));
+        assertArrayEquals(t1, DBMLib.dbm_updateValue(t2, 2, 1, 0));
     }
 
     @Test
     public void testDbmReset2() {
         t1 = new int[]{1, 1, 1, 1, 1, 1, 5, 5, 1};
         t2 = new int[]{1, 1, 1, 7, 1, 7, 5, 5, 1};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_updateValue(t2, 3, 1, 0)));
+        assertArrayEquals(t1, DBMLib.dbm_updateValue(t2, 3, 1, 0));
     }
 
     @Test
     public void testDbmFuture1() {
         t1 = new int[]{1, 1, 2147483646, 1};
         t2 = new int[]{1, 1, 1, 1};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_up(t2, 2)));
+        assertArrayEquals(t1, DBMLib.dbm_up(t2, 2));
     }
 
     @Test
     public void testDbmFuture2() {
         t1 = new int[]{1, -3, 2147483646, 1};
         t2 = new int[]{1, -3, 11, 1};
-        assertTrue(Arrays.equals(t1, DBMLib.dbm_up(t2, 2)));
+        assertArrayEquals(t1, DBMLib.dbm_up(t2, 2));
     }
 
 }

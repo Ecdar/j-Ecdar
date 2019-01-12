@@ -32,6 +32,8 @@ out/
 # Static DBM Libraries
 dbm/libs/
 
+src/META-INF
+
 Generated library files
 *.dylib
 *.so
