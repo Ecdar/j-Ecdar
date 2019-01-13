@@ -116,7 +116,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void testQuery() {
+    public void testQuery1() {
         ArrayList<TransitionSystem> ts = new ArrayList<>();
         ts.add(new SimpleTransitionSystem(adm));
         ts.add(new SimpleTransitionSystem(machine));
@@ -133,7 +133,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void testQuery3() {
+    public void testQuery2() {
         ArrayList<TransitionSystem> ts0 = new ArrayList<>();
         ts0.add(new SimpleTransitionSystem(researcher));
         ts0.add(new SimpleTransitionSystem(machine));
@@ -152,7 +152,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void testQuery4() {
+    public void testQuery3() {
         ArrayList<TransitionSystem> ts0 = new ArrayList<>();
         ts0.add(new SimpleTransitionSystem(researcher));
         ts0.add(new SimpleTransitionSystem(machine));
@@ -172,7 +172,7 @@ public class QueryParserTest {
     }
 
     @Test
-    public void testQuery5() {
+    public void testQuery4() {
         ArrayList<TransitionSystem> trs0 = new ArrayList<>();
         trs0.add(new SimpleTransitionSystem(researcher));
 
@@ -362,6 +362,15 @@ public class QueryParserTest {
 
     //Query validator tests
 
+    @Test
+    public void testQueryValid1() {
+        try {
+            boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            assertTrue(result);
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
     @Test
     public void testQueryValid2() {
@@ -421,16 +430,6 @@ public class QueryParserTest {
             fail();
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Parentheses are not balanced");
-        }
-    }
-
-    @Test
-    public void testQueryValid1() {
-        try {
-            boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
-            assertTrue(result);
-        } catch (Exception e) {
-            fail();
         }
     }
 

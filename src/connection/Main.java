@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static final String VERSION = "1.0";
+    public static final String VERSION = "1.0";
     private static Controller ctrl = new Controller();
 
     public static void main(String[] args) {

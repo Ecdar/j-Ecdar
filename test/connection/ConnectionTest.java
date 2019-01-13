@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class ConnectionTest {
     @Test
     public void testVersion() {
-        assertEquals("Version: 1.0", (Main.chooseCommand("-version")));
+        assertEquals("Version: " + Main.VERSION, (Main.chooseCommand("-version")));
     }
 
     @Test
@@ -20,36 +20,64 @@ public class ConnectionTest {
 
     @Test
     public void testVerificationOfQuery() {
-        assertEquals("true", (Main.chooseCommand("-vq refinement:spec<=spec")));
+        assertEquals("true", (Main.chooseCommand("-vq refinement:Spec<=Spec")));
     }
 
     @Test
-    public void testRunSingleQuery() {
-        assertEquals("true", (Main.chooseCommand("-rq ./samples/EcdarUniversity refinement:spec<=spec")));
+    public void testRunSingleQuery1() {
+        assertEquals("true", (Main.chooseCommand("-rq ./samples/EcdarUniversity refinement:Spec<=Spec")));
+    }
+
+    @Test
+    public void testRunSingleQuery2() {
+        assertEquals("true", (Main.chooseCommand("-rq ./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec")));
+    }
+
+    @Test
+    public void testRunSingleQuery3() {
+        assertEquals("true", (Main.chooseCommand("-rq ./samples/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2")));
     }
 
     @Test
     public void testRunMultipleQueries() {
-        assertEquals("true true", (Main.chooseCommand("-rq ./samples/EcdarUniversity refinement:spec<=spec refinement:Machine<=Machine")));
+        String query = "-rq ./samples/EcdarUniversity refinement:spec<=spec refinement:Machine<=Machine";
+        assertEquals("true true", (Main.chooseCommand(query)));
     }
 
     @Test
-    public void testIncorrectRunQuery() {
+    public void testRunMultipleQueries2() {
+        String query = "-rq ./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3";
+        assertEquals("true true", (Main.chooseCommand(query)));
+    }
+
+    @Test
+    public void testRunMultipleQueries3() {
+        String query = "-rq ./samples/EcdarUniversity refinement:Spec<=(Administration||Machine||Researcher) refinement:Machine3<=Machine3";
+        assertEquals("false true", (Main.chooseCommand(query)));
+    }
+
+    @Test
+    public void testRunMultipleQueries4() {
+        String query = "-rq ./samples/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine refinement:Machine3<=Machine3 refinement:Researcher<=Researcher";
+        assertEquals("true true true true", (Main.chooseCommand(query)));
+    }
+    @Test
+    public void testRunInvalidQuery() {
         assertEquals("Error: null", (Main.chooseCommand("-rq sdfsd xcv")));
     }
 
     @Test
-    public void testIncorrectRunQuery2() {
+    public void testRunInvalidQuery2() {
         assertEquals("Server confirms having received: \"-machine 1 2 3\" try -help", (Main.chooseCommand("-machine 1 2 3")));
     }
 
     @Test
-    public void testIncorrectValidationOfQuery3() {
+    public void testValidateInvalidQuery1() {
         assertEquals("Error: Expected: \"refinement:\"", (Main.chooseCommand("-vq spec<=spec")));
     }
 
     @Test
-    public void testIncorrectRunQuery3() {
+    public void testValidateInvalidQuery2() {
         assertEquals("Error: Incorrect syntax, does not contain any feature", (Main.chooseCommand("-vq sdf")));
     }
 }
