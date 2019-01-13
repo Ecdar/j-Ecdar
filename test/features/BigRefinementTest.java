@@ -1,7 +1,6 @@
 package features;
 
 import logic.Refinement;
-import logic.SimpleTransitionSystem;
 import models.Component;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static features.Helpers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -36,7 +36,7 @@ public class BigRefinementTest {
     }
 
     @Test
-    public void testRef1RefinesComp() {
+    public void testRef1RefinesComp1() {
         Refinement ref = simpleRefinesSimple(ref1, comp1);
         assertTrue(ref.check());
     }
@@ -58,15 +58,4 @@ public class BigRefinementTest {
         Refinement ref = selfRefinesSelf(comp1);
         assertTrue(ref.check());
     }
-
-    // helper functions
-    private Refinement selfRefinesSelf(Component component) {
-        return simpleRefinesSimple(component, component);
-    }
-
-    private Refinement simpleRefinesSimple(Component component1, Component component2) {
-        return new Refinement(new SimpleTransitionSystem(component1),
-                new SimpleTransitionSystem(component2));
-    }
-    //
 }

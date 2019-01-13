@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static features.Helpers.selfRefinesSelf;
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
@@ -34,6 +35,24 @@ public class ConjunctionTest {
         test1 = machines.get(0);
         test2 = machines.get(1);
         test3 = machines.get(2);
+    }
+
+    @Test
+    public void Test1RefinesTest1() {
+        Refinement ref = selfRefinesSelf(test1);
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void Test2RefinesTest2() {
+        Refinement ref = selfRefinesSelf(test2);
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void Test3RefinesTest3() {
+        Refinement ref = selfRefinesSelf(test3);
+        assertTrue(ref.check());
     }
 
     @Test

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static features.Helpers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -47,6 +48,24 @@ public class UniversityTest {
         adm2 = machines.get(5);
         half1 = machines.get(6);
         half2 = machines.get(7);
+    }
+
+    @Test
+    public void testAdm2RefinesAdm2() {
+        Refinement ref = selfRefinesSelf(adm2);
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void testHal1RefinesHalf1() {
+        Refinement ref = selfRefinesSelf(half1);
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void testHalf2RefinesHalf2() {
+        Refinement ref = selfRefinesSelf(half2);
+        assertTrue(ref.check());
     }
 
     @Test
@@ -202,7 +221,8 @@ public class UniversityTest {
     @Test
     public void testCompRefinesSpec() {
         Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
+                new Composition(new ArrayList<>(Arrays.asList(
+                        new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
                 new SimpleTransitionSystem(spec));
         assertTrue(ref.check());
     }
@@ -210,8 +230,10 @@ public class UniversityTest {
     @Test
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
-                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher), new SimpleTransitionSystem(adm)))));
+                new Composition(new ArrayList<>(Arrays.asList(
+                        new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
+                new Composition(new ArrayList<>(Arrays.asList(
+                        new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher), new SimpleTransitionSystem(adm)))));
         assertTrue(ref.check());
     }
 
@@ -247,15 +269,4 @@ public class UniversityTest {
 
         assertTrue(ref.check());
     }
-
-
-    // helper functions
-    private Refinement selfRefinesSelf(Component component) {
-        return simpleRefinesSimple(component, component);
-    }
-
-    private Refinement simpleRefinesSimple(Component component1, Component component2) {
-        return new Refinement(new SimpleTransitionSystem(component1), new SimpleTransitionSystem(component2));
-    }
-    //
 }
