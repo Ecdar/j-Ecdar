@@ -202,7 +202,10 @@ public class UniversityTest {
     @Test
     public void testCompRefinesSpec() {
         Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
+                new Composition(new ArrayList<>
+                        (Arrays.asList(new SimpleTransitionSystem(adm),
+                                       new SimpleTransitionSystem(machine),
+                                       new SimpleTransitionSystem(researcher)))),
                 new SimpleTransitionSystem(spec));
         assertTrue(ref.check());
     }
@@ -210,8 +213,14 @@ public class UniversityTest {
     @Test
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
-                new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher), new SimpleTransitionSystem(adm)))));
+                new Composition(new ArrayList<>
+                        (Arrays.asList(new SimpleTransitionSystem(adm),
+                                       new SimpleTransitionSystem(machine),
+                                       new SimpleTransitionSystem(researcher)))),
+                new Composition(new ArrayList<>
+                        (Arrays.asList(new SimpleTransitionSystem(machine),
+                                       new SimpleTransitionSystem(researcher),
+                                       new SimpleTransitionSystem(adm)))));
         assertTrue(ref.check());
     }
 
@@ -221,7 +230,9 @@ public class UniversityTest {
 
         try {
             Refinement ref = new Refinement(
-                    new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(machine), new SimpleTransitionSystem(machine3)))),
+                    new Composition(new ArrayList<>
+                            (Arrays.asList(new SimpleTransitionSystem(machine),
+                                           new SimpleTransitionSystem(machine3)))),
                     new SimpleTransitionSystem(machine));
         } catch (IllegalArgumentException ex) {
             fail = true;

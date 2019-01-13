@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class ConnectionTest {
     @Test
     public void testVersion() {
-        assertEquals("Version: " + Main.VERSION, (Main.chooseCommand("-version")));
+        assertEquals(Main.ENGINE_NAME + " Version: " + Main.VERSION, (Main.chooseCommand("-version")));
     }
 
     @Test
@@ -68,7 +68,9 @@ public class ConnectionTest {
 
     @Test
     public void testRunInvalidQuery2() {
-        assertEquals("Server confirms having received: \"-machine 1 2 3\" try -help", (Main.chooseCommand("-machine 1 2 3")));
+        String expected = "Unknown command: \"-machine 1 2 3\"\nwrite -help to get list of commands";
+        String result = Main.chooseCommand("-machine 1 2 3");
+        assertEquals(result, expected);
     }
 
     @Test
