@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static features.Helpers.selfRefinesSelf;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class UnspecTest {
     private static Component a, aa, b;
@@ -34,6 +36,24 @@ public class UnspecTest {
         a = machines.get(0);
         aa = machines.get(1);
         b = machines.get(2);
+    }
+
+    @Test
+    public void testARefinesA() {
+        Refinement ref = selfRefinesSelf(a);
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void testAaRefinesAa() {
+        Refinement ref = selfRefinesSelf(aa);
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void testBRefinesB() {
+        Refinement ref = selfRefinesSelf(b);
+        assertTrue(ref.check());
     }
 
     @Test
