@@ -12,7 +12,7 @@ import java.util.List;
 public class ParserTest {
     private static List<Component> machines;
     private static List<Component> machines2;
-    private static Component A, G, Q, Imp, Ref1;
+    private static Component A, G, Q, Imp, Ref1, Ref2;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -28,12 +28,12 @@ public class ParserTest {
                 "Components/Imp.json"));
         machines = Parser.parse(base, components);
 
-        Location l0 = new Location("L0", null, true, false, false, false);
-        Location l1 = new Location("L1", null, false, false, false, false);
-        Location l2 = new Location("L2", null, true, false, false, false);
-        Location l3 = new Location("L3", null, true, false, false, false);
-        Location l5 = new Location("L5", null, true, false, false, false);
-        Location u0 = new Location("U0", null, false, false, true, false);
+        Location l0 = new Location("L0", new ArrayList<>(), true, false, false, false);
+        Location l1 = new Location("L1", new ArrayList<>(), false, false, false, false);
+        Location l2 = new Location("L2", new ArrayList<>(), true, false, false, false);
+        Location l3 = new Location("L3", new ArrayList<>(), true, false, false, false);
+        Location l5 = new Location("L5", new ArrayList<>(), true, false, false, false);
+        Location u0 = new Location("U0", new ArrayList<>(), false, false, true, false);
 
         Channel button1 = new Channel("button1");
         Channel button2 = new Channel("button2");
@@ -83,13 +83,13 @@ public class ParserTest {
 
         Update u1 = new Update(x, 0);
 
-        Location l12 = new Location("L12", null, true, false, false, false);
-        Location l13 = new Location("L13", null, false, false, false, false);
-        Location l14 = new Location("L14", null, false, false, false, false);
-        Location l15 = new Location("L15", inv_l15, false, false, false, false);
-        Location l16 = new Location("L16", null, false, false, false, false);
-        Location l17 = new Location("L17", null, false, false, false, false);
-        Location l18 = new Location("L18", null, false, false, false, false);
+        Location l12 = new Location("L12", new ArrayList<>(), true, false, false, false);
+        Location l13 = new Location("L13", new ArrayList<>(), false, false, false, false);
+        Location l14 = new Location("L14", new ArrayList<>(), false, false, false, false);
+        Location l15 = new Location("L15", new ArrayList<>(Arrays.asList(inv_l15)), false, false, false, false);
+        Location l16 = new Location("L16", new ArrayList<>(), false, false, false, false);
+        Location l17 = new Location("L17", new ArrayList<>(), false, false, false, false);
+        Location l18 = new Location("L18", new ArrayList<>(), false, false, false, false);
 
         Channel i1 = new Channel("i1"); Channel i2 = new Channel("i2");
         Channel i3 = new Channel("i3"); Channel i4 = new Channel("i4");
@@ -116,6 +116,9 @@ public class ParserTest {
         t13 = new Transition(l12, l13, i1, true, new ArrayList<>(Arrays.asList(g_l12_l13)), new ArrayList<>());
 
         Ref1 = new Component("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
+                new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)));
+
+        Ref2 = new Component("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)));
     }
 

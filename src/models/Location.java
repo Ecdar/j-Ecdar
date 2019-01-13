@@ -1,5 +1,6 @@
 package models;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Location {
@@ -46,6 +47,6 @@ public class Location {
                 isUniversal == location.isUniversal &&
                 isInconsistent == location.isInconsistent &&
                 name.equals(location.name) &&
-                invariant.equals(location.invariant);
+                Arrays.equals(invariant.toArray(), location.invariant.toArray());
     }
 }

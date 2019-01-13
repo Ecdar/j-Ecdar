@@ -137,7 +137,7 @@ public class Parser {
             }
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            List<Guard> invariant = ("".equals(jsonObject.get("invariant").toString()) ? null :
+            List<Guard> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
                     addGuards(jsonObject.get("invariant").toString()));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
