@@ -1,6 +1,6 @@
 package connection;
 
-import main.Main;
+import Connection.Main;
 import org.junit.Test;
 
 

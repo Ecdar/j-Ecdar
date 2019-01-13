@@ -1,9 +1,7 @@
-package main;
+package Connection;
 
 import logic.Controller;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
