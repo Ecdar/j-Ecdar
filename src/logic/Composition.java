@@ -2,7 +2,7 @@ package logic;
 
 import models.Channel;
 import models.Location;
-import models.Transition;
+import models.Edge;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,25 +64,25 @@ public class Composition extends TransitionSystem {
     }
 
     // build a list of transitions from a given state and a signal
-    public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel) {
         List<Location> locations = currentState.getLocations();
         // these will store the locations of the target states and the corresponding transitions
         List<List<Location>> locationsArr = new ArrayList<>();
-        List<List<Transition>> transitionsArr = new ArrayList<>();
+        List<List<Edge>> transitionsArr = new ArrayList<>();
 
         if (outputs.contains(channel)) {
             // if the signal is an output, loop through the machines to find the one sending the output
             for (int i = 0; i < locations.size(); i++) {
-                List<Transition> transitions = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+                List<Edge> edges = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
 
-                for (Transition transition : transitions) {
+                for (Edge edge : edges) {
                     // the new locations will contain the locations of the source zone, but the location corresponding
                     // to the machine sending the output will be replaced by the location that can be reached following the output
                     List<Location> newLocations = new ArrayList<>(locations);
-                    newLocations.set(i, transition.getTarget());
+                    newLocations.set(i, edge.getTarget());
 
                     locationsArr.add(newLocations);
-                    transitionsArr.add(new ArrayList<>(Arrays.asList(transition)));
+                    transitionsArr.add(new ArrayList<>(Arrays.asList(edge)));
                 }
             }
         } else if (inputs.contains(channel) || (syncs.contains(channel))) {
@@ -92,22 +92,22 @@ public class Composition extends TransitionSystem {
             // inputs in the other machines
             if (checkForInputs) {
                 List<List<Location>> locationsList = new ArrayList<>();
-                List<List<Transition>> transitionsList = new ArrayList<>();
+                List<List<Edge>> transitionsList = new ArrayList<>();
 
                 // loop through the machines to get the transitions from the corresponding location
                 for (int i = 0; i < locations.size(); i++) {
-                    List<Transition> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+                    List<Edge> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
                     if (transitionsForI.isEmpty()) {
                         // if there are no transitions, only add the current location to the list and an empty transition
                         List<Location> newLocations = new ArrayList<>();
                         newLocations.add(locations.get(i));
                         locationsList.add(newLocations);
-                        List<Transition> newTransitions = new ArrayList<>();
-                        newTransitions.add(null);
-                        transitionsList.add(newTransitions);
+                        List<Edge> newEdges = new ArrayList<>();
+                        newEdges.add(null);
+                        transitionsList.add(newEdges);
                     } else {
                         // otherwise, add all transitions and build the list of new locations by taking the target of each transition
-                        List<Location> newLocations = transitionsForI.stream().map(Transition::getTarget).collect(Collectors.toList());
+                        List<Location> newLocations = transitionsForI.stream().map(Edge::getTarget).collect(Collectors.toList());
                         locationsList.add(newLocations);
                         transitionsList.add(transitionsForI);
                     }
@@ -130,7 +130,7 @@ public class Composition extends TransitionSystem {
             // loop through all machines to find the one sending the output
             for (int i = 0; i < systems.size(); i++) {
                 if (systems.get(i).getOutputs().contains(channel)) {
-                    List<Transition> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+                    List<Edge> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
                     if (transitionsForI.isEmpty()) {
                         // do not check for inputs if the state in the corresponding machine does not send that output
                         check = false;

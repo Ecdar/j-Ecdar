@@ -1,19 +1,19 @@
 package logic;
 
 import models.Guard;
-import models.Transition;
+import models.Edge;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StateTransition {
+public class Transition {
     private State source, target;
-    private List<Transition> transitions;
+    private List<Edge> edges;
 
-    public StateTransition(State source, State target, List<Transition> transitions) {
+    public Transition(State source, State target, List<Edge> edges) {
         this.source = source;
         this.target = target;
-        this.transitions = transitions;
+        this.edges = edges;
     }
 
     public State getSource() {
@@ -26,7 +26,7 @@ public class StateTransition {
 
     public List<Guard> getGuards() {
         List<Guard> guards = new ArrayList<>();
-        for (Transition t : transitions) {
+        for (Edge t : edges) {
             if (t != null) guards.addAll(t.getGuards());
         }
         return guards;

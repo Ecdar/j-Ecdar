@@ -159,8 +159,8 @@ associated interface definition files, plus the scripts used to
 control compilation and installation of the executable.  However, as a
 special exception, the source code distributed need not include
 anything that is normally distributed (in either source or binary
-form) with the major components (compiler, kernel, and so on) of the
-operating system on which the executable runs, unless that component
+form) with the major automata (compiler, kernel, and so on) of the
+operating system on which the executable runs, unless that automaton
 itself accompanies the executable.
 
 If distribution of executable or object code is made by offering

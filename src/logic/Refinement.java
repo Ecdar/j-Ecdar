@@ -59,11 +59,11 @@ public class Refinement {
     }
 
     // takes transitions of machine 1 and 2 and builds the states corresponding to all possible combinations between them
-    private List<State[]> getNewStates(List<StateTransition> next1, List<StateTransition> next2) {
+    private List<State[]> getNewStates(List<Transition> next1, List<Transition> next2) {
         List<State[]> states = new ArrayList<>();
 
-        for (StateTransition t1 : next1) {
-            for (StateTransition t2 : next2) {
+        for (Transition t1 : next1) {
+            for (Transition t2 : next2) {
                 // get source and target states
                 State source1 = copyState(t1.getSource());
                 State source2 = copyState(t2.getSource());
@@ -117,9 +117,9 @@ public class Refinement {
 
     private boolean checkInputs(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
         for (Channel action : actions) {
-            List<StateTransition> next2 = sys2.getNextTransitions(state2, action);
+            List<Transition> next2 = sys2.getNextTransitions(state2, action);
             if (!next2.isEmpty()) {
-                List<StateTransition> next1 = sys1.getNextTransitions(state1, action);
+                List<Transition> next1 = sys1.getNextTransitions(state1, action);
                 if (next1.isEmpty()) {
                     // we found an input in machine 2 that doesn't exist in machine 1, so refinement doesn't hold
                     return false;
@@ -139,9 +139,9 @@ public class Refinement {
 
     private boolean checkOutputs(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
         for (Channel action : actions) {
-            List<StateTransition> next1 = sys1.getNextTransitions(state1, action);
+            List<Transition> next1 = sys1.getNextTransitions(state1, action);
             if (!next1.isEmpty()) {
-                List<StateTransition> next2 = sys2.getNextTransitions(state2, action);
+                List<Transition> next2 = sys2.getNextTransitions(state2, action);
                 if (next2.isEmpty()) {
                     // we found an output in machine 1 that doesn't exist in machine 2, so refinement doesn't hold
                     return false;

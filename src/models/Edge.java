@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Transition {
+public class Edge {
 
     private Location source;
     private Location target;
@@ -13,7 +13,7 @@ public class Transition {
     private List<Guard> guards;
     private List<Update> updates;
 
-    public Transition(Location source, Location target, Channel chan, boolean isInput, List<Guard> guards, List<Update> updates) {
+    public Edge(Location source, Location target, Channel chan, boolean isInput, List<Guard> guards, List<Update> updates) {
         this.source = source;
         this.target = target;
         this.chan = chan;
@@ -49,8 +49,8 @@ public class Transition {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Transition)) return false;
-        Transition that = (Transition) o;
+        if (!(o instanceof Edge)) return false;
+        Edge that = (Edge) o;
         return isInput == that.isInput &&
                 source.equals(that.source) &&
                 target.equals(that.target) &&

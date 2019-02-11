@@ -1,9 +1,9 @@
 package logic;
 
+import models.Automaton;
 import models.Channel;
-import models.Component;
 import models.Location;
-import models.Transition;
+import models.Edge;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,26 +13,26 @@ import java.util.stream.Collectors;
 
 public class SimpleTransitionSystem extends TransitionSystem {
 
-    private Component component;
+    private Automaton automaton;
 
-    public SimpleTransitionSystem(Component component) {
-        super(new ArrayList<>(Arrays.asList(component)));
-        this.component = component;
+    public SimpleTransitionSystem(Automaton automaton) {
+        super(new ArrayList<>(Arrays.asList(automaton)));
+        this.automaton = automaton;
     }
 
     public Set<Channel> getInputs() {
-        return component.getInputAct();
+        return automaton.getInputAct();
     }
 
     public Set<Channel> getOutputs() {
-        return component.getOutputAct();
+        return automaton.getOutputAct();
     }
 
-    public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
-        List<Transition> transitions = component.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
+    public List<Transition> getNextTransitions(State currentState, Channel channel) {
+        List<Edge> edges = automaton.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
 
-        List<List<Location>> locationsArr = transitions.stream().map(transition -> new ArrayList<>(Arrays.asList(transition.getTarget()))).collect(Collectors.toList());
-        List<List<Transition>> transitionsArr = transitions.stream().map(transition -> new ArrayList<>(Arrays.asList(transition))).collect(Collectors.toList());
+        List<List<Location>> locationsArr = edges.stream().map(transition -> new ArrayList<>(Arrays.asList(transition.getTarget()))).collect(Collectors.toList());
+        List<List<Edge>> transitionsArr = edges.stream().map(transition -> new ArrayList<>(Arrays.asList(transition))).collect(Collectors.toList());
 
         return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
     }

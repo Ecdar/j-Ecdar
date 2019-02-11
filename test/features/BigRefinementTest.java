@@ -1,7 +1,7 @@
 package features;
 
 import logic.Refinement;
-import models.Component;
+import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BigRefinementTest {
 
-    private static Component comp1, ref1;
+    private static Automaton comp1, ref1;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -29,7 +29,7 @@ public class BigRefinementTest {
         List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
                 "Components/Comp1.json",
                 "Components/Ref1.json"));
-        List<Component> machines = Parser.parse(base, components);
+        List<Automaton> machines = Parser.parse(base, components);
 
         comp1 = machines.get(0);
         ref1 = machines.get(1);

@@ -1,10 +1,7 @@
 package parser;
 
 import logic.*;
-import models.Channel;
-import models.Component;
-import models.Location;
-import models.Transition;
+import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,8 +14,8 @@ import static org.junit.Assert.*;
 
 public class QueryParserTest {
     private static Controller ctrl;
-    private static ArrayList<Component> components;
-    private static Component adm, machine, researcher, spec, machine3, adm2, half1, half2;
+    private static ArrayList<Automaton> automata;
+    private static Automaton adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -35,7 +32,7 @@ public class QueryParserTest {
                 "Components/Adm2.json",
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"));
-        List<Component> machines = Parser.parse(base, components);
+        List<Automaton> machines = Parser.parse(base, components);
         adm = machines.get(0);
         machine = machines.get(1);
         researcher = machines.get(2);

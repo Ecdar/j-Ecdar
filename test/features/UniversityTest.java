@@ -4,7 +4,7 @@ import logic.Composition;
 import logic.Conjunction;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
-import models.Component;
+import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 public class UniversityTest {
 
-    private static Component adm, machine, researcher, spec, machine3, adm2, half1, half2;
+    private static Automaton adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -38,7 +38,7 @@ public class UniversityTest {
                 "Components/Adm2.json",
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"));
-        List<Component> machines = Parser.parse(base, components);
+        List<Automaton> machines = Parser.parse(base, components);
 
         adm = machines.get(0);
         machine = machines.get(1);

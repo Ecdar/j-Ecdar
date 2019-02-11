@@ -20,7 +20,7 @@ public class Parser {
     private static ArrayList<Channel> globalChannels = new ArrayList<>();
     private static Set<Clock> componentClocks = new HashSet<>();
 
-    public static ArrayList<Component> parse(String folderPath) {
+    public static ArrayList<Automaton> parse(String folderPath) {
         File dir = new File(folderPath + "/Components");
         File [] files = dir.listFiles(new FilenameFilter() {
             @Override
@@ -41,7 +41,7 @@ public class Parser {
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList);
     }
-    public static ArrayList<Component> parse(String base, List<String> components) {
+    public static ArrayList<Automaton> parse(String base, List<String> components) {
         ArrayList<String> locations = new ArrayList<>();
 
         for (String component : components) {
@@ -69,8 +69,8 @@ public class Parser {
         return returnList;
     }
 
-    private static ArrayList<Component> distrubuteObjects(ArrayList<JSONObject> objList) {
-        ArrayList<Component> components = new ArrayList<>();
+    private static ArrayList<Automaton> distrubuteObjects(ArrayList<JSONObject> objList) {
+        ArrayList<Automaton> automata = new ArrayList<>();
         try {
             for (JSONObject obj : objList) {
                 if (!obj.get("name").toString().equals("Global Declarations")) {
@@ -78,10 +78,10 @@ public class Parser {
                     JSONArray locationList = (JSONArray) obj.get("locations");
                     ArrayList<Location> locations = addLocations(locationList);
                     JSONArray edgeList = (JSONArray) obj.get("edges");
-                    ArrayList<Transition> transitions = addEdges(edgeList, locations);
+                    ArrayList<Edge> edges = addEdges(edgeList, locations);
                     // make copy of clocks, since calling componentClocks.clear() will empty it and we lose this information
-                    Component component = new Component((String) obj.get("name"), locations, transitions, new ArrayList<>(componentClocks));
-                    components.add(component);
+                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks));
+                    automata.add(automaton);
                     componentClocks.clear();
                 } else {
                     addDeclarations((String) obj.get("declarations"));
@@ -91,7 +91,7 @@ public class Parser {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return components;
+        return automata;
     }
 
     private static void addDeclarations(String declarations) {//add for typedefs
@@ -190,8 +190,8 @@ public class Parser {
         return null;
     }
 
-    private static ArrayList<Transition> addEdges(JSONArray edgeList, ArrayList<Location> locations) {
-        ArrayList<Transition> transitions = new ArrayList<>();
+    private static ArrayList<Edge> addEdges(JSONArray edgeList, ArrayList<Location> locations) {
+        ArrayList<Edge> edges = new ArrayList<>();
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
@@ -215,11 +215,11 @@ public class Parser {
                 }
             }
             if (chan != null) {
-                Transition transition = new Transition(sourceLocation, targetLocation, chan, isInput, guards, updates);
-                transitions.add(transition);
+                Edge edge = new Edge(sourceLocation, targetLocation, chan, isInput, guards, updates);
+                edges.add(edge);
             }
         }
-        return transitions;
+        return edges;
     }
 
     private static ArrayList<Update> addUpdates(String update) {

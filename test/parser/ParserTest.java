@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ParserTest {
-    private static List<Component> machines;
-    private static List<Component> machines2;
-    private static Component A, G, Q, Imp, Ref1, Ref2;
+    private static List<Automaton> machines;
+    private static List<Automaton> machines2;
+    private static Automaton A, G, Q, Imp, Ref1, Ref2;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -40,28 +40,28 @@ public class ParserTest {
         Channel good = new Channel("good");
         Channel bad = new Channel("bad");
 
-        Transition t1 = new Transition(l2, l2, bad, true, new ArrayList<>(), new ArrayList<>());
-        Transition t2 = new Transition(l2, l2, good, true, new ArrayList<>(), new ArrayList<>());
-        Transition t3 = new Transition(l2, l2, button1, false, new ArrayList<>(), new ArrayList<>());
-        Transition t4 = new Transition(l3, l3, button1, true, new ArrayList<>(), new ArrayList<>());
-        Transition t5 = new Transition(l3, l3, button2, true, new ArrayList<>(), new ArrayList<>());
-        Transition t6 = new Transition(l3, l3, good, false, new ArrayList<>(), new ArrayList<>());
-        Transition t7 = new Transition(l5, u0, button2, true, new ArrayList<>(), new ArrayList<>());
-        Transition t8 = new Transition(l5, l5, good, false, new ArrayList<>(), new ArrayList<>());
-        Transition t9 = new Transition(l5, l5, button1, true, new ArrayList<>(), new ArrayList<>());
-        Transition t10 = new Transition(l0, l0, button1, true, new ArrayList<>(), new ArrayList<>());
-        Transition t11 = new Transition(l0, l0, good, false, new ArrayList<>(), new ArrayList<>());
-        Transition t12 = new Transition(l1, l1, button1, true, new ArrayList<>(), new ArrayList<>());
-        Transition t13 = new Transition(l1, l1, button2, true, new ArrayList<>(), new ArrayList<>());
-        Transition t14 = new Transition(l1, l1, good, false, new ArrayList<>(), new ArrayList<>());
-        Transition t15 = new Transition(l1, l1, bad, false, new ArrayList<>(), new ArrayList<>());
-        Transition t16 = new Transition(l0, l1, button2, true, new ArrayList<>(), new ArrayList<>());
+        Edge t1 = new Edge(l2, l2, bad, true, new ArrayList<>(), new ArrayList<>());
+        Edge t2 = new Edge(l2, l2, good, true, new ArrayList<>(), new ArrayList<>());
+        Edge t3 = new Edge(l2, l2, button1, false, new ArrayList<>(), new ArrayList<>());
+        Edge t4 = new Edge(l3, l3, button1, true, new ArrayList<>(), new ArrayList<>());
+        Edge t5 = new Edge(l3, l3, button2, true, new ArrayList<>(), new ArrayList<>());
+        Edge t6 = new Edge(l3, l3, good, false, new ArrayList<>(), new ArrayList<>());
+        Edge t7 = new Edge(l5, u0, button2, true, new ArrayList<>(), new ArrayList<>());
+        Edge t8 = new Edge(l5, l5, good, false, new ArrayList<>(), new ArrayList<>());
+        Edge t9 = new Edge(l5, l5, button1, true, new ArrayList<>(), new ArrayList<>());
+        Edge t10 = new Edge(l0, l0, button1, true, new ArrayList<>(), new ArrayList<>());
+        Edge t11 = new Edge(l0, l0, good, false, new ArrayList<>(), new ArrayList<>());
+        Edge t12 = new Edge(l1, l1, button1, true, new ArrayList<>(), new ArrayList<>());
+        Edge t13 = new Edge(l1, l1, button2, true, new ArrayList<>(), new ArrayList<>());
+        Edge t14 = new Edge(l1, l1, good, false, new ArrayList<>(), new ArrayList<>());
+        Edge t15 = new Edge(l1, l1, bad, false, new ArrayList<>(), new ArrayList<>());
+        Edge t16 = new Edge(l0, l1, button2, true, new ArrayList<>(), new ArrayList<>());
 
 
-        A = new Component("A", new ArrayList<>(Arrays.asList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), new ArrayList<>());
-        G = new Component("G", new ArrayList<>(Arrays.asList(l3)), new ArrayList<>(Arrays.asList(t4, t5, t6)), new ArrayList<>());
-        Q = new Component("Q", new ArrayList<>(Arrays.asList(l5, u0)), new ArrayList<>(Arrays.asList(t7, t8, t9)), new ArrayList<>());
-        Imp = new Component("Imp", new ArrayList<>(Arrays.asList(l0, l1)), new ArrayList<>(Arrays.asList(t10, t11, t12, t13, t14, t15, t16)), new ArrayList<>());
+        A = new Automaton("A", new ArrayList<>(Arrays.asList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), new ArrayList<>());
+        G = new Automaton("G", new ArrayList<>(Arrays.asList(l3)), new ArrayList<>(Arrays.asList(t4, t5, t6)), new ArrayList<>());
+        Q = new Automaton("Q", new ArrayList<>(Arrays.asList(l5, u0)), new ArrayList<>(Arrays.asList(t7, t8, t9)), new ArrayList<>());
+        Imp = new Automaton("Imp", new ArrayList<>(Arrays.asList(l0, l1)), new ArrayList<>(Arrays.asList(t10, t11, t12, t13, t14, t15, t16)), new ArrayList<>());
 
 
         // Adding BigRefinement example automata
@@ -101,24 +101,24 @@ public class ParserTest {
         Channel o9 = new Channel("o9"); Channel o10 = new Channel("o10");
 
 
-        t1 = new Transition(l12, l14, i2, true, new ArrayList<>(Arrays.asList(g_l12_l14)), new ArrayList<>());
-        t2 = new Transition(l12, l17, i3, true, new ArrayList<>(Arrays.asList(g_l12_l17)), new ArrayList<>());
-        t3 = new Transition(l12, l15, i4, true, new ArrayList<>(Arrays.asList(g_l12_l15)), new ArrayList<>(Arrays.asList(u1)));
-        t4 = new Transition(l12, l16, i5, true, new ArrayList<>(Arrays.asList(g_l12_l16)), new ArrayList<>());
-        t5 = new Transition(l17, l18, o8, false, new ArrayList<>(), new ArrayList<>(Arrays.asList(u1)));
-        t6 = new Transition(l16, l18, o8, false, new ArrayList<>(), new ArrayList<>());
-        t7 = new Transition(l15, l18, o8, false, new ArrayList<>(Arrays.asList(g_l15_l18)), new ArrayList<>());
-        t8 = new Transition(l14, l18, o8, false, new ArrayList<>(), new ArrayList<>());
-        t9 = new Transition(l13, l18, o8, false, new ArrayList<>(), new ArrayList<>());
-        t10 = new Transition(l17, l17, o3, false, new ArrayList<>(), new ArrayList<>());
-        t11 = new Transition(l17, l17, o5, false, new ArrayList<>(), new ArrayList<>());
-        t12 = new Transition(l17, l14, i6, true, new ArrayList<>(), new ArrayList<>());
-        t13 = new Transition(l12, l13, i1, true, new ArrayList<>(Arrays.asList(g_l12_l13)), new ArrayList<>());
+        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Arrays.asList(g_l12_l14)), new ArrayList<>());
+        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Arrays.asList(g_l12_l17)), new ArrayList<>());
+        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Arrays.asList(g_l12_l15)), new ArrayList<>(Arrays.asList(u1)));
+        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Arrays.asList(g_l12_l16)), new ArrayList<>());
+        t5 = new Edge(l17, l18, o8, false, new ArrayList<>(), new ArrayList<>(Arrays.asList(u1)));
+        t6 = new Edge(l16, l18, o8, false, new ArrayList<>(), new ArrayList<>());
+        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Arrays.asList(g_l15_l18)), new ArrayList<>());
+        t8 = new Edge(l14, l18, o8, false, new ArrayList<>(), new ArrayList<>());
+        t9 = new Edge(l13, l18, o8, false, new ArrayList<>(), new ArrayList<>());
+        t10 = new Edge(l17, l17, o3, false, new ArrayList<>(), new ArrayList<>());
+        t11 = new Edge(l17, l17, o5, false, new ArrayList<>(), new ArrayList<>());
+        t12 = new Edge(l17, l14, i6, true, new ArrayList<>(), new ArrayList<>());
+        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Arrays.asList(g_l12_l13)), new ArrayList<>());
 
-        Ref1 = new Component("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
+        Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)));
 
-        Ref2 = new Component("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
+        Ref2 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)));
     }
 

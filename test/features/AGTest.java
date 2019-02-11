@@ -3,7 +3,7 @@ package features;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
-import models.Component;
+import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AGTest {
-    private static Component a, g, q, imp;
+    private static Automaton a, g, q, imp;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -32,7 +32,7 @@ public class AGTest {
                 "Components/G.json",
                 "Components/Q.json",
                 "Components/Imp.json"));
-        List<Component> machines = Parser.parse(base, components);
+        List<Automaton> machines = Parser.parse(base, components);
 
         a = machines.get(0);
         g = machines.get(1);

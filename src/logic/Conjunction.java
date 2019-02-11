@@ -2,7 +2,7 @@ package logic;
 
 import models.Channel;
 import models.Location;
-import models.Transition;
+import models.Edge;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,20 +40,20 @@ public class Conjunction extends TransitionSystem {
         return outputs;
     }
 
-    public List<StateTransition> getNextTransitions(State currentState, Channel channel) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel) {
         List<Location> locations = currentState.getLocations();
 
         List<List<Location>> locationsList = new ArrayList<>();
-        List<List<Transition>> transitionsList = new ArrayList<>();
+        List<List<Edge>> transitionsList = new ArrayList<>();
 
         for (int i = 0; i < systems.size(); i++) {
-            List<Transition> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+            List<Edge> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
             if (transitionsForI.isEmpty()) {
                 // no transitions are possible from this state
                 return new ArrayList<>();
             } else {
                 // otherwise, add all transitions and build the list of new locations by taking the target of each transition
-                List<Location> newLocations = transitionsForI.stream().map(Transition::getTarget).collect(Collectors.toList());
+                List<Location> newLocations = transitionsForI.stream().map(Edge::getTarget).collect(Collectors.toList());
                 locationsList.add(newLocations);
                 transitionsList.add(transitionsForI);
             }
@@ -61,7 +61,7 @@ public class Conjunction extends TransitionSystem {
 
         // use the cartesian product to build all possible combinations between locations (same for transitions)
         List<List<Location>> locationsArr = cartesianProduct(locationsList);
-        List<List<Transition>> transitionsArr = cartesianProduct(transitionsList);
+        List<List<Edge>> transitionsArr = cartesianProduct(transitionsList);
 
         return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
     }

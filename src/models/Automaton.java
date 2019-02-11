@@ -2,16 +2,16 @@ package models;
 
 import java.util.*;
 
-public class Component {
+public class Automaton {
     private String name;
     private List<Location> locations;
-    private List<Transition> transitions;
+    private List<Edge> edges;
     private List<Clock> clocks;
     private Set<Channel> inputAct;
     private Set<Channel> outputAct;
     private Location initLoc;
 
-    public Component(String name, List<Location> locations, List<Transition> transitions, List<Clock> clocks) {
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks) {
         this.name = name;
         this.locations = locations;
         for (Location location : locations) {
@@ -22,27 +22,27 @@ public class Component {
         }
         this.inputAct = new HashSet<>();
         this.outputAct = new HashSet<>();
-        setTransitions(transitions);
+        setEdges(edges);
         this.clocks = clocks;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Component)) return false;
-        Component component = (Component) o;
-        return name.equals(component.name) &&
-                Arrays.equals(locations.toArray(), component.locations.toArray()) &&
-                Arrays.equals(transitions.toArray(), component.transitions.toArray()) &&
-                Arrays.equals(clocks.toArray(), component.clocks.toArray()) &&
-                Arrays.equals(inputAct.toArray(), component.inputAct.toArray()) &&
-                Arrays.equals(outputAct.toArray(), component.outputAct.toArray()) &&
-                initLoc.equals(component.initLoc);
+        if (!(o instanceof Automaton)) return false;
+        Automaton automaton = (Automaton) o;
+        return name.equals(automaton.name) &&
+                Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
+                Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&
+                Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) &&
+                Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
+                Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) &&
+                initLoc.equals(automaton.initLoc);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, locations, transitions, clocks, inputAct, outputAct, initLoc);
+        return Objects.hash(name, locations, edges, clocks, inputAct, outputAct, initLoc);
     }
 
     public String getName() {
@@ -53,13 +53,13 @@ public class Component {
         return locations;
     }
 
-    private List<Transition> getTransitionsFromLocation(Location loc) {
-        List<Transition> trans = new ArrayList<>(transitions);
+    private List<Edge> getTransitionsFromLocation(Location loc) {
+        List<Edge> trans = new ArrayList<>(edges);
 
         if (loc.isUniversal()) {
             Set<Channel> actions = getActions();
             for (Channel action : actions) {
-                trans.add(new Transition(loc, loc, action, getInputAct().contains(action), new ArrayList<>(), new ArrayList<>()));
+                trans.add(new Edge(loc, loc, action, getInputAct().contains(action), new ArrayList<>(), new ArrayList<>()));
             }
         }
 
@@ -68,19 +68,19 @@ public class Component {
         return trans;
     }
 
-    public List<Transition> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
-        List<Transition> trans = getTransitionsFromLocation(loc);
+    public List<Edge> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
+        List<Edge> trans = getTransitionsFromLocation(loc);
 
         trans.removeIf(n -> !n.getChannel().getName().equals(signal.getName()));
 
         return trans;
     }
 
-    private void setTransitions(List<Transition> transitions) {
-        this.transitions = transitions;
-        for (Transition transition : transitions) {
-            Channel action = transition.getChannel();
-            if (transition.isInput()) {
+    private void setEdges(List<Edge> edges) {
+        this.edges = edges;
+        for (Edge edge : edges) {
+            Channel action = edge.getChannel();
+            if (edge.isInput()) {
                 inputAct.add(action);
             } else {
                 outputAct.add(action);

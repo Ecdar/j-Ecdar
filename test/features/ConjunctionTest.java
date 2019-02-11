@@ -3,7 +3,7 @@ package features;
 import logic.Conjunction;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
-import models.Component;
+import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
@@ -17,7 +17,7 @@ import static features.Helpers.selfRefinesSelf;
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
-    private static Component test1, test2, test3;
+    private static Automaton test1, test2, test3;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -30,7 +30,7 @@ public class ConjunctionTest {
                 "Components/Test1.json",
                 "Components/Test2.json",
                 "Components/Test3.json"));
-        List<Component> machines = Parser.parse(base, components);
+        List<Automaton> machines = Parser.parse(base, components);
 
         test1 = machines.get(0);
         test2 = machines.get(1);

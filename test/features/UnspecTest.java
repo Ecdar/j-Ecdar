@@ -3,7 +3,7 @@ package features;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
-import models.Component;
+import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UnspecTest {
-    private static Component a, aa, b;
+    private static Automaton a, aa, b;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -31,7 +31,7 @@ public class UnspecTest {
                 "Components/A.json",
                 "Components/AA.json",
                 "Components/B.json"));
-        List<Component> machines = Parser.parse(base, components);
+        List<Automaton> machines = Parser.parse(base, components);
 
         a = machines.get(0);
         aa = machines.get(1);

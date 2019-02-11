@@ -1,6 +1,6 @@
 package logic;
 
-import models.Component;
+import models.Automaton;
 import parser.Parser;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 public class Controller {
     private static String folderLoc;
     private static List<String> Queries = new ArrayList<>();
-    private static ArrayList<Component> cmpt = new ArrayList<>();
+    private static ArrayList<Automaton> cmpt = new ArrayList<>();
     private static final int FEATURE_REFINEMENT = 0;
     private static final int FEATURE_COMPOSITION = 1;
     private static final int FEATURE_CONJUNCTION = 2;
@@ -39,7 +39,7 @@ public class Controller {
         Queries.addAll(temp);
     }
 
-    public ArrayList<Component> parseComponents(String folderLocation) {
+    public ArrayList<Automaton> parseComponents(String folderLocation) {
         cmpt = Parser.parse(folderLocation);
         return cmpt;
     }
@@ -126,14 +126,14 @@ public class Controller {
         }
     }
 
-    // Finds and returns Component given the name of that component
-    private Component findComponent(String str) {
+    // Finds and returns Automaton given the name of that component
+    private Automaton findComponent(String str) {
         for (int i = 0; i < cmpt.size(); i++) {
             if (cmpt.get(i).getName().equalsIgnoreCase(str)) {
                 return cmpt.get(i);
             }
         }
-        System.out.println("Component does not exist  " + str);
+        System.out.println("Automaton does not exist  " + str);
         return null;
     }
 
