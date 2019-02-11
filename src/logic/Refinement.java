@@ -26,7 +26,7 @@ public class Refinement {
     }
 
     public boolean check() {
-        // get the inputs of machine 2 and the outputs of machine 1
+        // get the inputs of automata 2 and the outputs of automata 1
         Set<Channel> inputs2 = ts2.getInputs();
         Set<Channel> outputs1 = ts1.getOutputs();
 
@@ -42,12 +42,12 @@ public class Refinement {
                 // mark the pair of states as visited
                 passed.add(new State[]{newState1, newState2});
 
-                // check that for every output in machine 1 there is a corresponding output in machine 2
+                // check that for every output in automaton 1 there is a corresponding output in automaton 2
                 boolean holds1 = checkOutputs(outputs1, curr[0], curr[1], ts1, ts2);
                 if (!holds1)
                     return false;
 
-                // check that for every input in machine 2 there is a corresponding input in machine 1
+                // check that for every input in automaton 2 there is a corresponding input in automaton 1
                 boolean holds2 = checkInputs(inputs2, curr[0], curr[1], ts1, ts2);
                 if (!holds2)
                     return false;
@@ -58,7 +58,7 @@ public class Refinement {
         return true;
     }
 
-    // takes transitions of machine 1 and 2 and builds the states corresponding to all possible combinations between them
+    // takes transitions of automata 1 and 2 and builds the states corresponding to all possible combinations between them
     private List<State[]> getNewStates(List<Transition> next1, List<Transition> next2) {
         List<State[]> states = new ArrayList<>();
 
@@ -121,7 +121,7 @@ public class Refinement {
             if (!next2.isEmpty()) {
                 List<Transition> next1 = sys1.getNextTransitions(state1, action);
                 if (next1.isEmpty()) {
-                    // we found an input in machine 2 that doesn't exist in machine 1, so refinement doesn't hold
+                    // we found an input in automaton 2 that doesn't exist in automaton 1, so refinement doesn't hold
                     return false;
                 } else {
                     List<State[]> newStates = getNewStates(next1, next2);
@@ -143,7 +143,7 @@ public class Refinement {
             if (!next1.isEmpty()) {
                 List<Transition> next2 = sys2.getNextTransitions(state2, action);
                 if (next2.isEmpty()) {
-                    // we found an output in machine 1 that doesn't exist in machine 2, so refinement doesn't hold
+                    // we found an output in automaton 1 that doesn't exist in automaton 2, so refinement doesn't hold
                     return false;
                 } else {
                     List<State[]> newStates = getNewStates(next1, next2);

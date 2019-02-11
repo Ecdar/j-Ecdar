@@ -14,7 +14,7 @@ public class Conjunction extends TransitionSystem {
     List<TransitionSystem> systems;
 
     public Conjunction(List<TransitionSystem> systems) {
-        super(systems.stream().map(TransitionSystem::getMachines).flatMap(t -> t.stream()).collect(Collectors.toList()));
+        super(systems.stream().map(TransitionSystem::getAutomata).flatMap(t -> t.stream()).collect(Collectors.toList()));
         this.systems = systems;
     }
 
@@ -47,7 +47,7 @@ public class Conjunction extends TransitionSystem {
         List<List<Edge>> transitionsList = new ArrayList<>();
 
         for (int i = 0; i < systems.size(); i++) {
-            List<Edge> transitionsForI = systems.get(i).getTransitionsFromLocationAndSignal(locations.get(i), channel);
+            List<Edge> transitionsForI = systems.get(i).getEdgesFromLocationAndSignal(locations.get(i), channel);
             if (transitionsForI.isEmpty()) {
                 // no transitions are possible from this state
                 return new ArrayList<>();
@@ -63,6 +63,6 @@ public class Conjunction extends TransitionSystem {
         List<List<Location>> locationsArr = cartesianProduct(locationsList);
         List<List<Edge>> transitionsArr = cartesianProduct(transitionsList);
 
-        return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
+        return new ArrayList<>(createNewTransitions(currentState, locationsArr, transitionsArr));
     }
 }

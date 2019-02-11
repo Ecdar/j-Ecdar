@@ -10,15 +10,15 @@ import java.util.Set;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
-    private List<Automaton> machines;
+    private List<Automaton> automata;
     private List<Clock> clocks;
     private int dbmSize;
 
-    TransitionSystem(List<Automaton> machines) {
-        this.machines = machines;
+    TransitionSystem(List<Automaton> automata) {
+        this.automata = automata;
         this.clocks = new ArrayList<>();
-        for (Automaton machine : machines) {
-            clocks.addAll(machine.getClocks());
+        for (Automaton automaton : automata) {
+            clocks.addAll(automaton.getClocks());
         }
         dbmSize = clocks.size() + 1;
 
@@ -35,13 +35,13 @@ public abstract class TransitionSystem {
         return clocks;
     }
 
-    public List<Automaton> getMachines() { return machines; }
+    public List<Automaton> getAutomata() { return automata; }
 
     public State getInitialState() {
         List<Location> initialLocations = new ArrayList<>();
 
-        for (Automaton machine : machines) {
-            Location init = machine.getInitLoc();
+        for (Automaton automaton : automata) {
+            Location init = automaton.getInitLoc();
             initialLocations.add(init);
         }
 
@@ -53,7 +53,7 @@ public abstract class TransitionSystem {
         return state;
     }
 
-    List<Transition> addNewStateTransitions(State currentState, List<List<Location>> locationsArr, List<List<Edge>> transitionsArr) {
+    List<Transition> createNewTransitions(State currentState, List<List<Location>> locationsArr, List<List<Edge>> transitionsArr) {
         List<Transition> transitions = new ArrayList<>();
 
         // loop through all sets of locations and transitions
@@ -92,12 +92,12 @@ public abstract class TransitionSystem {
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
-    public List<Edge> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
-        List<Automaton> automata = getMachines();
+    public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
+        List<Automaton> automata = getAutomata();
 
         for (Automaton automaton : automata) {
             if (automaton.getLocations().contains(loc)) {
-                return automaton.getTransitionsFromLocationAndSignal(loc, signal);
+                return automaton.getEdgesFromLocationAndSignal(loc, signal);
             }
         }
 
@@ -106,7 +106,7 @@ public abstract class TransitionSystem {
 
     int[] initializeDBM() {
         // we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
-        // clocks x1 to xn are clocks derived from our components, while x0 is a reference clock needed by the library
+        // clocks x1 to xn are clocks derived from our automata, while x0 is a reference clock needed by the library
         // initially dbm is an array of 0's, which is what we need
         int[] dbm = new int[dbmSize * dbmSize];
         dbm = DBMLib.dbm_init(dbm, dbmSize);
@@ -149,7 +149,7 @@ public abstract class TransitionSystem {
         if (this.getClass() != obj.getClass()) return false;
         TransitionSystem ts = (TransitionSystem) obj ;
 
-        return this.getMachines().equals(ts.getMachines())&&
+        return this.getAutomata().equals(ts.getAutomata())&&
                 this.getOutputs().equals(ts.getOutputs())&&
                 this.getInputs().equals(ts.getInputs())&&
                 this.getClocks().equals(ts.getClocks())&&

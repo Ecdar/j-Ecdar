@@ -53,7 +53,7 @@ public class Automaton {
         return locations;
     }
 
-    private List<Edge> getTransitionsFromLocation(Location loc) {
+    private List<Edge> getEdgesFromLocation(Location loc) {
         List<Edge> trans = new ArrayList<>(edges);
 
         if (loc.isUniversal()) {
@@ -68,8 +68,8 @@ public class Automaton {
         return trans;
     }
 
-    public List<Edge> getTransitionsFromLocationAndSignal(Location loc, Channel signal) {
-        List<Edge> trans = getTransitionsFromLocation(loc);
+    public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
+        List<Edge> trans = getEdgesFromLocation(loc);
 
         trans.removeIf(n -> !n.getChannel().getName().equals(signal.getName()));
 

@@ -29,11 +29,11 @@ public class SimpleTransitionSystem extends TransitionSystem {
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
-        List<Edge> edges = automaton.getTransitionsFromLocationAndSignal(currentState.getLocations().get(0), channel);
+        List<Edge> edges = automaton.getEdgesFromLocationAndSignal(currentState.getLocations().get(0), channel);
 
         List<List<Location>> locationsArr = edges.stream().map(transition -> new ArrayList<>(Arrays.asList(transition.getTarget()))).collect(Collectors.toList());
         List<List<Edge>> transitionsArr = edges.stream().map(transition -> new ArrayList<>(Arrays.asList(transition))).collect(Collectors.toList());
 
-        return new ArrayList<>(addNewStateTransitions(currentState, locationsArr, transitionsArr));
+        return new ArrayList<>(createNewTransitions(currentState, locationsArr, transitionsArr));
     }
 }
