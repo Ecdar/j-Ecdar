@@ -5,6 +5,7 @@ import models.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -90,11 +91,13 @@ public abstract class TransitionSystem {
 
     public abstract Set<Channel> getOutputs();
 
+    public Set<Channel> getSyncs() {
+        return new HashSet<>();
+    }
+
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
     public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
-        List<Automaton> automata = getAutomata();
-
         for (Automaton automaton : automata) {
             if (automaton.getLocations().contains(loc)) {
                 return automaton.getEdgesFromLocationAndSignal(loc, signal);
@@ -140,19 +143,19 @@ public abstract class TransitionSystem {
         }
         return resultLists;
     }
+
     @Override
     public boolean equals (Object obj)
     {
-
         if (this==obj) return true;
         if (this == null) return false;
         if (this.getClass() != obj.getClass()) return false;
-        TransitionSystem ts = (TransitionSystem) obj ;
+        TransitionSystem ts = (TransitionSystem) obj;
 
-        return this.getAutomata().equals(ts.getAutomata())&&
-                this.getOutputs().equals(ts.getOutputs())&&
-                this.getInputs().equals(ts.getInputs())&&
-                this.getClocks().equals(ts.getClocks())&&
-                this.getDbmSize()==ts.getDbmSize();
+        return this.automata.equals(ts.getAutomata()) &&
+                this.getOutputs().equals(ts.getOutputs()) &&
+                this.getInputs().equals(ts.getInputs()) &&
+                this.getClocks().equals(ts.getClocks()) &&
+                this.getDbmSize() == ts.getDbmSize();
     }
 }

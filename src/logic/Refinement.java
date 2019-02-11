@@ -9,8 +9,8 @@ import java.util.*;
 
 public class Refinement {
     private TransitionSystem ts1, ts2;
-    private Deque<State[]> waiting;
-    private List<State[]> passed;
+    private Deque<StatePair> waiting;
+    private List<StatePair> passed;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
@@ -18,7 +18,7 @@ public class Refinement {
         this.waiting = new ArrayDeque<>();
         this.passed = new ArrayList<>();
         // the first states we look at are the initial ones
-        waiting.push(new State[]{ts1.getInitialState(), ts2.getInitialState()});
+        waiting.push(new StatePair(ts1.getInitialState(), ts2.getInitialState()));
 
         String fileName = "src/" + System.mapLibraryName("DBM");
         File lib = new File(fileName);
@@ -26,29 +26,29 @@ public class Refinement {
     }
 
     public boolean check() {
-        // get the inputs of automata 2 and the outputs of automata 1
+        // get the inputs of automaton 2 and the outputs of automaton 1
         Set<Channel> inputs2 = ts2.getInputs();
         Set<Channel> outputs1 = ts1.getOutputs();
 
         // keep looking at states from Waiting as long as it contains elements
         while (!waiting.isEmpty()) {
-            State[] curr = waiting.pop();
+            StatePair curr = waiting.pop();
 
             // ignore if the zones are included in zones belonging to pairs of states that we already visited
             if (!passedContainsState(curr)) {
                 // need to make deep copy
-                State newState1 = copyState(curr[0]);
-                State newState2 = copyState(curr[1]);
+                State newState1 = copyState(curr.getLeft());
+                State newState2 = copyState(curr.getRight());
                 // mark the pair of states as visited
-                passed.add(new State[]{newState1, newState2});
+                passed.add(new StatePair(newState1, newState2));
 
                 // check that for every output in automaton 1 there is a corresponding output in automaton 2
-                boolean holds1 = checkOutputs(outputs1, curr[0], curr[1], ts1, ts2);
+                boolean holds1 = checkOutputs(outputs1, curr.getLeft(), curr.getRight(), ts1, ts2);
                 if (!holds1)
                     return false;
 
                 // check that for every input in automaton 2 there is a corresponding input in automaton 1
-                boolean holds2 = checkInputs(inputs2, curr[0], curr[1], ts1, ts2);
+                boolean holds2 = checkInputs(inputs2, curr.getLeft(), curr.getRight(), ts1, ts2);
                 if (!holds2)
                     return false;
             }
@@ -59,8 +59,8 @@ public class Refinement {
     }
 
     // takes transitions of automata 1 and 2 and builds the states corresponding to all possible combinations between them
-    private List<State[]> getNewStates(List<Transition> next1, List<Transition> next2) {
-        List<State[]> states = new ArrayList<>();
+    private List<StatePair> getNewStates(List<Transition> next1, List<Transition> next2) {
+        List<StatePair> states = new ArrayList<>();
 
         for (Transition t1 : next1) {
             for (Transition t2 : next2) {
@@ -70,7 +70,7 @@ public class Refinement {
                 State target1 = copyState(t1.getTarget());
                 State target2 = copyState(t2.getTarget());
 
-                State[] newState = buildStatePair(source1, source2, t1.getGuards(), t2.getGuards(), target1, target2);
+                StatePair newState = buildStatePair(source1, source2, t1.getGuards(), t2.getGuards(), target1, target2);
                 if (newState != null) {
                     states.add(newState);
                 }
@@ -80,7 +80,7 @@ public class Refinement {
         return states;
     }
 
-    private State[] buildStatePair(State source1, State source2, List<Guard> guards1, List<Guard> guards2, State target1, State target2) {
+    private StatePair buildStatePair(State source1, State source2, List<Guard> guards1, List<Guard> guards2, State target1, State target2) {
         // apply guards on the source states
         source1.applyGuards(guards1, ts1.getClocks());
         source2.applyGuards(guards2, ts2.getClocks());
@@ -108,7 +108,7 @@ public class Refinement {
 
             // check again that the zones are compatible
             if (maxTarget1 >= minTarget2 && maxTarget2 >= minTarget1) {
-                return new State[]{target1, target2};
+                return new StatePair(target1, target2);
             }
         }
 
@@ -124,7 +124,7 @@ public class Refinement {
                     // we found an input in automaton 2 that doesn't exist in automaton 1, so refinement doesn't hold
                     return false;
                 } else {
-                    List<State[]> newStates = getNewStates(next1, next2);
+                    List<StatePair> newStates = getNewStates(next1, next2);
                     if (newStates.isEmpty()) {
                         // if we don't get any new states, it means we found some incompatibility
                         return false;
@@ -146,7 +146,7 @@ public class Refinement {
                     // we found an output in automaton 1 that doesn't exist in automaton 2, so refinement doesn't hold
                     return false;
                 } else {
-                    List<State[]> newStates = getNewStates(next1, next2);
+                    List<StatePair> newStates = getNewStates(next1, next2);
                     if (newStates.isEmpty()) {
                         // if we don't get any new states, it means we found some incompatibility
                         return false;
@@ -163,16 +163,16 @@ public class Refinement {
         return new State(state.getLocations(), state.getZone());
     }
 
-    private boolean passedContainsState(State[] state) {
+    private boolean passedContainsState(StatePair state) {
         // keep only states that have the same locations
-        List<State[]> passedCopy = new ArrayList<>(passed);
-        passedCopy.removeIf(n -> !(Arrays.equals(n[0].getLocations().toArray(), state[0].getLocations().toArray()) &&
-                Arrays.equals(n[1].getLocations().toArray(), state[1].getLocations().toArray())));
+        List<StatePair> passedCopy = new ArrayList<>(passed);
+        passedCopy.removeIf(n -> !(Arrays.equals(n.getLeft().getLocations().toArray(), state.getLeft().getLocations().toArray()) &&
+                Arrays.equals(n.getRight().getLocations().toArray(), state.getRight().getLocations().toArray())));
 
-        for (State[] passedState : passedCopy) {
+        for (StatePair passedState : passedCopy) {
             // check for zone inclusion
-            if (DBMLib.dbm_isSubsetEq(state[0].getZone(), passedState[0].getZone(), ts1.getDbmSize()) &&
-                    DBMLib.dbm_isSubsetEq(state[1].getZone(), passedState[1].getZone(), ts2.getDbmSize())) {
+            if (DBMLib.dbm_isSubsetEq(state.getLeft().getZone(), passedState.getLeft().getZone(), ts1.getDbmSize()) &&
+                    DBMLib.dbm_isSubsetEq(state.getRight().getZone(), passedState.getRight().getZone(), ts2.getDbmSize())) {
                 return true;
             }
         }
