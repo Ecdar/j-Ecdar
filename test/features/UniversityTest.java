@@ -1,9 +1,6 @@
 package features;
 
-import logic.Composition;
-import logic.Conjunction;
-import logic.Refinement;
-import logic.SimpleTransitionSystem;
+import logic.*;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -222,7 +219,22 @@ public class UniversityTest {
     public void testCompRefinesSpec() {
         Refinement ref = new Refinement(
                 new Composition(new ArrayList<>(Arrays.asList(
-                        new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
+                        new SimpleTransitionSystem(adm),
+                        new SimpleTransitionSystem(machine),
+                        new SimpleTransitionSystem(researcher)))),
+                new SimpleTransitionSystem(spec));
+        assertTrue(ref.check());
+    }
+
+    @Test
+    public void testCompOfCompRefinesSpec() {
+        Refinement ref = new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(
+                        new SimpleTransitionSystem(adm),
+                        new Composition(new ArrayList<>(Arrays.asList(
+                                new SimpleTransitionSystem(machine),
+                                new SimpleTransitionSystem(researcher)))
+                    )))),
                 new SimpleTransitionSystem(spec));
         assertTrue(ref.check());
     }

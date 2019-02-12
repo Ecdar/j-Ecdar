@@ -12,47 +12,58 @@ public class Composition extends TransitionSystem {
     private Set<Channel> inputs, outputs, syncs;
 
     public Composition(List<TransitionSystem> systems) {
+
+        // call constructor of super class
         super(systems.stream().map(TransitionSystem::getAutomata).flatMap(t -> t.stream()).collect(Collectors.toList()));
+
         this.systems = systems;
+
+        // initialize inputs, outputs and syncs
         inputs = new HashSet<>();
         outputs = new HashSet<>();
         syncs = new HashSet<>();
 
+        // to compute inputs, outputs and syncs of composed TS, analyse all pairs of TS's
         for (int i = 0; i < systems.size(); i++) {
-            Set<Channel> inputsOfI, outputsOfI, sync, outputsOfOthers, inputsOfOthers;
-            inputsOfI = new HashSet<>(systems.get(i).getInputs());
-            outputsOfI = new HashSet<>(systems.get(i).getOutputs());
-            sync = new HashSet<>(systems.get(i).getOutputs());
-            outputsOfOthers = new HashSet<>();
-            inputsOfOthers = new HashSet<>();
-            inputs.addAll(inputsOfI);
-            outputs.addAll(outputsOfI);
+
+            // initialize inputs and outputs of TS at index i
+            Set<Channel> inputsOfI = new HashSet<>(systems.get(i).getInputs());
+            Set<Channel> outputsOfI = new HashSet<>(systems.get(i).getOutputs());
+
+            // add syncs of I to global sync list
+            syncs.addAll(systems.get(i).getSyncs());
 
             for (int j = 0; j < systems.size(); j++) {
                 if (i != j) {
+
+                    // get inputs, outputs and syncs of TS at index j
+                    Set<Channel> inputsOfJ = new HashSet<>(systems.get(j).getInputs());
+                    Set<Channel> outputsOfJ = new HashSet<>(systems.get(j).getOutputs());
+                    Set<Channel> syncsOfJ = new HashSet<>(systems.get(j).getSyncs());
+
+                    // we need to fetch the outputs of I again, as they might have been modified in the process
+                    Set<Channel> cleanOutputsOfI = new HashSet<>(systems.get(i).getOutputs());
                     // check if output actions overlap
-                    Set<Channel> diff = new HashSet<>(systems.get(i).getOutputs());
-                    diff.retainAll(systems.get(j).getOutputs());
+                    Set<Channel> diff = setIntersection(cleanOutputsOfI, outputsOfJ);
                     if (!diff.isEmpty()) {
-                        throw new IllegalArgumentException("Automata cannot be composed");
+                        throw new IllegalArgumentException("The automata cannot be composed");
                     }
 
-                    outputsOfOthers.addAll(systems.get(j).getOutputs());
+                    // we need to fetch the inputs of I again, as they might have been modified in the process
+                    Set<Channel> cleanInputsOfI = new HashSet<>(systems.get(i).getInputs());
+                    // if some inputs of one automaton overlap with the outputs of another one, add those to the global sync list
+                    syncs.addAll(setIntersection(cleanInputsOfI, outputsOfJ));
 
-                    inputsOfOthers.addAll(systems.get(j).getInputs());
-
-                    Set<Channel> syncCopy = new HashSet<>(sync);
-                    syncCopy.retainAll(systems.get(j).getInputs());
-                    syncs.addAll(syncCopy);
+                    // apply changes to inputs and outputs of TS at index i
+                    inputsOfI.removeAll(outputsOfJ); inputsOfI.removeAll(syncsOfJ);
+                    outputsOfI.removeAll(inputsOfJ); outputsOfI.removeAll(syncsOfJ);
                 }
             }
 
-            // set difference
-            inputsOfI.removeAll(outputsOfOthers);
-            outputsOfI.removeAll(inputsOfOthers);
+            // add inputs and outputs to the global lists
+            inputs.addAll(inputsOfI);
+            outputs.addAll(outputsOfI);
         }
-        outputs.removeAll(syncs);
-        inputs.removeAll(syncs);
     }
 
     public Set<Channel> getInputs() {
@@ -143,5 +154,12 @@ public class Composition extends TransitionSystem {
         }
 
         return check;
+    }
+
+    private Set<Channel> setIntersection(Set<Channel> set1, Set<Channel> set2) {
+        Set<Channel> intersection = new HashSet<>(set1);
+        intersection.retainAll(set2);
+
+        return intersection;
     }
 }
