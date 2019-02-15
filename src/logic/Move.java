@@ -19,23 +19,11 @@ public class Move {
         return source;
     }
 
-    public void setSource(SymbolicLocation source) {
-        this.source = source;
-    }
-
     public SymbolicLocation getTarget() {
         return target;
     }
 
-    public void setTarget(SymbolicLocation target) {
-        this.target = target;
-    }
-
     public List<Edge> getEdges() {
         return edges;
-    }
-
-    public void setEdges(List<Edge> edges) {
-        this.edges = edges;
     }
 }

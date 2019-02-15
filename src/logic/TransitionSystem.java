@@ -96,17 +96,16 @@ public abstract class TransitionSystem {
 
         List<Move> resultMoves = systems.get(0).getNextMoves(symLocs.get(0), channel);
         // used when there are no moves for some TS
-        List<Move> dummyMove = new ArrayList<>(Collections.singletonList(new Move(symLocation, symLocation, new ArrayList<>())));
+        if (resultMoves.isEmpty())
+            resultMoves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(0), symLocs.get(0), new ArrayList<>())));
 
         for (int i = 1; i < systems.size(); i++) {
             List<Move> moves = systems.get(i).getNextMoves(symLocs.get(i), channel);
 
-            resultMoves = moveProduct(
-                    // if resultMoves is empty, use dummyMove
-                    resultMoves.isEmpty() ? dummyMove : resultMoves,
-                    // if moves is empty, use dummyMove
-                    moves.isEmpty() ? dummyMove : moves,
-                    i == 1);
+            if (moves.isEmpty())
+                moves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(i), symLocs.get(i), new ArrayList<>())));
+
+            resultMoves = moveProduct(resultMoves, moves, i == 1);
         }
 
         // if there are no actual moves, then return empty list
