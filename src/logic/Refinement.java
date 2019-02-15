@@ -26,7 +26,7 @@ public class Refinement {
     }
 
     public boolean check() {
-        // get the inputs of automaton 2 and the outputs of automaton 1
+        // get the inputs of TS 2 and the outputs of TS 1
         Set<Channel> inputs2 = ts2.getInputs();
         Set<Channel> outputs1 = ts1.getOutputs();
 
@@ -42,12 +42,12 @@ public class Refinement {
                 // mark the pair of states as visited
                 passed.add(new StatePair(newState1, newState2));
 
-                // check that for every output in automaton 1 there is a corresponding output in automaton 2
+                // check that for every output in TS 1 there is a corresponding output in TS 2
                 boolean holds1 = checkOutputs(outputs1, curr.getLeft(), curr.getRight(), ts1, ts2);
                 if (!holds1)
                     return false;
 
-                // check that for every input in automaton 2 there is a corresponding input in automaton 1
+                // check that for every input in TS 2 there is a corresponding input in TS 1
                 boolean holds2 = checkInputs(inputs2, curr.getLeft(), curr.getRight(), ts1, ts2);
                 if (!holds2)
                     return false;
@@ -160,14 +160,14 @@ public class Refinement {
     }
 
     private State copyState(State state) {
-        return new State(state.getLocations(), state.getZone());
+        return new State(state.getLocation(), state.getZone());
     }
 
     private boolean passedContainsState(StatePair state) {
         // keep only states that have the same locations
         List<StatePair> passedCopy = new ArrayList<>(passed);
-        passedCopy.removeIf(n -> !(Arrays.equals(n.getLeft().getLocations().toArray(), state.getLeft().getLocations().toArray()) &&
-                Arrays.equals(n.getRight().getLocations().toArray(), state.getRight().getLocations().toArray())));
+        passedCopy.removeIf(n -> !(n.getLeft().getLocation().equals(state.getLeft().getLocation())) ||
+                !(n.getRight().getLocation().equals(state.getRight().getLocation())));
 
         for (StatePair passedState : passedCopy) {
             // check for zone inclusion

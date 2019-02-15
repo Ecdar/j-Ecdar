@@ -4,24 +4,15 @@ import lib.DBMLib;
 import models.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
-    private List<Automaton> automata;
-    private List<Clock> clocks;
-    private int dbmSize;
+    List<Clock> clocks;
+    int dbmSize;
 
-    TransitionSystem(List<Automaton> automata) {
-        this.automata = automata;
+    TransitionSystem() {
         this.clocks = new ArrayList<>();
-        for (Automaton automaton : automata) {
-            clocks.addAll(automaton.getClocks());
-        }
-        dbmSize = clocks.size() + 1;
 
         String fileName = "src/" + System.mapLibraryName("DBM");
         File lib = new File(fileName);
@@ -36,50 +27,51 @@ public abstract class TransitionSystem {
         return clocks;
     }
 
-    public List<Automaton> getAutomata() { return automata; }
-
     public State getInitialState() {
-        List<Location> initialLocations = new ArrayList<>();
-
-        for (Automaton automaton : automata) {
-            Location init = automaton.getInitLoc();
-            initialLocations.add(init);
-        }
-
         int[] zone = initializeDBM();
-        State state = new State(initialLocations, zone);
+        State state = new State(getInitialLocation(), zone);
         state.applyInvariants(clocks);
         state.delay();
 
         return state;
     }
 
-    List<Transition> createNewTransitions(State currentState, List<List<Location>> locationsArr, List<List<Edge>> transitionsArr) {
+    public abstract SymbolicLocation getInitialLocation();
+
+    public SymbolicLocation getInitialLocation(List<TransitionSystem> systems) {
+        List<SymbolicLocation> locations = new ArrayList<>();
+
+        for (TransitionSystem ts : systems) {
+            locations.add(ts.getInitialLocation());
+        }
+
+        return new ComplexLocation(locations);
+    }
+
+    List<Transition> createNewTransitions(State currentState, List<Move> moves) {
         List<Transition> transitions = new ArrayList<>();
 
-        // loop through all sets of locations and transitions
-        for (int n = 0; n < locationsArr.size(); n++) {
-            List<Location> newLocations = locationsArr.get(n);
-            List<Edge> edges = (transitionsArr.get(n) == null) ? new ArrayList<>() : transitionsArr.get(n);
+        // loop through moves
+        for (Move move : moves) {
             List<Guard> guards = new ArrayList<>();
             List<Update> updates = new ArrayList<>();
-            // gather all the guards and resets of one set of transitions
-            for (Edge t : edges) {
+
+            // gather all the guards and resets of one move
+            for (Edge t : move.getEdges()) {
                 if (t != null) {
                     guards.addAll(t.getGuards());
                     updates.addAll(t.getUpdates());
                 }
             }
 
-            // build the target state given the set of locations
-            State state = new State(newLocations, currentState.getZone());
+            State state = new State(move.getTarget(), currentState.getZone());
             // get the new zone by applying guards and resets on the zone of the target state
             if (!guards.isEmpty()) state.applyGuards(guards, clocks);
             if (!updates.isEmpty()) state.applyResets(updates, clocks);
 
             // if the zone is valid, build the transition and add it to the list
             if (isDbmValid(state.getZone())) {
-                Transition transition = new Transition(currentState, state, edges);
+                Transition transition = new Transition(currentState, state, move.getEdges());
                 transitions.add(transition);
             }
         }
@@ -97,14 +89,33 @@ public abstract class TransitionSystem {
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
-    public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
-        for (Automaton automaton : automata) {
-            if (automaton.getLocations().contains(loc)) {
-                return automaton.getEdgesFromLocationAndSignal(loc, signal);
-            }
+    public abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
+
+    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel, List<TransitionSystem> systems) {
+        List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
+
+        List<Move> resultMoves = systems.get(0).getNextMoves(symLocs.get(0), channel);
+        // used when there are no moves for some TS
+        List<Move> dummyMove = new ArrayList<>(Collections.singletonList(new Move(symLocation, symLocation, new ArrayList<>())));
+
+        for (int i = 1; i < systems.size(); i++) {
+            List<Move> moves = systems.get(i).getNextMoves(symLocs.get(i), channel);
+
+            resultMoves = moveProduct(
+                    // if resultMoves is empty, use dummyMove
+                    resultMoves.isEmpty() ? dummyMove : resultMoves,
+                    // if moves is empty, use dummyMove
+                    moves.isEmpty() ? dummyMove : moves,
+                    i == 1);
         }
 
-        return new ArrayList<>();
+        // if there are no actual moves, then return empty list
+        Move move = resultMoves.get(0);
+        if (move.getSource().equals(move.getTarget())) {
+            return new ArrayList<>();
+        }
+
+        return resultMoves;
     }
 
     int[] initializeDBM() {
@@ -120,28 +131,36 @@ public abstract class TransitionSystem {
         return DBMLib.dbm_isValid(dbm, dbmSize);
     }
 
-    // function that takes an arbitrary number of lists and recursively calculates their cartesian product
-    <T> List<List<T>> cartesianProduct(List<List<T>> lists) {
-        List<List<T>> resultLists = new ArrayList<>();
-        if (lists.size() == 0) {
-            // base case; return a list containing one empty list
-            resultLists.add(new ArrayList<>());
-        } else {
-            // take head of list
-            List<T> firstList = lists.get(0);
-            // apply function to tail of list
-            List<List<T>> remainingLists = cartesianProduct(lists.subList(1, lists.size()));
-            // combine each element of the first list with each of the remaining lists
-            for (T condition : firstList) {
-                for (List<T> remainingList : remainingLists) {
-                    List<T> resultList = new ArrayList<>();
-                    resultList.add(condition);
-                    resultList.addAll(remainingList);
-                    resultLists.add(resultList);
+    List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
+        List<Move> moves = new ArrayList<>();
+
+        for (Move move1 : moves1) {
+            for (Move move2 : moves2) {
+
+                SymbolicLocation source, target;
+
+                if (toNest) {
+                    source = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getSource(), move2.getSource())));
+                    target = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getTarget(), move2.getTarget())));
+                } else {
+                    List<SymbolicLocation> newSourceLoc = ((ComplexLocation) move1.getSource()).getLocations();
+                    newSourceLoc.add(move2.getSource());
+                    source = new ComplexLocation(newSourceLoc);
+
+                    List<SymbolicLocation> newTargetLoc = ((ComplexLocation) move1.getTarget()).getLocations();
+                    newTargetLoc.add(move2.getTarget());
+                    target = new ComplexLocation(newTargetLoc);
                 }
+
+                List<Edge> edges = new ArrayList<>(move1.getEdges());
+                edges.addAll(move2.getEdges());
+
+                Move newMove = new Move(source, target, edges);
+                moves.add(newMove);
             }
         }
-        return resultLists;
+
+        return moves;
     }
 
     @Override
@@ -152,8 +171,7 @@ public abstract class TransitionSystem {
         if (this.getClass() != obj.getClass()) return false;
         TransitionSystem ts = (TransitionSystem) obj;
 
-        return this.automata.equals(ts.getAutomata()) &&
-                this.getOutputs().equals(ts.getOutputs()) &&
+        return this.getOutputs().equals(ts.getOutputs()) &&
                 this.getInputs().equals(ts.getInputs()) &&
                 this.getClocks().equals(ts.getClocks()) &&
                 this.getDbmSize() == ts.getDbmSize();

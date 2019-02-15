@@ -1,21 +1,20 @@
 package logic;
 
 import models.Channel;
-import models.Location;
-import models.Edge;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class Conjunction extends TransitionSystem {
     List<TransitionSystem> systems;
 
     public Conjunction(List<TransitionSystem> systems) {
-        super(systems.stream().map(TransitionSystem::getAutomata).flatMap(t -> t.stream()).collect(Collectors.toList()));
+        super();
+
         this.systems = systems;
+
+        for (TransitionSystem ts : systems) {
+            clocks.addAll(ts.getClocks());
+        }
+        dbmSize = clocks.size() + 1;
     }
 
     public Set<Channel> getInputs() {
@@ -40,29 +39,33 @@ public class Conjunction extends TransitionSystem {
         return outputs;
     }
 
+    public SymbolicLocation getInitialLocation() {
+        return getInitialLocation(systems);
+    }
+
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
-        List<Location> locations = currentState.getLocations();
+        List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
-        List<List<Location>> locationsList = new ArrayList<>();
-        List<List<Edge>> transitionsList = new ArrayList<>();
+        // these will store the locations of the target states and the corresponding transitions
+        List<Move> resultMoves = systems.get(0).getNextMoves(locations.get(0), channel);
 
-        for (int i = 0; i < systems.size(); i++) {
-            List<Edge> transitionsForI = systems.get(i).getEdgesFromLocationAndSignal(locations.get(i), channel);
-            if (transitionsForI.isEmpty()) {
+        if (resultMoves.isEmpty())
+            return new ArrayList<>();
+
+        for (int i = 1; i < systems.size(); i++) {
+            List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
+
+            if (moves.isEmpty())
                 // no transitions are possible from this state
                 return new ArrayList<>();
-            } else {
-                // otherwise, add all transitions and build the list of new locations by taking the target of each transition
-                List<Location> newLocations = transitionsForI.stream().map(Edge::getTarget).collect(Collectors.toList());
-                locationsList.add(newLocations);
-                transitionsList.add(transitionsForI);
-            }
+
+            resultMoves = moveProduct(resultMoves, moves, i == 1);
         }
 
-        // use the cartesian product to build all possible combinations between locations (same for transitions)
-        List<List<Location>> locationsArr = cartesianProduct(locationsList);
-        List<List<Edge>> transitionsArr = cartesianProduct(transitionsList);
+        return createNewTransitions(currentState, resultMoves);
+    }
 
-        return new ArrayList<>(createNewTransitions(currentState, locationsArr, transitionsArr));
+    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+        return getNextMoves(symLocation, channel, systems);
     }
 }

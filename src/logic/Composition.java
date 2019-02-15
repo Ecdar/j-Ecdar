@@ -14,9 +14,14 @@ public class Composition extends TransitionSystem {
     public Composition(List<TransitionSystem> systems) {
 
         // call constructor of super class
-        super(systems.stream().map(TransitionSystem::getAutomata).flatMap(t -> t.stream()).collect(Collectors.toList()));
+        super();
 
         this.systems = systems;
+
+        for (TransitionSystem ts : systems) {
+            clocks.addAll(ts.getClocks());
+        }
+        dbmSize = clocks.size() + 1;
 
         // initialize inputs, outputs and syncs
         inputs = new HashSet<>();
@@ -76,26 +81,30 @@ public class Composition extends TransitionSystem {
 
     public Set<Channel> getSyncs() { return syncs; }
 
+    public SymbolicLocation getInitialLocation() {
+        return getInitialLocation(systems);
+    }
+
     // build a list of transitions from a given state and a signal
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
-        List<Location> locations = currentState.getLocations();
+        List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
+
         // these will store the locations of the target states and the corresponding transitions
-        List<List<Location>> locationsArr = new ArrayList<>();
-        List<List<Edge>> transitionsArr = new ArrayList<>();
+        List<Move> resultMoves = new ArrayList<>();
 
         if (outputs.contains(channel)) {
             // if the signal is an output, loop through the automata to find the one sending the output
             for (int i = 0; i < locations.size(); i++) {
-                List<Edge> edges = systems.get(i).getEdgesFromLocationAndSignal(locations.get(i), channel);
+                List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
 
-                for (Edge edge : edges) {
-                    // the new locations will contain the locations of the source zone, but the location corresponding
-                    // to the automaton sending the output will be replaced by the location that can be reached following the output
-                    List<Location> newLocations = new ArrayList<>(locations);
-                    newLocations.set(i, edge.getTarget());
+                for (Move move : moves) {
+                    // the new locations will contain the locations of the source state, but the location corresponding
+                    // to the TS sending the output will be replaced by the location that can be reached following the output
+                    List<SymbolicLocation> newLocations = new ArrayList<>(locations);
+                    newLocations.set(i, move.getTarget());
+                    Move newMove = new Move(currentState.getLocation(), new ComplexLocation(newLocations), move.getEdges());
 
-                    locationsArr.add(newLocations);
-                    transitionsArr.add(new ArrayList<>(Arrays.asList(edge)));
+                    resultMoves.add(newMove);
                 }
             }
         } else if (inputs.contains(channel) || (syncs.contains(channel))) {
@@ -104,37 +113,33 @@ public class Composition extends TransitionSystem {
             // for syncs, we have to check if that output is being sent by a automaton, otherwise we do not look at the
             // inputs in the other automata
             if (checkForInputs) {
-                List<List<Location>> locationsList = new ArrayList<>();
-                List<List<Edge>> transitionsList = new ArrayList<>();
 
-                // loop through the automata to get the transitions from the corresponding location
-                for (int i = 0; i < locations.size(); i++) {
-                    List<Edge> transitionsForI = systems.get(i).getEdgesFromLocationAndSignal(locations.get(i), channel);
-                    if (transitionsForI.isEmpty()) {
-                        // if there are no transitions, only add the current location to the list and an empty transition
-                        List<Location> newLocations = new ArrayList<>();
-                        newLocations.add(locations.get(i));
-                        locationsList.add(newLocations);
-                        List<Edge> newEdges = new ArrayList<>();
-                        newEdges.add(null);
-                        transitionsList.add(newEdges);
-                    } else {
-                        // otherwise, add all transitions and build the list of new locations by taking the target of each transition
-                        List<Location> newLocations = transitionsForI.stream().map(Edge::getTarget).collect(Collectors.toList());
-                        locationsList.add(newLocations);
-                        transitionsList.add(transitionsForI);
-                    }
+                resultMoves = systems.get(0).getNextMoves(locations.get(0), channel);
+                // used when there are no moves for some TS
+                if (resultMoves.isEmpty())
+                    resultMoves = new ArrayList<>(Collections.singletonList(new Move(locations.get(0), locations.get(0), new ArrayList<>())));
+
+                for (int i = 1; i < locations.size(); i++) {
+                    List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
+                    if (moves.isEmpty())
+                        moves = new ArrayList<>(Collections.singletonList(new Move(locations.get(i), locations.get(i), new ArrayList<>())));
+
+                    resultMoves = moveProduct(resultMoves, moves, i == 1);
                 }
-                // use the cartesian product to build all possible combinations between locations (same for transitions)
-                locationsArr = cartesianProduct(locationsList);
-                transitionsArr = cartesianProduct(transitionsList);
             }
         }
 
-        return new ArrayList<>(createNewTransitions(currentState, locationsArr, transitionsArr));
+        return createNewTransitions(currentState, resultMoves);
     }
 
-    private boolean checkForInputs(Channel channel, List<Location> locations) {
+    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+        if (outputs.contains(channel) || inputs.contains(channel) || syncs.contains(channel))
+            return getNextMoves(symLocation, channel, systems);
+        else
+            return new ArrayList<>();
+    }
+
+    private boolean checkForInputs(Channel channel, List<SymbolicLocation> locations) {
         // assume we should check for inputs
         boolean check = true;
 
@@ -143,8 +148,8 @@ public class Composition extends TransitionSystem {
             // loop through all automata to find the one sending the output
             for (int i = 0; i < systems.size(); i++) {
                 if (systems.get(i).getOutputs().contains(channel)) {
-                    List<Edge> transitionsForI = systems.get(i).getEdgesFromLocationAndSignal(locations.get(i), channel);
-                    if (transitionsForI.isEmpty()) {
+                    List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
+                    if (moves.isEmpty()) {
                         // do not check for inputs if the state in the corresponding automaton does not send that output
                         check = false;
                         break;

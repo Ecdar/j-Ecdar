@@ -230,9 +230,9 @@ public class UniversityTest {
     public void testCompOfCompRefinesSpec() {
         Refinement ref = new Refinement(
                 new Composition(new ArrayList<>(Arrays.asList(
-                        new SimpleTransitionSystem(adm),
+                        new SimpleTransitionSystem(machine),
                         new Composition(new ArrayList<>(Arrays.asList(
-                                new SimpleTransitionSystem(machine),
+                                new SimpleTransitionSystem(adm),
                                 new SimpleTransitionSystem(researcher)))
                     )))),
                 new SimpleTransitionSystem(spec));

@@ -5,19 +5,18 @@ import models.Channel;
 import models.Location;
 import models.Edge;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class SimpleTransitionSystem extends TransitionSystem {
 
     private Automaton automaton;
 
     public SimpleTransitionSystem(Automaton automaton) {
-        super(new ArrayList<>(Arrays.asList(automaton)));
+        super();
+
         this.automaton = automaton;
+        clocks.addAll(automaton.getClocks());
+        dbmSize = clocks.size() + 1;
     }
 
     public Set<Channel> getInputs() {
@@ -28,12 +27,28 @@ public class SimpleTransitionSystem extends TransitionSystem {
         return automaton.getOutputAct();
     }
 
+    public SymbolicLocation getInitialLocation() {
+        return new SimpleLocation(automaton.getInitLoc());
+    }
+
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
-        List<Edge> edges = automaton.getEdgesFromLocationAndSignal(currentState.getLocations().get(0), channel);
+        List<Move> moves = getNextMoves(currentState.getLocation(), channel);
 
-        List<List<Location>> locationsArr = edges.stream().map(transition -> new ArrayList<>(Arrays.asList(transition.getTarget()))).collect(Collectors.toList());
-        List<List<Edge>> transitionsArr = edges.stream().map(transition -> new ArrayList<>(Arrays.asList(transition))).collect(Collectors.toList());
+        return createNewTransitions(currentState, moves);
+    }
 
-        return new ArrayList<>(createNewTransitions(currentState, locationsArr, transitionsArr));
+    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+        List<Move> moves = new ArrayList<>();
+
+        Location location = ((SimpleLocation) symLocation).getActualLocation();
+        List<Edge> edges = automaton.getEdgesFromLocationAndSignal(location, channel);
+
+        for (Edge edge : edges) {
+            SymbolicLocation target = new SimpleLocation(edge.getTarget());
+            Move move = new Move(symLocation, target, Collections.singletonList(edge));
+            moves.add(move);
+        }
+
+        return moves;
     }
 }

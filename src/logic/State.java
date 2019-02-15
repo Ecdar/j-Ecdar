@@ -3,20 +3,18 @@ package logic;
 import lib.DBMLib;
 import models.Clock;
 import models.Guard;
-import models.Location;
 import models.Update;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class State {
-    private List<Location> locations;
+    private SymbolicLocation location;
     private int[] zone;
     private int zoneSize;
 
-    public State(List<Location> locations, int[] zone) {
-        this.locations = locations;
+    public State(SymbolicLocation location, int[] zone) {
+        this.location = location;
         this.zone = zone;
         this.zoneSize = (int) Math.sqrt(zone.length);
 
@@ -25,8 +23,8 @@ public class State {
         System.load(lib.getAbsolutePath());
     }
 
-    public List<Location> getLocations() {
-        return locations;
+    public SymbolicLocation getLocation() {
+        return location;
     }
 
     public int[] getZone() {
@@ -88,14 +86,7 @@ public class State {
     }
 
     public List<Guard> getInvariants() {
-        List<Guard> invariants = new ArrayList<>();
-
-        for (Location location : locations) {
-            List<Guard> invariant = location.getInvariant();
-            if (invariant != null) invariants.addAll(invariant);
-        }
-
-        return invariants;
+        return location.getInvariants();
     }
 
     public void applyGuards(List<Guard> guards, List<Clock> clocks) {
