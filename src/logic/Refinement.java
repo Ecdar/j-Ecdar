@@ -6,11 +6,13 @@ import models.Guard;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Refinement {
     private TransitionSystem ts1, ts2;
     private Deque<StatePair> waiting;
     private List<StatePair> passed;
+    private Set<Channel> inputs2, outputs1, syncs1, syncs2;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
@@ -20,22 +22,25 @@ public class Refinement {
         // the first states we look at are the initial ones
         waiting.push(new StatePair(ts1.getInitialState(), ts2.getInitialState()));
 
+        inputs2 = ts2.getInputs();
+        outputs1 = ts1.getOutputs();
+        syncs1 = ts1.getSyncs();
+        syncs2 = ts2.getSyncs();
+
         String fileName = "src/" + System.mapLibraryName("DBM");
         File lib = new File(fileName);
         System.load(lib.getAbsolutePath());
     }
 
     public boolean check() {
-        // get the inputs of TS 2 and the outputs of TS 1
-        Set<Channel> inputs2 = ts2.getInputs();
-        Set<Channel> outputs1 = ts1.getOutputs();
+
 
         // keep looking at states from Waiting as long as it contains elements
         while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
 
             // ignore if the zones are included in zones belonging to pairs of states that we already visited
-            if (!passedContainsState(curr)) {
+            if (!passedContainsStatePair(curr)) {
                 // need to make deep copy
                 State newState1 = copyState(curr.getLeft());
                 State newState2 = copyState(curr.getRight());
@@ -43,12 +48,12 @@ public class Refinement {
                 passed.add(new StatePair(newState1, newState2));
 
                 // check that for every output in TS 1 there is a corresponding output in TS 2
-                boolean holds1 = checkOutputs(outputs1, curr.getLeft(), curr.getRight(), ts1, ts2);
+                boolean holds1 = checkOutputs(curr.getLeft(), curr.getRight(), ts1, ts2);
                 if (!holds1)
                     return false;
 
                 // check that for every input in TS 2 there is a corresponding input in TS 1
-                boolean holds2 = checkInputs(inputs2, curr.getLeft(), curr.getRight(), ts1, ts2);
+                boolean holds2 = checkInputs(curr.getLeft(), curr.getRight(), ts1, ts2);
                 if (!holds2)
                     return false;
             }
@@ -57,6 +62,7 @@ public class Refinement {
         // if we got here it means refinement property holds
         return true;
     }
+
 
     // takes transitions of automata 1 and 2 and builds the states corresponding to all possible combinations between them
     private List<StatePair> getNewStates(List<Transition> next1, List<Transition> next2) {
@@ -115,11 +121,11 @@ public class Refinement {
         return null;
     }
 
-    private boolean checkInputs(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
-        for (Channel action : actions) {
-            List<Transition> next2 = sys2.getNextTransitions(state2, action);
+    private boolean checkInputs(State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
+        for (Channel action : inputs2) {
+            List<Transition> next2 = getInternalTransitions(state2, action, sys2, false);
             if (!next2.isEmpty()) {
-                List<Transition> next1 = sys1.getNextTransitions(state1, action);
+                List<Transition> next1 = getInternalTransitions(state1, action, sys1, true);
                 if (next1.isEmpty()) {
                     // we found an input in automaton 2 that doesn't exist in automaton 1, so refinement doesn't hold
                     return false;
@@ -137,11 +143,11 @@ public class Refinement {
         return true;
     }
 
-    private boolean checkOutputs(Set<Channel> actions, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
-        for (Channel action : actions) {
-            List<Transition> next1 = sys1.getNextTransitions(state1, action);
+    private boolean checkOutputs(State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
+        for (Channel action : outputs1) {
+            List<Transition> next1 = getInternalTransitions(state1, action, sys1, true);
             if (!next1.isEmpty()) {
-                List<Transition> next2 = sys2.getNextTransitions(state2, action);
+                List<Transition> next2 = getInternalTransitions(state2, action, sys2, false);
                 if (next2.isEmpty()) {
                     // we found an output in automaton 1 that doesn't exist in automaton 2, so refinement doesn't hold
                     return false;
@@ -159,11 +165,49 @@ public class Refinement {
         return true;
     }
 
+    public List<Transition> getInternalTransitions(State state, Channel action, TransitionSystem ts, boolean isFirst){
+        List<Transition> result = new ArrayList<>();
+
+        List<Transition> tempTrans = new ArrayList<>();
+        List<State> tempStates = new ArrayList<>(Arrays.asList(state));
+        List<State> passedInternal = new ArrayList<>(Arrays.asList(state));
+
+        boolean checkSyncs = true;
+
+        while (checkSyncs) {
+
+            for (State tempState : tempStates) {
+                for (Channel sync : isFirst? syncs1 : syncs2) {
+                    tempTrans.addAll(ts.getNextTransitions(tempState, sync));
+                }
+            }
+
+            if(tempTrans.isEmpty()) checkSyncs = false;
+            else {
+                // Collect all states that are target of the given transitions
+                tempStates = tempTrans.stream().map(Transition::getTarget).collect(Collectors.toList());
+                tempTrans = new ArrayList<>();
+                // Get all states that are in passed list
+                List<State> toRemove = tempStates.stream().filter(s -> passedContainsState(s, passedInternal, ts)).collect(Collectors.toList());
+                // Remove all states that are already in passed
+                tempStates.removeAll(toRemove);
+
+                passedInternal.addAll(tempStates);
+            }
+        }
+
+        for (State passedState : passedInternal){
+            result.addAll(ts.getNextTransitions(passedState, action));
+        }
+
+        return result;
+    }
+
     private State copyState(State state) {
         return new State(state.getLocation(), state.getZone());
     }
 
-    private boolean passedContainsState(StatePair state) {
+    private boolean passedContainsStatePair(StatePair state) {
         // keep only states that have the same locations
         List<StatePair> passedCopy = new ArrayList<>(passed);
         passedCopy.removeIf(n -> !(n.getLeft().getLocation().equals(state.getLeft().getLocation())) ||
@@ -173,6 +217,20 @@ public class Refinement {
             // check for zone inclusion
             if (DBMLib.dbm_isSubsetEq(state.getLeft().getZone(), passedState.getLeft().getZone(), ts1.getDbmSize()) &&
                     DBMLib.dbm_isSubsetEq(state.getRight().getZone(), passedState.getRight().getZone(), ts2.getDbmSize())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean passedContainsState(State state, List<State> passed1, TransitionSystem ts) {
+        // keep only states that have the same locations
+
+        for (State passedState : passed1) {
+            // check for zone inclusion
+            if (state.getLocation().equals(passedState.getLocation()) &&
+                    DBMLib.dbm_isSubsetEq(state.getZone(), passedState.getZone(), ts.getDbmSize())) {
                 return true;
             }
         }

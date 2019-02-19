@@ -66,6 +66,32 @@ public class Conjunction extends TransitionSystem {
     }
 
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
-        return getNextMoves(symLocation, channel, systems);
+        // Check if this TS contains that action at all before proceeding
+        //if (outputs.contains(channel) || inputs.contains(channel) || syncs.contains(channel))
+        //    return new ArrayList<>();
+
+        List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
+
+        List<Move> resultMoves = systems.get(0).getNextMoves(symLocs.get(0), channel);
+        // used when there are no moves for some TS
+        if (resultMoves.isEmpty())
+            return new ArrayList<>();
+
+        for (int i = 1; i < systems.size(); i++) {
+            List<Move> moves = systems.get(i).getNextMoves(symLocs.get(i), channel);
+
+            if (moves.isEmpty())
+                return new ArrayList<>();
+
+            resultMoves = moveProduct(resultMoves, moves, i == 1);
+        }
+
+        // if there are no actual moves, then return empty list
+        Move move = resultMoves.get(0);
+        if (move.getSource().equals(move.getTarget())) {
+            return new ArrayList<>();
+        }
+
+        return resultMoves;
     }
 }

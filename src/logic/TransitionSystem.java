@@ -91,32 +91,6 @@ public abstract class TransitionSystem {
 
     public abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 
-    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel, List<TransitionSystem> systems) {
-        List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
-
-        List<Move> resultMoves = systems.get(0).getNextMoves(symLocs.get(0), channel);
-        // used when there are no moves for some TS
-        if (resultMoves.isEmpty())
-            resultMoves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(0), symLocs.get(0), new ArrayList<>())));
-
-        for (int i = 1; i < systems.size(); i++) {
-            List<Move> moves = systems.get(i).getNextMoves(symLocs.get(i), channel);
-
-            if (moves.isEmpty())
-                moves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(i), symLocs.get(i), new ArrayList<>())));
-
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
-        }
-
-        // if there are no actual moves, then return empty list
-        Move move = resultMoves.get(0);
-        if (move.getSource().equals(move.getTarget())) {
-            return new ArrayList<>();
-        }
-
-        return resultMoves;
-    }
-
     int[] initializeDBM() {
         // we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
         // clocks x1 to xn are clocks derived from our automata, while x0 is a reference clock needed by the library
@@ -142,11 +116,11 @@ public abstract class TransitionSystem {
                     source = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getSource(), move2.getSource())));
                     target = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getTarget(), move2.getTarget())));
                 } else {
-                    List<SymbolicLocation> newSourceLoc = ((ComplexLocation) move1.getSource()).getLocations();
+                    List<SymbolicLocation> newSourceLoc = new ArrayList<>(((ComplexLocation) move1.getSource()).getLocations());
                     newSourceLoc.add(move2.getSource());
                     source = new ComplexLocation(newSourceLoc);
 
-                    List<SymbolicLocation> newTargetLoc = ((ComplexLocation) move1.getTarget()).getLocations();
+                    List<SymbolicLocation> newTargetLoc = new ArrayList<>(((ComplexLocation) move1.getTarget()).getLocations());
                     newTargetLoc.add(move2.getTarget());
                     target = new ComplexLocation(newTargetLoc);
                 }

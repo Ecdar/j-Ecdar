@@ -1,11 +1,8 @@
 package logic;
 
 import models.Channel;
-import models.Location;
-import models.Edge;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Composition extends TransitionSystem {
     private List<TransitionSystem> systems;
@@ -128,20 +125,46 @@ public class Composition extends TransitionSystem {
                 }
             }
         }
-
         return createNewTransitions(currentState, resultMoves);
     }
 
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
-        if (outputs.contains(channel) || inputs.contains(channel) || syncs.contains(channel))
-            return getNextMoves(symLocation, channel, systems);
-        else
+        // Check if action belongs to this TS at all before proceeding
+        if (!outputs.contains(channel) && !inputs.contains(channel) && !syncs.contains(channel))
             return new ArrayList<>();
+
+        // If action is sync, then check if there is corresponding input and output in TS
+        if(!checkForInputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
+
+        List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
+
+        List<Move> resultMoves = systems.get(0).getNextMoves(symLocs.get(0), channel);
+        // used when there are no moves for some TS
+        if (resultMoves.isEmpty())
+            resultMoves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(0), symLocs.get(0), new ArrayList<>())));
+
+        for (int i = 1; i < systems.size(); i++) {
+            List<Move> moves = systems.get(i).getNextMoves(symLocs.get(i), channel);
+
+            if (moves.isEmpty())
+                moves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(i), symLocs.get(i), new ArrayList<>())));
+
+            resultMoves = moveProduct(resultMoves, moves, i == 1);
+        }
+
+        // if there are no actual moves, then return empty list
+        Move move = resultMoves.get(0);
+        if (move.getSource().equals(move.getTarget())) {
+            return new ArrayList<>();
+        }
+
+        return resultMoves;
     }
 
     private boolean checkForInputs(Channel channel, List<SymbolicLocation> locations) {
         // assume we should check for inputs
-        boolean check = true;
+        boolean checkOutput = true;
+        boolean checkInput = false;
 
         // for syncs, we must make sure we have an output first
         if (syncs.contains(channel)) {
@@ -151,14 +174,19 @@ public class Composition extends TransitionSystem {
                     List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
                     if (moves.isEmpty()) {
                         // do not check for inputs if the state in the corresponding automaton does not send that output
-                        check = false;
+                        checkOutput = false;
                         break;
                     }
+                } else if (systems.get(i).getInputs().contains(channel)) {
+                    List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
+                    // do not check for inputs if the state in the corresponding automaton does not send that input
+                    if (!moves.isEmpty())
+                    checkInput = true;
                 }
             }
-        }
+        } else checkInput = true;
 
-        return check;
+        return checkOutput && checkInput;
     }
 
     private Set<Channel> setIntersection(Set<Channel> set1, Set<Channel> set2) {
