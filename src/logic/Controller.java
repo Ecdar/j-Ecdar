@@ -34,9 +34,8 @@ public class Controller {
         Queries.addAll(temp);
     }
 
-    public ArrayList<Automaton> parseComponents(String folderLocation) {
+    public void parseComponents(String folderLocation) {
         cmpt = Parser.parse(folderLocation);
-        return cmpt;
     }
 
     public List<Boolean> runQueries() throws Exception {
@@ -153,7 +152,7 @@ public class Controller {
         return -1;
     }
 
-    public boolean isQueryValid(String query) throws Exception {
+    public void isQueryValid(String query) throws Exception {
         try {
             checkRefinementSyntax(query);
             isParBalanced(query);
@@ -162,7 +161,6 @@ public class Controller {
         } catch (Exception e) {
             throw e;
         }
-        return true;
     }
 
     private void checkRefinementSyntax(String query) throws Exception {

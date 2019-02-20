@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ParserTest {
@@ -53,8 +54,8 @@ public class ParserTest {
         Edge t16 = new Edge(l0, l1, button2, true, new ArrayList<>(), new ArrayList<>());
 
 
-        A = new Automaton("A", new ArrayList<>(Arrays.asList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), new ArrayList<>());
-        G = new Automaton("G", new ArrayList<>(Arrays.asList(l3)), new ArrayList<>(Arrays.asList(t4, t5, t6)), new ArrayList<>());
+        A = new Automaton("A", new ArrayList<>(Collections.singletonList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), new ArrayList<>());
+        G = new Automaton("G", new ArrayList<>(Collections.singletonList(l3)), new ArrayList<>(Arrays.asList(t4, t5, t6)), new ArrayList<>());
         Q = new Automaton("Q", new ArrayList<>(Arrays.asList(l5, u0)), new ArrayList<>(Arrays.asList(t7, t8, t9)), new ArrayList<>());
         Imp = new Automaton("Imp", new ArrayList<>(Arrays.asList(l0, l1)), new ArrayList<>(Arrays.asList(t10, t11, t12, t13, t14, t15, t16)), new ArrayList<>());
 
@@ -81,7 +82,7 @@ public class ParserTest {
         Location l12 = new Location("L12", new ArrayList<>(), true, false, false, false);
         Location l13 = new Location("L13", new ArrayList<>(), false, false, false, false);
         Location l14 = new Location("L14", new ArrayList<>(), false, false, false, false);
-        Location l15 = new Location("L15", new ArrayList<>(Arrays.asList(inv_l15)), false, false, false, false);
+        Location l15 = new Location("L15", new ArrayList<>(Collections.singletonList(inv_l15)), false, false, false, false);
         Location l16 = new Location("L16", new ArrayList<>(), false, false, false, false);
         Location l17 = new Location("L17", new ArrayList<>(), false, false, false, false);
         Location l18 = new Location("L18", new ArrayList<>(), false, false, false, false);
@@ -96,19 +97,19 @@ public class ParserTest {
         Channel o9 = new Channel("o9"); Channel o10 = new Channel("o10");
 
 
-        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Arrays.asList(g_l12_l14)), new ArrayList<>());
-        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Arrays.asList(g_l12_l17)), new ArrayList<>());
-        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Arrays.asList(g_l12_l15)), new ArrayList<>(Arrays.asList(u1)));
-        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Arrays.asList(g_l12_l16)), new ArrayList<>());
-        t5 = new Edge(l17, l18, o8, false, new ArrayList<>(), new ArrayList<>(Arrays.asList(u1)));
+        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Collections.singletonList(g_l12_l14)), new ArrayList<>());
+        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Collections.singletonList(g_l12_l17)), new ArrayList<>());
+        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Collections.singletonList(g_l12_l15)), new ArrayList<>(Collections.singletonList(u1)));
+        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Collections.singletonList(g_l12_l16)), new ArrayList<>());
+        t5 = new Edge(l17, l18, o8, false, new ArrayList<>(), new ArrayList<>(Collections.singletonList(u1)));
         t6 = new Edge(l16, l18, o8, false, new ArrayList<>(), new ArrayList<>());
-        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Arrays.asList(g_l15_l18)), new ArrayList<>());
+        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Collections.singletonList(g_l15_l18)), new ArrayList<>());
         t8 = new Edge(l14, l18, o8, false, new ArrayList<>(), new ArrayList<>());
         t9 = new Edge(l13, l18, o8, false, new ArrayList<>(), new ArrayList<>());
         t10 = new Edge(l17, l17, o3, false, new ArrayList<>(), new ArrayList<>());
         t11 = new Edge(l17, l17, o5, false, new ArrayList<>(), new ArrayList<>());
         t12 = new Edge(l17, l14, i6, true, new ArrayList<>(), new ArrayList<>());
-        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Arrays.asList(g_l12_l13)), new ArrayList<>());
+        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(g_l12_l13)), new ArrayList<>());
 
         Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)));

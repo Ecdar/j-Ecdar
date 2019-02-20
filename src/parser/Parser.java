@@ -22,16 +22,8 @@ public class Parser {
 
     public static ArrayList<Automaton> parse(String folderPath) {
         File dir = new File(folderPath + "/Components");
-        File [] files = dir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".json");
-            }
-        });
-//        System.out.println(files.length);
-//        for (File jsonFiles : files) {
-//            System.out.println(jsonFiles);
-//        }
+        File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
+
         ArrayList<String> locations = new ArrayList<>();
         locations.add(folderPath + "/GlobalDeclarations.json");
         for (File jsonFiles : files) {
@@ -101,8 +93,8 @@ public class Parser {
                 firstList[i] = firstList[i].replaceFirst("^broadcast chan", "");//get rid of starting text
                 firstList[i] = firstList[i].replaceAll("\\s+", ""); //get rid of spaces
                 String[] secondList = (firstList[i].split(","));
-                for (int j = 0; j < secondList.length; j++) {
-                    Channel chan = new Channel(secondList[j]);
+                for (String s : secondList) {
+                    Channel chan = new Channel(s);
                     globalChannels.add(chan);
                 }
             }
@@ -110,8 +102,8 @@ public class Parser {
                 firstList[i] = firstList[i].replaceFirst("^clock", "");//get rid of starting text
                 firstList[i] = firstList[i].replaceAll("\\s+", ""); //get rid of spaces
                 String[] secondList = (firstList[i].split(","));
-                for (int j = 0; j < secondList.length; j++) {
-                    Clock clock = new Clock(secondList[j]);
+                for (String s : secondList) {
+                    Clock clock = new Clock(s);
                     componentClocks.add(clock);
                 }
             }

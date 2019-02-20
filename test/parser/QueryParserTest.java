@@ -357,8 +357,8 @@ public class QueryParserTest {
     @Test
     public void testQueryValid1() {
         try {
-            boolean result = ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
-            assertTrue(result);
+            ctrl.isQueryValid("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
+            assertTrue(true);
         } catch (Exception e) {
             fail();
         }
@@ -367,8 +367,8 @@ public class QueryParserTest {
     @Test
     public void testQueryValid2() {
         try {
-            boolean result = ctrl.isQueryValid("refinement:(Administration||Researcher||Machine)<=Spec");
-            assertTrue(result);
+            ctrl.isQueryValid("refinement:(Administration||Researcher||Machine)<=Spec");
+            assertTrue(true);
         } catch (Exception e) {
             fail();
         }
@@ -377,8 +377,8 @@ public class QueryParserTest {
     @Test
     public void testQueryValid3() {
         try {
-            boolean result = ctrl.isQueryValid("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec");
-            assertTrue(result);
+            ctrl.isQueryValid("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec");
+            assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -388,8 +388,8 @@ public class QueryParserTest {
     @Test
     public void testQueryValid4() {
         try {
-            boolean result = ctrl.isQueryValid("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine1&&Machine2))<=Spec");
-            assertTrue(result);
+            ctrl.isQueryValid("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine1&&Machine2))<=Spec");
+            assertTrue(true);
         } catch (Exception e) {
             fail();
         }
@@ -398,8 +398,8 @@ public class QueryParserTest {
     @Test
     public void testQueryValid5() {
         try {
-            boolean result = ctrl.isQueryValid("refinement:((HalfAdm1&&(HA1||HA2))||Researcher||(Machine1&&Machine2))<=Spec");
-            assertTrue(result);
+            ctrl.isQueryValid("refinement:((HalfAdm1&&(HA1||HA2))||Researcher||(Machine1&&Machine2))<=Spec");
+            assertTrue(true);
         } catch (Exception e) {
             fail();
         }

@@ -42,8 +42,8 @@ public class Main {
                 }
             case "-vq":
                 try {
-                    boolean result = ctrl.isQueryValid(query.substring(query.indexOf(' ') + 1));
-                    return String.valueOf(result);
+                    ctrl.isQueryValid(query.substring(query.indexOf(' ') + 1));
+                    return String.valueOf(true);
                 } catch (Exception e) {
                     return "Error: " + e.getMessage();//e.printStackTrace();
                 }
