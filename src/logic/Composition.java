@@ -109,21 +109,7 @@ public class Composition extends TransitionSystem {
 
             // for syncs, we have to check if that output is being sent by a automaton, otherwise we do not look at the
             // inputs in the other automata
-            if (checkForInputs) {
-
-                resultMoves = systems.get(0).getNextMoves(locations.get(0), channel);
-                // used when there are no moves for some TS
-                if (resultMoves.isEmpty())
-                    resultMoves = new ArrayList<>(Collections.singletonList(new Move(locations.get(0), locations.get(0), new ArrayList<>())));
-
-                for (int i = 1; i < locations.size(); i++) {
-                    List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
-                    if (moves.isEmpty())
-                        moves = new ArrayList<>(Collections.singletonList(new Move(locations.get(i), locations.get(i), new ArrayList<>())));
-
-                    resultMoves = moveProduct(resultMoves, moves, i == 1);
-                }
-            }
+            if (checkForInputs) resultMoves = computeResultMoves(locations, channel);
         }
         return createNewTransitions(currentState, resultMoves);
     }
@@ -138,24 +124,30 @@ public class Composition extends TransitionSystem {
 
         List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
 
-        List<Move> resultMoves = systems.get(0).getNextMoves(symLocs.get(0), channel);
-        // used when there are no moves for some TS
-        if (resultMoves.isEmpty())
-            resultMoves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(0), symLocs.get(0), new ArrayList<>())));
-
-        for (int i = 1; i < systems.size(); i++) {
-            List<Move> moves = systems.get(i).getNextMoves(symLocs.get(i), channel);
-
-            if (moves.isEmpty())
-                moves = new ArrayList<>(Collections.singletonList(new Move(symLocs.get(i), symLocs.get(i), new ArrayList<>())));
-
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
-        }
+        List<Move> resultMoves = computeResultMoves(symLocs, channel);
 
         // if there are no actual moves, then return empty list
         Move move = resultMoves.get(0);
         if (move.getSource().equals(move.getTarget())) {
             return new ArrayList<>();
+        }
+
+        return resultMoves;
+    }
+
+    private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
+        List<Move> resultMoves = systems.get(0).getNextMoves(locations.get(0), channel);
+        // used when there are no moves for some TS
+        if (resultMoves.isEmpty())
+            resultMoves = new ArrayList<>(Collections.singletonList(new Move(locations.get(0), locations.get(0), new ArrayList<>())));
+
+        for (int i = 1; i < systems.size(); i++) {
+            List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
+
+            if (moves.isEmpty())
+                moves = new ArrayList<>(Collections.singletonList(new Move(locations.get(i), locations.get(i), new ArrayList<>())));
+
+            resultMoves = moveProduct(resultMoves, moves, i == 1);
         }
 
         return resultMoves;

@@ -70,7 +70,7 @@ public class Controller {
             if (part.charAt(i) == '(') {
                 int tempPosition = checkParentheses(part);
                 transitionSystems.add(runQuery(part.substring(i, tempPosition)));
-                part = part.substring(tempPosition, part.length());
+                part = part.substring(tempPosition);
                 i = 0;
             }
 
