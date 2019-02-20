@@ -97,4 +97,13 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isValid(JNIEnv *env, jclass cls,
     return dbm_isValid(converted, dim);
 }
 
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection(JNIEnv *env, jclass cls, jintArray dbm1, jintArray dbm2, jint dim) {
+    jsize len = env->GetArrayLength(dbm2);
+
+    auto converted1 = helper_functions::jintToC(env, dbm1, len);
+    auto converted2 = helper_functions::jintToC(env, dbm2, len);
+
+    return dbm_intersection(converted1, converted2, dim);
+}
+
 int main() { return 0; }

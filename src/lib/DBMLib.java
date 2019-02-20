@@ -20,4 +20,6 @@ public class DBMLib {
     public static native int[] dbm_updateValue(int[] dbm, int dim, int x, int value);
 
     public static native boolean dbm_isValid(int[] dbm, int dim);
+
+    public static native boolean dbm_intersection(int[] dbm1, int[] dbm2, int dim);
 }

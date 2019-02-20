@@ -79,6 +79,14 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue
 JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isValid
   (JNIEnv *, jclass, jintArray, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_intersection
+ * Signature: ([I[II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection
+  (JNIEnv *, jclass, jintArray, jintArray, jint);
+
 #ifdef __cplusplus
 }
 #endif
