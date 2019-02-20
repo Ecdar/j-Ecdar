@@ -121,4 +121,42 @@ public class DBMTest {
         assertArrayEquals(t1, DBMLib.dbm_up(t2, 2));
     }
 
+    @Test
+    public void testDbmIntersects1() {
+        t1 = new int[]{1, 1, 11, 1};
+        t2 = new int[]{1, 1, 2147483646, 1};
+
+        assertTrue(DBMLib.dbm_intersection(t1, t2, 2));
+    }
+
+    @Test
+    public void testDbmIntersects2() {
+        t1 = new int[]{1, -9, 1, 1, 2147483646, 1, 2147483646, 2147483646,
+                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
+        t2 = new int[]{1, 1, 1, 1, 13, 1, 13, 13,
+                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
+
+        assertTrue(DBMLib.dbm_intersection(t1, t2, 4));
+    }
+
+    @Test
+    public void testDbmNotIntersects1() {
+        t1 = new int[]{1, 1, 11, 1};
+        t2 = new int[]{1, -15, 2147483646, 1};
+
+        assertFalse(DBMLib.dbm_intersection(t1, t2, 2));
+    }
+
+    @Test
+    public void testDbmNotIntersects2() {
+        t1 = new int[]{1, 13, 1, 1, 2147483646, 1, 2147483646, 2147483646,
+                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
+        t2 = new int[]{1, 1, 1, 1, -9, 1, -9, -9,
+                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
+
+        assertFalse(DBMLib.dbm_intersection(t1, t2, 4));
+    }
+
+
+
 }
