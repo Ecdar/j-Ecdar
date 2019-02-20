@@ -5,7 +5,6 @@ import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,14 +13,10 @@ import static org.junit.Assert.*;
 
 public class QueryParserTest {
     private static Controller ctrl;
-    private static ArrayList<Automaton> automata;
     private static Automaton adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
+    public static void setUpBeforeClass() {
         String base = "./samples/EcdarUniversity/";
         List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
                 "Components/Administration.json",

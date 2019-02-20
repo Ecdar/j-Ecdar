@@ -8,7 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +20,7 @@ public class AGTest {
     private static Automaton a, g, q, imp;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
-
+    public static void setUpBeforeClass()  {
         String base = "./samples/AG/";
         List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
                 "Components/A.json",

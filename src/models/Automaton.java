@@ -1,6 +1,7 @@
 package models;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Automaton {
     private String name;
@@ -9,40 +10,26 @@ public class Automaton {
     private List<Clock> clocks;
     private Set<Channel> inputAct;
     private Set<Channel> outputAct;
+    private Set<Channel> actions;
     private Location initLoc;
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks) {
         this.name = name;
         this.locations = locations;
+
         for (Location location : locations) {
             if (location.isInitial()) {
                 initLoc = location;
                 break;
             }
         }
+
         this.inputAct = new HashSet<>();
         this.outputAct = new HashSet<>();
-        setEdges(edges);
+        this.actions = new HashSet<>();
+        this.edges = edges;
+        setActions(edges);
         this.clocks = clocks;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Automaton)) return false;
-        Automaton automaton = (Automaton) o;
-        return name.equals(automaton.name) &&
-                Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
-                Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&
-                Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) &&
-                Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
-                Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) &&
-                initLoc.equals(automaton.initLoc);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, locations, edges, clocks, inputAct, outputAct, initLoc);
     }
 
     public String getName() {
@@ -54,32 +41,29 @@ public class Automaton {
     }
 
     private List<Edge> getEdgesFromLocation(Location loc) {
-        List<Edge> trans = new ArrayList<>(edges);
-
         if (loc.isUniversal()) {
-            Set<Channel> actions = getActions();
+            List<Edge> resultEdges = new ArrayList<>();
             for (Channel action : actions) {
-                trans.add(new Edge(loc, loc, action, getInputAct().contains(action), new ArrayList<>(), new ArrayList<>()));
+                resultEdges.add(new Edge(loc, loc, action, getInputAct().contains(action), new ArrayList<>(), new ArrayList<>()));
             }
+            return resultEdges;
         }
 
-        trans.removeIf(n -> n.getSource() != loc);
-
-        return trans;
+        return edges.stream().filter(edge -> edge.getSource().equals(loc)).collect(Collectors.toList());
     }
 
     public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
-        List<Edge> trans = getEdgesFromLocation(loc);
+        List<Edge> resultEdges = getEdgesFromLocation(loc);
 
-        trans.removeIf(n -> !n.getChannel().getName().equals(signal.getName()));
-
-        return trans;
+        return resultEdges.stream().filter(edge -> edge.getChannel().getName().equals(signal.getName())).collect(Collectors.toList());
     }
 
-    private void setEdges(List<Edge> edges) {
-        this.edges = edges;
+    private void setActions(List<Edge> edges) {
         for (Edge edge : edges) {
             Channel action = edge.getChannel();
+
+            actions.add(action);
+
             if (edge.isInput()) {
                 inputAct.add(action);
             } else {
@@ -104,10 +88,22 @@ public class Automaton {
         return outputAct;
     }
 
-    public Set<Channel> getActions() {
-        Set<Channel> actions = new HashSet<>();
-        actions.addAll(inputAct);
-        actions.addAll(outputAct);
-        return actions;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Automaton)) return false;
+        Automaton automaton = (Automaton) o;
+        return name.equals(automaton.name) &&
+                Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
+                Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&
+                Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) &&
+                Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
+                Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) &&
+                initLoc.equals(automaton.initLoc);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, locations, edges, clocks, inputAct, outputAct, initLoc);
     }
 }

@@ -1,24 +1,18 @@
 package dbm;
 
+import global.LibLoader;
 import lib.DBMLib;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public class DBMTest {
     int[] t1, t2;
 
-
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
-
+    public static void setUpBeforeClass() {
+        LibLoader.load();
     }
 
     @Test

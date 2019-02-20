@@ -1,10 +1,10 @@
 package logic;
 
+import global.LibLoader;
 import lib.DBMLib;
 import models.Channel;
 import models.Guard;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,6 +19,7 @@ public class Refinement {
         this.ts2 = system2;
         this.waiting = new ArrayDeque<>();
         this.passed = new ArrayList<>();
+
         // the first states we look at are the initial ones
         waiting.push(new StatePair(ts1.getInitialState(), ts2.getInitialState()));
 
@@ -27,9 +28,7 @@ public class Refinement {
         syncs1 = ts1.getSyncs();
         syncs2 = ts2.getSyncs();
 
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
+        LibLoader.load();
     }
 
     public boolean check() {
@@ -42,20 +41,17 @@ public class Refinement {
             // ignore if the zones are included in zones belonging to pairs of states that we already visited
             if (!passedContainsStatePair(curr)) {
                 // need to make deep copy
-                State newState1 = copyState(curr.getLeft());
-                State newState2 = copyState(curr.getRight());
+                State newState1 = copyState(curr.getLeft()); State newState2 = copyState(curr.getRight());
                 // mark the pair of states as visited
                 passed.add(new StatePair(newState1, newState2));
 
                 // check that for every output in TS 1 there is a corresponding output in TS 2
                 boolean holds1 = checkOutputs(curr.getLeft(), curr.getRight(), ts1, ts2);
-                if (!holds1)
-                    return false;
+                if (!holds1) return false;
 
                 // check that for every input in TS 2 there is a corresponding input in TS 1
                 boolean holds2 = checkInputs(curr.getLeft(), curr.getRight(), ts1, ts2);
-                if (!holds2)
-                    return false;
+                if (!holds2) return false;
             }
         }
 
@@ -71,10 +67,8 @@ public class Refinement {
         for (Transition t1 : next1) {
             for (Transition t2 : next2) {
                 // get source and target states
-                State source1 = copyState(t1.getSource());
-                State source2 = copyState(t2.getSource());
-                State target1 = copyState(t1.getTarget());
-                State target2 = copyState(t2.getTarget());
+                State source1 = copyState(t1.getSource()); State source2 = copyState(t2.getSource());
+                State target1 = copyState(t1.getTarget()); State target2 = copyState(t2.getTarget());
 
                 StatePair newState = buildStatePair(source1, source2, t1.getGuards(), t2.getGuards(), target1, target2);
                 if (newState != null) {
@@ -92,25 +86,19 @@ public class Refinement {
         source2.applyGuards(guards2, ts2.getClocks());
 
         // based on the zone, get the min and max value of the clocks
-        int maxSource1 = source1.getMinUpperBound();
-        int maxSource2 = source2.getMinUpperBound();
-        int minSource1 = source1.getMinLowerBound();
-        int minSource2 = source2.getMinLowerBound();
+        int maxSource1 = source1.getMinUpperBound(); int maxSource2 = source2.getMinUpperBound();
+        int minSource1 = source1.getMinLowerBound(); int minSource2 = source2.getMinLowerBound();
 
         // check that the zones are compatible
         if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
             // delay and apply invariants on target states
 
-            target1.delay();
-            target2.delay();
-            target1.applyInvariants(ts1.getClocks());
-            target2.applyInvariants(ts2.getClocks());
+            target1.delay(); target2.delay();
+            target1.applyInvariants(ts1.getClocks()); target2.applyInvariants(ts2.getClocks());
 
             // get the max value of the clocks
-            int maxTarget1 = target1.getMinUpperBound();
-            int maxTarget2 = target2.getMinUpperBound();
-            int minTarget1 = target1.getMinLowerBound();
-            int minTarget2 = target2.getMinLowerBound();
+            int maxTarget1 = target1.getMinUpperBound(); int maxTarget2 = target2.getMinUpperBound();
+            int minTarget1 = target1.getMinLowerBound(); int minTarget2 = target2.getMinLowerBound();
 
             // check again that the zones are compatible
             if (maxTarget1 >= minTarget2 && maxTarget2 >= minTarget1) {
@@ -121,56 +109,44 @@ public class Refinement {
         return null;
     }
 
-    private boolean checkInputs(State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
-        for (Channel action : inputs2) {
-            List<Transition> next2 = getInternalTransitions(state2, action, sys2, false);
-            if (!next2.isEmpty()) {
-                List<Transition> next1 = getInternalTransitions(state1, action, sys1, true);
-                if (next1.isEmpty()) {
-                    // we found an input in automaton 2 that doesn't exist in automaton 1, so refinement doesn't hold
-                    return false;
-                } else {
-                    List<StatePair> newStates = getNewStates(next1, next2);
-                    if (newStates.isEmpty()) {
-                        // if we don't get any new states, it means we found some incompatibility
-                        return false;
-                    } else {
-                        waiting.addAll(newStates);
-                    }
-                }
+    private boolean checkActions(boolean isInput, State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
+        for (Channel action : isInput ? inputs2 : outputs1) {
+            List<Transition> next1 = isInput ? getInternalTransitions(state2, action, sys2, false) :
+                    getInternalTransitions(state1, action, sys1, false);
+
+            if (!next1.isEmpty()) {
+                List<Transition> next2 = isInput ? getInternalTransitions(state1, action, sys1, true) :
+                        getInternalTransitions(state2, action, sys2, true);
+
+                // we found an input in TS 2 that doesn't exist in TS 1, so refinement doesn't hold
+                if (next2.isEmpty()) return false;
+
+                List<StatePair> newStates = isInput ? getNewStates(next2, next1): getNewStates(next1, next2);
+
+                // if we don't get any new states, it means we found some incompatibility
+                if (newStates.isEmpty()) return false;
+
+                waiting.addAll(newStates);
             }
         }
+
         return true;
     }
 
+    private boolean checkInputs(State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
+        return checkActions(true, state1, state2, sys1, sys2);
+    }
+
     private boolean checkOutputs(State state1, State state2, TransitionSystem sys1, TransitionSystem sys2) {
-        for (Channel action : outputs1) {
-            List<Transition> next1 = getInternalTransitions(state1, action, sys1, true);
-            if (!next1.isEmpty()) {
-                List<Transition> next2 = getInternalTransitions(state2, action, sys2, false);
-                if (next2.isEmpty()) {
-                    // we found an output in automaton 1 that doesn't exist in automaton 2, so refinement doesn't hold
-                    return false;
-                } else {
-                    List<StatePair> newStates = getNewStates(next1, next2);
-                    if (newStates.isEmpty()) {
-                        // if we don't get any new states, it means we found some incompatibility
-                        return false;
-                    } else {
-                        waiting.addAll(newStates);
-                    }
-                }
-            }
-        }
-        return true;
+        return checkActions(false, state1, state2, sys1, sys2);
     }
 
     public List<Transition> getInternalTransitions(State state, Channel action, TransitionSystem ts, boolean isFirst){
         List<Transition> result = new ArrayList<>();
 
         List<Transition> tempTrans = new ArrayList<>();
-        List<State> tempStates = new ArrayList<>(Arrays.asList(state));
-        List<State> passedInternal = new ArrayList<>(Arrays.asList(state));
+        List<State> tempStates = new ArrayList<>(Collections.singletonList(state));
+        List<State> passedInternal = new ArrayList<>(Collections.singletonList(state));
 
         boolean checkSyncs = true;
 
@@ -182,7 +158,7 @@ public class Refinement {
                 }
             }
 
-            if(tempTrans.isEmpty()) checkSyncs = false;
+            if (tempTrans.isEmpty()) checkSyncs = false;
             else {
                 // Collect all states that are target of the given transitions
                 tempStates = tempTrans.stream().map(Transition::getTarget).collect(Collectors.toList());
@@ -208,16 +184,14 @@ public class Refinement {
     }
 
     private boolean passedContainsStatePair(StatePair state) {
-        // keep only states that have the same locations
-        List<StatePair> passedCopy = new ArrayList<>(passed);
-        passedCopy.removeIf(n -> !(n.getLeft().getLocation().equals(state.getLeft().getLocation())) ||
-                !(n.getRight().getLocation().equals(state.getRight().getLocation())));
-
-        for (StatePair passedState : passedCopy) {
+        for (StatePair passedState : passed) {
             // check for zone inclusion
-            if (DBMLib.dbm_isSubsetEq(state.getLeft().getZone(), passedState.getLeft().getZone(), ts1.getDbmSize()) &&
-                    DBMLib.dbm_isSubsetEq(state.getRight().getZone(), passedState.getRight().getZone(), ts2.getDbmSize())) {
-                return true;
+            if (passedState.getLeft().getLocation().equals(state.getLeft().getLocation()) &&
+                    passedState.getRight().getLocation().equals(state.getRight().getLocation())) {
+                if (DBMLib.dbm_isSubsetEq(state.getLeft().getZone(), passedState.getLeft().getZone(), ts1.getDbmSize()) &&
+                        DBMLib.dbm_isSubsetEq(state.getRight().getZone(), passedState.getRight().getZone(), ts2.getDbmSize())) {
+                    return true;
+                }
             }
         }
 
@@ -225,8 +199,6 @@ public class Refinement {
     }
 
     private boolean passedContainsState(State state, List<State> passed1, TransitionSystem ts) {
-        // keep only states that have the same locations
-
         for (State passedState : passed1) {
             // check for zone inclusion
             if (state.getLocation().equals(passedState.getLocation()) &&

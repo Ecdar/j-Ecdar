@@ -2,6 +2,7 @@ package logic;
 
 import models.Channel;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Conjunction extends TransitionSystem {
     List<TransitionSystem> systems;
@@ -11,9 +12,8 @@ public class Conjunction extends TransitionSystem {
 
         this.systems = systems;
 
-        for (TransitionSystem ts : systems) {
-            clocks.addAll(ts.getClocks());
-        }
+        clocks.addAll(systems.stream().map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
+
         dbmSize = clocks.size() + 1;
     }
 

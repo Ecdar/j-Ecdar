@@ -2,10 +2,10 @@ package logic;
 
 import models.Guard;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ComplexLocation extends SymbolicLocation {
     private List<SymbolicLocation> locations;
@@ -20,13 +20,7 @@ public class ComplexLocation extends SymbolicLocation {
     }
 
     public List<Guard> getInvariants() {
-        List<Guard> invariantList = new ArrayList<>();
-
-        for (SymbolicLocation loc : locations) {
-            invariantList.addAll(loc.getInvariants());
-        }
-
-        return invariantList;
+        return locations.stream().map(SymbolicLocation::getInvariants).flatMap(List::stream).collect(Collectors.toList());
     }
 
     @Override

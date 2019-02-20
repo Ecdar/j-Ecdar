@@ -16,10 +16,6 @@ public class Controller {
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public Controller() {
-
-    }
-
     public List<Boolean> handleRequest(String locQuery) throws Exception {
         folderLoc = "";
         cmpt.clear();
@@ -32,8 +28,7 @@ public class Controller {
     }
 
     public void separateLocQuery(String locQuery) {
-        ArrayList<String> temp = new ArrayList<>();
-        temp.addAll(Arrays.asList(locQuery.split(" ")));
+        ArrayList<String> temp = new ArrayList<>(Arrays.asList(locQuery.split(" ")));
         folderLoc = temp.get(0);
         temp.remove(0);
         Queries.addAll(temp);
@@ -45,7 +40,8 @@ public class Controller {
     }
 
     public List<Boolean> runQueries() throws Exception {
-        List<Boolean> returnlist = new ArrayList<Boolean>();
+        List<Boolean> returnlist = new ArrayList<>();
+
         for (int i = 0; i < Queries.size(); i++) {
             isQueryValid(Queries.get(i));
             Queries.set(i, Queries.get(i).replaceAll("\\s+", ""));
@@ -56,12 +52,13 @@ public class Controller {
             }
             //add if contains specification or smth else
         }
+
         return returnlist;
     }
 
     public TransitionSystem runQuery(String part) {
         ArrayList<TransitionSystem> transitionSystems = new ArrayList<>();
-        if (part.charAt(0) == '(' && part.length() > 0) {
+        if (part.charAt(0) == '(') {
             part = part.substring(1);
         }
         int feature = -1;
@@ -128,11 +125,12 @@ public class Controller {
 
     // Finds and returns Automaton given the name of that component
     private Automaton findComponent(String str) {
-        for (int i = 0; i < cmpt.size(); i++) {
-            if (cmpt.get(i).getName().equalsIgnoreCase(str)) {
-                return cmpt.get(i);
+        for (Automaton automaton : cmpt) {
+            if (automaton.getName().equalsIgnoreCase(str)) {
+                return automaton;
             }
         }
+
         System.out.println("Automaton does not exist  " + str);
         return null;
     }
@@ -167,19 +165,18 @@ public class Controller {
         return true;
     }
 
-    private boolean checkRefinementSyntax(String query) throws Exception {
+    private void checkRefinementSyntax(String query) throws Exception {
         if (query.contains("<=") && !query.contains("refinement:")) {
             throw new Exception("Expected: \"refinement:\"");
         }
         boolean ok = !query.matches(".*<=.*<=.*");
-        if (ok) {
-            return true;
-        } else throw new Exception("There can only be one refinement");
+        if (!ok) throw new Exception("There can only be one refinement");
 
     }
 
-    private boolean isParBalanced(String query) throws Exception {
+    private void isParBalanced(String query) throws Exception {
         int counter = 0;
+
         for (int i = 0; i < query.length(); i++) {
             if (query.charAt(i) == '(') {
                 counter++;
@@ -188,12 +185,11 @@ public class Controller {
                 counter--;
             }
         }
-        if (counter == 0) {
-            return true;
-        } else throw new Exception("Parentheses are not balanced");
+
+        if (counter != 0) throw new Exception("Parentheses are not balanced");
     }
 
-    private boolean BeforeAfterParantheses(String query) throws Exception {
+    private void BeforeAfterParantheses(String query) throws Exception {
         String testString = "/=|&:(";
 
         for (int i = 0; i < query.length(); i++) {
@@ -208,19 +204,15 @@ public class Controller {
                 }
             }
         }
-        return true;
     }
 
-    private boolean checkSyntax(String query) throws Exception {
+    private void checkSyntax(String query) throws Exception {
         String testString = "/=|&:";
         for (int i = 0; i < query.length(); i++) {
             if (testString.indexOf(query.charAt(i)) != -1) {
-                return true;
+                return;
             }
         }
         throw new Exception("Incorrect syntax, does not contain any feature");
-
     }
-
-
 }

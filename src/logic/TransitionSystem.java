@@ -3,8 +3,9 @@ package logic;
 import lib.DBMLib;
 import models.*;
 
-import java.io.File;
+import global.LibLoader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
@@ -14,9 +15,7 @@ public abstract class TransitionSystem {
     TransitionSystem() {
         this.clocks = new ArrayList<>();
 
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
+        LibLoader.load();
     }
 
     int getDbmSize() {
@@ -39,13 +38,8 @@ public abstract class TransitionSystem {
     public abstract SymbolicLocation getInitialLocation();
 
     public SymbolicLocation getInitialLocation(List<TransitionSystem> systems) {
-        List<SymbolicLocation> locations = new ArrayList<>();
-
-        for (TransitionSystem ts : systems) {
-            locations.add(ts.getInitialLocation());
-        }
-
-        return new ComplexLocation(locations);
+        // build ComplexLocation with initial location from each TransitionSystem
+        return new ComplexLocation(systems.stream().map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
     }
 
     List<Transition> createNewTransitions(State currentState, List<Move> moves) {
@@ -53,16 +47,11 @@ public abstract class TransitionSystem {
 
         // loop through moves
         for (Move move : moves) {
-            List<Guard> guards = new ArrayList<>();
-            List<Update> updates = new ArrayList<>();
+            List<Edge> egdes = move.getEdges();
 
             // gather all the guards and resets of one move
-            for (Edge t : move.getEdges()) {
-                if (t != null) {
-                    guards.addAll(t.getGuards());
-                    updates.addAll(t.getUpdates());
-                }
-            }
+            List<Guard> guards = egdes.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
+            List<Update> updates = egdes.stream().map(Edge::getUpdates).flatMap(List::stream).collect(Collectors.toList());
 
             State state = new State(move.getTarget(), currentState.getZone());
             // get the new zone by applying guards and resets on the zone of the target state
@@ -70,10 +59,8 @@ public abstract class TransitionSystem {
             if (!updates.isEmpty()) state.applyResets(updates, clocks);
 
             // if the zone is valid, build the transition and add it to the list
-            if (isDbmValid(state.getZone())) {
-                Transition transition = new Transition(currentState, state, move.getEdges());
-                transitions.add(transition);
-            }
+            if (isDbmValid(state.getZone()))
+                transitions.add(new Transition(currentState, state, move.getEdges()));
         }
 
         return transitions;
@@ -137,16 +124,11 @@ public abstract class TransitionSystem {
     }
 
     @Override
-    public boolean equals (Object obj)
-    {
-        if (this==obj) return true;
-        if (this == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        TransitionSystem ts = (TransitionSystem) obj;
-
-        return this.getOutputs().equals(ts.getOutputs()) &&
-                this.getInputs().equals(ts.getInputs()) &&
-                this.getClocks().equals(ts.getClocks()) &&
-                this.getDbmSize() == ts.getDbmSize();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TransitionSystem that = (TransitionSystem) o;
+        return dbmSize == that.dbmSize &&
+                clocks.equals(that.clocks);
     }
 }

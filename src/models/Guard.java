@@ -23,7 +23,6 @@ public class Guard {
         return clock;
     }
 
-
     public int getLowerBound() {
         return lowerBound;
     }

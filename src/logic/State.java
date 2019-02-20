@@ -1,11 +1,11 @@
 package logic;
 
+import global.LibLoader;
 import lib.DBMLib;
 import models.Clock;
 import models.Guard;
 import models.Update;
 
-import java.io.File;
 import java.util.List;
 
 public class State {
@@ -18,9 +18,7 @@ public class State {
         this.zone = zone;
         this.zoneSize = (int) Math.sqrt(zone.length);
 
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
+        LibLoader.load();
     }
 
     public SymbolicLocation getLocation() {

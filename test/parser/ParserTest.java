@@ -4,7 +4,6 @@ import models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,11 +14,7 @@ public class ParserTest {
     private static Automaton A, G, Q, Imp, Ref1, Ref2;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        String fileName = "src/" + System.mapLibraryName("DBM");
-        File lib = new File(fileName);
-        System.load(lib.getAbsolutePath());
-
+    public static void setUpBeforeClass() {
         String base = "./samples/AG/";
         List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
                 "Components/A.json",

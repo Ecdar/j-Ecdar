@@ -3,8 +3,8 @@ package logic;
 import models.Guard;
 import models.Edge;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Transition {
     private State source, target;
@@ -25,10 +25,7 @@ public class Transition {
     }
 
     public List<Guard> getGuards() {
-        List<Guard> guards = new ArrayList<>();
-        for (Edge t : edges) {
-            if (t != null) guards.addAll(t.getGuards());
-        }
-        return guards;
+        // collect guards from each Edge and flatten the list
+        return edges.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
     }
 }
