@@ -106,4 +106,13 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection(JNIEnv *env, jclass
     return dbm_intersection(converted1, converted2, dim);
 }
 
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_freeAllDown(converted, dim);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
 int main() { return 0; }

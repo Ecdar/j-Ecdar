@@ -124,6 +124,14 @@ public class DBMTest {
     }
 
     @Test
+    public void testDbmIntersects3() {
+        assertTrue(DBMLib.dbm_intersection(
+                new int[]{1, 1, -29, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1},
+                new int[]{1, 1, 1, 1, 13, 1, 13, 13, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+        );
+    }
+
+    @Test
     public void testDbmNotIntersects1() {
         assertFalse(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, -15, inf, 1}, 2));
     }
@@ -131,8 +139,25 @@ public class DBMTest {
     @Test
     public void testDbmNotIntersects2() {
         assertFalse(DBMLib.dbm_intersection(
-                new int[]{1, 13, 1, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1},
-                new int[]{1, 1, 1, 1, -9, 1, -9, -9, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+                new int[]{1, 1, 1, 1, 11, 1, 11, 11, inf, inf, 1, inf, inf, inf, inf, 1},
+                new int[]{1, -15, 1, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+        );
+    }
+
+    @Test
+    public void testDbmFreeAllDown1() {
+        assertArrayEquals(new int[]{1, 1, 11, 1}, DBMLib.dbm_freeAllDown(new int[]{1, -3, 11, 1}, 2));
+    }
+
+    @Test
+    public void testDbmFreeAllDown2() {
+        assertArrayEquals(new int[]{1, 1, 11, 1}, DBMLib.dbm_freeAllDown(new int[]{1, 1, 11, 1}, 2));
+    }
+
+    @Test
+    public void testDbmFreeAllDown3() {
+        assertArrayEquals(new int[]{1, 1, 1, 1, 15, 1, 15, 15, 23, 23, 1, 23, 115, 115, 115, 1},
+                DBMLib.dbm_freeAllDown(new int[]{1, -9, -3, -27, 15, 1, 11, -13, 23, 13, 1, -5, 115, 105, 111, 1}, 4)
         );
     }
 }
