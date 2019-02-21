@@ -1,18 +1,8 @@
 package features;
 
 import lib.DBMLib;
-import logic.Refinement;
-import logic.SimpleTransitionSystem;
-import models.Automaton;
 
-public class Helpers {
-    public static Refinement selfRefinesSelf(Automaton automaton) {
-        return simpleRefinesSimple(automaton, automaton);
-    }
-
-    public static Refinement simpleRefinesSimple(Automaton automaton1, Automaton automaton2) {
-        return new Refinement(new SimpleTransitionSystem(automaton1), new SimpleTransitionSystem(automaton2));
-    }
+class Helpers {
 
     // Method to nicely print DBM for testing purposes.
     // The boolean flag determines if values of the zone will be converted from DBM format to actual bound of constraint

@@ -4,13 +4,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Automaton {
-    private String name;
-    private List<Location> locations;
-    private List<Edge> edges;
-    private List<Clock> clocks;
-    private Set<Channel> inputAct;
-    private Set<Channel> outputAct;
-    private Set<Channel> actions;
+    private final String name;
+    private final List<Location> locations;
+    private final List<Edge> edges;
+    private final List<Clock> clocks;
+    private final Set<Channel> inputAct, outputAct, actions;
     private Location initLoc;
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks) {
@@ -34,10 +32,6 @@ public class Automaton {
 
     public String getName() {
         return name;
-    }
-
-    public List<Location> getLocations() {
-        return locations;
     }
 
     private List<Edge> getEdgesFromLocation(Location loc) {

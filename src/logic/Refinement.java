@@ -9,10 +9,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Refinement {
-    private TransitionSystem ts1, ts2;
-    private Deque<StatePair> waiting;
-    private List<StatePair> passed;
-    private Set<Channel> inputs2, outputs1, syncs1, syncs2;
+    private final TransitionSystem ts1, ts2;
+    private final Deque<StatePair> waiting;
+    private final List<StatePair> passed;
+    private final Set<Channel> inputs2, outputs1, syncs1, syncs2;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
@@ -141,7 +141,7 @@ public class Refinement {
         return checkActions(false, state1, state2, sys1, sys2);
     }
 
-    public List<Transition> getInternalTransitions(State state, Channel action, TransitionSystem ts, boolean isFirst){
+    private List<Transition> getInternalTransitions(State state, Channel action, TransitionSystem ts, boolean isFirst){
         List<Transition> result = new ArrayList<>();
 
         List<Transition> tempTrans = new ArrayList<>();

@@ -3,7 +3,7 @@ package models;
 import java.util.Objects;
 
 public class Channel {
-    private String name;
+    private final String name;
 
     public Channel(String name) {
         this.name = name;

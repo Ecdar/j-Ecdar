@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Controller {
     private static String folderLoc;
-    private static List<String> Queries = new ArrayList<>();
+    private static final List<String> Queries = new ArrayList<>();
     private static ArrayList<Automaton> cmpt = new ArrayList<>();
     private static final int FEATURE_REFINEMENT = 0;
     private static final int FEATURE_COMPOSITION = 1;
@@ -27,7 +27,7 @@ public class Controller {
         return runQueries();
     }
 
-    public void separateLocQuery(String locQuery) {
+    private void separateLocQuery(String locQuery) {
         ArrayList<String> temp = new ArrayList<>(Arrays.asList(locQuery.split(" ")));
         folderLoc = temp.get(0);
         temp.remove(0);
@@ -38,7 +38,7 @@ public class Controller {
         cmpt = Parser.parse(folderLocation);
     }
 
-    public List<Boolean> runQueries() throws Exception {
+    private List<Boolean> runQueries() throws Exception {
         List<Boolean> returnlist = new ArrayList<>();
 
         for (int i = 0; i < Queries.size(); i++) {
@@ -153,14 +153,10 @@ public class Controller {
     }
 
     public void isQueryValid(String query) throws Exception {
-        try {
-            checkRefinementSyntax(query);
-            isParBalanced(query);
-            BeforeAfterParantheses(query);
-            checkSyntax(query);
-        } catch (Exception e) {
-            throw e;
-        }
+        checkRefinementSyntax(query);
+        isParBalanced(query);
+        BeforeAfterParantheses(query);
+        checkSyntax(query);
     }
 
     private void checkRefinementSyntax(String query) throws Exception {

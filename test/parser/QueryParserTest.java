@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class QueryParserTest {
     private static Controller ctrl;
-    private static Automaton adm, machine, researcher, spec, machine3, adm2, half1, half2;
+    private static TransitionSystem adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -27,53 +27,44 @@ public class QueryParserTest {
                 "Components/Adm2.json",
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"));
+
         List<Automaton> machines = Parser.parse(base, components);
-        adm = machines.get(0);
-        machine = machines.get(1);
-        researcher = machines.get(2);
-        spec = machines.get(3);
-        machine3 = machines.get(4);
-        adm2 = machines.get(5);
-        half1 = machines.get(6);
-        half2 = machines.get(7);
+        adm = new SimpleTransitionSystem(machines.get(0));
+        machine = new SimpleTransitionSystem(machines.get(1));
+        researcher = new SimpleTransitionSystem(machines.get(2));
+        spec = new SimpleTransitionSystem(machines.get(3));
+        machine3 = new SimpleTransitionSystem(machines.get(4));
+        adm2 = new SimpleTransitionSystem(machines.get(5));
+        half1 = new SimpleTransitionSystem(machines.get(6));
+        half2 = new SimpleTransitionSystem(machines.get(7));
+
         ctrl = new Controller();
         ctrl.parseComponents("./samples/EcdarUniversity");
     }
 
     @Test
     public void testCompositionOfThree() {
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(new SimpleTransitionSystem(adm));
-        ts.add(new SimpleTransitionSystem(machine));
-        ts.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem ts1 = new Composition(ts);
+        TransitionSystem ts1 = new Composition(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
         TransitionSystem ts2 = ctrl.runQuery("(Administration||Machine||Researcher)");
         assertEquals(ts1, ts2);
     }
 
     @Test
     public void testCompositionOfOne() {
-        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(spec);
-        TransitionSystem ts2 = ctrl.runQuery("(Spec)");
-        assertEquals(ts1, ts2);
+        TransitionSystem ts = ctrl.runQuery("(Spec)");
+        assertEquals(spec, ts);
     }
 
     @Test
     public void testCompositionOfOneMultiBrackets() {
-        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(spec);
-        TransitionSystem ts2 = ctrl.runQuery("((Spec))");
-        assertEquals(ts1, ts2);
+        TransitionSystem ts = ctrl.runQuery("((Spec))");
+        assertEquals(spec, ts);
     }
 
     @Test
     public void testCompositionOfThreeExtraBrackets() {
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(new SimpleTransitionSystem(adm));
-        ts.add(new SimpleTransitionSystem(machine));
-        TransitionSystem transitionSystem1 = new Composition(ts);
-        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
-        trs2.add(transitionSystem1);
-        trs2.add(new SimpleTransitionSystem(researcher));
+        TransitionSystem transitionSystem1 = new Composition(new ArrayList<>(Arrays.asList(adm, machine)));
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>(Arrays.asList(transitionSystem1, researcher));
 
         TransitionSystem ts1 = new Composition(trs2);
         TransitionSystem ts2 = ctrl.runQuery("((Administration||Machine)||Researcher)");
@@ -82,25 +73,15 @@ public class QueryParserTest {
 
     @Test
     public void testConjunctionOfThree() {
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(new SimpleTransitionSystem(adm));
-        ts.add(new SimpleTransitionSystem(machine));
-        ts.add(new SimpleTransitionSystem(researcher));
-
-        TransitionSystem ts1 = new Conjunction(ts);
+        TransitionSystem ts1 = new Conjunction(new ArrayList<>(Arrays.asList(adm, machine, researcher)));
         TransitionSystem ts2 = ctrl.runQuery("(Administration&&Machine&&Researcher)");
         assertEquals(ts1, ts2);
     }
 
     @Test
     public void testConjunctionOfThreeExtraBrackets() {
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(new SimpleTransitionSystem(adm));
-        ts.add(new SimpleTransitionSystem(machine));
-        TransitionSystem transitionSystem1 = new Conjunction(ts);
-        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
-        trs2.add(transitionSystem1);
-        trs2.add(new SimpleTransitionSystem(researcher));
+        TransitionSystem transitionSystem1 = new Conjunction(new ArrayList<>(Arrays.asList(adm, machine)));
+        ArrayList<TransitionSystem> trs2 = new ArrayList<>(Arrays.asList(transitionSystem1, researcher));
 
         TransitionSystem ts1 = new Composition(trs2);
         TransitionSystem ts2 = ctrl.runQuery("((Administration&&Machine)||Researcher)");
@@ -109,34 +90,17 @@ public class QueryParserTest {
 
     @Test
     public void testQuery1() {
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(new SimpleTransitionSystem(adm));
-        ts.add(new SimpleTransitionSystem(machine));
-        ts.add(new SimpleTransitionSystem(machine));
-        TransitionSystem trs1 = new Conjunction(ts);
-        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
-        trs2.add(trs1);
-        trs2.add(new SimpleTransitionSystem(researcher));
-        trs2.add(new SimpleTransitionSystem(half1));
+        TransitionSystem trs1 = new Conjunction(new ArrayList<>(Arrays.asList(adm, machine, machine)));
 
-        TransitionSystem ts1 = new Composition(trs2);
+        TransitionSystem ts1 = new Composition(new ArrayList<>(Arrays.asList(trs1, researcher, half1)));
         TransitionSystem ts2 = ctrl.runQuery("((Administration&&Machine&&Machine)||Researcher||HalfAdm1)");
         assertEquals(ts1, ts2);
     }
 
     @Test
     public void testQuery2() {
-        ArrayList<TransitionSystem> ts0 = new ArrayList<>();
-        ts0.add(new SimpleTransitionSystem(researcher));
-        ts0.add(new SimpleTransitionSystem(machine));
-
-
-        ArrayList<TransitionSystem> ts = new ArrayList<>();
-        ts.add(new SimpleTransitionSystem(machine));
-        ts.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem trs1 = new Conjunction(ts);
-        ts0.add(trs1);
-        ts0.add(new SimpleTransitionSystem(spec));
+        TransitionSystem trs1 = new Conjunction(new ArrayList<>(Arrays.asList(machine, researcher)));
+        ArrayList<TransitionSystem> ts0 = new ArrayList<>(Arrays.asList(researcher, machine, trs1, spec));
 
         TransitionSystem ts1 = new Composition(ts0);
         TransitionSystem ts2 = ctrl.runQuery("(Researcher||Machine||(Machine&&Researcher)||Spec)");
@@ -145,64 +109,29 @@ public class QueryParserTest {
 
     @Test
     public void testQuery3() {
-        ArrayList<TransitionSystem> ts0 = new ArrayList<>();
-        ts0.add(new SimpleTransitionSystem(researcher));
-        ts0.add(new SimpleTransitionSystem(machine));
-        TransitionSystem trs1 = new Conjunction(ts0);
+        TransitionSystem trs1 = new Conjunction(new ArrayList<>(Arrays.asList(researcher, machine)));
+        TransitionSystem trs2 = new Conjunction(new ArrayList<>(Arrays.asList(machine, researcher)));
 
-        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
-        trs2.add(new SimpleTransitionSystem(machine));
-        trs2.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem trs3 = new Conjunction(trs2);
-        ArrayList<TransitionSystem> tss = new ArrayList<>();
-        tss.add(trs1);
-        tss.add(trs3);
-
-        TransitionSystem ts1 = new Composition(tss);
+        TransitionSystem ts1 = new Composition(new ArrayList<>(Arrays.asList(trs1, trs2)));
         TransitionSystem ts2 = ctrl.runQuery("((Researcher&&Machine)||(Machine&&Researcher))");
         assertEquals(ts1, ts2);
     }
 
     @Test
     public void testQuery4() {
-        ArrayList<TransitionSystem> trs0 = new ArrayList<>();
-        trs0.add(new SimpleTransitionSystem(researcher));
+        TransitionSystem trs1 = new Composition(new ArrayList<>(Arrays.asList(machine, researcher)));
+        ArrayList<TransitionSystem> tss = new ArrayList<>(Arrays.asList(spec, trs1, machine));
+        TransitionSystem trs2 = new Conjunction(tss);
+        TransitionSystem trs3 = new Conjunction(new ArrayList<>(Arrays.asList(machine, machine, machine)));
 
-
-        ArrayList<TransitionSystem> trs2 = new ArrayList<>();
-        trs2.add(new SimpleTransitionSystem(machine));
-        trs2.add(new SimpleTransitionSystem(machine));
-        trs2.add(new SimpleTransitionSystem(machine));
-        TransitionSystem trs3 = new Conjunction(trs2);
-        trs0.add(trs3);
-
-        ArrayList<TransitionSystem> tss = new ArrayList<>();
-        tss.add(new SimpleTransitionSystem(spec));
-
-
-        ArrayList<TransitionSystem> ts5 = new ArrayList<>();
-        ts5.add(new SimpleTransitionSystem(machine));
-        ts5.add(new SimpleTransitionSystem(researcher));
-        TransitionSystem ts6 = new Composition(ts5);
-
-        tss.add(ts6);
-        tss.add(new SimpleTransitionSystem(machine));
-        TransitionSystem ts7 = new Conjunction(tss);
-        trs0.add(ts7);
-
-
-        TransitionSystem ts1 = new Composition(trs0);
+        TransitionSystem ts1 = new Composition(new ArrayList<>(Arrays.asList(researcher, trs3, trs2)));
         TransitionSystem ts2 = ctrl.runQuery("(Researcher||(Machine&&Machine&&Machine)||(Spec&&(Machine||Researcher)&&Machine))");
         assertEquals(ts1, ts2);
     }
 
     @Test
     public void Half1ConjHalf2() {
-        ArrayList<TransitionSystem> trs0 = new ArrayList<>();
-        trs0.add(new SimpleTransitionSystem(half1));
-        trs0.add(new SimpleTransitionSystem(half2));
-
-        TransitionSystem ts1 = new Conjunction(trs0);
+        TransitionSystem ts1 = new Conjunction(new ArrayList<>(Arrays.asList(half1, half2)));
         TransitionSystem ts2 = ctrl.runQuery("(HalfAdm1&&HalfAdm2)");
         assertEquals(ts1, ts2);
     }

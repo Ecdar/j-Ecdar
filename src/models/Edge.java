@@ -6,12 +6,11 @@ import java.util.Objects;
 
 public class Edge {
 
-    private Location source;
-    private Location target;
-    private Channel chan;
-    private boolean isInput;
-    private List<Guard> guards;
-    private List<Update> updates;
+    private final Location source, target;
+    private final Channel chan;
+    private final boolean isInput;
+    private final List<Guard> guards;
+    private final List<Update> updates;
 
     public Edge(Location source, Location target, Channel chan, boolean isInput, List<Guard> guards, List<Update> updates) {
         this.source = source;

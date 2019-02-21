@@ -1,7 +1,7 @@
 package logic;
 
-public class StatePair {
-    private State left, right;
+class StatePair {
+    private final State left, right;
 
     public StatePair(State state1, State state2) {
         this.left = state1;

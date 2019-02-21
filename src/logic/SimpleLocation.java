@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class SimpleLocation extends SymbolicLocation {
-    private Location location;
+    private final Location location;
 
     public SimpleLocation(Location location) {
         super();

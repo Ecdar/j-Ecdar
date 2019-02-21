@@ -6,8 +6,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Composition extends TransitionSystem {
-    private List<TransitionSystem> systems;
-    private Set<Channel> inputs, outputs, syncs;
+    private final List<TransitionSystem> systems;
+    private final Set<Channel> inputs, outputs, syncs;
 
     public Composition(List<TransitionSystem> systems) {
 

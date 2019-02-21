@@ -4,10 +4,10 @@ import models.Edge;
 
 import java.util.List;
 
-public class Move {
+class Move {
 
-    private SymbolicLocation source, target;
-    private List<Edge> edges;
+    private final SymbolicLocation source, target;
+    private final List<Edge> edges;
 
     public Move(SymbolicLocation source, SymbolicLocation target, List<Edge> edges) {
         this.source = source;

@@ -8,7 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class DBMTest {
-    int[] t1, t2;
+    private int inf = 2147483646;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -17,32 +17,27 @@ public class DBMTest {
 
     @Test
     public void testDbmValid1() {
-        t1 = new int[]{1, 1, 2147483646, 1};
-        assertTrue(DBMLib.dbm_isValid(t1, 2));
+        assertTrue(DBMLib.dbm_isValid(new int[]{1, 1, inf, 1}, 2));
     }
 
     @Test
     public void testDbmValid2() {
-        t1 = new int[]{1, 1, 1, 1};
-        assertTrue(DBMLib.dbm_isValid(t1, 2));
+        assertTrue(DBMLib.dbm_isValid(new int[]{1, 1, 1, 1}, 2));
     }
 
     @Test
     public void testDbmValid3() {
-        t1 = new int[]{1, -3, 11, 1};
-        assertTrue(DBMLib.dbm_isValid(t1, 2));
+        assertTrue(DBMLib.dbm_isValid(new int[]{1, -3, 11, 1}, 2));
     }
 
     @Test
     public void testDbmNotValid1() {
-        t1 = new int[]{0, 0, 0, 0};
-        assertFalse(DBMLib.dbm_isValid(t1, 2));
+        assertFalse(DBMLib.dbm_isValid(new int[]{0, 0, 0, 0}, 2));
     }
 
     @Test
     public void testDbmNotValid2() {
-        t1 = new int[]{-1, 0, 0, 0};
-        assertFalse(DBMLib.dbm_isValid(t1, 2));
+        assertFalse(DBMLib.dbm_isValid(new int[]{-1, 0, 0, 0}, 2));
     }
 
     @Test
@@ -52,7 +47,7 @@ public class DBMTest {
 
     @Test
     public void testRaw2Bound2(){
-        assertEquals(1073741823, DBMLib.raw2bound(2147483646));
+        assertEquals(1073741823, DBMLib.raw2bound(inf));
     }
 
     @Test
@@ -67,96 +62,77 @@ public class DBMTest {
 
     @Test
     public void testDbmInit1() {
-        t1 = new int[]{1, 1, 2147483646, 1};
-        t2 = new int[]{0, 0, 0, 0};
-        assertArrayEquals(t1, DBMLib.dbm_init(t2, 2));
+        assertArrayEquals(new int[]{1, 1, inf, 1}, DBMLib.dbm_init(new int[]{0, 0, 0, 0}, 2));
     }
 
     @Test
     public void testDbmInit2() {
-        t1 = new int[]{1, 1, 1, 2147483646, 1, 2147483646, 2147483646, 2147483646, 1};
-        t2 = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-        assertArrayEquals(t1, DBMLib.dbm_init(t2, 3));
+        assertArrayEquals(new int[]{1, 1, 1, inf, 1, inf, inf, inf, 1},
+                DBMLib.dbm_init(new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0}, 3)
+        );
     }
 
     @Test
     public void testDbmConstrain1() {
-        t1 = new int[]{1, 1, 11, 1};
-        t2 = new int[]{1, 1, 2147483646, 1};
-        assertArrayEquals(t1, DBMLib.dbm_constrain1(t2, 2, 1, 0, 5));
+        assertArrayEquals(new int[]{1, 1, 11, 1},
+                DBMLib.dbm_constrain1(new int[]{1, 1, inf, 1}, 2, 1, 0, 5)
+        );
     }
 
     @Test
     public void testDbmConstrain2() {
-        t1 = new int[]{1, -3, 11, 1};
-        t2 = new int[]{1, 1, 11, 1};
-        assertArrayEquals(t1, DBMLib.dbm_constrain1(t2, 2, 0, 1, -2));
+        assertArrayEquals(new int[]{1, -3, 11, 1},
+                DBMLib.dbm_constrain1(new int[]{1, 1, 11, 1}, 2, 0, 1, -2)
+        );
     }
 
     @Test
     public void testDbmReset1() {
-        t1 = new int[]{1, 1, 1, 1};
-        t2 = new int[]{1, -3, 11, 1};
-        assertArrayEquals(t1, DBMLib.dbm_updateValue(t2, 2, 1, 0));
+        assertArrayEquals(new int[]{1, 1, 1, 1},
+                DBMLib.dbm_updateValue(new int[]{1, -3, 11, 1}, 2, 1, 0)
+        );
     }
 
     @Test
     public void testDbmReset2() {
-        t1 = new int[]{1, 1, 1, 1, 1, 1, 5, 5, 1};
-        t2 = new int[]{1, 1, 1, 7, 1, 7, 5, 5, 1};
-        assertArrayEquals(t1, DBMLib.dbm_updateValue(t2, 3, 1, 0));
+        assertArrayEquals(new int[]{1, 1, 1, 1, 1, 1, 5, 5, 1},
+                DBMLib.dbm_updateValue(new int[]{1, 1, 1, 7, 1, 7, 5, 5, 1}, 3, 1, 0)
+        );
     }
 
     @Test
     public void testDbmFuture1() {
-        t1 = new int[]{1, 1, 2147483646, 1};
-        t2 = new int[]{1, 1, 1, 1};
-        assertArrayEquals(t1, DBMLib.dbm_up(t2, 2));
+        assertArrayEquals(new int[]{1, 1, inf, 1}, DBMLib.dbm_up(new int[]{1, 1, 1, 1}, 2));
     }
 
     @Test
     public void testDbmFuture2() {
-        t1 = new int[]{1, -3, 2147483646, 1};
-        t2 = new int[]{1, -3, 11, 1};
-        assertArrayEquals(t1, DBMLib.dbm_up(t2, 2));
+        assertArrayEquals(new int[]{1, -3, inf, 1}, DBMLib.dbm_up(new int[]{1, -3, 11, 1}, 2));
     }
 
     @Test
     public void testDbmIntersects1() {
-        t1 = new int[]{1, 1, 11, 1};
-        t2 = new int[]{1, 1, 2147483646, 1};
-
-        assertTrue(DBMLib.dbm_intersection(t1, t2, 2));
+        assertTrue(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, 1, inf, 1}, 2));
     }
 
     @Test
     public void testDbmIntersects2() {
-        t1 = new int[]{1, -9, 1, 1, 2147483646, 1, 2147483646, 2147483646,
-                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
-        t2 = new int[]{1, 1, 1, 1, 13, 1, 13, 13,
-                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
-
-        assertTrue(DBMLib.dbm_intersection(t1, t2, 4));
+        assertTrue(DBMLib.dbm_intersection(
+                new int[]{1, -9, 1, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1},
+                new int[]{1, 1, 1, 1, 13, 1, 13, 13, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+        );
     }
 
     @Test
     public void testDbmNotIntersects1() {
-        t1 = new int[]{1, 1, 11, 1};
-        t2 = new int[]{1, -15, 2147483646, 1};
-
-        assertFalse(DBMLib.dbm_intersection(t1, t2, 2));
+        assertFalse(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, -15, inf, 1}, 2));
     }
 
     @Test
     public void testDbmNotIntersects2() {
-        t1 = new int[]{1, 13, 1, 1, 2147483646, 1, 2147483646, 2147483646,
-                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
-        t2 = new int[]{1, 1, 1, 1, -9, 1, -9, -9,
-                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
-
-        assertFalse(DBMLib.dbm_intersection(t1, t2, 4));
+        assertFalse(DBMLib.dbm_intersection(
+                new int[]{1, 13, 1, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1},
+                new int[]{1, 1, 1, 1, -9, 1, -9, -9, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+        );
     }
-
-
-
 }

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ComplexLocation extends SymbolicLocation {
-    private List<SymbolicLocation> locations;
+    private final List<SymbolicLocation> locations;
 
     public ComplexLocation(List<SymbolicLocation> locations) {
         super();

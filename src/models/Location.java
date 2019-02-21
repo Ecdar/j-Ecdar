@@ -5,12 +5,9 @@ import java.util.List;
 
 public class Location {
 
-    private String name;
-    private List<Guard> invariant;
-    private boolean isInitial;
-    private boolean isUrgent;
-    private boolean isUniversal;
-    private boolean isInconsistent;
+    private final String name;
+    private final List<Guard> invariant;
+    private final boolean isInitial, isUrgent, isUniversal, isInconsistent;
 
     public Location(String name, List<Guard> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
         this.name = name;

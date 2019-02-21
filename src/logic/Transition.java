@@ -6,9 +6,9 @@ import models.Edge;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Transition {
-    private State source, target;
-    private List<Edge> edges;
+class Transition {
+    private final State source, target;
+    private final List<Edge> edges;
 
     public Transition(State source, State target, List<Edge> edges) {
         this.source = source;

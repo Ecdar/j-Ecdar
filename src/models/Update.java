@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class Update {
 
-    private Clock clock;
-    private int value;
+    private final Clock clock;
+    private final int value;
 
     public Update(Clock clock, int value) {
         this.clock = clock;

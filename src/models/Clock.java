@@ -2,7 +2,7 @@ package models;
 
 public class Clock {
 
-    private String name;
+    private final String name;
 
     public Clock(String name) {
         this.name = name;

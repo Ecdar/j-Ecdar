@@ -4,9 +4,8 @@ import java.util.Objects;
 
 public class Guard {
 
-    private Clock clock;
-    private int upperBound;
-    private int lowerBound;
+    private final Clock clock;
+    private final int upperBound, lowerBound;
 
     public Guard(Clock clock, int value, boolean greater, boolean strict) {
         this.clock = clock;

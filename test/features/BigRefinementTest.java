@@ -1,6 +1,8 @@
 package features;
 
 import logic.Refinement;
+import logic.SimpleTransitionSystem;
+import logic.TransitionSystem;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -10,13 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static features.Helpers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BigRefinementTest {
 
-    private static Automaton comp1, ref1;
+    private static TransitionSystem comp1, ref1;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -26,31 +27,27 @@ public class BigRefinementTest {
                 "Components/Ref1.json"));
         List<Automaton> machines = Parser.parse(base, components);
 
-        comp1 = machines.get(0);
-        ref1 = machines.get(1);
+        comp1 = new SimpleTransitionSystem(machines.get(0));
+        ref1 = new SimpleTransitionSystem(machines.get(1));
     }
 
     @Test
     public void testRef1RefinesComp1() {
-        Refinement ref = simpleRefinesSimple(ref1, comp1);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(ref1, comp1).check());
     }
 
     @Test
     public void testComp1NotRefinesRef1() {
-        Refinement ref = simpleRefinesSimple(comp1, ref1);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(comp1, ref1).check());
     }
 
     @Test
     public void testRef1RefinesRef1() {
-        Refinement ref = selfRefinesSelf(ref1);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(ref1, ref1).check());
     }
 
     @Test
     public void testComp1RefinesComp1() {
-        Refinement ref = selfRefinesSelf(comp1);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(comp1, comp1).check());
     }
 }

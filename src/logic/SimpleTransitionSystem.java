@@ -9,7 +9,7 @@ import java.util.*;
 
 public class SimpleTransitionSystem extends TransitionSystem {
 
-    private Automaton automaton;
+    private final Automaton automaton;
 
     public SimpleTransitionSystem(Automaton automaton) {
         super();
@@ -37,7 +37,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
         return createNewTransitions(currentState, moves);
     }
 
-    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+    protected List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
         List<Move> moves = new ArrayList<>();
 
         Location location = ((SimpleLocation) symLocation).getActualLocation();

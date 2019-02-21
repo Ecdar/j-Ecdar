@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
-    List<Clock> clocks;
+    final List<Clock> clocks;
     int dbmSize;
 
     TransitionSystem() {
@@ -35,9 +35,9 @@ public abstract class TransitionSystem {
         return state;
     }
 
-    public abstract SymbolicLocation getInitialLocation();
+    protected abstract SymbolicLocation getInitialLocation();
 
-    public SymbolicLocation getInitialLocation(List<TransitionSystem> systems) {
+    SymbolicLocation getInitialLocation(List<TransitionSystem> systems) {
         // build ComplexLocation with initial location from each TransitionSystem
         return new ComplexLocation(systems.stream().map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
     }
@@ -76,9 +76,9 @@ public abstract class TransitionSystem {
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
-    public abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
+    protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 
-    int[] initializeDBM() {
+    private int[] initializeDBM() {
         // we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
         // clocks x1 to xn are clocks derived from our automata, while x0 is a reference clock needed by the library
         // initially dbm is an array of 0's, which is what we need
@@ -87,7 +87,7 @@ public abstract class TransitionSystem {
         return dbm;
     }
 
-    boolean isDbmValid(int[] dbm) {
+    private boolean isDbmValid(int[] dbm) {
         return DBMLib.dbm_isValid(dbm, dbmSize);
     }
 

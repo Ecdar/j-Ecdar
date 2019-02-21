@@ -3,6 +3,7 @@ package features;
 import logic.Conjunction;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
+import logic.TransitionSystem;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,11 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static features.Helpers.selfRefinesSelf;
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
-    private static Automaton test1, test2, test3;
+    private static TransitionSystem test1, test2, test3;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -27,53 +27,38 @@ public class ConjunctionTest {
                 "Components/Test3.json"));
         List<Automaton> machines = Parser.parse(base, components);
 
-        test1 = machines.get(0);
-        test2 = machines.get(1);
-        test3 = machines.get(2);
+        test1 = new SimpleTransitionSystem(machines.get(0));
+        test2 = new SimpleTransitionSystem(machines.get(1));
+        test3 = new SimpleTransitionSystem(machines.get(2));
     }
 
     @Test
     public void Test1RefinesTest1() {
-        Refinement ref = selfRefinesSelf(test1);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(test1, test1).check());
     }
 
     @Test
     public void Test2RefinesTest2() {
-        Refinement ref = selfRefinesSelf(test2);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(test2, test2).check());
     }
 
     @Test
     public void Test3RefinesTest3() {
-        Refinement ref = selfRefinesSelf(test3);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(test3, test3).check());
     }
 
     @Test
     public void testTest1ConjTest2RefinesTest3() {
-        Refinement ref = new Refinement(
-                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(test1), new SimpleTransitionSystem(test2)))),
-                new SimpleTransitionSystem(test3));
-
-        assertTrue(ref.check());
+        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(test1, test2))), test3).check());
     }
 
     @Test
     public void testTest2ConjTest3RefinesTest1() {
-        Refinement ref = new Refinement(
-                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(test2), new SimpleTransitionSystem(test3)))),
-                new SimpleTransitionSystem(test1));
-
-        assertTrue(ref.check());
+        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(test2, test3))), test1).check());
     }
 
     @Test
     public void testTest1ConjTest3RefinesTest2() {
-        Refinement ref = new Refinement(
-                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(test1), new SimpleTransitionSystem(test3)))),
-                new SimpleTransitionSystem(test2));
-
-        assertTrue(ref.check());
+        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(test1, test3))), test2).check());
     }
 }

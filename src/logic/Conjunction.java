@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Conjunction extends TransitionSystem {
-    List<TransitionSystem> systems;
+    private final List<TransitionSystem> systems;
 
     public Conjunction(List<TransitionSystem> systems) {
         super();

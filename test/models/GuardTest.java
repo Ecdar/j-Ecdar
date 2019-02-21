@@ -7,7 +7,7 @@ public class GuardTest {
     private static Clock x;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    public static void setUpBeforeClass() {
         x = new Clock("x");
     }
 

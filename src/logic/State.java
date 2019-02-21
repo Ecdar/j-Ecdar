@@ -9,9 +9,9 @@ import models.Update;
 import java.util.List;
 
 public class State {
-    private SymbolicLocation location;
+    private final SymbolicLocation location;
     private int[] zone;
-    private int zoneSize;
+    private final int zoneSize;
 
     public State(SymbolicLocation location, int[] zone) {
         this.location = location;
@@ -29,7 +29,7 @@ public class State {
         return zone;
     }
 
-    public int[] getZoneValues() {
+    private int[] getZoneValues() {
         int[] newZone = new int[zone.length];
 
         for (int i = 0; i < zone.length; i++) {
@@ -83,7 +83,7 @@ public class State {
         return min;
     }
 
-    public List<Guard> getInvariants() {
+    private List<Guard> getInvariants() {
         return location.getInvariants();
     }
 

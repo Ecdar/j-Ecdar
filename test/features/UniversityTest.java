@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static features.Helpers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UniversityTest {
 
-    private static Automaton adm, machine, researcher, spec, machine3, adm2, half1, half2;
+    private static TransitionSystem adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -32,215 +31,175 @@ public class UniversityTest {
                 "Components/HalfAdm2.json"));
         List<Automaton> machines = Parser.parse(base, components);
 
-        adm = machines.get(0);
-        machine = machines.get(1);
-        researcher = machines.get(2);
-        spec = machines.get(3);
-        machine3 = machines.get(4);
-        adm2 = machines.get(5);
-        half1 = machines.get(6);
-        half2 = machines.get(7);
+        adm = new SimpleTransitionSystem(machines.get(0));
+        machine = new SimpleTransitionSystem(machines.get(1));
+        researcher = new SimpleTransitionSystem(machines.get(2));
+        spec = new SimpleTransitionSystem(machines.get(3));
+        machine3 = new SimpleTransitionSystem(machines.get(4));
+        adm2 = new SimpleTransitionSystem(machines.get(5));
+        half1 = new SimpleTransitionSystem(machines.get(6));
+        half2 = new SimpleTransitionSystem(machines.get(7));
     }
 
     @Test
     public void testAdm2RefinesAdm2() {
-        Refinement ref = selfRefinesSelf(adm2);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(adm2, adm2).check());
     }
 
     @Test
     public void testHal1RefinesHalf1() {
-        Refinement ref = selfRefinesSelf(half1);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(half1, half1).check());
     }
 
     @Test
     public void testHalf2RefinesHalf2() {
-        Refinement ref = selfRefinesSelf(half2);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(half2, half2).check());
     }
 
     @Test
     public void testAdmRefinesAdm() {
-        Refinement ref = selfRefinesSelf(adm);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(adm, adm).check());
     }
 
     @Test
     public void testAdmNotRefinesMachine() {
-        Refinement ref = simpleRefinesSimple(adm, machine);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(adm,  machine).check());
     }
 
     @Test
     public void testAdmNotRefinesResearcher() {
-        Refinement ref = simpleRefinesSimple(adm, researcher);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(adm, researcher).check());
     }
 
     @Test
     public void testAdmNotRefinesSpec() {
-        Refinement ref = simpleRefinesSimple(adm, spec);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(adm, spec).check());
     }
 
     @Test
     public void testAdmNotRefinesMachine3() {
-        Refinement ref = simpleRefinesSimple(adm, machine3);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(adm, machine3).check());
     }
 
     @Test
     public void testMachineRefinesMachine() {
-        Refinement ref = selfRefinesSelf(machine);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(machine, machine).check());
     }
 
     @Test
     public void testMachineNotRefinesAdm() {
-        Refinement ref = simpleRefinesSimple(machine, adm);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine, adm).check());
     }
 
     @Test
     public void testMachineNotRefinesResearcher() {
-        Refinement ref = simpleRefinesSimple(machine, researcher);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine, researcher).check());
     }
 
     @Test
     public void testMachineNotRefinesSpec() {
-        Refinement ref = simpleRefinesSimple(machine, spec);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine, spec).check());
     }
 
     @Test
     public void testMachineNotRefinesMachine3() {
-        Refinement ref = simpleRefinesSimple(machine, machine3);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine, machine3).check());
     }
 
     @Test
     public void testResRefinesRes() {
-        Refinement ref = selfRefinesSelf(researcher);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(researcher, researcher).check());
     }
 
     @Test
     public void testResNotRefinesAdm() {
-        Refinement ref = simpleRefinesSimple(researcher, adm);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(researcher, adm).check());
     }
 
     @Test
     public void testResNotRefinesMachine() {
-        Refinement ref = simpleRefinesSimple(researcher, machine);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(researcher, machine).check());
     }
 
     @Test
     public void testResNotRefinesSpec() {
-        Refinement ref = simpleRefinesSimple(researcher, spec);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(researcher, spec).check());
     }
 
     @Test
     public void testResNotRefinesMachine3() {
-        Refinement ref = simpleRefinesSimple(researcher, machine3);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(researcher, machine3).check());
     }
 
     @Test
     public void testSpecRefinesSpec() {
-        Refinement ref = selfRefinesSelf(spec);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(spec, spec).check());
     }
 
     @Test
     public void testSpecNotRefinesAdm() {
-        Refinement ref = simpleRefinesSimple(spec, adm);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(spec, adm).check());
     }
 
     @Test
     public void testSpecNotRefinesMachine() {
-        Refinement ref = simpleRefinesSimple(spec, machine);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(spec, machine).check());
     }
 
     @Test
     public void testSpecNotRefinesResearcher() {
-        Refinement ref = simpleRefinesSimple(spec, researcher);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(spec, researcher).check());
     }
 
     @Test
     public void testSpecNotRefinesMachine3() {
-        Refinement ref = simpleRefinesSimple(spec, machine3);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(spec, machine3).check());
     }
 
     @Test
     public void testMachine3RefinesMachine3() {
-        Refinement ref = selfRefinesSelf(machine3);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(machine3, machine3).check());
     }
 
     @Test
     public void testMachine3RefinesMachine() {
-        Refinement ref = simpleRefinesSimple(machine3, machine);
-        assertTrue(ref.check());
+        assertTrue(new Refinement(machine3, machine).check());
     }
 
     @Test
     public void testMachine3NotRefinesAdm() {
-        Refinement ref = simpleRefinesSimple(machine3, adm);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine3, adm).check());
     }
 
     @Test
     public void testMachine3NotRefinesResearcher() {
-        Refinement ref = simpleRefinesSimple(machine3, researcher);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine3, researcher).check());
     }
 
     @Test
     public void testMachine3NotRefinesSpec() {
-        Refinement ref = simpleRefinesSimple(machine3, spec);
-        assertFalse(ref.check());
+        assertFalse(new Refinement(machine3, spec).check());
     }
 
     @Test
     public void testCompRefinesSpec() {
-        Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(
-                        new SimpleTransitionSystem(adm),
-                        new SimpleTransitionSystem(machine),
-                        new SimpleTransitionSystem(researcher)))),
-                new SimpleTransitionSystem(spec));
-        assertTrue(ref.check());
+        assertTrue(new Refinement(new Composition(new ArrayList<>(Arrays.asList(adm, machine, researcher))), spec).check());
     }
 
     @Test
     public void testCompOfCompRefinesSpec() {
-        Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(
-                        new SimpleTransitionSystem(machine),
-                        new Composition(new ArrayList<>(Arrays.asList(
-                                new SimpleTransitionSystem(adm),
-                                new SimpleTransitionSystem(researcher)))
-                    )))),
-                new SimpleTransitionSystem(spec));
-        assertTrue(ref.check());
+        assertTrue(new Refinement(
+                new Composition(new ArrayList<>(Arrays.asList(machine,
+                        new Composition(new ArrayList<>(Arrays.asList(adm, researcher)))))),
+                spec).check()
+        );
     }
 
     @Test
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(
-                        new SimpleTransitionSystem(adm), new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher)))),
-                new Composition(new ArrayList<>(Arrays.asList(
-                        new SimpleTransitionSystem(machine), new SimpleTransitionSystem(researcher), new SimpleTransitionSystem(adm)))));
+                new Composition(new ArrayList<>(Arrays.asList(adm, machine, researcher))),
+                new Composition(new ArrayList<>(Arrays.asList(machine, researcher, adm))));
         assertTrue(ref.check());
     }
 
@@ -250,8 +209,8 @@ public class UniversityTest {
 
         try {
             new Refinement(
-                    new Composition(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(machine), new SimpleTransitionSystem(machine3)))),
-                    new SimpleTransitionSystem(machine));
+                    new Composition(new ArrayList<>(Arrays.asList(machine, machine3))),
+                    machine);
         } catch (IllegalArgumentException ex) {
             fail = true;
         }
@@ -261,19 +220,11 @@ public class UniversityTest {
 
     @Test
     public void testHalf1AndHalf2RefinesAdm2() {
-        Refinement ref = new Refinement(
-                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(half1), new SimpleTransitionSystem(half2)))),
-                new SimpleTransitionSystem(adm2));
-
-        assertTrue(ref.check());
+        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(half1, half2))), adm2).check());
     }
 
     @Test
     public void testAdm2RefinesHalf1AndHalf2() {
-        Refinement ref = new Refinement(
-                new SimpleTransitionSystem(adm2),
-                new Conjunction(new ArrayList<>(Arrays.asList(new SimpleTransitionSystem(half1), new SimpleTransitionSystem(half2)))));
-
-        assertTrue(ref.check());
+        assertTrue(new Refinement(adm2, new Conjunction(new ArrayList<>(Arrays.asList(half1, half2)))).check());
     }
 }
