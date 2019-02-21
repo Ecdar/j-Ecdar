@@ -5,6 +5,7 @@ import lib.DBMLib;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
@@ -140,6 +141,16 @@ public class DBMTest {
     }
 
     @Test
+    public void testDbmIntersects3() {
+        t1 = new int[]{1, 1, -29, 1, 2147483646, 1, 2147483646, 2147483646,
+                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
+        t2 = new int[]{1, 1, 1, 1, 13, 1, 13, 13,
+                2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
+
+        assertTrue(DBMLib.dbm_intersection(t1, t2, 4));
+    }
+
+    @Test
     public void testDbmNotIntersects1() {
         t1 = new int[]{1, 1, 11, 1};
         t2 = new int[]{1, -15, 2147483646, 1};
@@ -149,14 +160,35 @@ public class DBMTest {
 
     @Test
     public void testDbmNotIntersects2() {
-        t1 = new int[]{1, 13, 1, 1, 2147483646, 1, 2147483646, 2147483646,
+        t1 = new int[]{1, 1, 1, 1, 11, 1, 11, 11,
                 2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
-        t2 = new int[]{1, 1, 1, 1, -9, 1, -9, -9,
+        t2 = new int[]{1, -15, 1, 1, 2147483646, 1, 2147483646, 2147483646,
                 2147483646, 2147483646, 1, 2147483646, 2147483646, 2147483646, 2147483646, 1};
 
         assertFalse(DBMLib.dbm_intersection(t1, t2, 4));
     }
 
+    @Test
+    public void testDbmFreeAllDown1() {
+        t1 = new int[]{1, 1, 11, 1};
+        t2 = new int[]{1, -3, 11, 1};
 
+        assertArrayEquals(t1, DBMLib.dbm_freeAllDown(t2, 2));
+    }
 
+    @Test
+    public void testDbmFreeAllDown2() {
+        t1 = new int[]{1, 1, 11, 1};
+        t2 = new int[]{1, 1, 11, 1};
+
+        assertArrayEquals(t1, DBMLib.dbm_freeAllDown(t2, 2));
+    }
+
+    @Test
+    public void testDbmFreeAllDown3() {
+        t1 = new int[]{1, 1, 1, 1, 15, 1, 15, 15, 23, 23, 1, 23, 115, 115, 115, 1};
+        t2 = new int[]{1, -9, -3, -27, 15, 1, 11, -13, 23, 13, 1, -5, 115, 105, 111, 1};
+
+        assertArrayEquals(t1, DBMLib.dbm_freeAllDown(t2, 4));
+    }
 }

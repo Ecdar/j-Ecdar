@@ -108,6 +108,30 @@ public class State {
         }
     }
 
+    // Method used to get a new zone, where for each clock:
+    // If not infinity, the upper bound is lowered by the value of the lower bound
+    // The lower bound is removed (set to 0)
+    public int[] getAbsoluteZone(int[] zone, int zoneSize){
+        int[] result = zone;
+
+        for(int i = 1; i < zoneSize; i++){
+
+            int upperBound = DBMLib.raw2bound(result[zoneSize * i]);
+
+            // If upper bound is infinity then don't change it
+            if(upperBound != 1073741823) {
+                int lowerBound = DBMLib.raw2bound(result[i]) * (-1);
+                int resultBound = upperBound - lowerBound;
+
+                result = DBMLib.dbm_updateValue(result, zoneSize, i, resultBound);
+            }
+        }
+
+        result = DBMLib.dbm_freeAllDown(result, zoneSize);
+
+        return result;
+    }
+
     public void delay() {
         zone = DBMLib.dbm_up(zone, zoneSize);
     }

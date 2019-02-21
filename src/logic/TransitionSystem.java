@@ -30,7 +30,6 @@ public abstract class TransitionSystem {
         int[] zone = initializeDBM();
         State state = new State(getInitialLocation(), zone);
         state.applyInvariants(clocks);
-        state.delay();
 
         return state;
     }

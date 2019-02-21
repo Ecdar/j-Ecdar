@@ -22,4 +22,6 @@ public class DBMLib {
     public static native boolean dbm_isValid(int[] dbm, int dim);
 
     public static native boolean dbm_intersection(int[] dbm1, int[] dbm2, int dim);
+
+    public static native int[] dbm_freeAllDown(int[] dbm, int dim);
 }
