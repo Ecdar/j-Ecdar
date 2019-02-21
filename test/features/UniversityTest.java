@@ -6,10 +6,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -20,7 +16,7 @@ public class UniversityTest {
     @BeforeClass
     public static void setUpBeforeClass() {
         String base = "./samples/EcdarUniversity/";
-        List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
+        String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Administration.json",
                 "Components/Machine.json",
                 "Components/Researcher.json",
@@ -28,17 +24,17 @@ public class UniversityTest {
                 "Components/Machine3.json",
                 "Components/Adm2.json",
                 "Components/HalfAdm1.json",
-                "Components/HalfAdm2.json"));
-        List<Automaton> machines = Parser.parse(base, components);
+                "Components/HalfAdm2.json"};
+        Automaton[] machines = Parser.parse(base, components);
 
-        adm = new SimpleTransitionSystem(machines.get(0));
-        machine = new SimpleTransitionSystem(machines.get(1));
-        researcher = new SimpleTransitionSystem(machines.get(2));
-        spec = new SimpleTransitionSystem(machines.get(3));
-        machine3 = new SimpleTransitionSystem(machines.get(4));
-        adm2 = new SimpleTransitionSystem(machines.get(5));
-        half1 = new SimpleTransitionSystem(machines.get(6));
-        half2 = new SimpleTransitionSystem(machines.get(7));
+        adm = new SimpleTransitionSystem(machines[0]);
+        machine = new SimpleTransitionSystem(machines[1]);
+        researcher = new SimpleTransitionSystem(machines[2]);
+        spec = new SimpleTransitionSystem(machines[3]);
+        machine3 = new SimpleTransitionSystem(machines[4]);
+        adm2 = new SimpleTransitionSystem(machines[5]);
+        half1 = new SimpleTransitionSystem(machines[6]);
+        half2 = new SimpleTransitionSystem(machines[7]);
     }
 
     @Test
@@ -183,14 +179,14 @@ public class UniversityTest {
 
     @Test
     public void testCompRefinesSpec() {
-        assertTrue(new Refinement(new Composition(new ArrayList<>(Arrays.asList(adm, machine, researcher))), spec).check());
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check());
     }
 
     @Test
     public void testCompOfCompRefinesSpec() {
         assertTrue(new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(machine,
-                        new Composition(new ArrayList<>(Arrays.asList(adm, researcher)))))),
+                new Composition(new TransitionSystem[]{machine,
+                        new Composition(new TransitionSystem[]{adm, researcher})}),
                 spec).check()
         );
     }
@@ -198,8 +194,8 @@ public class UniversityTest {
     @Test
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(adm, machine, researcher))),
-                new Composition(new ArrayList<>(Arrays.asList(machine, researcher, adm))));
+                new Composition(new TransitionSystem[]{adm, machine, researcher}),
+                new Composition(new TransitionSystem[]{machine, researcher, adm}));
         assertTrue(ref.check());
     }
 
@@ -209,7 +205,7 @@ public class UniversityTest {
 
         try {
             new Refinement(
-                    new Composition(new ArrayList<>(Arrays.asList(machine, machine3))),
+                    new Composition(new TransitionSystem[]{machine, machine3}),
                     machine);
         } catch (IllegalArgumentException ex) {
             fail = true;
@@ -220,11 +216,11 @@ public class UniversityTest {
 
     @Test
     public void testHalf1AndHalf2RefinesAdm2() {
-        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(half1, half2))), adm2).check());
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{half1, half2}), adm2).check());
     }
 
     @Test
     public void testAdm2RefinesHalf1AndHalf2() {
-        assertTrue(new Refinement(adm2, new Conjunction(new ArrayList<>(Arrays.asList(half1, half2)))).check());
+        assertTrue(new Refinement(adm2, new Conjunction(new TransitionSystem[]{half1, half2})).check());
     }
 }

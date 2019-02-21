@@ -7,11 +7,8 @@ import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Parser {
 
@@ -19,25 +16,19 @@ public class Parser {
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
     private static final Set<Clock> componentClocks = new HashSet<>();
 
-    public static ArrayList<Automaton> parse(String folderPath) {
+    public static Automaton[] parse(String folderPath) {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
 
-        ArrayList<String> locations = new ArrayList<>();
-        locations.add(folderPath + "/GlobalDeclarations.json");
-        for (File jsonFiles : files) {
-            locations.add(jsonFiles.toString());
-        }
+        ArrayList<String> locations = new ArrayList<>(Collections.singletonList(folderPath + "/GlobalDeclarations.json"));
+        locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
 
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList);
     }
-    public static ArrayList<Automaton> parse(String base, List<String> components) {
-        ArrayList<String> locations = new ArrayList<>();
 
-        for (String component : components) {
-            locations.add(base + component);
-        }
+    public static Automaton[] parse(String base, String[] components) {
+        ArrayList<String> locations = Arrays.stream(components).map(c -> base + c).collect(Collectors.toCollection(ArrayList::new));
 
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList);
@@ -48,6 +39,7 @@ public class Parser {
     private static ArrayList<JSONObject> parseFiles(ArrayList<String> locations) {
         JSONParser parser = new JSONParser();
         ArrayList<JSONObject> returnList = new ArrayList<>();
+
         try {
             for (String location : locations) {
                 Object obj = parser.parse(new FileReader(location));
@@ -57,64 +49,65 @@ public class Parser {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return returnList;
     }
 
-    private static ArrayList<Automaton> distrubuteObjects(ArrayList<JSONObject> objList) {
+    private static Automaton[] distrubuteObjects(ArrayList<JSONObject> objList) {
         ArrayList<Automaton> automata = new ArrayList<>();
+
         try {
             for (JSONObject obj : objList) {
                 if (!obj.get("name").toString().equals("Global Declarations")) {
                     addDeclarations((String) obj.get("declarations"));
                     JSONArray locationList = (JSONArray) obj.get("locations");
-                    ArrayList<Location> locations = addLocations(locationList);
+                    Location[] locations = addLocations(locationList);
                     JSONArray edgeList = (JSONArray) obj.get("edges");
-                    ArrayList<Edge> edges = addEdges(edgeList, locations);
-                    // make copy of clocks, since calling componentClocks.clear() will empty it and we lose this information
-                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks));
+                    Edge[] edges = addEdges(edgeList, locations);
+                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, componentClocks.toArray(new Clock[0]));
                     automata.add(automaton);
                     componentClocks.clear();
                 } else {
                     addDeclarations((String) obj.get("declarations"));
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return automata;
+
+        return automata.toArray(new Automaton[0]);
     }
 
     private static void addDeclarations(String declarations) {//add for typedefs
-        String[] firstList = (declarations.split(";"));
+        String[] firstList = declarations.split(";");
+
         for (int i = 0; i < firstList.length; i++) {
-            if (firstList[i].contains("broadcast chan")) {
+            boolean isChan = firstList[i].contains("broadcast chan");
+            boolean isClock = firstList[i].contains("clock");
+
+            if (isChan || isClock) {
                 firstList[i] = firstList[i].replaceFirst("^broadcast chan", "");//get rid of starting text
-                firstList[i] = firstList[i].replaceAll("\\s+", ""); //get rid of spaces
-                String[] secondList = (firstList[i].split(","));
-                for (String s : secondList) {
-                    Channel chan = new Channel(s);
-                    globalChannels.add(chan);
-                }
-            }
-            if (firstList[i].contains("clock")) {
                 firstList[i] = firstList[i].replaceFirst("^clock", "");//get rid of starting text
                 firstList[i] = firstList[i].replaceAll("\\s+", ""); //get rid of spaces
                 String[] secondList = (firstList[i].split(","));
+
                 for (String s : secondList) {
-                    Clock clock = new Clock(s);
-                    componentClocks.add(clock);
+                    if (isChan) globalChannels.add(new Channel(s));
+                    if (isClock) componentClocks.add(new Clock(s));
                 }
             }
         }
     }
 
-    private static ArrayList<Location> addLocations(JSONArray locationList) {
+    private static Location[] addLocations(JSONArray locationList) {
         ArrayList<Location> returnLocList = new ArrayList<>();
+
         for (Object obj : locationList) {
             JSONObject jsonObject = (JSONObject) obj;
+
             boolean isInitial, isUniversal, isInconsistent;
             isInitial = isUniversal = isInconsistent = false;
+
             switch (jsonObject.get("type").toString()) {
                 case "INITIAL":
                     isInitial = true;
@@ -126,20 +119,24 @@ public class Parser {
                     isInconsistent = true;
                     break;
             }
+
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            List<Guard> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
+            Guard[] invariant = ("".equals(jsonObject.get("invariant").toString()) ? new Guard[]{} :
                     addGuards(jsonObject.get("invariant").toString()));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
+
             returnLocList.add(loc);
         }
-        return returnLocList;
+
+        return returnLocList.toArray(new Location[0]);
     }
 
-    private static ArrayList<Guard> addGuards(String invariant) {
+    private static Guard[] addGuards(String invariant) {
         ArrayList<Guard> guards = new ArrayList<>();
         String[] listOfInv = invariant.split("&&");
+
         for (String str : listOfInv) {
             String symbol = "";
             boolean strict, greater;
@@ -169,53 +166,53 @@ public class Parser {
             }
             guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
         }
-        return guards;
+
+        return guards.toArray(new Guard[0]);
     }
 
     private static Clock findClock(String clockName) {
-        for (Clock clock : componentClocks) {
-            if (clock.getName().equals(clockName))
-                return clock;
-        }
+        for (Clock clock : componentClocks)
+            if (clock.getName().equals(clockName)) return clock;
 
         return null;
     }
 
-    private static ArrayList<Edge> addEdges(JSONArray edgeList, ArrayList<Location> locations) {
+    private static Edge[] addEdges(JSONArray edgeList, Location[] locations) {
         ArrayList<Edge> edges = new ArrayList<>();
+
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            ArrayList<Guard> guards = new ArrayList<>();
-            if (!jsonObject.get("guard").toString().equals("")) {
+            Guard[] guards; Update[] updates;
+
+            if (!jsonObject.get("guard").toString().equals(""))
                 guards = addGuards((String) jsonObject.get("guard"));
-            }
-            ArrayList<Update> updates = new ArrayList<>();
-            if (!jsonObject.get("update").toString().equals("")) {
+            else
+                guards = new Guard[]{};
+
+            if (!jsonObject.get("update").toString().equals(""))
                 updates = addUpdates((String) jsonObject.get("update"));
-            }
+            else
+                updates = new Update[]{};
+
             Location sourceLocation = findLoc(locations, (String) jsonObject.get("sourceLocation"));
             Location targetLocation = findLoc(locations, (String) jsonObject.get("targetLocation"));
 
             boolean isInput = "INPUT".equals(jsonObject.get("status").toString());
-            Channel chan = null;
-            for (Channel channel : globalChannels) {
-                if (channel.getName().equals(jsonObject.get("sync"))) {
-                    chan = channel;
-                    break;
-                }
-            }
-            if (chan != null) {
-                Edge edge = new Edge(sourceLocation, targetLocation, chan, isInput, guards, updates);
+
+            List<Channel> c = globalChannels.stream().filter(channel -> channel.getName().equals(jsonObject.get("sync"))).collect(Collectors.toList());
+            if (!c.isEmpty()) {
+                Edge edge = new Edge(sourceLocation, targetLocation, c.get(0), isInput, guards, updates);
                 edges.add(edge);
             }
         }
-        return edges;
+        return edges.toArray(new Edge[0]);
     }
 
-    private static ArrayList<Update> addUpdates(String update) {
+    private static Update[] addUpdates(String update) {
         ArrayList<Update> updates = new ArrayList<>();
         String[] listOfInv = update.split(",");
+
         for (String str : listOfInv) {
             String[] s = str.split("=");
             for (int i = 0; i < s.length; i++)
@@ -223,15 +220,16 @@ public class Parser {
             Update upd = new Update(findClock(s[0]), Integer.parseInt(s[1]));
             updates.add(upd);
         }
-        return updates;
+
+        return updates.toArray(new Update[0]);
     }
 
     //Helper method for addEdge in order to find which Location is source and which one is target
-    private static Location findLoc(ArrayList<Location> locations, String name) {
-        for (Location location : locations) {
-            if (location.getName().equals(name))
-                return location;
-        }
-        return null;
+    private static Location findLoc(Location[] locations, String name) {
+        List<Location> locs = Arrays.stream(locations).filter(location -> location.getName().equals(name)).collect(Collectors.toList());
+
+        if (locs.isEmpty()) return null;
+
+        return locs.get(0);
     }
 }

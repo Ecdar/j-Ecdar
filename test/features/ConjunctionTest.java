@@ -9,10 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
@@ -21,15 +17,15 @@ public class ConjunctionTest {
     @BeforeClass
     public static void setUpBeforeClass() {
         String base = "./samples/Conjunction/";
-        List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
+        String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Test1.json",
                 "Components/Test2.json",
-                "Components/Test3.json"));
-        List<Automaton> machines = Parser.parse(base, components);
+                "Components/Test3.json"};
+        Automaton[] machines = Parser.parse(base, components);
 
-        test1 = new SimpleTransitionSystem(machines.get(0));
-        test2 = new SimpleTransitionSystem(machines.get(1));
-        test3 = new SimpleTransitionSystem(machines.get(2));
+        test1 = new SimpleTransitionSystem(machines[0]);
+        test2 = new SimpleTransitionSystem(machines[1]);
+        test3 = new SimpleTransitionSystem(machines[2]);
     }
 
     @Test
@@ -49,16 +45,16 @@ public class ConjunctionTest {
 
     @Test
     public void testTest1ConjTest2RefinesTest3() {
-        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(test1, test2))), test3).check());
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{test1, test2}), test3).check());
     }
 
     @Test
     public void testTest2ConjTest3RefinesTest1() {
-        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(test2, test3))), test1).check());
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{test2, test3}), test1).check());
     }
 
     @Test
     public void testTest1ConjTest3RefinesTest2() {
-        assertTrue(new Refinement(new Conjunction(new ArrayList<>(Arrays.asList(test1, test3))), test2).check());
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{test1, test3}), test2).check());
     }
 }

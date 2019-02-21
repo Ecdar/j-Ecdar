@@ -9,10 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -22,17 +18,17 @@ public class AGTest {
     @BeforeClass
     public static void setUpBeforeClass()  {
         String base = "./samples/AG/";
-        List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
+        String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/A.json",
                 "Components/G.json",
                 "Components/Q.json",
-                "Components/Imp.json"));
-        List<Automaton> machines = Parser.parse(base, components);
+                "Components/Imp.json"};
+        Automaton[] machines = Parser.parse(base, components);
 
-        a = new SimpleTransitionSystem(machines.get(0));
-        g = new SimpleTransitionSystem(machines.get(1));
-        q = new SimpleTransitionSystem(machines.get(2));
-        imp = new SimpleTransitionSystem(machines.get(3));
+        a = new SimpleTransitionSystem(machines[0]);
+        g = new SimpleTransitionSystem(machines[1]);
+        q = new SimpleTransitionSystem(machines[2]);
+        imp = new SimpleTransitionSystem(machines[3]);
     }
 
     @Test
@@ -58,16 +54,16 @@ public class AGTest {
     @Test
     public void AGRefinesAImp() {
         assertTrue(new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(a, g))),
-                new Composition(new ArrayList<>(Arrays.asList(a, imp)))).check()
+                new Composition(new TransitionSystem[]{a, g}),
+                new Composition(new TransitionSystem[]{a, imp})).check()
         );
     }
 
     @Test
     public void AImpRefinesAG() {
         assertFalse(new Refinement(
-                new Composition(new ArrayList<>(Arrays.asList(a, imp))),
-                new Composition(new ArrayList<>(Arrays.asList(a, g)))).check()
+                new Composition(new TransitionSystem[]{a, imp}),
+                new Composition(new TransitionSystem[]{a, g})).check()
         );
     }
 

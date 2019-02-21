@@ -19,12 +19,4 @@ public class Clock {
         Clock clock = (Clock) o;
         return name.equals(clock.getName());
     }
-
-    // When adding a clock to a set, it shouldn't work if it has the same name as a clock that already exists in the set
-    // so the hashCode() method is used to compare them. We override it so 2 different Clock objects with the same
-    // name would have the same hash code
-    @Override
-    public int hashCode() {
-        return 10 * name.hashCode();
-    }
 }

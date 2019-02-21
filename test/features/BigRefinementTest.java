@@ -8,10 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -22,13 +18,13 @@ public class BigRefinementTest {
     @BeforeClass
     public static void setUpBeforeClass() {
         String base = "./samples/BigRefinement/";
-        List<String> components = new ArrayList<>(Arrays.asList("GlobalDeclarations.json",
+        String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Comp1.json",
-                "Components/Ref1.json"));
-        List<Automaton> machines = Parser.parse(base, components);
+                "Components/Ref1.json"};
+        Automaton[] machines = Parser.parse(base, components);
 
-        comp1 = new SimpleTransitionSystem(machines.get(0));
-        ref1 = new SimpleTransitionSystem(machines.get(1));
+        comp1 = new SimpleTransitionSystem(machines[0]);
+        ref1 = new SimpleTransitionSystem(machines[1]);
     }
 
     @Test

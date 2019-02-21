@@ -3,6 +3,7 @@ package logic;
 import models.Guard;
 import models.Location;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,7 +11,6 @@ public class SimpleLocation extends SymbolicLocation {
     private final Location location;
 
     public SimpleLocation(Location location) {
-        super();
         this.location = location;
     }
 
@@ -19,7 +19,7 @@ public class SimpleLocation extends SymbolicLocation {
     }
 
     public List<Guard> getInvariants() {
-        return location.getInvariant();
+        return Arrays.asList(location.getInvariant());
     }
 
     @Override

@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Scanner;
 
 class Main {
-    public static final String VERSION = "1.0";
-    public static final String ENGINE_NAME = "JECDAR";
-    private static final Controller ctrl = new Controller();
+    static final String VERSION = "1.0";
+    static final String ENGINE_NAME = "JECDAR";
 
     public static void main(String[] args) {
         Scanner console = new Scanner(System.in);
@@ -17,17 +16,18 @@ class Main {
         }
     }
 
-    public static String chooseCommand(String query) {
+    static String chooseCommand(String query) {
         String indicator = query;
         if (query.contains(" ")) {
             indicator = query.substring(0, query.indexOf(' '));
         }
+
         switch (indicator.toLowerCase()) {
             case "-version":
                 return ENGINE_NAME + " Version: " + VERSION;
             case "-rq":
                 try {
-                    List<Boolean> temp = ctrl.handleRequest(query.substring(query.indexOf(' ') + 1));
+                    List<Boolean> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1));
                     if (temp.size() == 1) return temp.get(0).toString();
                     else {
                         StringBuilder str = new StringBuilder();
@@ -42,7 +42,7 @@ class Main {
                 }
             case "-vq":
                 try {
-                    ctrl.isQueryValid(query.substring(query.indexOf(' ') + 1));
+                    Controller.isQueryValid(query.substring(query.indexOf(' ') + 1));
                     return String.valueOf(true);
                 } catch (Exception e) {
                     return "Error: " + e.getMessage();//e.printStackTrace();

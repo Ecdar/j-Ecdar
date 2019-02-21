@@ -5,41 +5,37 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Conjunction extends TransitionSystem {
-    private final List<TransitionSystem> systems;
+    private final TransitionSystem[] systems;
 
-    public Conjunction(List<TransitionSystem> systems) {
-        super();
-
+    public Conjunction(TransitionSystem[] systems) {
         this.systems = systems;
 
-        clocks.addAll(systems.stream().map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
+        clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
 
         dbmSize = clocks.size() + 1;
     }
 
     public Set<Channel> getInputs() {
-        Set<Channel> inputs = new HashSet<>(systems.get(0).getInputs());
+        Set<Channel> inputs = new HashSet<>(systems[0].getInputs());
 
-        for (int i = 1; i < systems.size(); i++) {
-            inputs.retainAll(systems.get(i).getInputs());
+        for (int i = 1; i < systems.length; i++) {
+            inputs.retainAll(systems[i].getInputs());
         }
 
         return inputs;
     }
 
     public Set<Channel> getOutputs() {
-        Set<Channel> outputs = new HashSet<>(systems.get(0).getOutputs());
+        Set<Channel> outputs = new HashSet<>(systems[0].getOutputs());
 
-        for (int i = 1; i < systems.size(); i++) {
-            outputs.retainAll(systems.get(i).getOutputs());
+        for (int i = 1; i < systems.length; i++) {
+            outputs.retainAll(systems[i].getOutputs());
         }
 
         return outputs;
     }
 
-    public SymbolicLocation getInitialLocation() {
-        return getInitialLocation(systems);
-    }
+    public SymbolicLocation getInitialLocation() { return getInitialLocation(systems); }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
@@ -67,13 +63,14 @@ public class Conjunction extends TransitionSystem {
     }
 
     private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
-        List<Move> resultMoves = systems.get(0).getNextMoves(locations.get(0), channel);
+        List<Move> resultMoves = systems[0].getNextMoves(locations.get(0), channel);
+
         // used when there are no moves for some TS
         if (resultMoves.isEmpty())
             return new ArrayList<>();
 
-        for (int i = 1; i < systems.size(); i++) {
-            List<Move> moves = systems.get(i).getNextMoves(locations.get(i), channel);
+        for (int i = 1; i < systems.length; i++) {
+            List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
 
             if (moves.isEmpty())
                 return new ArrayList<>();

@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 public class Automaton {
     private final String name;
-    private final List<Location> locations;
-    private final List<Edge> edges;
-    private final List<Clock> clocks;
-    private final Set<Channel> inputAct, outputAct, actions;
+    private final Location[] locations;
+    private final Edge[] edges;
+    private final Clock[] clocks;
+    private Set<Channel> inputAct, outputAct, actions;
     private Location initLoc;
 
-    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks) {
+    public Automaton(String name, Location[] locations, Edge[] edges, Clock[] clocks) {
         this.name = name;
         this.locations = locations;
 
@@ -22,9 +22,6 @@ public class Automaton {
             }
         }
 
-        this.inputAct = new HashSet<>();
-        this.outputAct = new HashSet<>();
-        this.actions = new HashSet<>();
         this.edges = edges;
         setActions(edges);
         this.clocks = clocks;
@@ -38,12 +35,12 @@ public class Automaton {
         if (loc.isUniversal()) {
             List<Edge> resultEdges = new ArrayList<>();
             for (Channel action : actions) {
-                resultEdges.add(new Edge(loc, loc, action, getInputAct().contains(action), new ArrayList<>(), new ArrayList<>()));
+                resultEdges.add(new Edge(loc, loc, action, inputAct.contains(action), new Guard[]{}, new Update[]{}));
             }
             return resultEdges;
         }
 
-        return edges.stream().filter(edge -> edge.getSource().equals(loc)).collect(Collectors.toList());
+        return Arrays.stream(edges).filter(edge -> edge.getSource().equals(loc)).collect(Collectors.toList());
     }
 
     public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
@@ -52,7 +49,11 @@ public class Automaton {
         return resultEdges.stream().filter(edge -> edge.getChannel().getName().equals(signal.getName())).collect(Collectors.toList());
     }
 
-    private void setActions(List<Edge> edges) {
+    private void setActions(Edge[] edges) {
+        inputAct = new HashSet<>();
+        outputAct = new HashSet<>();
+        actions = new HashSet<>();
+
         for (Edge edge : edges) {
             Channel action = edge.getChannel();
 
@@ -66,7 +67,7 @@ public class Automaton {
         }
     }
 
-    public List<Clock> getClocks() {
+    public Clock[] getClocks() {
         return clocks;
     }
 
@@ -88,9 +89,9 @@ public class Automaton {
         if (!(o instanceof Automaton)) return false;
         Automaton automaton = (Automaton) o;
         return name.equals(automaton.name) &&
-                Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
-                Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&
-                Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) &&
+                Arrays.equals(locations, automaton.locations) &&
+                Arrays.equals(edges, automaton.edges) &&
+                Arrays.equals(clocks, automaton.clocks) &&
                 Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
                 Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) &&
                 initLoc.equals(automaton.initLoc);

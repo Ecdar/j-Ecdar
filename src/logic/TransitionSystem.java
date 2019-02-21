@@ -36,9 +36,9 @@ public abstract class TransitionSystem {
 
     protected abstract SymbolicLocation getInitialLocation();
 
-    SymbolicLocation getInitialLocation(List<TransitionSystem> systems) {
+    SymbolicLocation getInitialLocation(TransitionSystem[] systems) {
         // build ComplexLocation with initial location from each TransitionSystem
-        return new ComplexLocation(systems.stream().map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
+        return new ComplexLocation(Arrays.stream(systems).map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
     }
 
     List<Transition> createNewTransitions(State currentState, List<Move> moves) {
@@ -49,8 +49,8 @@ public abstract class TransitionSystem {
             List<Edge> egdes = move.getEdges();
 
             // gather all the guards and resets of one move
-            List<Guard> guards = egdes.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
-            List<Update> updates = egdes.stream().map(Edge::getUpdates).flatMap(List::stream).collect(Collectors.toList());
+            List<Guard> guards = egdes.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
+            List<Update> updates = egdes.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
 
             State state = new State(move.getTarget(), currentState.getZone());
             // get the new zone by applying guards and resets on the zone of the target state

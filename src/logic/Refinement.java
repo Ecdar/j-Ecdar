@@ -32,8 +32,6 @@ public class Refinement {
     }
 
     public boolean check() {
-
-
         // keep looking at states from Waiting as long as it contains elements
         while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
@@ -92,7 +90,6 @@ public class Refinement {
         // check that the zones are compatible
         if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
             // delay and apply invariants on target states
-
             target1.delay(); target2.delay();
             target1.applyInvariants(ts1.getClocks()); target2.applyInvariants(ts2.getClocks());
 

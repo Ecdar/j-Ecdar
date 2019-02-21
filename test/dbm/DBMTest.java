@@ -8,7 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class DBMTest {
-    private int inf = 2147483646;
+    private final int inf = 2147483646;
 
     @BeforeClass
     public static void setUpBeforeClass() {

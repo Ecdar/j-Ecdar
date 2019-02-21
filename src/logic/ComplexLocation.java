@@ -11,7 +11,6 @@ public class ComplexLocation extends SymbolicLocation {
     private final List<SymbolicLocation> locations;
 
     public ComplexLocation(List<SymbolicLocation> locations) {
-        super();
         this.locations = locations;
     }
 

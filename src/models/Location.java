@@ -1,15 +1,14 @@
 package models;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class Location {
 
     private final String name;
-    private final List<Guard> invariant;
+    private final Guard[] invariant;
     private final boolean isInitial, isUrgent, isUniversal, isInconsistent;
 
-    public Location(String name, List<Guard> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
+    public Location(String name, Guard[] invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
         this.name = name;
         this.invariant = invariant;
         this.isInitial = isInitial;
@@ -22,7 +21,7 @@ public class Location {
         return name;
     }
 
-    public List<Guard> getInvariant() {
+    public Guard[] getInvariant() {
         return invariant;
     }
 
@@ -44,6 +43,6 @@ public class Location {
                 isUniversal == location.isUniversal &&
                 isInconsistent == location.isInconsistent &&
                 name.equals(location.name) &&
-                Arrays.equals(invariant.toArray(), location.invariant.toArray());
+                Arrays.equals(invariant, location.invariant);
     }
 }
