@@ -95,6 +95,14 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown
   (JNIEnv *, jclass, jintArray, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_freeDown
+ * Signature: ([III)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown
+  (JNIEnv *, jclass, jintArray, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif

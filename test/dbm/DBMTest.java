@@ -5,6 +5,7 @@ import lib.DBMLib;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
@@ -160,4 +161,32 @@ public class DBMTest {
                 DBMLib.dbm_freeAllDown(new int[]{1, -9, -3, -27, 15, 1, 11, -13, 23, 13, 1, -5, 115, 105, 111, 1}, 4)
         );
     }
+
+    @Test
+    public void testTest() {
+        int[] t1 = {1, 1, inf, 1};
+
+        //t1 = DBMLib.dbm_init(t1, 2);
+
+        printDBM(t1, true);
+
+        t1 = DBMLib.dbm_constrain1(t1, 2, 0, 1, -1);
+        t1 = DBMLib.dbm_constrain1(t1, 2, 1, 0, 4);
+
+        printDBM(t1, true);
+
+        t1 = DBMLib.dbm_updateValue(t1, 2, 1, 3);
+        t1 = DBMLib.dbm_freeDown(t1, 2, 1);
+        t1 = DBMLib.dbm_constrain1(t1, 2, 0, 1, -2);
+
+//        t1 = DBMLib.dbm_constrain1(t1, 4, 0, 1, -17);
+//
+//
+      printDBM(t1, true);
+
+        boolean result = DBMLib.dbm_isValid(t1, 2);
+
+        assertTrue(result);
+    }
+
 }

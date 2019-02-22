@@ -81,11 +81,11 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isSubsetEq(JNIEnv *env, jclass c
     return dbm_isSubsetEq(converted1, converted2, dim);
 }
 
-JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint x, jint value) {
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint clockIndex, jint value) {
     jsize len = env->GetArrayLength(dbm);
 
     auto converted = helper_functions::jintToC(env, dbm, len);
-    dbm_updateValue(converted, dim, x, value);
+    dbm_updateValue(converted, dim, clockIndex, value);
 
     return helper_functions::cToJint(env, converted, len);
 }
@@ -111,6 +111,15 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown(JNIEnv *env, jclass
 
     auto converted = helper_functions::jintToC(env, dbm, len);
     dbm_freeAllDown(converted, dim);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint clockIndex) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_freeDown(converted, dim, clockIndex);
 
     return helper_functions::cToJint(env, converted, len);
 }
