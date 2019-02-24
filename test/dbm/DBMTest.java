@@ -2,18 +2,68 @@ package dbm;
 
 import global.LibLoader;
 import lib.DBMLib;
+import logic.SimpleLocation;
+import logic.State;
+import logic.SymbolicLocation;
+import models.Clock;
+import models.Guard;
+import models.Location;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
-    private final int inf = 2147483646;
+    private static final int inf = 2147483646;
+    private static State state1, state2, state3, state4, state5;
+    private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
+    private static List<Clock> clockList = new ArrayList<>();
 
     @BeforeClass
     public static void setUpBeforeClass() {
         LibLoader.load();
+
+        Location l1 = new Location("L0", new Guard[]{}, false, false, false, false);
+        SymbolicLocation sl1 = new SimpleLocation(l1);
+
+        Clock x = new Clock("x");
+        Clock y = new Clock("y");
+        Clock z = new Clock("z");
+
+        clockList.addAll(Arrays.asList(x, y, z));
+
+        // STATES----------------------
+        // From 0 to inf
+        int[] sz1 = new int[]{1, 1, inf, 1};
+        state1 = new State(sl1, sz1);
+
+        // From 2 to inf
+        int[] sz2 = new int[]{1, -3, inf, 1};
+        state2 = new State(sl1, sz2);
+
+        // From 0 to 5
+        int[] sz3 = new int[]{1, 1, 11, 1};
+        state3 = new State(sl1, sz3);
+
+        // From 3 to 12
+        int[] sz4 = new int[]{1, -5, 25, 1};
+        state4 = new State(sl1, sz4);
+
+
+        // GUARDS---------------------
+        g1 = new Guard(x, 5, true, false);
+        g2 = new Guard(x, 1, true, false);
+        g3 = new Guard(x, 7, false, false);
+        g4 = new Guard(x, 14, false, false);
+
     }
 
     @Test
@@ -163,30 +213,119 @@ public class DBMTest {
     }
 
     @Test
-    public void testTest() {
-        int[] t1 = {1, 1, inf, 1};
+    public void testAZNoGuards1(){
+        int[] t1 = state1.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
-        //t1 = DBMLib.dbm_init(t1, 2);
-
-        printDBM(t1, true);
-
-        t1 = DBMLib.dbm_constrain1(t1, 2, 0, 1, -1);
-        t1 = DBMLib.dbm_constrain1(t1, 2, 1, 0, 4);
-
-        printDBM(t1, true);
-
-        t1 = DBMLib.dbm_updateValue(t1, 2, 1, 3);
-        t1 = DBMLib.dbm_freeDown(t1, 2, 1);
-        t1 = DBMLib.dbm_constrain1(t1, 2, 0, 1, -2);
-
-//        t1 = DBMLib.dbm_constrain1(t1, 4, 0, 1, -17);
-//
-//
-      printDBM(t1, true);
-
-        boolean result = DBMLib.dbm_isValid(t1, 2);
-
-        assertTrue(result);
+        assertArrayEquals(t1, new int[]{1, 1, inf, 1});
     }
 
+    @Test
+    public void testAZNoGuards2(){
+        int[] t1 = state2.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+
+        assertArrayEquals(t1, new int[]{1, 1, inf, 1});
+    }
+
+    @Test
+    public void testAZNoGuards3(){
+        int[] t1 = state3.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+
+        assertArrayEquals(t1, new int[]{1, 1, 11, 1});
+    }
+
+    @Test
+    public void testAZNoGuards4(){
+        int[] t1 = state4.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+
+        assertArrayEquals(t1, new int[]{1, 1, 19, 1});
+    }
+
+    @Test
+    public void testAZWithGuards1(){
+        List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
+        List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g2));
+
+        int[] t1 = state4.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state4.getAbsoluteZone(guardList2, clockList);
+
+        assertArrayEquals(t1, new int[]{1, -3, 19, 1});
+        assertArrayEquals(t2, new int[]{1, 1, 19, 1});
+    }
+
+    @Test
+    public void testAZWithGuards2(){
+        List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g3));
+        List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g4));
+
+        int[] t1 = state4.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state4.getAbsoluteZone(guardList2, clockList);
+
+        assertArrayEquals(t1, new int[]{1, 1, 9, 1});
+        assertArrayEquals(t2, new int[]{1, 1, 19, 1});
+    }
+
+    @Test
+    public void testAZWithGuards3(){
+        List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
+        List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g3));
+        List<Guard> guardList3 = new ArrayList<>(Collections.singletonList(g2));
+
+        int[] t1 = state2.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state2.getAbsoluteZone(guardList2, clockList);
+        int[] t3 = state2.getAbsoluteZone(guardList3, clockList);
+
+        assertArrayEquals(t1, new int[]{1, -5, inf, 1});
+        assertArrayEquals(t2, new int[]{1, 1, 11, 1});
+        assertArrayEquals(t3, new int[]{1, 1, inf, 1});
+    }
+
+    @Test
+    public void testAZWithGuards4(){
+        List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
+        List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g2));
+        List<Guard> guardList3 = new ArrayList<>(Collections.singletonList(g3));
+        List<Guard> guardList4 = new ArrayList<>(Collections.singletonList(g4));
+
+        int[] t1 = state3.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state3.getAbsoluteZone(guardList2, clockList);
+        int[] t3 = state3.getAbsoluteZone(guardList3, clockList);
+        int[] t4 = state3.getAbsoluteZone(guardList4, clockList);
+
+        assertArrayEquals(t1, new int[]{1, -9, 11, 1});
+        assertArrayEquals(t2, new int[]{1, -1, 11, 1});
+        assertArrayEquals(t3, new int[]{1, 1, 11, 1});
+        assertArrayEquals(t4, new int[]{1, 1, 11, 1});
+    }
+
+    @Test
+    public void testAZWithMultipleGuards1(){
+        List<Guard> guardList1 = new ArrayList<>(Arrays.asList(g1, g3));
+        List<Guard> guardList2 = new ArrayList<>(Arrays.asList(g3, g1));
+        List<Guard> guardList3 = new ArrayList<>(Arrays.asList(g2, g4));
+
+        int[] t1 = state4.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state4.getAbsoluteZone(guardList2, clockList);
+        int[] t3 = state4.getAbsoluteZone(guardList3, clockList);
+
+        assertArrayEquals(t1, new int[]{1, -3, 9, 1});
+        assertArrayEquals(t2, new int[]{1, -3, 9, 1});
+        assertArrayEquals(t3, new int[]{1, 1, 19, 1});
+    }
+
+    @Test
+    public void testAZWithMultipleGuards2(){
+        List<Guard> guardList1 = new ArrayList<>(Arrays.asList(g1, g3));
+        List<Guard> guardList2 = new ArrayList<>(Arrays.asList(g4, g3, g4));
+
+        int[] t1 = state2.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state2.getAbsoluteZone(guardList2, clockList);
+
+        assertArrayEquals(t1, new int[]{1, -5, 11, 1});
+        assertArrayEquals(t2, new int[]{1, 1, 11, 1});
+    }
+
+    @Test
+    public void testZoneContainsNegatives1(){
+        assertFalse(state4.zoneContainsNegatives( new int[]{1, -1, 11, 1}));
+    }
 }

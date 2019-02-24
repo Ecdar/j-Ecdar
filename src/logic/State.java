@@ -6,13 +6,17 @@ import models.Clock;
 import models.Guard;
 import models.Update;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class State {
     private final SymbolicLocation location;
     private int[] zone;
     private final int zoneSize;
+    private static final int DBM_INF = 1073741823;
 
     public State(SymbolicLocation location, int[] zone) {
         this.location = location;
@@ -109,70 +113,69 @@ public class State {
         }
     }
 
-    // Method used to get a new zone, where for each clock:
-    // If not infinity, the upper bound is lowered by the value of the lower bound
-    // The lower bound is removed (set to 0)
-//    public int[] getAbsoluteZone(){
-//        int[] result = zone;
-//
-//        for (int i = 1; i < zoneSize; i++){
-//
-//            int upperBound = DBMLib.raw2bound(result[zoneSize * i]);
-//
-//            // If upper bound is infinity then don't change it
-//            if (upperBound != 1073741823) {
-//                int lowerBound = DBMLib.raw2bound(result[i]) * (-1);
-//                int resultBound = upperBound - lowerBound;
-//
-//                result = DBMLib.dbm_updateValue(result, zoneSize, i, resultBound);
-//            }
-//        }
-//
-//        result = DBMLib.dbm_freeAllDown(result, zoneSize);
-//
-//        return result;
-//    }
-
-    public int[] getAbsoluteZone(List<Guard> guards, List<Clock> clocks){
+    public int[] getAbsoluteZone(List<Guard> guards, List<Clock> clocks) {
         int[] result = zone;
+        List<Integer> clockIndices = IntStream.rangeClosed(1, zoneSize - 1).boxed().collect(Collectors.toList());
 
-        //Need to test this
-        int[] a = IntStream.range(1, zoneSize).toArray();
+        for (Guard guard : guards) {
+            int index = clocks.indexOf(guard.getClock()) + 1;
+            boolean firstVisit = clockIndices.contains(index);
 
-        for(Guard guard : guards) {
-            int index = clocks.indexOf(guard.getClock());
-
-            // Get correspondings UBs (UpperBounds) and LBs (LowerBounds)
+            // Get corresponding UBs (UpperBounds) and LBs (LowerBounds)
             int guardUB = guard.getUpperBound();
             int clockUB = DBMLib.raw2bound(zone[zoneSize * index]);
-            int clockLB = DBMLib.raw2bound(zone[index] * (-1));
+            int clockLB = DBMLib.raw2bound(zone[index]) * (-1);
             int constraint;
 
+            if(firstVisit && clockLB != 0) {
+                result = DBMLib.dbm_freeDown(result, zoneSize, index);
+                clockIndices.remove(index-1);
+            }
             // If guard is GEQ:
             if (guardUB == Integer.MAX_VALUE) {
                 constraint = guard.getLowerBound();
 
                 int newLowerBound = constraint - clockLB < 0 ? 0 : constraint - clockLB;
-                int newUpperBound = clockUB - clockLB;
 
-                result = DBMLib.dbm_updateValue(result, zoneSize, index, newUpperBound);
-                result = DBMLib.dbm_freeDown(result, zoneSize, index);
+                if (firstVisit && clockUB != DBM_INF) {
+                    int newUpperBound = clockUB - clockLB;
+
+                    result = DBMLib.dbm_constrain1(result, zoneSize, index, 0, newUpperBound);
+                }
+
                 result = DBMLib.dbm_constrain1(result, zoneSize, 0, index, (-1) * newLowerBound);
-            }
-            else {
+            } else {
                 // If guard is LEQ:
                 constraint = guardUB;
-                int newUpperBound = constraint - clockLB;
+                int newUpperBound = constraint > clockUB && clockUB != DBM_INF ? clockUB - clockLB : constraint - clockLB;
 
-                // Protected against semantically invalid guards for the given zone (perhaps just to be removed)
-                // Maybe can be simply replaced with dbm_isValid check at the end of the method (or most likely just removed)
-                if(newUpperBound < 0) return new int[]{};
+                result = DBMLib.dbm_constrain1(result, zoneSize, index, 0, newUpperBound);
+            }
+        }
 
-                result = DBMLib.dbm_updateValue(result, zoneSize, index, newUpperBound);
+        // After processing all guards we have to update clocks that had no related guards
+        for(Integer index : clockIndices){
+
+            int clockUB = DBMLib.raw2bound(zone[zoneSize * index]);
+            int clockLB = DBMLib.raw2bound(zone[index]) * (-1);
+
+            if(clockLB != 0) {
                 result = DBMLib.dbm_freeDown(result, zoneSize, index);
+
+                if (clockUB != DBM_INF)
+                    result = DBMLib.dbm_constrain1(result, zoneSize, index, 0, clockUB - clockLB);
             }
         }
         return result;
+    }
+
+    public boolean zoneContainsNegatives(int[] zone){
+        if(zoneSize > 2) {
+            for (int i = zoneSize + 2; i < zone.length; i++) {
+                if (DBMLib.raw2bound(zone[i]) < 0) return true;
+            }
+        }
+        return false;
     }
 
     public void delay() {
