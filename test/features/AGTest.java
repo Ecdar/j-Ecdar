@@ -1,9 +1,6 @@
 package features;
 
-import logic.Composition;
-import logic.Refinement;
-import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
+import logic.*;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -95,5 +92,20 @@ public class AGTest {
     @Test
     public void ImpNotRefinesQ() {
         assertFalse(new Refinement(imp, q).check());
+    }
+
+    @Test
+    public void GRefinesAGQuotientA() {
+        assertTrue(new Refinement(g, new Quotient(new Composition(new TransitionSystem[]{a, g}), a)).check());
+    }
+
+    @Test
+    public void AGQuotientANotRefinesG() {
+        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), g).check());
+    }
+
+    @Test
+    public void AGQuotientANotRefinesImp() {
+        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), imp).check());
     }
 }

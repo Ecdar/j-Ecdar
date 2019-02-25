@@ -14,7 +14,7 @@ public class GuardTest {
     @Test
     public void test1() {
         Guard g = new Guard(x, 5, true, true);
-        assert g.getLowerBound() == 6;
+        assert g.getLowerBound() == 5;
         assert g.getUpperBound() == Integer.MAX_VALUE;
     }
 
@@ -22,7 +22,7 @@ public class GuardTest {
     public void test2() {
         Guard g = new Guard(x, 5, false, true);
         assert g.getLowerBound() == 0;
-        assert g.getUpperBound() == 4;
+        assert g.getUpperBound() == 5;
     }
 
     @Test

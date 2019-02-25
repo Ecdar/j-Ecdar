@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
@@ -126,14 +123,14 @@ public class DBMTest {
     @Test
     public void testDbmConstrain1() {
         assertArrayEquals(new int[]{1, 1, 11, 1},
-                DBMLib.dbm_constrain1(new int[]{1, 1, inf, 1}, 2, 1, 0, 5)
+                DBMLib.dbm_constrain1(new int[]{1, 1, inf, 1}, 2, 1, 0, 5, false)
         );
     }
 
     @Test
     public void testDbmConstrain2() {
         assertArrayEquals(new int[]{1, -3, 11, 1},
-                DBMLib.dbm_constrain1(new int[]{1, 1, 11, 1}, 2, 0, 1, -2)
+                DBMLib.dbm_constrain1(new int[]{1, 1, 11, 1}, 2, 0, 1, -2, false)
         );
     }
 
