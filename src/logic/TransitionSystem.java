@@ -73,6 +73,14 @@ public abstract class TransitionSystem {
         return new HashSet<>();
     }
 
+    public Set<Channel> getActions() {
+        Set<Channel> actions = new HashSet<>(getInputs());
+        actions.addAll(getOutputs());
+        actions.addAll(getSyncs());
+
+        return actions;
+    }
+
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);

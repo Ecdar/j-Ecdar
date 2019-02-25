@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Transition {
+public class Transition {
     private final State source, target;
     private final List<Edge> edges;
 
@@ -27,8 +27,6 @@ class Transition {
 
     public List<Guard> getGuards() {
         // collect guards from each Edge and flatten the list
-        //return edges.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
         return edges.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
-
     }
 }

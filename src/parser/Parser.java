@@ -14,7 +14,7 @@ public class Parser {
 
     private static ArrayList<JSONObject> objectList = new ArrayList<>();
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
-    private static final Set<Clock> componentClocks = new HashSet<>();
+    private static final List<Clock> componentClocks = new ArrayList<>();
 
     public static Automaton[] parse(String folderPath) {
         File dir = new File(folderPath + "/Components");

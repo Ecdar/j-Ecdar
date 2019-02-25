@@ -45,11 +45,13 @@ public class Refinement {
 
                 // check that for every output in TS 1 there is a corresponding output in TS 2
                 boolean holds1 = checkOutputs(curr.getLeft(), curr.getRight(), ts1, ts2);
-                if (!holds1) return false;
+                if (!holds1)
+                    return false;
 
                 // check that for every input in TS 2 there is a corresponding input in TS 1
                 boolean holds2 = checkInputs(curr.getLeft(), curr.getRight(), ts1, ts2);
-                if (!holds2) return false;
+                if (!holds2)
+                    return false;
             }
         }
 
