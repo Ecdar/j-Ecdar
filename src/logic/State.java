@@ -130,7 +130,7 @@ public class State {
 
             if (firstVisit && clockLB != 0) {
                 result = DBMLib.dbm_freeDown(result, zoneSize, index);
-                clockIndices.remove(index-1);
+                clockIndices.remove(new Integer(index));
             }
             // If guard is GEQ:
             if (guardUB == Integer.MAX_VALUE) {
@@ -172,11 +172,45 @@ public class State {
 
     public boolean zoneContainsNegatives(int[] zone){
         if (zoneSize > 2) {
-            for (int i = zoneSize + 2; i < zone.length; i++) {
+            for (int i = zoneSize; i < zone.length; i++) {
                 if (DBMLib.raw2bound(zone[i]) < 0) return true;
             }
         }
         return false;
+    }
+
+    public boolean absoluteZonesIntersect(int[] absZone1, int[] absZone2, int zone1Size, int zone2Size){
+        int[] values1 = getRowMaxColumnMin(absZone1, zone1Size);
+        int[] values2 = getRowMaxColumnMin(absZone2, zone2Size);
+
+        return values1[0] <= values2[1] && values2[0] <= values1[1];
+    }
+
+    private int[] getRowMaxColumnMin(int[] zone, int size){
+        int rowMax = 0; int columnMin = Integer.MAX_VALUE;
+
+        for (int i = 1; i < size; i++) {
+            int curr = DBMLib.raw2bound(zone[i]);
+            if(curr > rowMax) rowMax = curr;
+
+            curr = DBMLib.raw2bound(zone[size * i]) * (-1);
+            if(curr < columnMin) columnMin = curr;
+        }
+
+        return new int[]{rowMax, columnMin};
+    }
+
+    public void updateLowerBounds(int[] prevZone, int[] absZone){
+        for (int i = 1; i < zone.length; i++) {
+
+            int prevValue = DBMLib.raw2bound(prevZone[i] * (-1));
+            int absValue = DBMLib.raw2bound(absZone[i] * (-1));
+            int currValue = DBMLib.raw2bound(zone[i] * (-1));
+            if (currValue != prevValue + absValue){
+                //TODO update the strictness boolean!!!
+                zone = DBMLib.dbm_constrain1(zone, zoneSize, 0, i, prevValue + absValue, false);
+            }
+        }
     }
 
     public void delay() {

@@ -124,4 +124,8 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown(JNIEnv *env, jclass cl
     return helper_functions::cToJint(env, converted, len);
 }
 
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict(JNIEnv *env, jclass cls, jint raw) {
+   return dbm_rawIsStrict(raw);
+}
+
 int main() { return 0; }

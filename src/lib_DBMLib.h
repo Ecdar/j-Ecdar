@@ -103,6 +103,14 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown
   (JNIEnv *, jclass, jintArray, jint, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_rawIsStrict
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict
+  (JNIEnv *, jclass, jint);
+
 #ifdef __cplusplus
 }
 #endif

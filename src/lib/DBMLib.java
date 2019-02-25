@@ -26,4 +26,6 @@ public class DBMLib {
     public static native int[] dbm_freeAllDown(int[] dbm, int dim);
 
     public static native int[] dbm_freeDown(int[] dbm, int dim, int clockIndex);
+
+    public static native boolean dbm_rawIsStrict(int raw);
 }
