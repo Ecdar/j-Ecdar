@@ -6,20 +6,24 @@ public class Guard {
 
     private final Clock clock;
     private int upperBound, lowerBound;
+    private boolean isStrict;
 
-    public Guard(Clock clock, int value, boolean greater, boolean strict) {
+    public Guard(Clock clock, int value, boolean greater, boolean isStrict) {
         this.clock = clock;
+        this.isStrict = isStrict;
+
         if (greater) {
             upperBound = Integer.MAX_VALUE;
-            lowerBound = strict ? (value + 1) : value;
+            lowerBound = value;
         } else {
-            upperBound = strict ? (value - 1) : value;
+            upperBound = value;
             lowerBound = 0;
         }
     }
 
-    public Guard (Clock clock, int upper, int lower) {
+    public Guard (Clock clock, int upper, int lower, boolean isStrict) {
         this.clock = clock;
+        this.isStrict = isStrict;
         this.upperBound = upper;
         this.lowerBound = lower;
     }
@@ -36,11 +40,16 @@ public class Guard {
         return upperBound;
     }
 
-    public Guard negate() {
-        int newLower = (lowerBound == 0) ? upperBound : 0;
-        int newUpper = (upperBound == Integer.MAX_VALUE) ? lowerBound : Integer.MAX_VALUE;
+    public boolean isStrict() {
+        return isStrict;
+    }
 
-        return new Guard(clock, newUpper, newLower);
+    public Guard negate() {
+        isStrict = !isStrict;
+        int newLower = (lowerBound == 0) ? (upperBound - 1) : 0;
+        int newUpper = (upperBound == Integer.MAX_VALUE) ? (lowerBound + 1) : Integer.MAX_VALUE;
+
+        return new Guard(clock, newUpper, newLower, isStrict);
     }
 
     @Override
@@ -50,11 +59,12 @@ public class Guard {
         Guard guard = (Guard) o;
         return upperBound == guard.upperBound &&
                 lowerBound == guard.lowerBound &&
-                clock.equals(guard.clock);
+                clock.equals(guard.clock) &&
+                isStrict == ((Guard) o).isStrict;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clock, upperBound, lowerBound);
+        return Objects.hash(clock, upperBound, lowerBound, isStrict);
     }
 }

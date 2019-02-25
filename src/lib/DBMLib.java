@@ -11,7 +11,7 @@ public class DBMLib {
 
     public static native int[] dbm_zero(int[] dbm, int dim);
 
-    public static native int[] dbm_constrain1(int[] dbm, int dim, int i, int j, int constraint);
+    public static native int[] dbm_constrain1(int[] dbm, int dim, int i, int j, int constraint, boolean strict);
 
     public static native int[] dbm_up(int[] dbm, int dim);
 

@@ -53,11 +53,11 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero(JNIEnv *env, jclass cls, j
 }
 
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
-    jint j, jint bound) {
+    jint j, jint bound, jboolean strict) {
     jsize len = env->GetArrayLength(dbm);
     auto converted = helper_functions::jintToC(env, dbm, len);
 
-    raw_t constraint = dbm_boundbool2raw(bound, false);
+    raw_t constraint = dbm_boundbool2raw(bound, strict);
     dbm_constrain1(converted, dim, i, j, constraint);
 
     return helper_functions::cToJint(env, converted, len);

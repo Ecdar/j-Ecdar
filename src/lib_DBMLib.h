@@ -42,10 +42,10 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero
 /*
  * Class:     lib_DBMLib
  * Method:    dbm_constrain1
- * Signature: ([IIIII)[I
+ * Signature: ([IIIIIZ)[I
  */
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1
-  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint, jboolean);
 
 /*
  * Class:     lib_DBMLib
