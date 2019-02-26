@@ -22,8 +22,6 @@ public class Quotient extends TransitionSystem {
         newClock = new Clock("new");
         clocks.add(newClock); clocks.addAll(ts1.getClocks()); clocks.addAll(ts2.getClocks());
 
-        dbmSize = clocks.size() + 1;
-
         // inputs should contain inputs of ts1, outputs of ts2 and a new input
         inputs = new HashSet<>(ts1.getInputs()); inputs.addAll(ts2.getOutputs());
         inputs.add(new Channel("newInput"));

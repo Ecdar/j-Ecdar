@@ -8,6 +8,7 @@ import java.util.List;
 public class InconsistentLocation extends SymbolicLocation {
 
     public List<Guard> getInvariants() {
-        // TODO new clocks should be <= 0
+        // TODO the new clock should be <= 0
         return new ArrayList<>();
-    }}
+    }
+}

@@ -46,8 +46,8 @@ public class Guard {
 
     public Guard negate() {
         isStrict = !isStrict;
-        int newLower = (lowerBound == 0) ? (upperBound - 1) : 0;
-        int newUpper = (upperBound == Integer.MAX_VALUE) ? (lowerBound + 1) : Integer.MAX_VALUE;
+        int newLower = (lowerBound == 0) ? upperBound : 0;
+        int newUpper = (upperBound == Integer.MAX_VALUE) ? lowerBound : Integer.MAX_VALUE;
 
         return new Guard(clock, newUpper, newLower, isStrict);
     }

@@ -5,6 +5,7 @@ import lib.DBMLib;
 import logic.SimpleLocation;
 import logic.State;
 import logic.SymbolicLocation;
+import logic.Zone;
 import models.Clock;
 import models.Guard;
 import models.Location;
@@ -39,20 +40,20 @@ public class DBMTest {
 
         // STATES----------------------
         // From 0 to inf
-        int[] sz1 = new int[]{1, 1, inf, 1};
-        state1 = new State(sl1, sz1);
+        Zone z1 = new Zone(new int[]{1, 1, inf, 1});
+        state1 = new State(sl1, z1);
 
         // From 2 to inf
-        int[] sz2 = new int[]{1, -3, inf, 1};
-        state2 = new State(sl1, sz2);
+        Zone z2 = new Zone(new int[]{1, -3, inf, 1});
+        state2 = new State(sl1, z2);
 
         // From 0 to 5
-        int[] sz3 = new int[]{1, 1, 11, 1};
-        state3 = new State(sl1, sz3);
+        Zone z3 = new Zone(new int[]{1, 1, 11, 1});
+        state3 = new State(sl1, z3);
 
         // From 3 to 12
-        int[] sz4 = new int[]{1, -5, 25, 1};
-        state4 = new State(sl1, sz4);
+        Zone z4 = new Zone(new int[]{1, -5, 25, 1});
+        state4 = new State(sl1, z4);
 
 
         // GUARDS---------------------
@@ -89,22 +90,22 @@ public class DBMTest {
     }
 
     @Test
-    public void testRaw2Bound1(){
+    public void testRaw2Bound1() {
         assertEquals(0, DBMLib.raw2bound(1));
     }
 
     @Test
-    public void testRaw2Bound2(){
+    public void testRaw2Bound2() {
         assertEquals(1073741823, DBMLib.raw2bound(inf));
     }
 
     @Test
-    public void testBound2Raw1(){
+    public void testBound2Raw1() {
         assertEquals(1, DBMLib.boundbool2raw(0, false));
     }
 
     @Test
-    public void testBound2Raw2(){
+    public void testBound2Raw2() {
         assertEquals(2147483647, DBMLib.boundbool2raw(1073741823, false));
     }
 
@@ -210,66 +211,66 @@ public class DBMTest {
     }
 
     @Test
-    public void testAZNoGuards1(){
-        int[] t1 = state1.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+    public void testAZNoGuards1() {
+        int[] t1 = state1.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1, new int[]{1, 1, inf, 1});
     }
 
     @Test
-    public void testAZNoGuards2(){
-        int[] t1 = state2.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+    public void testAZNoGuards2() {
+        int[] t1 = state2.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1, new int[]{1, 1, inf, 1});
     }
 
     @Test
-    public void testAZNoGuards3(){
-        int[] t1 = state3.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+    public void testAZNoGuards3() {
+        int[] t1 = state3.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1, new int[]{1, 1, 11, 1});
     }
 
     @Test
-    public void testAZNoGuards4(){
-        int[] t1 = state4.getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+    public void testAZNoGuards4() {
+        int[] t1 = state4.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1, new int[]{1, 1, 19, 1});
     }
 
     @Test
-    public void testAZWithGuards1(){
+    public void testAZWithGuards1() {
         List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g2));
 
-        int[] t1 = state4.getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state4.getAbsoluteZone(guardList2, clockList);
+        int[] t1 = state4.getZone().getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state4.getZone().getAbsoluteZone(guardList2, clockList);
 
         assertArrayEquals(t1, new int[]{1, -3, 19, 1});
         assertArrayEquals(t2, new int[]{1, 1, 19, 1});
     }
 
     @Test
-    public void testAZWithGuards2(){
+    public void testAZWithGuards2() {
         List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g3));
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g4));
 
-        int[] t1 = state4.getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state4.getAbsoluteZone(guardList2, clockList);
+        int[] t1 = state4.getZone().getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state4.getZone().getAbsoluteZone(guardList2, clockList);
 
         assertArrayEquals(t1, new int[]{1, 1, 9, 1});
         assertArrayEquals(t2, new int[]{1, 1, 19, 1});
     }
 
     @Test
-    public void testAZWithGuards3(){
+    public void testAZWithGuards3() {
         List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g3));
         List<Guard> guardList3 = new ArrayList<>(Collections.singletonList(g2));
 
-        int[] t1 = state2.getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state2.getAbsoluteZone(guardList2, clockList);
-        int[] t3 = state2.getAbsoluteZone(guardList3, clockList);
+        int[] t1 = state2.getZone().getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state2.getZone().getAbsoluteZone(guardList2, clockList);
+        int[] t3 = state2.getZone().getAbsoluteZone(guardList3, clockList);
 
         assertArrayEquals(t1, new int[]{1, -5, inf, 1});
         assertArrayEquals(t2, new int[]{1, 1, 11, 1});
@@ -277,16 +278,16 @@ public class DBMTest {
     }
 
     @Test
-    public void testAZWithGuards4(){
+    public void testAZWithGuards4() {
         List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g2));
         List<Guard> guardList3 = new ArrayList<>(Collections.singletonList(g3));
         List<Guard> guardList4 = new ArrayList<>(Collections.singletonList(g4));
 
-        int[] t1 = state3.getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state3.getAbsoluteZone(guardList2, clockList);
-        int[] t3 = state3.getAbsoluteZone(guardList3, clockList);
-        int[] t4 = state3.getAbsoluteZone(guardList4, clockList);
+        int[] t1 = state3.getZone().getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state3.getZone().getAbsoluteZone(guardList2, clockList);
+        int[] t3 = state3.getZone().getAbsoluteZone(guardList3, clockList);
+        int[] t4 = state3.getZone().getAbsoluteZone(guardList4, clockList);
 
         assertArrayEquals(t1, new int[]{1, -9, 11, 1});
         assertArrayEquals(t2, new int[]{1, -1, 11, 1});
@@ -295,14 +296,14 @@ public class DBMTest {
     }
 
     @Test
-    public void testAZWithMultipleGuards1(){
+    public void testAZWithMultipleGuards1() {
         List<Guard> guardList1 = new ArrayList<>(Arrays.asList(g1, g3));
         List<Guard> guardList2 = new ArrayList<>(Arrays.asList(g3, g1));
         List<Guard> guardList3 = new ArrayList<>(Arrays.asList(g2, g4));
 
-        int[] t1 = state4.getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state4.getAbsoluteZone(guardList2, clockList);
-        int[] t3 = state4.getAbsoluteZone(guardList3, clockList);
+        int[] t1 = state4.getZone().getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state4.getZone().getAbsoluteZone(guardList2, clockList);
+        int[] t3 = state4.getZone().getAbsoluteZone(guardList3, clockList);
 
         assertArrayEquals(t1, new int[]{1, -3, 9, 1});
         assertArrayEquals(t2, new int[]{1, -3, 9, 1});
@@ -310,19 +311,20 @@ public class DBMTest {
     }
 
     @Test
-    public void testAZWithMultipleGuards2(){
+    public void testAZWithMultipleGuards2() {
         List<Guard> guardList1 = new ArrayList<>(Arrays.asList(g1, g3));
         List<Guard> guardList2 = new ArrayList<>(Arrays.asList(g4, g3, g4));
 
-        int[] t1 = state2.getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state2.getAbsoluteZone(guardList2, clockList);
+        int[] t1 = state2.getZone().getAbsoluteZone(guardList1, clockList);
+        int[] t2 = state2.getZone().getAbsoluteZone(guardList2, clockList);
 
         assertArrayEquals(t1, new int[]{1, -5, 11, 1});
         assertArrayEquals(t2, new int[]{1, 1, 11, 1});
     }
 
     @Test
-    public void testZoneContainsNegatives1(){
-        assertFalse(state4.zoneContainsNegatives( new int[]{1, -1, 11, 1}));
+    public void testZoneContainsNegatives1() {
+        Zone newZone = new Zone(new int[]{1, -1, 11, 1});
+        assertFalse(newZone.containsNegatives());
     }
 }
