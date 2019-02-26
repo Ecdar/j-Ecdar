@@ -28,4 +28,6 @@ public class DBMLib {
     public static native int[] dbm_freeDown(int[] dbm, int dim, int clockIndex);
 
     public static native boolean dbm_rawIsStrict(int raw);
+
+    public static native int dbm_addRawRaw(int raw1, int raw2);
 }

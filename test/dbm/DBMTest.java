@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
@@ -301,9 +302,11 @@ public class DBMTest {
         List<Guard> guardList2 = new ArrayList<>(Arrays.asList(g3, g1));
         List<Guard> guardList3 = new ArrayList<>(Arrays.asList(g2, g4));
 
-        int[] t1 = state4.getZone().getAbsoluteZone(guardList1, clockList);
-        int[] t2 = state4.getZone().getAbsoluteZone(guardList2, clockList);
-        int[] t3 = state4.getZone().getAbsoluteZone(guardList3, clockList);
+        Zone zone = new Zone(new int[]{1, -5, 25, 1});
+
+        int[] t1 = zone.getAbsoluteZone(guardList1, clockList);
+        int[] t2 = zone.getAbsoluteZone(guardList2, clockList);
+        int[] t3 = zone.getAbsoluteZone(guardList3, clockList);
 
         assertArrayEquals(t1, new int[]{1, -3, 9, 1});
         assertArrayEquals(t2, new int[]{1, -3, 9, 1});
@@ -326,5 +329,37 @@ public class DBMTest {
     public void testZoneContainsNegatives1() {
         Zone newZone = new Zone(new int[]{1, -1, 11, 1});
         assertFalse(newZone.containsNegatives());
+    }
+
+    @Test
+    public void testZoneContainsNegatives2() {
+        Zone zone1 = new Zone(new int[]{1, 1, 1, inf, 1, inf, inf, inf, 1});
+        Zone zone2 = new Zone(new int[]{1, 1, -7, 9, 1, 1, inf, inf, 1});
+        Zone zone3 = new Zone(new int[]{1, 1, -8, 9, 1, 0, inf, inf, 1});
+
+
+        assertFalse(zone1.containsNegatives());
+        assertFalse(zone2.containsNegatives());
+        assertTrue(zone3.containsNegatives());
+    }
+
+    @Test
+    public void testDBM(){
+        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+        t1 = DBMLib.dbm_init(t1, 3);
+
+        //printDBM(t1, false, true);
+
+        //t1 = DBMLib.dbm_constrain1(t1, 3, 0, 2, -500, true);
+
+        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 3, false);
+
+        printDBM(t1, false, true);
+
+        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 3, true);
+
+        printDBM(t1, false, true);
+
     }
 }

@@ -128,4 +128,8 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict(JNIEnv *env, jclass 
    return dbm_rawIsStrict(raw);
 }
 
+JNIEXPORT jint JNICALL Java_lib_DBMLib_dbm_1addRawRaw(JNIEnv *env, jclass cls, jint raw1, jint raw2) {
+   return dbm_addRawRaw(raw1, raw2);
+}
+
 int main() { return 0; }

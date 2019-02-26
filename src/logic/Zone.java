@@ -13,7 +13,7 @@ public class Zone {
     private int[] dbm;
     private int size;
     private int actualSize;
-    private static final int DBM_INF = 1073741823;
+    private static final int DBM_INF = Integer.MAX_VALUE - 1;
 
     public Zone(int size) {
         this.size = size;
@@ -90,11 +90,12 @@ public class Zone {
         int upperBoundI = g.getUpperBound();
 
         if (upperBoundI == Integer.MAX_VALUE) {
-            dbm = DBMLib.dbm_constrain1(dbm, size, 0, index, (-1) * lowerBoundI, isStrict);
+            constrain1(0, index, (-1) * lowerBoundI, isStrict);
         }
 
         if (lowerBoundI == 0) {
             dbm = DBMLib.dbm_constrain1(dbm, size, index, 0, upperBoundI, isStrict);
+            constrain1(index, 0, upperBoundI, isStrict);
         }
     }
 
@@ -114,51 +115,71 @@ public class Zone {
 
         for (Guard guard : guards) {
             int index = clocks.indexOf(guard.getClock()) + 1;
+            isStrict = guard.isStrict();
             boolean firstVisit = clockIndices.contains(index);
 
             // Get corresponding UBs (UpperBounds) and LBs (LowerBounds)
             int guardUB = guard.getUpperBound();
-            int clockUB = DBMLib.raw2bound(dbm[size * index]);
-            int clockLB = DBMLib.raw2bound(dbm[index]) * (-1);
-            int constraint;
+            int rawClockUB = dbm[size * index];
+            int rawClockLB = dbm[index];
+            int constraint, rawConstraint;
 
-            if (firstVisit && clockLB != 0) {
+            if (firstVisit && rawClockLB != 1) {
                 result = DBMLib.dbm_freeDown(result, size, index);
                 clockIndices.remove(new Integer(index));
             }
             // If guard is GEQ:
             if (guardUB == Integer.MAX_VALUE) {
                 constraint = guard.getLowerBound();
+                rawConstraint = DBMLib.boundbool2raw(constraint, isStrict);
 
-                int newLowerBound = constraint - clockLB < 0 ? 0 : constraint - clockLB;
+                int rawNewLB = rawConstraint - rawClockLB < 0 ? 1 : DBMLib.dbm_addRawRaw(rawConstraint, rawClockLB);
+                isStrict = DBMLib.dbm_rawIsStrict(rawNewLB);
+                int newLB = DBMLib.raw2bound(rawNewLB);
 
-                if (firstVisit && clockUB != DBM_INF) {
-                    int newUpperBound = clockUB - clockLB;
+                result = DBMLib.dbm_constrain1(result, size, 0, index, (-1) * newLB, isStrict);
 
-                    result = DBMLib.dbm_constrain1(result, size, index, 0, newUpperBound, isStrict);
+                if (firstVisit && rawClockUB != DBM_INF) {
+                    int rawNewUB = DBMLib.dbm_addRawRaw(rawClockUB, rawClockLB);
+                    isStrict = DBMLib.dbm_rawIsStrict(rawNewUB);
+                    int newUB = DBMLib.raw2bound(rawNewUB);
+
+                    result = DBMLib.dbm_constrain1(result, size, index, 0, newUB, isStrict);
                 }
 
-                result = DBMLib.dbm_constrain1(result, size, 0, index, (-1) * newLowerBound, isStrict);
+
             } else {
                 // If guard is LEQ:
                 constraint = guardUB;
-                int newUpperBound = constraint > clockUB && clockUB != DBM_INF ? clockUB - clockLB : constraint - clockLB;
+                rawConstraint = DBMLib.boundbool2raw(constraint, isStrict);
 
-                result = DBMLib.dbm_constrain1(result, size, index, 0, newUpperBound, isStrict);
+                int rawNewUB = rawConstraint > rawClockUB && rawClockUB != DBM_INF ?
+                        DBMLib.dbm_addRawRaw(rawClockUB, rawClockLB) :
+                        DBMLib.dbm_addRawRaw(rawConstraint, rawClockLB);
+
+                isStrict = DBMLib.dbm_rawIsStrict(rawNewUB);
+
+                int newUB = DBMLib.raw2bound(rawNewUB);
+
+                result = DBMLib.dbm_constrain1(result, size, index, 0, newUB, isStrict);
             }
         }
 
         // After processing all guards we have to update clocks that had no related guards
-        for (Integer index : clockIndices) {
+        for (Integer index : clockIndices){
 
-            int clockUB = DBMLib.raw2bound(dbm[size * index]);
-            int clockLB = DBMLib.raw2bound(dbm[index]) * (-1);
+            int clockUB = dbm[size * index];
+            int clockLB = dbm[index];
 
-            if (clockLB != 0) {
+            if (clockLB != 1) {
                 result = DBMLib.dbm_freeDown(result, size, index);
 
-                if (clockUB != DBM_INF)
-                    result = DBMLib.dbm_constrain1(result, size, index, 0, clockUB - clockLB, isStrict);
+                if (clockUB != DBM_INF) {
+                    int rawNewUB = DBMLib.dbm_addRawRaw(clockUB, clockLB);
+                    isStrict = DBMLib.dbm_rawIsStrict(rawNewUB);
+                    int newUB = DBMLib.raw2bound(rawNewUB);
+                    result = DBMLib.dbm_constrain1(result, size, index, 0, newUB, isStrict);
+                }
             }
         }
         return result;
@@ -167,7 +188,7 @@ public class Zone {
     public boolean containsNegatives() {
         if (size > 2) {
             for (int i = size; i < actualSize; i++) {
-                if (DBMLib.raw2bound(dbm[i]) < 0) return true;
+                if (dbm[i] <= 0) return true;
             }
         }
         return false;
@@ -213,5 +234,46 @@ public class Zone {
 
     public boolean isValid() {
         return DBMLib.dbm_isValid(dbm, size);
+    }
+
+    // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
+    public void constrain1(int i, int j, int constraint, boolean isStrict){
+        dbm = DBMLib.dbm_constrain1(dbm, size, i, j, constraint, isStrict);
+    }
+
+    public void init(){
+        dbm = DBMLib.dbm_init(dbm, size);
+    }
+
+    // Method to nicely print DBM for testing purposes.
+    // The boolean flag determines if values of the zone will be converted from DBM format to actual bound of constraint
+    public void printDBM(boolean toConvert, boolean showStrictness){
+        int intLength = 0;
+        int toPrint = 0;
+
+        System.out.println("---------------------------------------");
+        for(int i = 0,j = 1; i < actualSize; i++, j++){
+
+            toPrint = toConvert? DBMLib.raw2bound(dbm[i]) : dbm[i];
+
+            System.out.print(toPrint);
+
+            if(showStrictness){
+                String strictness = DBMLib.dbm_rawIsStrict(dbm[i]) ? " < " : " <=";
+                System.out.print(strictness);
+            }
+            if(j == size){
+                System.out.println();
+                if(i == actualSize - 1) System.out.println("---------------------------------------");
+                j = 0;
+            }
+            else{
+                intLength = String.valueOf(toPrint).length();
+                for (int k = 0; k < 14 - intLength; k++)
+                {
+                    System.out.print(" ");
+                }
+            }
+        }
     }
 }
