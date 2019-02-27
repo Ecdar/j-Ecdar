@@ -2,6 +2,7 @@ package logic;
 
 import models.Guard;
 import models.Edge;
+import models.Update;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,5 +29,9 @@ public class Transition {
     public List<Guard> getGuards() {
         // collect guards from each Edge and flatten the list
         return edges.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
+    }
+
+    public List<Update> getUpdates() {
+        return edges.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
     }
 }

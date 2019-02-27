@@ -1,7 +1,9 @@
 package logic;
 
 import models.Channel;
+import models.Edge;
 import models.Guard;
+import models.Update;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,8 +30,10 @@ public class Refinement {
     }
 
     public boolean check() {
+        int waitingAmount = 0;
         // keep looking at states from Waiting as long as it contains elements
         while (!waiting.isEmpty()) {
+            if(waiting.size() > waitingAmount) waitingAmount = waiting.size();
             StatePair curr = waiting.pop();
 
             // ignore if the zones are included in zones belonging to pairs of states that we already visited
@@ -66,10 +70,8 @@ public class Refinement {
         for (Transition t1 : next1) {
             for (Transition t2 : next2) {
                 // get source and target states
-                State source1 = new State(t1.getSource()); State source2 = new State(t2.getSource());
-                State target1 = new State(t1.getTarget()); State target2 = new State(t2.getTarget());
 
-                StatePair newState = buildStatePair(source1, source2, t1.getGuards(), t2.getGuards(), target1, target2);
+                StatePair newState = buildStatePair(t1, t2);
                 if (newState != null) {
                     states.add(newState);
                 }
@@ -79,32 +81,43 @@ public class Refinement {
         return states;
     }
 
-    private StatePair buildStatePair(State source1, State source2, List<Guard> guards1, List<Guard> guards2, State target1, State target2) {
-        // apply guards on the source states
-        source1.applyGuards(guards1, ts1.getClocks());
-        source2.applyGuards(guards2, ts2.getClocks());
+    private StatePair buildStatePair(Transition t1, Transition t2) {
 
-        // based on the zone, get the min and max value of the clocks
-        int maxSource1 = source1.getZone().getMinUpperBound(); int maxSource2 = source2.getZone().getMinUpperBound();
-        int minSource1 = source1.getZone().getMinLowerBound(); int minSource2 = source2.getZone().getMinLowerBound();
+        State source1 = new State(t1.getSource());
+        State target1 = new State(t1.getTarget().getLocation(), new Zone(t1.getSource().getZone()));
+        State source2 = new State(t2.getSource());
+        State target2 = new State(t2.getTarget().getLocation(), new Zone(t2.getSource().getZone()));
 
-        // check that the zones are compatible
-        if (maxSource1 >= minSource2 && maxSource2 >= minSource1) {
-            // delay and apply invariants on target states
-            target1.getZone().delay(); target2.getZone().delay();
-            target1.applyInvariants(ts1.getClocks()); target2.applyInvariants(ts2.getClocks());
+        Zone absZone1 = source1.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
+        Zone absZone2 = source2.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
 
-            // get the max value of the clocks
-            int maxTarget1 = target1.getZone().getMinUpperBound(); int maxTarget2 = target2.getZone().getMinUpperBound();
-            int minTarget1 = target1.getZone().getMinLowerBound(); int minTarget2 = target2.getZone().getMinLowerBound();
+        if(!absZone1.absoluteZonesIntersect(absZone2)) return null;
 
-            // check again that the zones are compatible
-            if (maxTarget1 >= minTarget2 && maxTarget2 >= minTarget1) {
-                return new StatePair(target1, target2);
-            }
-        }
+        target1.applyGuards(t1.getGuards(), ts1.getClocks());
+        target2.applyGuards(t2.getGuards(), ts2.getClocks());
 
-        return null;
+        // Update lower bounds with the most minimal delay one of the states has to take
+        int rowMax1 = absZone1.getRawRowMax();
+        int rowMax2 = absZone2.getRawRowMax();
+        int rowMax = rowMax1 < rowMax2 ? rowMax1 : rowMax2;
+        target1.getZone().updateLowerBounds(source1.getZone(), rowMax);
+        target2.getZone().updateLowerBounds(source2.getZone(), rowMax);
+
+        if(!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
+
+        target1.applyResets(t1.getUpdates(), ts1.getClocks());
+        target2.applyResets(t2.getUpdates(), ts2.getClocks());
+
+        target1.getZone().delay();
+        target2.getZone().delay();
+
+        target1.applyInvariants(ts1.getClocks());
+        target2.applyInvariants(ts2.getClocks());
+
+        if(!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
+
+        return new StatePair(target1, target2);
+
     }
 
     private boolean checkActions(boolean isInput, State state1, State state2) {
@@ -126,7 +139,10 @@ public class Refinement {
                 if (newStates.isEmpty())
                     return false;
 
-                waiting.addAll(newStates);
+                for (StatePair statePair : newStates) {
+                    if(!passedContainsStatePair(statePair))
+                    waiting.add(statePair);
+                }
             }
         }
 

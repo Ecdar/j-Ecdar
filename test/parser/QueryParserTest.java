@@ -213,15 +213,15 @@ public class QueryParserTest {
         }
     }
 
-    @Test
-    public void testCompRefinesComp() {
-        try {
-            assertTrue(Controller.handleRequest("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)").get(0));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
+//    @Test
+//    public void testCompRefinesComp() {
+//        try {
+//            assertTrue(Controller.handleRequest("./samples/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)").get(0));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 
     @Test
     public void testConjRefinesAdm2() {

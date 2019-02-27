@@ -107,9 +107,9 @@ public class Zone {
         dbm = DBMLib.dbm_up(dbm, size);
     }
 
-    public int[] getAbsoluteZone(List<Guard> guards, List<Clock> clocks) {
+    public Zone getAbsoluteZone(List<Guard> guards, List<Clock> clocks) {
         int[] result = dbm;
-        boolean isStrict = false;
+        boolean isStrict;
         List<Integer> clockIndices = IntStream.rangeClosed(1, size - 1).boxed().collect(Collectors.toList());
 
         for (Guard guard : guards) {
@@ -123,9 +123,10 @@ public class Zone {
             int rawClockLB = dbm[index];
             int constraint, rawConstraint;
 
+            if(firstVisit) clockIndices.remove(new Integer(index));
             if (firstVisit && rawClockLB != 1) {
                 result = DBMLib.dbm_freeDown(result, size, index);
-                clockIndices.remove(new Integer(index));
+
             }
             // If guard is GEQ:
             if (guardUB == Integer.MAX_VALUE) {
@@ -181,7 +182,7 @@ public class Zone {
                 }
             }
         }
-        return result;
+        return new Zone(result);
     }
 
     public boolean containsNegatives() {
@@ -217,14 +218,13 @@ public class Zone {
         return new int[]{rowMax, columnMin};
     }
 
-    public void updateLowerBounds(Zone prevZone, Zone absZone) {
-        int absRawRowMax = absZone.getRawRowMax();
+    public void updateLowerBounds(Zone prevZone, int rawRowMax) {
 
         for (int i = 1; i < size; i++) {
 
             int prevRawValue = prevZone.getElementAt(i);
             int currRawValue = dbm[i];
-            int targetRawValue = DBMLib.dbm_addRawRaw(prevRawValue, absRawRowMax);
+            int targetRawValue = DBMLib.dbm_addRawRaw(prevRawValue, rawRowMax);
             if (currRawValue != targetRawValue) {
                 boolean isStrict = DBMLib.dbm_rawIsStrict(targetRawValue);
 
@@ -233,7 +233,7 @@ public class Zone {
         }
     }
 
-    private int getRawRowMax() {
+    public int getRawRowMax() {
         int rowMax = 1;
 
         for (int i = 1; i < size; i++) {

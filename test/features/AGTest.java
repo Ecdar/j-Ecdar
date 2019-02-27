@@ -94,18 +94,18 @@ public class AGTest {
         assertFalse(new Refinement(imp, q).check());
     }
 
-    @Test
-    public void GRefinesAGQuotientA() {
-        assertTrue(new Refinement(g, new Quotient(new Composition(new TransitionSystem[]{a, g}), a)).check());
-    }
-
-    @Test
-    public void AGQuotientANotRefinesG() {
-        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), g).check());
-    }
-
-    @Test
-    public void AGQuotientANotRefinesImp() {
-        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), imp).check());
-    }
+//    @Test
+//    public void GRefinesAGQuotientA() {
+//        assertTrue(new Refinement(g, new Quotient(new Composition(new TransitionSystem[]{a, g}), a)).check());
+//    }
+//
+//    @Test
+//    public void AGQuotientANotRefinesG() {
+//        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), g).check());
+//    }
+//
+//    @Test
+//    public void AGQuotientANotRefinesImp() {
+//        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), imp).check());
+//    }
 }

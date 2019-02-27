@@ -45,14 +45,28 @@ public abstract class TransitionSystem {
 
             // need to make a copy of the zone
             Zone copiedZone = new Zone(currentState.getZone());
-            State state = new State(move.getTarget(), copiedZone);
+            State targetState = new State(move.getTarget(), copiedZone);
             // get the new zone by applying guards and resets on the zone of the target state
-            if (!guards.isEmpty()) state.applyGuards(guards, clocks);
-            if (!updates.isEmpty()) state.applyResets(updates, clocks);
+            Zone absZone = targetState.getZone().getAbsoluteZone(guards, clocks);
+            if(absZone.containsNegatives()) continue;
 
-            // if the zone is valid, build the transition and add it to the list
-            if (state.getZone().isValid())
-                transitions.add(new Transition(currentState, state, move.getEdges()));
+            if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
+            if (!targetState.getZone().isValid()) continue;
+
+
+
+            targetState.getZone().updateLowerBounds(currentState.getZone(), absZone.getRawRowMax());
+            if (!targetState.getZone().isValid()) continue;
+
+            if (!updates.isEmpty()) targetState.applyResets(updates, clocks);
+
+            targetState.getZone().delay();
+
+            targetState.applyInvariants(clocks);
+
+            if (!targetState.getZone().isValid()) continue;
+
+            transitions.add(new Transition(currentState, targetState, move.getEdges()));
         }
 
         return transitions;
