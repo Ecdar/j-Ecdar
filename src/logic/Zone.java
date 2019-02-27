@@ -109,7 +109,6 @@ public class Zone {
 
     public int[] getAbsoluteZone(List<Guard> guards, List<Clock> clocks) {
         int[] result = dbm;
-        //TODO figure this out
         boolean isStrict = false;
         List<Integer> clockIndices = IntStream.rangeClosed(1, size - 1).boxed().collect(Collectors.toList());
 
@@ -194,21 +193,24 @@ public class Zone {
         return false;
     }
 
-    public boolean absoluteZonesIntersect(Zone absZone1, Zone absZone2) {
-        int[] values1 = absZone1.getRowMaxColumnMin();
-        int[] values2 = absZone2.getRowMaxColumnMin();
+    public boolean absoluteZonesIntersect(Zone zone) {
+        int[] values1 = getRawRowMaxColumnMin();
+        int[] values2 = zone.getRawRowMaxColumnMin();
 
-        return values1[0] <= values2[1] && values2[0] <= values1[1];
+        int raw1 = DBMLib.dbm_addRawRaw(values1[0], values2[1]);
+        int raw2 = DBMLib.dbm_addRawRaw(values2[0], values1[1]);
+
+        return raw1 > 0 && raw2 > 0;
     }
 
-    private int[] getRowMaxColumnMin() {
-        int rowMax = 0; int columnMin = Integer.MAX_VALUE;
+    private int[] getRawRowMaxColumnMin() {
+        int rowMax = 1; int columnMin = DBM_INF;
 
         for (int i = 1; i < size; i++) {
-            int curr = DBMLib.raw2bound(dbm[i]);
-            if (curr > rowMax) rowMax = curr;
+            int curr = dbm[i];
+            if (curr < rowMax) rowMax = curr;
 
-            curr = DBMLib.raw2bound(dbm[size * i]) * (-1);
+            curr = dbm[size * i];
             if (curr < columnMin) columnMin = curr;
         }
 
@@ -216,16 +218,30 @@ public class Zone {
     }
 
     public void updateLowerBounds(Zone prevZone, Zone absZone) {
-        for (int i = 1; i < actualSize; i++) {
+        int absRawRowMax = absZone.getRawRowMax();
 
-            int prevValue = DBMLib.raw2bound(prevZone.getElementAt(i) * (-1));
-            int absValue = DBMLib.raw2bound(absZone.getElementAt(i) * (-1));
-            int currValue = DBMLib.raw2bound(dbm[i] * (-1));
-            if (currValue != prevValue + absValue) {
-                //TODO update the strictness boolean!!!
-                dbm = DBMLib.dbm_constrain1(dbm, size, 0, i, prevValue + absValue, false);
+        for (int i = 1; i < size; i++) {
+
+            int prevRawValue = prevZone.getElementAt(i);
+            int currRawValue = dbm[i];
+            int targetRawValue = DBMLib.dbm_addRawRaw(prevRawValue, absRawRowMax);
+            if (currRawValue != targetRawValue) {
+                boolean isStrict = DBMLib.dbm_rawIsStrict(targetRawValue);
+
+                dbm = DBMLib.dbm_constrain1(dbm, size, 0, i, DBMLib.raw2bound(targetRawValue), isStrict);
             }
         }
+    }
+
+    private int getRawRowMax() {
+        int rowMax = 1;
+
+        for (int i = 1; i < size; i++) {
+            int curr = dbm[i];
+            if (curr < rowMax) rowMax = curr;
+        }
+
+        return rowMax;
     }
 
     public boolean isSubset(Zone zone2) {
@@ -243,6 +259,10 @@ public class Zone {
 
     public void init(){
         dbm = DBMLib.dbm_init(dbm, size);
+    }
+
+    public int[] getDbm(){
+        return dbm;
     }
 
     // Method to nicely print DBM for testing purposes.

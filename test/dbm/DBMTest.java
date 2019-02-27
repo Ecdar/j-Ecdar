@@ -21,7 +21,7 @@ import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
-    private static final int inf = 2147483646;
+    private static final int DBM_INF = 2147483646;
     private static State state1, state2, state3, state4, state5;
     private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
@@ -41,11 +41,11 @@ public class DBMTest {
 
         // STATES----------------------
         // From 0 to inf
-        Zone z1 = new Zone(new int[]{1, 1, inf, 1});
+        Zone z1 = new Zone(new int[]{1, 1, DBM_INF, 1});
         state1 = new State(sl1, z1);
 
         // From 2 to inf
-        Zone z2 = new Zone(new int[]{1, -3, inf, 1});
+        Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
         state2 = new State(sl1, z2);
 
         // From 0 to 5
@@ -63,11 +63,14 @@ public class DBMTest {
         g3 = new Guard(x, 7, false, false);
         g4 = new Guard(x, 14, false, false);
 
+        g5 = new Guard(x, 505, true, false);
+        g6 = new Guard(y, 8, true, false);
+
     }
 
     @Test
     public void testDbmValid1() {
-        assertTrue(DBMLib.dbm_isValid(new int[]{1, 1, inf, 1}, 2));
+        assertTrue(DBMLib.dbm_isValid(new int[]{1, 1, DBM_INF, 1}, 2));
     }
 
     @Test
@@ -97,7 +100,7 @@ public class DBMTest {
 
     @Test
     public void testRaw2Bound2() {
-        assertEquals(1073741823, DBMLib.raw2bound(inf));
+        assertEquals(1073741823, DBMLib.raw2bound(DBM_INF));
     }
 
     @Test
@@ -112,12 +115,12 @@ public class DBMTest {
 
     @Test
     public void testDbmInit1() {
-        assertArrayEquals(new int[]{1, 1, inf, 1}, DBMLib.dbm_init(new int[]{0, 0, 0, 0}, 2));
+        assertArrayEquals(new int[]{1, 1, DBM_INF, 1}, DBMLib.dbm_init(new int[]{0, 0, 0, 0}, 2));
     }
 
     @Test
     public void testDbmInit2() {
-        assertArrayEquals(new int[]{1, 1, 1, inf, 1, inf, inf, inf, 1},
+        assertArrayEquals(new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1},
                 DBMLib.dbm_init(new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0}, 3)
         );
     }
@@ -125,7 +128,7 @@ public class DBMTest {
     @Test
     public void testDbmConstrain1() {
         assertArrayEquals(new int[]{1, 1, 11, 1},
-                DBMLib.dbm_constrain1(new int[]{1, 1, inf, 1}, 2, 1, 0, 5, false)
+                DBMLib.dbm_constrain1(new int[]{1, 1, DBM_INF, 1}, 2, 1, 0, 5, false)
         );
     }
 
@@ -152,45 +155,45 @@ public class DBMTest {
 
     @Test
     public void testDbmFuture1() {
-        assertArrayEquals(new int[]{1, 1, inf, 1}, DBMLib.dbm_up(new int[]{1, 1, 1, 1}, 2));
+        assertArrayEquals(new int[]{1, 1, DBM_INF, 1}, DBMLib.dbm_up(new int[]{1, 1, 1, 1}, 2));
     }
 
     @Test
     public void testDbmFuture2() {
-        assertArrayEquals(new int[]{1, -3, inf, 1}, DBMLib.dbm_up(new int[]{1, -3, 11, 1}, 2));
+        assertArrayEquals(new int[]{1, -3, DBM_INF, 1}, DBMLib.dbm_up(new int[]{1, -3, 11, 1}, 2));
     }
 
     @Test
     public void testDbmIntersects1() {
-        assertTrue(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, 1, inf, 1}, 2));
+        assertTrue(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, 1, DBM_INF, 1}, 2));
     }
 
     @Test
     public void testDbmIntersects2() {
         assertTrue(DBMLib.dbm_intersection(
-                new int[]{1, -9, 1, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1},
-                new int[]{1, 1, 1, 1, 13, 1, 13, 13, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+                new int[]{1, -9, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1},
+                new int[]{1, 1, 1, 1, 13, 1, 13, 13, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1}, 4)
         );
     }
 
     @Test
     public void testDbmIntersects3() {
         assertTrue(DBMLib.dbm_intersection(
-                new int[]{1, 1, -29, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1},
-                new int[]{1, 1, 1, 1, 13, 1, 13, 13, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+                new int[]{1, 1, -29, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1},
+                new int[]{1, 1, 1, 1, 13, 1, 13, 13, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1}, 4)
         );
     }
 
     @Test
     public void testDbmNotIntersects1() {
-        assertFalse(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, -15, inf, 1}, 2));
+        assertFalse(DBMLib.dbm_intersection(new int[]{1, 1, 11, 1}, new int[]{1, -15, DBM_INF, 1}, 2));
     }
 
     @Test
     public void testDbmNotIntersects2() {
         assertFalse(DBMLib.dbm_intersection(
-                new int[]{1, 1, 1, 1, 11, 1, 11, 11, inf, inf, 1, inf, inf, inf, inf, 1},
-                new int[]{1, -15, 1, 1, inf, 1, inf, inf, inf, inf, 1, inf, inf, inf, inf, 1}, 4)
+                new int[]{1, 1, 1, 1, 11, 1, 11, 11, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1},
+                new int[]{1, -15, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1}, 4)
         );
     }
 
@@ -215,14 +218,14 @@ public class DBMTest {
     public void testAZNoGuards1() {
         int[] t1 = state1.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
-        assertArrayEquals(t1, new int[]{1, 1, inf, 1});
+        assertArrayEquals(t1, new int[]{1, 1, DBM_INF, 1});
     }
 
     @Test
     public void testAZNoGuards2() {
         int[] t1 = state2.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
-        assertArrayEquals(t1, new int[]{1, 1, inf, 1});
+        assertArrayEquals(t1, new int[]{1, 1, DBM_INF, 1});
     }
 
     @Test
@@ -273,9 +276,9 @@ public class DBMTest {
         int[] t2 = state2.getZone().getAbsoluteZone(guardList2, clockList);
         int[] t3 = state2.getZone().getAbsoluteZone(guardList3, clockList);
 
-        assertArrayEquals(t1, new int[]{1, -5, inf, 1});
+        assertArrayEquals(t1, new int[]{1, -5, DBM_INF, 1});
         assertArrayEquals(t2, new int[]{1, 1, 11, 1});
-        assertArrayEquals(t3, new int[]{1, 1, inf, 1});
+        assertArrayEquals(t3, new int[]{1, 1, DBM_INF, 1});
     }
 
     @Test
@@ -333,14 +336,59 @@ public class DBMTest {
 
     @Test
     public void testZoneContainsNegatives2() {
-        Zone zone1 = new Zone(new int[]{1, 1, 1, inf, 1, inf, inf, inf, 1});
-        Zone zone2 = new Zone(new int[]{1, 1, -7, 9, 1, 1, inf, inf, 1});
-        Zone zone3 = new Zone(new int[]{1, 1, -8, 9, 1, 0, inf, inf, 1});
+        Zone zone1 = new Zone(new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
+        Zone zone2 = new Zone(new int[]{1, 1, -7, 9, 1, 1, DBM_INF, DBM_INF, 1});
+        Zone zone3 = new Zone(new int[]{1, 1, -8, 9, 1, 0, DBM_INF, DBM_INF, 1});
 
 
         assertFalse(zone1.containsNegatives());
         assertFalse(zone2.containsNegatives());
         assertTrue(zone3.containsNegatives());
+    }
+
+    @Test
+    public void testAZIntersect1(){
+        Zone zone1 = new Zone(new int[]{1, 1, 8, 1});
+        Zone zone2 = new Zone(new int[]{1, -8, DBM_INF, 1});
+        Zone zone3 = new Zone(new int[]{1, -5, DBM_INF, 1});
+        Zone zone4 = new Zone(new int[]{1, -6, DBM_INF, 1});
+        Zone zone5 = new Zone(new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
+
+        zone5.init();
+        //zone5.constrain1();
+
+        assertFalse(zone1.absoluteZonesIntersect(zone2));
+        assertTrue(zone1.absoluteZonesIntersect(zone3));
+        assertTrue(zone1.absoluteZonesIntersect(zone4));
+        assertTrue(zone4.absoluteZonesIntersect(zone1));
+        assertTrue(zone3.absoluteZonesIntersect(zone1));
+        assertTrue(zone3.absoluteZonesIntersect(zone4));
+    }
+
+    @Test
+    public void testUpdateLowerBounds1(){
+        Zone prevZone = new Zone(new int[]{1, -999, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
+        Zone targetZone = new Zone(prevZone);
+
+        List<Guard> guardList = new ArrayList<>(Arrays.asList(g5, g6));
+
+        int[] t1 = prevZone.getAbsoluteZone(guardList, clockList);
+        Zone absZone = new Zone(t1);
+
+        Location l2 = new Location("L0", new Guard[]{}, false, false, false, false);
+        SymbolicLocation sl2 = new SimpleLocation(l2);
+        State state = new State(sl2, targetZone);
+
+        state.applyGuards(guardList, clockList);
+
+        prevZone.printDBM(false, true);
+        state.getZone().printDBM(false, true);
+        printDBM(t1, false, true);
+
+        state.getZone().updateLowerBounds(prevZone, absZone);
+        state.getZone().printDBM(false, true);
+
+        assertArrayEquals(state.getZone().getDbm(), new int[]{1, -1015, -15, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
     }
 
     @Test
@@ -353,13 +401,14 @@ public class DBMTest {
 
         //t1 = DBMLib.dbm_constrain1(t1, 3, 0, 2, -500, true);
 
-        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 3, false);
+        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 4, false);
+        t1 = DBMLib.dbm_constrain1(t1, 3, 0, 2, -4, true);
 
-        printDBM(t1, false, true);
 
-        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 3, true);
 
-        printDBM(t1, false, true);
+        //printDBM(t1, false, true);
+
+        //System.out.println(DBMLib.boundbool2raw(-508, true));
 
     }
 }
