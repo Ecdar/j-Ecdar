@@ -66,12 +66,12 @@ public class ParserTest {
         Clock x = new Clock("x");
         Clock y = new Clock("y");
 
-        models.Guard g_l12_l17 = new Guard(x, 15,false, false);
-        models.Guard g_l12_l14 = new Guard(x, 20,false, true);
-        models.Guard g_l12_l13 = new Guard(x, 5,false, true);
-        models.Guard g_l12_l15 = new Guard(x, 8,false, false);
-        models.Guard g_l12_l16 = new Guard(x, 55,false, true);
-        models.Guard g_l15_l18 = new Guard(x, 15,true, true);
+        models.Guard g_l12_l17 = new Guard(x, 15, false, false);
+        models.Guard g_l12_l14 = new Guard(x, 20, false, true);
+        models.Guard g_l12_l13 = new Guard(x, 5, false, true);
+        models.Guard g_l12_l15 = new Guard(x, 8, false, false);
+        models.Guard g_l12_l16 = new Guard(x, 55, false, true);
+        models.Guard g_l15_l18 = new Guard(x, 15, true, true);
         models.Guard inv_l15 = new Guard(x, 20, false, false);
 
         Update u1 = new Update(x, 0);
@@ -84,14 +84,22 @@ public class ParserTest {
         Location l17 = new Location("L17", emptyGuards, false, false, false, false);
         Location l18 = new Location("L18", emptyGuards, false, false, false, false);
 
-        Channel i1 = new Channel("i1"); Channel i2 = new Channel("i2");
-        Channel i3 = new Channel("i3"); Channel i4 = new Channel("i4");
-        Channel i5 = new Channel("i5"); Channel i6 = new Channel("i6");
-        Channel o1 = new Channel("o1"); Channel o2 = new Channel("o2");
-        Channel o3 = new Channel("o3"); Channel o4 = new Channel("o4");
-        Channel o5 = new Channel("o5"); Channel o6 = new Channel("o6");
-        Channel o7 = new Channel("o7"); Channel o8 = new Channel("o8");
-        Channel o9 = new Channel("o9"); Channel o10 = new Channel("o10");
+        Channel i1 = new Channel("i1");
+        Channel i2 = new Channel("i2");
+        Channel i3 = new Channel("i3");
+        Channel i4 = new Channel("i4");
+        Channel i5 = new Channel("i5");
+        Channel i6 = new Channel("i6");
+        Channel o1 = new Channel("o1");
+        Channel o2 = new Channel("o2");
+        Channel o3 = new Channel("o3");
+        Channel o4 = new Channel("o4");
+        Channel o5 = new Channel("o5");
+        Channel o6 = new Channel("o6");
+        Channel o7 = new Channel("o7");
+        Channel o8 = new Channel("o8");
+        Channel o9 = new Channel("o9");
+        Channel o10 = new Channel("o10");
 
 
         t1 = new Edge(l12, l14, i2, true, new Guard[]{g_l12_l14}, emptyUpdates);

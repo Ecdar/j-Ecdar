@@ -48,7 +48,7 @@ class Main {
                     return "Error: " + e.getMessage();//e.printStackTrace();
                 }
             case "-help":
-                return    "In order to check version type:-version\n"
+                return "In order to check version type:-version\n"
                         + "In order to run query type:-rq folderPath query query...\n"
                         + "In order to check the validity of a query type:-vq query";
             default:

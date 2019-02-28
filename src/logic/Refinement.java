@@ -1,9 +1,6 @@
 package logic;
 
 import models.Channel;
-import models.Edge;
-import models.Guard;
-import models.Update;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,7 +30,7 @@ public class Refinement {
         int waitingAmount = 0;
         // keep looking at states from Waiting as long as it contains elements
         while (!waiting.isEmpty()) {
-            if(waiting.size() > waitingAmount) waitingAmount = waiting.size();
+            if (waiting.size() > waitingAmount) waitingAmount = waiting.size();
             StatePair curr = waiting.pop();
 
             // ignore if the zones are included in zones belonging to pairs of states that we already visited
@@ -42,7 +39,8 @@ public class Refinement {
                 State right = curr.getRight();
 
                 // need to make deep copy
-                State newState1 = new State(left); State newState2 = new State(right);
+                State newState1 = new State(left);
+                State newState2 = new State(right);
                 // mark the pair of states as visited
                 passed.add(new StatePair(newState1, newState2));
 
@@ -54,6 +52,10 @@ public class Refinement {
                 // check that for every input in TS 2 there is a corresponding input in TS 1
                 boolean holds2 = checkInputs(left, right);
                 if (!holds2)
+                    return false;
+
+                // check if TS 2 can delay at least as much as TS 1
+                if (!(left.getZone().getMaxRawDelay() <= right.getZone().getMaxRawDelay()))
                     return false;
             }
         }
@@ -91,7 +93,7 @@ public class Refinement {
         Zone absZone1 = source1.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
         Zone absZone2 = source2.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
 
-        if(!absZone1.absoluteZonesIntersect(absZone2)) return null;
+        if (!absZone1.absoluteZonesIntersect(absZone2)) return null;
 
         target1.applyGuards(t1.getGuards(), ts1.getClocks());
         target2.applyGuards(t2.getGuards(), ts2.getClocks());
@@ -103,7 +105,7 @@ public class Refinement {
         target1.getZone().updateLowerBounds(source1.getZone(), rowMax);
         target2.getZone().updateLowerBounds(source2.getZone(), rowMax);
 
-        if(!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
+        if (!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
 
         target1.applyResets(t1.getUpdates(), ts1.getClocks());
         target2.applyResets(t2.getUpdates(), ts2.getClocks());
@@ -114,7 +116,7 @@ public class Refinement {
         target1.applyInvariants(ts1.getClocks());
         target2.applyInvariants(ts2.getClocks());
 
-        if(!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
+        if (!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
 
         return new StatePair(target1, target2);
 
@@ -133,15 +135,15 @@ public class Refinement {
                 if (next2.isEmpty())
                     return false;
 
-                List<StatePair> newStates = isInput ? getNewStates(next2, next1): getNewStates(next1, next2);
+                List<StatePair> newStates = isInput ? getNewStates(next2, next1) : getNewStates(next1, next2);
 
                 // if we don't get any new states, it means we found some incompatibility
                 if (newStates.isEmpty())
                     return false;
 
                 for (StatePair statePair : newStates) {
-                    if(!passedContainsStatePair(statePair))
-                    waiting.add(statePair);
+                    if (!passedContainsStatePair(statePair))
+                        waiting.add(statePair);
                 }
             }
         }
@@ -169,7 +171,7 @@ public class Refinement {
         while (checkSyncs) {
 
             for (State tempState : tempStates) {
-                for (Channel sync : isFirst? syncs1 : syncs2) {
+                for (Channel sync : isFirst ? syncs1 : syncs2) {
                     tempTrans.addAll(ts.getNextTransitions(tempState, sync));
                 }
             }

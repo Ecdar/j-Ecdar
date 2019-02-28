@@ -20,15 +20,21 @@ public class Quotient extends TransitionSystem {
 
         //clocks should contain the clocks of ts1, ts2 and a new clock
         newClock = new Clock("new");
-        clocks.add(newClock); clocks.addAll(ts1.getClocks()); clocks.addAll(ts2.getClocks());
+        clocks.add(newClock);
+        clocks.addAll(ts1.getClocks());
+        clocks.addAll(ts2.getClocks());
 
         // inputs should contain inputs of ts1, outputs of ts2 and a new input
-        inputs = new HashSet<>(ts1.getInputs()); inputs.addAll(ts2.getOutputs());
+        inputs = new HashSet<>(ts1.getInputs());
+        inputs.addAll(ts2.getOutputs());
         inputs.add(new Channel("newInput"));
 
-        Set<Channel> outputsOF1 = new HashSet<>(ts1.getOutputs()); outputsOF1.addAll(ts1.getSyncs());
-        Set<Channel> outputsOF2 = new HashSet<>(ts2.getOutputs()); outputsOF1.addAll(ts2.getSyncs());
-        outputs = new HashSet<>(outputsOF1); outputs.removeAll(outputsOF2);
+        Set<Channel> outputsOF1 = new HashSet<>(ts1.getOutputs());
+        outputsOF1.addAll(ts1.getSyncs());
+        Set<Channel> outputsOF2 = new HashSet<>(ts2.getOutputs());
+        outputsOF1.addAll(ts2.getSyncs());
+        outputs = new HashSet<>(outputsOF1);
+        outputs.removeAll(outputsOF2);
         System.out.println();
     }
 
@@ -36,13 +42,17 @@ public class Quotient extends TransitionSystem {
         // the invariant of locations consisting of locations from each transition system should be true
         // which means the location has no invariants
         SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{ts1, ts2});
-        ((ComplexLocation)initLoc).removeInvariants();
+        ((ComplexLocation) initLoc).removeInvariants();
         return initLoc;
     }
 
-    public Set<Channel> getInputs() { return inputs; }
+    public Set<Channel> getInputs() {
+        return inputs;
+    }
 
-    public Set<Channel> getOutputs() { return outputs; }
+    public Set<Channel> getOutputs() {
+        return outputs;
+    }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
         SymbolicLocation location = currentState.getLocation();

@@ -59,7 +59,7 @@ public class UniversityTest {
 
     @Test
     public void testAdmNotRefinesMachine() {
-        assertFalse(new Refinement(adm,  machine).check());
+        assertFalse(new Refinement(adm, machine).check());
     }
 
     @Test

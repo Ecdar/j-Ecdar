@@ -21,7 +21,7 @@ public class Guard {
         }
     }
 
-    public Guard (Clock clock, int upper, int lower, boolean isStrict) {
+    public Guard(Clock clock, int upper, int lower, boolean isStrict) {
         this.clock = clock;
         this.isStrict = isStrict;
         this.upperBound = upper;

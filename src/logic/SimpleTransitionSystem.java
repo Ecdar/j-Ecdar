@@ -2,8 +2,8 @@ package logic;
 
 import models.Automaton;
 import models.Channel;
-import models.Location;
 import models.Edge;
+import models.Location;
 
 import java.util.*;
 

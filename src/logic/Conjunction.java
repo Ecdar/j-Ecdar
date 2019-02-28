@@ -1,6 +1,7 @@
 package logic;
 
 import models.Channel;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,9 @@ public class Conjunction extends TransitionSystem {
         return outputs;
     }
 
-    public SymbolicLocation getInitialLocation() { return getInitialLocation(systems); }
+    public SymbolicLocation getInitialLocation() {
+        return getInitialLocation(systems);
+    }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();

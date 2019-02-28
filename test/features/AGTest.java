@@ -1,6 +1,9 @@
 package features;
 
-import logic.*;
+import logic.Composition;
+import logic.Refinement;
+import logic.SimpleTransitionSystem;
+import logic.TransitionSystem;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,7 +16,7 @@ public class AGTest {
     private static TransitionSystem a, g, q, imp;
 
     @BeforeClass
-    public static void setUpBeforeClass()  {
+    public static void setUpBeforeClass() {
         String base = "./samples/AG/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/A.json",

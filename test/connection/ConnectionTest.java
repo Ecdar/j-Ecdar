@@ -60,6 +60,7 @@ public class ConnectionTest {
         String query = "-rq ./samples/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine refinement:Machine3<=Machine3 refinement:Researcher<=Researcher";
         assertEquals("true true true true", (Main.chooseCommand(query)));
     }
+
     @Test
     public void testRunInvalidQuery() {
         assertEquals("Error: null", (Main.chooseCommand("-rq sdfsd xcv")));

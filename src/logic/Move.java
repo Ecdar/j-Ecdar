@@ -36,11 +36,19 @@ class Move {
         return edges;
     }
 
-    public List<Guard> getGuards() { return guards; }
+    public List<Guard> getGuards() {
+        return guards;
+    }
 
-    public void setGuards(List<Guard> guards) { this.guards = guards; }
+    public void setGuards(List<Guard> guards) {
+        this.guards = guards;
+    }
 
-    public List<Update> getUpdates() { return updates; }
+    public List<Update> getUpdates() {
+        return updates;
+    }
 
-    public void setUpdates(List<Update> updates) { this.updates = updates; }
+    public void setUpdates(List<Update> updates) {
+        this.updates = updates;
+    }
 }

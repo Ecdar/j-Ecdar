@@ -347,7 +347,7 @@ public class DBMTest {
     }
 
     @Test
-    public void testAZIntersect1(){
+    public void testAZIntersect1() {
         Zone zone1 = new Zone(new int[]{1, 1, 8, 1});
         Zone zone2 = new Zone(new int[]{1, -8, DBM_INF, 1});
         Zone zone3 = new Zone(new int[]{1, -5, DBM_INF, 1});
@@ -366,7 +366,7 @@ public class DBMTest {
     }
 
     @Test
-    public void testUpdateLowerBounds1(){
+    public void testUpdateLowerBounds1() {
         Zone prevZone = new Zone(new int[]{1, -999, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
         Zone targetZone = new Zone(prevZone);
 
@@ -391,7 +391,7 @@ public class DBMTest {
     }
 
     @Test
-    public void testDBM(){
+    public void testDBM() {
 //        int[] t1 = new int[]{1, 1, 1, 1, 1, 1,
 //                9, 1, 9, 9, 9, 9,
 //                DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF,

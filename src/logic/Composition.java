@@ -51,8 +51,10 @@ public class Composition extends TransitionSystem {
                     syncs.addAll(setIntersection(cleanInputsOfI, outputsOfJ));
 
                     // apply changes to inputs and outputs of TS at index i
-                    inputsOfI.removeAll(outputsOfJ); inputsOfI.removeAll(syncsOfJ);
-                    outputsOfI.removeAll(inputsOfJ); outputsOfI.removeAll(syncsOfJ);
+                    inputsOfI.removeAll(outputsOfJ);
+                    inputsOfI.removeAll(syncsOfJ);
+                    outputsOfI.removeAll(inputsOfJ);
+                    outputsOfI.removeAll(syncsOfJ);
                 }
             }
 
@@ -62,13 +64,21 @@ public class Composition extends TransitionSystem {
         }
     }
 
-    public Set<Channel> getInputs() { return inputs; }
+    public Set<Channel> getInputs() {
+        return inputs;
+    }
 
-    public Set<Channel> getOutputs() { return outputs; }
+    public Set<Channel> getOutputs() {
+        return outputs;
+    }
 
-    public Set<Channel> getSyncs() { return syncs; }
+    public Set<Channel> getSyncs() {
+        return syncs;
+    }
 
-    public SymbolicLocation getInitialLocation() { return getInitialLocation(systems); }
+    public SymbolicLocation getInitialLocation() {
+        return getInitialLocation(systems);
+    }
 
     // build a list of transitions from a given state and a signal
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
@@ -106,7 +116,7 @@ public class Composition extends TransitionSystem {
             return new ArrayList<>();
 
         // If action is sync, then check if there is corresponding input and output in TS
-        if(!checkForInputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
+        if (!checkForInputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
 
         List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
 
@@ -159,7 +169,7 @@ public class Composition extends TransitionSystem {
                     List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
                     // do not check for inputs if the state in the corresponding automaton does not send that input
                     if (!moves.isEmpty())
-                    checkInput = true;
+                        checkInput = true;
                 }
             }
         } else checkInput = true;

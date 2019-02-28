@@ -1,7 +1,7 @@
 package logic;
 
-import models.Guard;
 import models.Edge;
+import models.Guard;
 import models.Update;
 
 import java.util.Arrays;

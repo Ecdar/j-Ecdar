@@ -21,9 +21,13 @@ public class ComplexLocation extends SymbolicLocation {
         return locations;
     }
 
-    public List<Guard> getInvariants() { return invariants; }
+    public List<Guard> getInvariants() {
+        return invariants;
+    }
 
-    public void removeInvariants() { invariants = new ArrayList<>(); }
+    public void removeInvariants() {
+        invariants = new ArrayList<>();
+    }
 
     @Override
     public boolean equals(Object o) {

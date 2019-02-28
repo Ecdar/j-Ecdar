@@ -1,7 +1,7 @@
 package logic;
 
 import lib.DBMLib;
-import models.*;
+import models.Channel;
 
 import java.io.File;
 import java.util.ArrayDeque;
@@ -66,55 +66,46 @@ public class Specification {
     private boolean checkDeterminism(List<Transition> transitions) {
         for (int i = 0; i < transitions.size(); i++) {
             waiting.add(transitions.get(i).getTarget());
-            for (int j = i+1; j < transitions.size(); j++) {
+            for (int j = i + 1; j < transitions.size(); j++) {
 
                 transitions.get(i).getTarget().applyGuards(transitions.get(i).getGuards(), ts.getClocks());
                 transitions.get(j).getTarget().applyGuards(transitions.get(j).getGuards(), ts.getClocks());
                 //printDBM(transitions.get(i).getTarget().getZone(),true);
                 //printDBM(transitions.get(j).getTarget().getZone(),true);
                 //boolean check = DBMLib.dbm_intersection(transitions.get(i).getTarget().getZone(),
-                 //       transitions.get(j).getTarget().getZone(), ts.getDbmSize());
+                //       transitions.get(j).getTarget().getZone(), ts.getDbmSize());
                 //if (check)
-                    return false;
+                return false;
             }
         }
         return true;
     }
 
-    public static void printDBM(int[] x, boolean toConvert){
+    public static void printDBM(int[] x, boolean toConvert) {
         int length = x.length;
         int dim = (int) Math.sqrt(length);
         int intLength = 0;
         int toPrint = 0;
 
         System.out.println("---------------------------------------");
-        for(int i = 0,j = 1; i < length; i++, j++){
+        for (int i = 0, j = 1; i < length; i++, j++) {
 
-            if(toConvert) toPrint = DBMLib.raw2bound(x[i]);
+            if (toConvert) toPrint = DBMLib.raw2bound(x[i]);
             else toPrint = x[i];
 
             System.out.print(toPrint);
-            if(j == dim){
+            if (j == dim) {
                 System.out.println();
-                if(i == length - 1) System.out.println("---------------------------------------");
+                if (i == length - 1) System.out.println("---------------------------------------");
                 j = 0;
-            }
-            else{
+            } else {
                 intLength = String.valueOf(toPrint).length();
-                for (int k = 0; k < 14 - intLength; k++)
-                {
+                for (int k = 0; k < 14 - intLength; k++) {
                     System.out.print(" ");
                 }
             }
         }
     }
-
-
-
-
-
-
-
 
 
 }

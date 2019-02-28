@@ -48,11 +48,10 @@ public abstract class TransitionSystem {
             State targetState = new State(move.getTarget(), copiedZone);
             // get the new zone by applying guards and resets on the zone of the target state
             Zone absZone = targetState.getZone().getAbsoluteZone(guards, clocks);
-            if(absZone.containsNegatives()) continue;
+            if (absZone.containsNegatives()) continue;
 
             if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
             if (!targetState.getZone().isValid()) continue;
-
 
 
             targetState.getZone().updateLowerBounds(currentState.getZone(), absZone.getRawRowMax());

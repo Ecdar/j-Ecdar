@@ -55,32 +55,18 @@ public class Zone {
         return newZone;
     }
 
-    public int getMinUpperBound() {
-        int[] newZone = getZoneValues();
-
-        int min = Integer.MAX_VALUE;
+    public int getMaxRawDelay() {
+        int max = DBM_INF;
 
         for (int i = 1; i < size; i++) {
-            int curr = newZone[size * i];
-            if (curr < min)
-                min = curr;
+            // upper bound - lower bound of corresponding clock
+            int ub = dbm[size * i];
+            int lb = dbm[i];
+            int diff = (ub == DBM_INF) ? DBM_INF : ub + lb;
+            if (diff < max) max = diff;
         }
 
-        return min;
-    }
-
-    public int getMinLowerBound() {
-        int[] newZone = getZoneValues();
-
-        int min = Integer.MAX_VALUE;
-
-        for (int i = 1; i < size; i++) {
-            int curr = (-1) * newZone[i];
-            if (curr < min)
-                min = curr;
-        }
-
-        return min;
+        return max;
     }
 
     public void buildConstraintsForGuard(Guard g, int index) {
@@ -123,7 +109,7 @@ public class Zone {
             int rawClockLB = dbm[index];
             int constraint, rawConstraint;
 
-            if(firstVisit) clockIndices.remove(new Integer(index));
+            if (firstVisit) clockIndices.remove(new Integer(index));
             if (firstVisit && rawClockLB != 1) {
                 result = DBMLib.dbm_freeDown(result, size, index);
 
@@ -166,7 +152,7 @@ public class Zone {
         }
 
         // After processing all guards we have to update clocks that had no related guards
-        for (Integer index : clockIndices){
+        for (Integer index : clockIndices) {
 
             int clockUB = dbm[size * index];
             int clockLB = dbm[index];
@@ -205,7 +191,8 @@ public class Zone {
     }
 
     private int[] getRawRowMaxColumnMin() {
-        int rowMax = 1; int columnMin = DBM_INF;
+        int rowMax = 1;
+        int columnMin = DBM_INF;
 
         for (int i = 1; i < size; i++) {
             int curr = dbm[i];
@@ -253,44 +240,42 @@ public class Zone {
     }
 
     // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
-    public void constrain1(int i, int j, int constraint, boolean isStrict){
+    public void constrain1(int i, int j, int constraint, boolean isStrict) {
         dbm = DBMLib.dbm_constrain1(dbm, size, i, j, constraint, isStrict);
     }
 
-    public void init(){
+    public void init() {
         dbm = DBMLib.dbm_init(dbm, size);
     }
 
-    public int[] getDbm(){
+    public int[] getDbm() {
         return dbm;
     }
 
     // Method to nicely print DBM for testing purposes.
     // The boolean flag determines if values of the zone will be converted from DBM format to actual bound of constraint
-    public void printDBM(boolean toConvert, boolean showStrictness){
+    public void printDBM(boolean toConvert, boolean showStrictness) {
         int intLength = 0;
         int toPrint = 0;
 
         System.out.println("---------------------------------------");
-        for(int i = 0,j = 1; i < actualSize; i++, j++){
+        for (int i = 0, j = 1; i < actualSize; i++, j++) {
 
-            toPrint = toConvert? DBMLib.raw2bound(dbm[i]) : dbm[i];
+            toPrint = toConvert ? DBMLib.raw2bound(dbm[i]) : dbm[i];
 
             System.out.print(toPrint);
 
-            if(showStrictness){
+            if (showStrictness) {
                 String strictness = DBMLib.dbm_rawIsStrict(dbm[i]) ? " < " : " <=";
                 System.out.print(strictness);
             }
-            if(j == size){
+            if (j == size) {
                 System.out.println();
-                if(i == actualSize - 1) System.out.println("---------------------------------------");
+                if (i == actualSize - 1) System.out.println("---------------------------------------");
                 j = 0;
-            }
-            else{
+            } else {
                 intLength = String.valueOf(toPrint).length();
-                for (int k = 0; k < 14 - intLength; k++)
-                {
+                for (int k = 0; k < 14 - intLength; k++) {
                     System.out.print(" ");
                 }
             }

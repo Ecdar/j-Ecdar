@@ -1,20 +1,16 @@
 package features;
 
-import logic.*;
+import logic.SimpleTransitionSystem;
+import logic.Specification;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.Parser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static features.Helpers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SpecifcationTest {
+public class SpecificationTest {
     private static Automaton comp, comp1;
 
     @BeforeClass
@@ -29,6 +25,7 @@ public class SpecifcationTest {
         comp1 = machines[1];
 
     }
+
     @Test
     public void specificationComp() {
         Specification spec = new Specification(new SimpleTransitionSystem(comp));
