@@ -29,7 +29,7 @@ public class State {
         return zone;
     }
 
-    private int[] getZoneValues() {
+    public int[] getZoneValues() {
         int[] newZone = new int[zone.length];
 
         for (int i = 0; i < zone.length; i++) {
@@ -83,7 +83,7 @@ public class State {
         return min;
     }
 
-    private List<Guard> getInvariants() {
+    public List<Guard> getInvariants() {
         return location.getInvariants();
     }
 
