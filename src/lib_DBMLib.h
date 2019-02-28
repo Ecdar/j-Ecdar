@@ -42,10 +42,10 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero
 /*
  * Class:     lib_DBMLib
  * Method:    dbm_constrain1
- * Signature: ([IIIII)[I
+ * Signature: ([IIIIIZ)[I
  */
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1
-  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint);
+  (JNIEnv *, jclass, jintArray, jint, jint, jint, jint, jboolean);
 
 /*
  * Class:     lib_DBMLib
@@ -94,6 +94,30 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection
  */
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown
   (JNIEnv *, jclass, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_freeDown
+ * Signature: ([III)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown
+  (JNIEnv *, jclass, jintArray, jint, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_rawIsStrict
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_addRawRaw
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_lib_DBMLib_dbm_1addRawRaw
+  (JNIEnv *, jclass, jint, jint);
 
 #ifdef __cplusplus
 }

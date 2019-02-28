@@ -11,17 +11,23 @@ public class DBMLib {
 
     public static native int[] dbm_zero(int[] dbm, int dim);
 
-    public static native int[] dbm_constrain1(int[] dbm, int dim, int i, int j, int constraint);
+    public static native int[] dbm_constrain1(int[] dbm, int dim, int i, int j, int constraint, boolean strict);
 
     public static native int[] dbm_up(int[] dbm, int dim);
 
     public static native boolean dbm_isSubsetEq(int[] dbm1, int[] dbm2, int dim);
 
-    public static native int[] dbm_updateValue(int[] dbm, int dim, int x, int value);
+    public static native int[] dbm_updateValue(int[] dbm, int dim, int clockIndex, int value);
 
     public static native boolean dbm_isValid(int[] dbm, int dim);
 
     public static native boolean dbm_intersection(int[] dbm1, int[] dbm2, int dim);
 
     public static native int[] dbm_freeAllDown(int[] dbm, int dim);
+
+    public static native int[] dbm_freeDown(int[] dbm, int dim, int clockIndex);
+
+    public static native boolean dbm_rawIsStrict(int raw);
+
+    public static native int dbm_addRawRaw(int raw1, int raw2);
 }

@@ -11,8 +11,6 @@ public class Conjunction extends TransitionSystem {
         this.systems = systems;
 
         clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
-
-        dbmSize = clocks.size() + 1;
     }
 
     public Set<Channel> getInputs() {

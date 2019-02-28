@@ -1,25 +1,16 @@
 package logic;
 
-import lib.DBMLib;
 import models.*;
 
-import global.LibLoader;
 import java.util.*;
 import java.util.stream.Collectors;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
     final List<Clock> clocks;
-    int dbmSize;
 
     TransitionSystem() {
         this.clocks = new ArrayList<>();
-
-        LibLoader.load();
-    }
-
-    int getDbmSize() {
-        return dbmSize;
     }
 
     public List<Clock> getClocks() {
@@ -27,7 +18,7 @@ public abstract class TransitionSystem {
     }
 
     public State getInitialState() {
-        int[] zone = initializeDBM();
+        Zone zone = new Zone(clocks.size() + 1);
         State state = new State(getInitialLocation(), zone);
         state.applyInvariants(clocks);
 
@@ -52,14 +43,30 @@ public abstract class TransitionSystem {
             List<Guard> guards = egdes.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
             List<Update> updates = egdes.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
 
-            State state = new State(move.getTarget(), currentState.getZone());
+            // need to make a copy of the zone
+            Zone copiedZone = new Zone(currentState.getZone());
+            State targetState = new State(move.getTarget(), copiedZone);
             // get the new zone by applying guards and resets on the zone of the target state
-            if (!guards.isEmpty()) state.applyGuards(guards, clocks);
-            if (!updates.isEmpty()) state.applyResets(updates, clocks);
+            Zone absZone = targetState.getZone().getAbsoluteZone(guards, clocks);
+            if(absZone.containsNegatives()) continue;
 
-            // if the zone is valid, build the transition and add it to the list
-            if (isDbmValid(state.getZone()))
-                transitions.add(new Transition(currentState, state, move.getEdges()));
+            if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
+            if (!targetState.getZone().isValid()) continue;
+
+
+
+            targetState.getZone().updateLowerBounds(currentState.getZone(), absZone.getRawRowMax());
+            if (!targetState.getZone().isValid()) continue;
+
+            if (!updates.isEmpty()) targetState.applyResets(updates, clocks);
+
+            targetState.getZone().delay();
+
+            targetState.applyInvariants(clocks);
+
+            if (!targetState.getZone().isValid()) continue;
+
+            transitions.add(new Transition(currentState, targetState, move.getEdges()));
         }
 
         return transitions;
@@ -73,22 +80,17 @@ public abstract class TransitionSystem {
         return new HashSet<>();
     }
 
+    public Set<Channel> getActions() {
+        Set<Channel> actions = new HashSet<>(getInputs());
+        actions.addAll(getOutputs());
+        actions.addAll(getSyncs());
+
+        return actions;
+    }
+
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
-
-    private int[] initializeDBM() {
-        // we need a DBM of size n*n, where n is the number of clocks (x0, x1, x2, ... , xn)
-        // clocks x1 to xn are clocks derived from our automata, while x0 is a reference clock needed by the library
-        // initially dbm is an array of 0's, which is what we need
-        int[] dbm = new int[dbmSize * dbmSize];
-        dbm = DBMLib.dbm_init(dbm, dbmSize);
-        return dbm;
-    }
-
-    private boolean isDbmValid(int[] dbm) {
-        return DBMLib.dbm_isValid(dbm, dbmSize);
-    }
 
     List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
         List<Move> moves = new ArrayList<>();
@@ -127,7 +129,6 @@ public abstract class TransitionSystem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TransitionSystem that = (TransitionSystem) o;
-        return dbmSize == that.dbmSize &&
-                clocks.equals(that.clocks);
+        return clocks.equals(that.clocks);
     }
 }

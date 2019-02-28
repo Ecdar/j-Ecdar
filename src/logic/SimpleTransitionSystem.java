@@ -14,7 +14,6 @@ public class SimpleTransitionSystem extends TransitionSystem {
     public SimpleTransitionSystem(Automaton automaton) {
         this.automaton = automaton;
         clocks.addAll(Arrays.asList(automaton.getClocks()));
-        dbmSize = clocks.size() + 1;
     }
 
     public Set<Channel> getInputs() {

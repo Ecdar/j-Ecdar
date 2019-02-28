@@ -30,12 +30,12 @@ public class Specification {
         channels.addAll(ts.getSyncs());
         while (!waiting.isEmpty()) {
             State currentState = waiting.pop();
-            currentState.getZoneValues();
+            //currentState.getZoneValues();
             boolean outputEdge = false;
             boolean invariant = false;
-            if (currentState.getInvariants().size() > 0) {
-                invariant = true;
-            }
+            //if (currentState.getInvariants().size() > 0) {
+            //    invariant = true;
+            //}
             for (Channel action : channels) {
 
                 List<Transition> transitions = ts.getNextTransitions(currentState, action);
@@ -70,11 +70,11 @@ public class Specification {
 
                 transitions.get(i).getTarget().applyGuards(transitions.get(i).getGuards(), ts.getClocks());
                 transitions.get(j).getTarget().applyGuards(transitions.get(j).getGuards(), ts.getClocks());
-                printDBM(transitions.get(i).getTarget().getZone(),true);
-                printDBM(transitions.get(j).getTarget().getZone(),true);
-                boolean check = DBMLib.dbm_intersection(transitions.get(i).getTarget().getZone(),
-                        transitions.get(j).getTarget().getZone(), ts.getDbmSize());
-                if (check)
+                //printDBM(transitions.get(i).getTarget().getZone(),true);
+                //printDBM(transitions.get(j).getTarget().getZone(),true);
+                //boolean check = DBMLib.dbm_intersection(transitions.get(i).getTarget().getZone(),
+                 //       transitions.get(j).getTarget().getZone(), ts.getDbmSize());
+                //if (check)
                     return false;
             }
         }

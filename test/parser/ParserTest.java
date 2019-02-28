@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class ParserTest {
     private static Automaton[] machines, machines2;
-    private static Automaton A, G, Q, Imp, Ref1, Ref2;
+    private static Automaton A, G, Q, Imp, Ref1;
 
     private static final Guard[] emptyGuards = new Guard[]{};
     private static final Update[] emptyUpdates = new Update[]{};
@@ -110,9 +110,6 @@ public class ParserTest {
 
         Ref1 = new Automaton("Ref1", new Location[]{l12, l13, l14, l15, l16, l17, l18},
                 new Edge[]{t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13}, new Clock[]{x, y});
-
-        Ref2 = new Automaton("Ref1", new Location[]{l12, l13, l14, l15, l16, l17, l18},
-                new Edge[]{t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t1}, new Clock[]{x, y});
     }
 
     @Test

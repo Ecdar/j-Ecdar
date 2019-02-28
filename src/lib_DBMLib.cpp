@@ -53,11 +53,11 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero(JNIEnv *env, jclass cls, j
 }
 
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
-    jint j, jint bound) {
+    jint j, jint bound, jboolean strict) {
     jsize len = env->GetArrayLength(dbm);
     auto converted = helper_functions::jintToC(env, dbm, len);
 
-    raw_t constraint = dbm_boundbool2raw(bound, false);
+    raw_t constraint = dbm_boundbool2raw(bound, strict);
     dbm_constrain1(converted, dim, i, j, constraint);
 
     return helper_functions::cToJint(env, converted, len);
@@ -81,11 +81,11 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isSubsetEq(JNIEnv *env, jclass c
     return dbm_isSubsetEq(converted1, converted2, dim);
 }
 
-JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint x, jint value) {
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1updateValue(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint clockIndex, jint value) {
     jsize len = env->GetArrayLength(dbm);
 
     auto converted = helper_functions::jintToC(env, dbm, len);
-    dbm_updateValue(converted, dim, x, value);
+    dbm_updateValue(converted, dim, clockIndex, value);
 
     return helper_functions::cToJint(env, converted, len);
 }
@@ -113,6 +113,23 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown(JNIEnv *env, jclass
     dbm_freeAllDown(converted, dim);
 
     return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint clockIndex) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_freeDown(converted, dim, clockIndex);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict(JNIEnv *env, jclass cls, jint raw) {
+   return dbm_rawIsStrict(raw);
+}
+
+JNIEXPORT jint JNICALL Java_lib_DBMLib_dbm_1addRawRaw(JNIEnv *env, jclass cls, jint raw1, jint raw2) {
+   return dbm_addRawRaw(raw1, raw2);
 }
 
 int main() { return 0; }
