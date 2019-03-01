@@ -5,6 +5,7 @@ import lib.DBMLib;
 import models.Clock;
 import models.Guard;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -62,7 +63,7 @@ public class Zone {
             // upper bound - lower bound of corresponding clock
             int ub = dbm[size * i];
             int lb = dbm[i];
-            int diff = (ub == DBM_INF) ? DBM_INF : ub + lb;
+            int diff = DBMLib.dbm_addRawRaw(ub, lb);
             if (diff < max) max = diff;
         }
 
@@ -280,5 +281,10 @@ public class Zone {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(dbm);
     }
 }

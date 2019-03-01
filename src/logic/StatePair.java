@@ -15,4 +15,9 @@ class StatePair {
     public State getRight() {
         return right;
     }
+
+    @Override
+    public String toString() {
+        return "L=" + left + ", R=" + right;
+    }
 }

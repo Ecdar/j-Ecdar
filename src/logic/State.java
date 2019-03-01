@@ -50,4 +50,9 @@ public class State {
         for (Update reset : resets)
             zone.updateValue(getIndexOfClock(reset.getClock(), clocks), reset.getValue());
     }
+
+    @Override
+    public String toString() {
+        return "{" + location + ", " + zone + '}';
+    }
 }

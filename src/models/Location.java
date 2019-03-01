@@ -45,4 +45,9 @@ public class Location {
                 name.equals(location.name) &&
                 Arrays.equals(invariant, location.invariant);
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

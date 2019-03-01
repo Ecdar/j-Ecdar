@@ -41,4 +41,9 @@ public class ComplexLocation extends SymbolicLocation {
     public int hashCode() {
         return Objects.hash(locations);
     }
+
+    @Override
+    public String toString() {
+        return "" + locations;
+    }
 }

@@ -34,4 +34,9 @@ public class SimpleLocation extends SymbolicLocation {
     public int hashCode() {
         return Objects.hash(location);
     }
+
+    @Override
+    public String toString() {
+        return "" + location;
+    }
 }
