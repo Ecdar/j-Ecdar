@@ -142,22 +142,28 @@ public class Parser {
 
         for (String str : listOfInv) {
             String symbol = "";
-            boolean strict, greater;
+            boolean strict, greater, isEq;
             strict = false;
             greater = false;
+            isEq = false;
 
-            if (str.contains("<=")) {
+            if (str.contains("==")) {
+                symbol = "==";
+                greater = false;
+                isEq = true;
+            }
+            else if (str.contains("<=")) {
                 symbol = "<=";
             }
-            if (str.contains(">=")) {
+            else if (str.contains(">=")) {
                 symbol = ">=";
                 greater = true;
             }
-            if (str.contains("<") && !str.contains("=")) {
+            else if (str.contains("<") && !str.contains("=")) {
                 symbol = "<";
                 strict = true;
             }
-            if (str.contains(">") && !str.contains("=")) {
+            else if (str.contains(">") && !str.contains("=")) {
                 symbol = ">";
                 greater = true;
                 strict = true;
@@ -167,7 +173,11 @@ public class Parser {
             for (int x = 0; x < s.length; x++) {
                 s[x] = s[x].replaceAll(" ", "");
             }
-            guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
+
+            if (isEq)
+                guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
+            else
+                guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
         }
 
         return guards.toArray(new Guard[0]);

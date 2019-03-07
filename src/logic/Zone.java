@@ -76,14 +76,17 @@ public class Zone {
         int lowerBoundI = g.getLowerBound();
         int upperBoundI = g.getUpperBound();
 
-        if (upperBoundI == Integer.MAX_VALUE) {
+        // if guard is of type "clock == value"
+        if (lowerBoundI == upperBoundI) {
             constrain1(0, index, (-1) * lowerBoundI, isStrict);
-        }
-
-        if (lowerBoundI == 0) {
-            dbm = DBMLib.dbm_constrain1(dbm, size, index, 0, upperBoundI, isStrict);
             constrain1(index, 0, upperBoundI, isStrict);
         }
+
+        if (upperBoundI == Integer.MAX_VALUE)
+            constrain1(0, index, (-1) * lowerBoundI, isStrict);
+
+        if (lowerBoundI == 0)
+            constrain1(index, 0, upperBoundI, isStrict);
     }
 
     public void updateValue(int index, int value) {

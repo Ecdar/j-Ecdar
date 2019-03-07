@@ -28,6 +28,13 @@ public class Guard {
         this.lowerBound = lower;
     }
 
+    public Guard(Clock clock, int value) {
+        this.clock = clock;
+        this.isStrict = false;
+        this.upperBound = value;
+        this.lowerBound = value;
+    }
+
     public Clock getClock() {
         return clock;
     }
