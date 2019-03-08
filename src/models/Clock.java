@@ -19,4 +19,11 @@ public class Clock {
         Clock clock = (Clock) o;
         return name.equals(clock.getName());
     }
+
+    @Override
+    public String toString() {
+        return "Clock{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

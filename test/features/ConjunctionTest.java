@@ -7,7 +7,7 @@ import logic.TransitionSystem;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import parser.Parser;
+import parser.JSONParser;
 
 import static org.junit.Assert.assertTrue;
 
@@ -16,12 +16,12 @@ public class ConjunctionTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        String base = "./samples/Conjunction/";
+        String base = "./samples/json/Conjunction/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Test1.json",
                 "Components/Test2.json",
                 "Components/Test3.json"};
-        Automaton[] machines = Parser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components);
 
         test1 = new SimpleTransitionSystem(machines[0]);
         test2 = new SimpleTransitionSystem(machines[1]);

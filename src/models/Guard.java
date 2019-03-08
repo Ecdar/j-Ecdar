@@ -71,6 +71,16 @@ public class Guard {
     }
 
     @Override
+    public String toString() {
+        return "Guard{" +
+                "clock=" + clock +
+                ", upperBound=" + upperBound +
+                ", lowerBound=" + lowerBound +
+                ", isStrict=" + isStrict +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(clock, upperBound, lowerBound, isStrict);
     }

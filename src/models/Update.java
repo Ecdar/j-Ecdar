@@ -30,6 +30,14 @@ public class Update {
     }
 
     @Override
+    public String toString() {
+        return "Update{" +
+                "clock=" + clock +
+                ", value=" + value +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(clock, value);
     }

@@ -3,7 +3,6 @@ package parser;
 import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Parser {
+public class JSONParser {
 
     private static ArrayList<JSONObject> objectList = new ArrayList<>();
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
@@ -40,7 +39,7 @@ public class Parser {
     //---------------------------Testing-----------------
 
     private static ArrayList<JSONObject> parseFiles(ArrayList<String> locations) {
-        JSONParser parser = new JSONParser();
+        org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
         ArrayList<JSONObject> returnList = new ArrayList<>();
 
         try {

@@ -98,6 +98,20 @@ public class Automaton {
     }
 
     @Override
+    public String toString() {
+        return "Automaton{" +
+                "name='" + name + '\'' +
+                ", locations=" + Arrays.toString(locations) +
+                ", edges=" + Arrays.toString(edges) +
+                ", clocks=" + Arrays.toString(clocks) +
+                ", inputAct=" + inputAct +
+                ", outputAct=" + outputAct +
+                ", actions=" + actions +
+                ", initLoc=" + initLoc +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(name, locations, edges, clocks, inputAct, outputAct, initLoc);
     }

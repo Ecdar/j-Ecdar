@@ -4,7 +4,7 @@ import models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ParserTest {
+public class JSONParserTest {
     private static Automaton[] machines, machines2;
     private static Automaton A, G, Q, Imp, Ref1;
 
@@ -14,13 +14,13 @@ public class ParserTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        String base = "./samples/AG/";
+        String base = "./samples/json/AG/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/A.json",
                 "Components/G.json",
                 "Components/Q.json",
                 "Components/Imp.json"};
-        machines = Parser.parse(base, components);
+        machines = JSONParser.parse(base, components);
 
         Location l0 = new Location("L0", emptyGuards, true, false, false, false);
         Location l1 = new Location("L1", emptyGuards, false, false, false, false);
@@ -59,9 +59,9 @@ public class ParserTest {
 
 
         // Adding BigRefinement example automata
-        base = "./samples/BigRefinement/";
+        base = "./samples/json/BigRefinement/";
         components = new String[]{"GlobalDeclarations.json", "Components/Ref1.json"};
-        machines2 = Parser.parse(base, components);
+        machines2 = JSONParser.parse(base, components);
 
         Clock x = new Clock("x");
         Clock y = new Clock("y");

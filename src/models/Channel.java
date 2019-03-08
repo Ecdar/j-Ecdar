@@ -25,4 +25,11 @@ public class Channel {
         Channel channel = (Channel) o;
         return name.equals(channel.name);
     }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

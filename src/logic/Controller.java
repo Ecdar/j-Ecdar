@@ -1,7 +1,7 @@
 package logic;
 
 import models.Automaton;
-import parser.Parser;
+import parser.JSONParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class Controller {
     }
 
     public static void parseComponents(String folderLocation) {
-        cmpt = Parser.parse(folderLocation);
+        cmpt = JSONParser.parse(folderLocation);
     }
 
     private static List<Boolean> runQueries() throws Exception {

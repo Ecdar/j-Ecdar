@@ -4,7 +4,7 @@ import logic.*;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import parser.Parser;
+import parser.JSONParser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +15,7 @@ public class UniversityTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        String base = "./samples/EcdarUniversity/";
+        String base = "./samples/json/EcdarUniversity/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Administration.json",
                 "Components/Machine.json",
@@ -25,7 +25,7 @@ public class UniversityTest {
                 "Components/Adm2.json",
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"};
-        Automaton[] machines = Parser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components);
 
         adm = new SimpleTransitionSystem(machines[0]);
         machine = new SimpleTransitionSystem(machines[1]);

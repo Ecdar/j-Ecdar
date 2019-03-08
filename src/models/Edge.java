@@ -58,6 +58,18 @@ public class Edge {
     }
 
     @Override
+    public String toString() {
+        return "Edge{" +
+                "source=" + source +
+                ", target=" + target +
+                ", chan=" + chan +
+                ", isInput=" + isInput +
+                ", guards=" + Arrays.toString(guards) +
+                ", updates=" + Arrays.toString(updates) +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(source, target, chan, isInput, guards, updates);
     }

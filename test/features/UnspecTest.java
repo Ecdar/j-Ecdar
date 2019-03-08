@@ -7,7 +7,7 @@ import logic.TransitionSystem;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import parser.Parser;
+import parser.JSONParser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -17,12 +17,12 @@ public class UnspecTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        String base = "./samples/Unspec/";
+        String base = "./samples/json/Unspec/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/A.json",
                 "Components/AA.json",
                 "Components/B.json"};
-        Automaton[] machines = Parser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components);
 
         a = new SimpleTransitionSystem(machines[0]);
         aa = new SimpleTransitionSystem(machines[1]);

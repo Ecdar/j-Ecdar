@@ -6,7 +6,7 @@ import logic.TransitionSystem;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import parser.Parser;
+import parser.JSONParser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -17,11 +17,11 @@ public class BigRefinementTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        String base = "./samples/BigRefinement/";
+        String base = "./samples/json/BigRefinement/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Comp1.json",
                 "Components/Ref1.json"};
-        Automaton[] machines = Parser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components);
 
         comp1 = new SimpleTransitionSystem(machines[0]);
         ref1 = new SimpleTransitionSystem(machines[1]);
