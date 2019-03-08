@@ -1,5 +1,6 @@
 package logic;
 
+import models.Automaton;
 import models.Channel;
 
 import java.util.*;
@@ -78,6 +79,14 @@ public class Composition extends TransitionSystem {
 
     public SymbolicLocation getInitialLocation() {
         return getInitialLocation(systems);
+    }
+
+    public List<TransitionSystem> getSystems(){
+        List<TransitionSystem> result = new ArrayList<>();
+        for(TransitionSystem ts : systems){
+            result.addAll(ts.getSystems());
+        }
+        return result;
     }
 
     // build a list of transitions from a given state and a signal

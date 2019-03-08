@@ -34,6 +34,14 @@ public class Conjunction extends TransitionSystem {
         return outputs;
     }
 
+    public List<TransitionSystem> getSystems(){
+        List<TransitionSystem> result = new ArrayList<>();
+        for(TransitionSystem ts : systems){
+            result.addAll(ts.getSystems());
+        }
+        return result;
+    }
+
     public SymbolicLocation getInitialLocation() {
         return getInitialLocation(systems);
     }

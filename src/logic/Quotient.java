@@ -54,6 +54,13 @@ public class Quotient extends TransitionSystem {
         return outputs;
     }
 
+    public List<TransitionSystem> getSystems(){
+        List<TransitionSystem> result = new ArrayList<>();
+        result.addAll(ts1.getSystems());
+        result.addAll(ts2.getSystems());
+        return result;
+    }
+
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
         SymbolicLocation location = currentState.getLocation();
 

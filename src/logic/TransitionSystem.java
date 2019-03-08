@@ -37,11 +37,10 @@ public abstract class TransitionSystem {
 
         // loop through moves
         for (Move move : moves) {
-            List<Edge> egdes = move.getEdges();
 
             // gather all the guards and resets of one move
-            List<Guard> guards = egdes.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
-            List<Update> updates = egdes.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
+            List<Guard> guards = move.getGuards();
+            List<Update> updates = move.getUpdates();
 
             // need to make a copy of the zone
             Zone copiedZone = new Zone(currentState.getZone());
@@ -75,6 +74,8 @@ public abstract class TransitionSystem {
 
     public abstract Set<Channel> getOutputs();
 
+    public abstract List<TransitionSystem> getSystems();
+
     public Set<Channel> getSyncs() {
         return new HashSet<>();
     }
@@ -86,6 +87,27 @@ public abstract class TransitionSystem {
 
         return actions;
     }
+
+    public boolean isDeterministic(){
+        List<TransitionSystem> systems = getSystems();
+
+        for (TransitionSystem ts : systems){
+            if(!isDeterministic())
+                return false;
+        }
+        return true;
+    }
+
+    public boolean isConsistent(){
+        List<TransitionSystem> systems = getSystems();
+
+        for (TransitionSystem ts : systems){
+            if(isConsistent())
+                return false;
+        }
+        return true;
+    }
+
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 

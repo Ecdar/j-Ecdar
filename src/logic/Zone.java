@@ -243,6 +243,19 @@ public class Zone {
         return DBMLib.dbm_isValid(dbm, size);
     }
 
+    // This zone and received zone MUST BE OF THE SAME SIZE!!!
+    public boolean zonesIntersect(Zone zone){
+        return DBMLib.dbm_intersection(dbm, zone.dbm, size);
+    }
+
+    public boolean canDelayIndefinetly(){
+        for (int i = 1; i < size; i++) {
+            int curr = dbm[size * i];
+            if (curr < DBM_INF) return false;
+        }
+        return true;
+    }
+
     // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
     public void constrain1(int i, int j, int constraint, boolean isStrict) {
         dbm = DBMLib.dbm_constrain1(dbm, size, i, j, constraint, isStrict);
