@@ -27,8 +27,13 @@ public class Refinement {
     }
 
     public boolean check() {
+        // Temp waiting list peak counter
         int waitingAmount = 0;
         // keep looking at states from Waiting as long as it contains elements
+
+        if(!ts1.isConsistent() || !ts2.isConsistent())
+            return false;
+
         while (!waiting.isEmpty()) {
             if (waiting.size() > waitingAmount) waitingAmount = waiting.size();
             StatePair curr = waiting.pop();
@@ -65,7 +70,7 @@ public class Refinement {
     }
 
 
-    // takes transitions of automata 1 and 2 and builds the states corresponding to all possible combinations between them
+    // takes transitions of automaton 1 and 2 and builds the states corresponding to all possible combinations between them
     private List<StatePair> getNewStates(List<Transition> next1, List<Transition> next2) {
         List<StatePair> states = new ArrayList<>();
 
@@ -179,14 +184,12 @@ public class Refinement {
             if (tempTrans.isEmpty()) checkSyncs = false;
             else {
                 // Collect all states that are target of the given transitions
-                tempStates = tempTrans.stream().map(Transition::getTarget).collect(Collectors.toList());
-                tempTrans = new ArrayList<>();
-                // Get all states that are in passed list
-                List<State> toRemove = tempStates.stream().filter(s -> passedContainsState(s, passedInternal)).collect(Collectors.toList());
-                // Remove all states that are already in passed
-                tempStates.removeAll(toRemove);
+                tempStates = tempTrans.stream().map(Transition::getTarget).
+                        filter(s -> !passedContainsState(s, passedInternal)).collect(Collectors.toList());
 
                 passedInternal.addAll(tempStates);
+
+                tempTrans = new ArrayList<>();
             }
         }
 

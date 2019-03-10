@@ -92,7 +92,7 @@ public abstract class TransitionSystem {
         List<TransitionSystem> systems = getSystems();
 
         for (TransitionSystem ts : systems){
-            if(!isDeterministic())
+            if(!ts.isDeterministic())
                 return false;
         }
         return true;
@@ -102,12 +102,11 @@ public abstract class TransitionSystem {
         List<TransitionSystem> systems = getSystems();
 
         for (TransitionSystem ts : systems){
-            if(isConsistent())
+            if(!ts.isConsistent())
                 return false;
         }
         return true;
     }
-
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 

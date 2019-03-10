@@ -136,4 +136,25 @@ public class ConsistencyTest {
 
         assertTrue(ts.isConsistent());
     }
+
+    @Test
+    public void testG18(){
+        TransitionSystem ts = new SimpleTransitionSystem(automata[17]);
+
+        assertTrue(ts.isConsistent());
+    }
+
+    @Test
+    public void testG19(){
+        TransitionSystem ts = new SimpleTransitionSystem(automata[18]);
+
+        assertFalse(ts.isConsistent());
+    }
+
+    @Test
+    public void testG20(){
+        TransitionSystem ts = new SimpleTransitionSystem(automata[19]);
+
+        assertTrue(ts.isConsistent());
+    }
 }

@@ -66,23 +66,23 @@ public class SimpleTransitionSystem extends TransitionSystem {
         return true;
     }
 
-    // Check if zones of moves for the same action overlap, that is if there is non determinism
+    // Check if zones of moves for the same action overlap, that is if there is non-determinism
     public boolean checkMovesOverlap(List<Transition> trans) {
-        if (trans.size() >= 2) {
-            for (int i = 0; i < trans.size(); i++) {
-                for (int j = i + 1; j < trans.size(); j++) {
-                    if (!trans.get(i).getTarget().getLocation().equals(trans.get(j).getTarget().getLocation())) {
+        if (trans.size() < 2) return false;
 
-                        State state1 = new State(trans.get(i).getSource());
-                        State state2 = new State(trans.get(j).getSource());
+        for (int i = 0; i < trans.size(); i++) {
+            for (int j = i + 1; j < trans.size(); j++) {
+                if (trans.get(i).getTarget().getLocation().equals(trans.get(j).getTarget().getLocation()))
+                    continue;
 
-                        state1.applyGuards(trans.get(i).getGuards(), clocks);
-                        state2.applyGuards(trans.get(j).getGuards(), clocks);
+                State state1 = new State(trans.get(i).getSource());
+                State state2 = new State(trans.get(j).getSource());
 
-                        if (state1.getZone().isValid() && state2.getZone().isValid()) {
-                            return state1.getZone().zonesIntersect(state2.getZone());
-                        }
-                    }
+                state1.applyGuards(trans.get(i).getGuards(), clocks);
+                state2.applyGuards(trans.get(j).getGuards(), clocks);
+
+                if (state1.getZone().isValid() && state2.getZone().isValid()) {
+                    return state1.getZone().intersects(state2.getZone());
                 }
             }
         }
@@ -93,14 +93,12 @@ public class SimpleTransitionSystem extends TransitionSystem {
         if (!isDeterministic())
             return false;
         passed = new ArrayList<>();
-        Set<Channel> inputs = getInputs();
-        Set<Channel> outputs = getOutputs();
-        return checkConsistency(getInitialState(), inputs, outputs);
+        return checkConsistency(getInitialState(), getInputs(), getOutputs());
     }
 
     public boolean checkConsistency(State currState, Set<Channel> inputs, Set<Channel> outputs) {
 
-        if(passedContainsState(currState))
+        if (passedContainsState(currState))
             return true;
 
         passed.add(currState);
@@ -115,44 +113,28 @@ public class SimpleTransitionSystem extends TransitionSystem {
             }
         }
 
-        // If Delay indefinitely -> Continue;
+        // If delaying indefinitely is possible -> Prune the rest
         if (currState.getZone().canDelayIndefinetly())
             return true;
-        // Else if independent progress does not hold through delaying indefinitely,
-        // we must check for being able to output and satisfy independent progress
+            // Else if independent progress does not hold through delaying indefinitely,
+            // we must check for being able to output and satisfy independent progress
         else {
             for (Channel channel : outputs) {
 
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
-                if(tempTrans.size() == 0)
-                    return false;
 
                 for (Transition ts : tempTrans) {
                     boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs);
-                    if(outputConsistent)
+                    if (outputConsistent)
                         return true;
                 }
             }
-        }
-        return false;
-    }
-
-    private int addStatesToWaitingList(Set<Channel> channels, State state) {
-        int counter = 0;
-
-        for (Channel channel : channels) {
-            List<Transition> tempTrans = getNextTransitions(state, channel);
-
-            List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
-                    filter(s -> !passedContainsState(s)).collect(Collectors.toList());
-
-            waiting.addAll(toAdd);
-            counter += toAdd.size();
+            // If by now no locations reached by output edges managed to satisfy independent progress check
+            // or there are no output edges from the current location -> Independent progress does not hold
+            return false;
         }
 
-        return counter;
     }
-
 
     private boolean passedContainsState(State state) {
         for (State passedState : passed) {
@@ -162,7 +144,6 @@ public class SimpleTransitionSystem extends TransitionSystem {
                 return true;
             }
         }
-
         return false;
     }
 

@@ -244,7 +244,8 @@ public class Zone {
     }
 
     // This zone and received zone MUST BE OF THE SAME SIZE!!!
-    public boolean zonesIntersect(Zone zone){
+    public boolean intersects(Zone zone){
+        if(this.size != zone.size) throw new IllegalArgumentException("Zones must be of the same size");
         return DBMLib.dbm_intersection(dbm, zone.dbm, size);
     }
 
