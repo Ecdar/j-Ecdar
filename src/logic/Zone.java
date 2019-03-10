@@ -257,6 +257,15 @@ public class Zone {
         return true;
     }
 
+    public boolean isUrgent(){
+        for (int i = 1; i < size; i++) {
+            int currLower = dbm[i];
+            int currUpper = dbm[size * i];
+            if (currLower != currUpper) return false;
+        }
+        return true;
+    }
+
     // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
     public void constrain1(int i, int j, int constraint, boolean isStrict) {
         dbm = DBMLib.dbm_constrain1(dbm, size, i, j, constraint, isStrict);

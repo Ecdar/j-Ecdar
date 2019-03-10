@@ -108,6 +108,16 @@ public abstract class TransitionSystem {
         return true;
     }
 
+    public boolean isImplementation(){
+        List<TransitionSystem> systems = getSystems();
+
+        for (TransitionSystem ts : systems){
+            if(!ts.isImplementation())
+                return false;
+        }
+        return true;
+    }
+
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);

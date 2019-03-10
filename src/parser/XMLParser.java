@@ -206,7 +206,7 @@ public class XMLParser {
 
     private static List<Update> addUpdates(String text, Clock[] clockList) {
         List<Update> list = new ArrayList<>();
-        String[] rawUpdates = text.split(";");
+        String[] rawUpdates = text.split(",");
         for (String rawUpdate : rawUpdates) {
             rawUpdate = rawUpdate.replaceAll(" ", "");
 

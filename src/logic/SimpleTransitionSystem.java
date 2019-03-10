@@ -48,7 +48,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
 
         while (!waiting.isEmpty()) {
             State currState = new State(waiting.pop());
-            passed.add(currState);
+            passed.add(new State(currState));
 
             for (Channel action : actions) {
 
@@ -93,6 +93,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
         if (!isDeterministic())
             return false;
         passed = new ArrayList<>();
+        State test = getInitialState();
         return checkConsistency(getInitialState(), getInputs(), getOutputs());
     }
 
@@ -101,7 +102,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
         if (passedContainsState(currState))
             return true;
 
-        passed.add(currState);
+        passed.add(new State(currState));
 
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
@@ -128,12 +129,56 @@ public class SimpleTransitionSystem extends TransitionSystem {
                     if (outputConsistent)
                         return true;
                 }
+
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
             // or there are no output edges from the current location -> Independent progress does not hold
             return false;
         }
+    }
 
+    public boolean isImplementation(){
+        if(!isConsistent())
+            return false;
+
+        Set<Channel> outputs = getOutputs();
+        Set<Channel> actions = getActions();
+
+        waiting = new ArrayDeque<>();
+        passed = new ArrayList<>();
+        waiting.add(getInitialState());
+
+        while (!waiting.isEmpty()) {
+            State currState = new State(waiting.pop());
+            passed.add(new State(currState));
+
+            for (Channel action : actions){
+                List<Transition> tempTrans = getNextTransitions(currState, action);
+
+                if(!tempTrans.isEmpty() && outputs.contains(action)){
+                    if(!outputsAreUrgent(tempTrans))
+                        return false;
+                }
+
+                List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
+                        filter(s -> !passedContainsState(s)).collect(Collectors.toList());
+
+                waiting.addAll(toAdd);
+            }
+        }
+
+        return true;
+    }
+
+    public boolean outputsAreUrgent(List<Transition> trans){
+        for (Transition ts : trans){
+            State state = new State(ts.getSource());
+            state.applyGuards(ts.getGuards(), clocks);
+
+            if(!state.getZone().isUrgent())
+                return false;
+        }
+        return true;
     }
 
     private boolean passedContainsState(State state) {
