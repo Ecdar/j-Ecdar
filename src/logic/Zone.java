@@ -261,7 +261,8 @@ public class Zone {
         for (int i = 1; i < size; i++) {
             int currLower = dbm[i];
             int currUpper = dbm[size * i];
-            if (currLower != currUpper) return false;
+            if (DBMLib.dbm_addRawRaw(currLower, currUpper) != 1)
+                return false;
         }
         return true;
     }

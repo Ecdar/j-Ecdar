@@ -89,15 +89,19 @@ public class SimpleTransitionSystem extends TransitionSystem {
         return false;
     }
 
-    public boolean isConsistent() {
+    public boolean isConsistent(){
+        return isConsistentHelper(true);
+    }
+
+    public boolean isConsistentHelper(boolean canPrune) {
         if (!isDeterministic())
             return false;
         passed = new ArrayList<>();
         State test = getInitialState();
-        return checkConsistency(getInitialState(), getInputs(), getOutputs());
+        return checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
     }
 
-    public boolean checkConsistency(State currState, Set<Channel> inputs, Set<Channel> outputs) {
+    public boolean checkConsistency(State currState, Set<Channel> inputs, Set<Channel> outputs, boolean canPrune) {
 
         if (passedContainsState(currState))
             return true;
@@ -108,14 +112,15 @@ public class SimpleTransitionSystem extends TransitionSystem {
         for (Channel channel : inputs) {
             List<Transition> tempTrans = getNextTransitions(currState, channel);
             for (Transition ts : tempTrans) {
-                boolean inputConsistent = checkConsistency(ts.getTarget(), inputs, outputs);
+                boolean inputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                 if (!inputConsistent)
                     return false;
             }
         }
 
+        boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (currState.getZone().canDelayIndefinetly())
+        if (currState.getZone().canDelayIndefinetly() && canPrune)
             return true;
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
@@ -125,20 +130,32 @@ public class SimpleTransitionSystem extends TransitionSystem {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
 
                 for (Transition ts : tempTrans) {
-                    boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs);
-                    if (outputConsistent)
+                    if(!outputExisted) outputExisted = true;
+                    boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
+                    if (outputConsistent && canPrune)
                         return true;
+
+                    if(!outputConsistent && !canPrune)
+                        return false;
                 }
+
+            }
+            if(!canPrune) {
+                if (outputExisted)
+                    return true;
+                if (!currState.getZone().canDelayIndefinetly())
+                    return false;
+                return true;
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
             // or there are no output edges from the current location -> Independent progress does not hold
-            return false;
+            else return false;
         }
     }
 
     public boolean isImplementation(){
-        if(!isConsistent())
+        if(!isConsistentHelper(false))
             return false;
 
         Set<Channel> outputs = getOutputs();
