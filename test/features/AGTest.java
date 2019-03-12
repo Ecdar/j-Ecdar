@@ -9,11 +9,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AGTest {
-    private static TransitionSystem a, g, q, imp;
+    private static TransitionSystem a, g, q, imp, aa;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -22,13 +21,16 @@ public class AGTest {
                 "Components/A.json",
                 "Components/G.json",
                 "Components/Q.json",
-                "Components/Imp.json"};
+                "Components/Imp.json",
+                "Components/AA.json"
+        };
         Automaton[] machines = JSONParser.parse(base, components);
 
         a = new SimpleTransitionSystem(machines[0]);
         g = new SimpleTransitionSystem(machines[1]);
         q = new SimpleTransitionSystem(machines[2]);
         imp = new SimpleTransitionSystem(machines[3]);
+        aa = new SimpleTransitionSystem(machines[4]);
     }
 
     @Test
@@ -61,7 +63,7 @@ public class AGTest {
 
     @Test
     public void AImpRefinesAG() {
-        assertFalse(new Refinement(
+        assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{a, imp}),
                 new Composition(new TransitionSystem[]{a, g})).check()
         );
@@ -73,8 +75,8 @@ public class AGTest {
     }
 
     @Test
-    public void ImpNotRefinesG() {
-        assertFalse(new Refinement(imp, g).check());
+    public void ImpRefinesG() {
+        assertTrue(new Refinement(imp, g).check());
     }
 
     @Test
@@ -93,8 +95,13 @@ public class AGTest {
     }
 
     @Test
-    public void ImpNotRefinesQ() {
-        assertFalse(new Refinement(imp, q).check());
+    public void ImpRefinesQ() {
+        assertTrue(new Refinement(imp, q).check());
+    }
+
+    @Test
+    public void ARefinesAA() {
+        assertTrue(new Refinement(a, aa).check());
     }
 
 //    @Test

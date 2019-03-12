@@ -3,13 +3,12 @@ package logic;
 import models.Channel;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Refinement {
     private final TransitionSystem ts1, ts2;
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
-    private final Set<Channel> inputs2, outputs1, syncs1, syncs2;
+    private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
@@ -20,10 +19,14 @@ public class Refinement {
         // the first states we look at are the initial ones
         waiting.push(new StatePair(ts1.getInitialState(), ts2.getInitialState()));
 
+        inputs1 = ts1.getInputs();
         inputs2 = ts2.getInputs();
-        outputs1 = ts1.getOutputs();
-        syncs1 = ts1.getSyncs();
-        syncs2 = ts2.getSyncs();
+
+        outputs1 = new HashSet<>(ts1.getOutputs());
+        outputs1.addAll(ts1.getSyncs());
+
+        outputs2 = new HashSet<>(ts2.getOutputs());
+        outputs2.addAll(ts2.getSyncs());
     }
 
     public boolean check() {
@@ -69,34 +72,14 @@ public class Refinement {
         return true;
     }
 
-
-    // takes transitions of automaton 1 and 2 and builds the states corresponding to all possible combinations between them
-    private List<StatePair> getNewStates(List<Transition> next1, List<Transition> next2) {
-        List<StatePair> states = new ArrayList<>();
-
-        for (Transition t1 : next1) {
-            for (Transition t2 : next2) {
-                // get source and target states
-
-                StatePair newState = buildStatePair(t1, t2);
-                if (newState != null) {
-                    states.add(newState);
-                }
-            }
-        }
-
-        return states;
-    }
-
     private StatePair buildStatePair(Transition t1, Transition t2) {
-
         State source1 = new State(t1.getSource());
         State target1 = new State(t1.getTarget().getLocation(), new Zone(t1.getSource().getZone()));
         State source2 = new State(t2.getSource());
         State target2 = new State(t2.getTarget().getLocation(), new Zone(t2.getSource().getZone()));
 
         Zone absZone1 = source1.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
-        Zone absZone2 = source2.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
+        Zone absZone2 = source2.getZone().getAbsoluteZone(t2.getGuards(), ts2.getClocks());
 
         if (!absZone1.absoluteZonesIntersect(absZone2)) return null;
 
@@ -124,80 +107,56 @@ public class Refinement {
         if (!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
 
         return new StatePair(target1, target2);
-
     }
 
-    private boolean checkActions(boolean isInput, State state1, State state2) {
-        for (Channel action : isInput ? inputs2 : outputs1) {
-            List<Transition> next1 = isInput ? getInternalTransitions(state2, action, ts2, false) :
-                    getInternalTransitions(state1, action, ts1, false);
+    private List<StatePair> createNewStatePairs(List<Transition> transitions1, List<Transition> transitions2) {
+        List<StatePair> pairs = new ArrayList<>();
 
-            if (!next1.isEmpty()) {
-                List<Transition> next2 = isInput ? getInternalTransitions(state1, action, ts1, true) :
-                        getInternalTransitions(state2, action, ts2, true);
+        for (Transition transition1 : transitions1) {
+            for (Transition transition2 : transitions2) {
+                StatePair pair = buildStatePair(transition1, transition2);
+                if (pair != null)
+                    pairs.add(pair);
+            }
+        }
 
-                // we found an input in TS 2 that doesn't exist in TS 1, so refinement doesn't hold
-                if (next2.isEmpty())
-                    return false;
+        return pairs;
+    }
 
-                List<StatePair> newStates = isInput ? getNewStates(next2, next1) : getNewStates(next1, next2);
+    private boolean checkInputs(State state1, State state2) {
+        return checkActions(state1, state2, true);
+    }
 
-                // if we don't get any new states, it means we found some incompatibility
-                if (newStates.isEmpty())
-                    return false;
+    private boolean checkOutputs(State state1, State state2) {
+        return checkActions(state1, state2, false);
+    }
 
-                for (StatePair statePair : newStates) {
-                    if (!passedContainsStatePair(statePair))
-                        waiting.add(statePair);
+    private boolean checkActions(State state1, State state2, boolean isInput) {
+        for (Channel action : (isInput ? inputs2 : outputs1)) {
+            List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action) : ts1.getNextTransitions(state1, action);
+
+            if (!transitions1.isEmpty()) {
+
+                List<Transition> transitions2;
+                Set<Channel> toCheck = isInput ? inputs1 : outputs2;
+                if (toCheck.contains(action)) {
+                    transitions2 = isInput ? ts1.getNextTransitions(state1, action) : ts2.getNextTransitions(state2, action);
+
+                    if (transitions2.isEmpty()) return false;
+                } else {
+                    // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
+                    transitions2 = new ArrayList<>();
+                    Transition loop = isInput ? new Transition(state1, state1, new ArrayList<>()) : new Transition(state2, state2, new ArrayList<>());
+                    transitions2.add(loop);
                 }
+
+                List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2);
+                if (pairs.isEmpty()) return false;
+                waiting.addAll(pairs);
             }
         }
 
         return true;
-    }
-
-    private boolean checkInputs(State state1, State state2) {
-        return checkActions(true, state1, state2);
-    }
-
-    private boolean checkOutputs(State state1, State state2) {
-        return checkActions(false, state1, state2);
-    }
-
-    private List<Transition> getInternalTransitions(State state, Channel action, TransitionSystem ts, boolean isFirst) {
-        List<Transition> result = new ArrayList<>();
-
-        List<Transition> tempTrans = new ArrayList<>();
-        List<State> tempStates = new ArrayList<>(Collections.singletonList(state));
-        List<State> passedInternal = new ArrayList<>(Collections.singletonList(state));
-
-        boolean checkSyncs = true;
-
-        while (checkSyncs) {
-
-            for (State tempState : tempStates) {
-                for (Channel sync : isFirst ? syncs1 : syncs2) {
-                    tempTrans.addAll(ts.getNextTransitions(tempState, sync));
-                }
-            }
-
-            if (tempTrans.isEmpty()) checkSyncs = false;
-            else {
-                // Collect all states that are target of the given transitions
-                tempStates = tempTrans.stream().map(Transition::getTarget).
-                        filter(s -> !passedContainsState(s, passedInternal)).collect(Collectors.toList());
-
-                passedInternal.addAll(tempStates);
-
-                tempTrans = new ArrayList<>();
-            }
-        }
-
-        for (State passedState : passedInternal) {
-            result.addAll(ts.getNextTransitions(passedState, action));
-        }
-
-        return result;
     }
 
     private boolean passedContainsStatePair(StatePair state) {
@@ -215,18 +174,6 @@ public class Refinement {
                         currRight.getZone().isSubset(passedRight.getZone())) {
                     return true;
                 }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean passedContainsState(State state, List<State> passed1) {
-        for (State passedState : passed1) {
-            // check for zone inclusion
-            if (state.getLocation().equals(passedState.getLocation()) &&
-                    state.getZone().isSubset(passedState.getZone())) {
-                return true;
             }
         }
 

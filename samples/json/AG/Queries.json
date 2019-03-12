@@ -38,5 +38,10 @@
     "query": "refinement: Imp \u003c\u003d Q",
     "comment": "",
     "isPeriodic": false
+  },
+  {
+    "query": "refinement: A \u003c\u003d AA",
+    "comment": "",
+    "isPeriodic": false
   }
 ]
