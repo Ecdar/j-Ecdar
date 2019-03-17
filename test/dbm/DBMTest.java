@@ -380,12 +380,12 @@ public class DBMTest {
 
         state.applyGuards(guardList, clockList);
 
-        prevZone.printDBM(false, true);
-        state.getZone().printDBM(false, true);
-        absZone.printDBM(false, true);
+//        prevZone.printDBM(false, true);
+//        state.getZone().printDBM(false, true);
+//        absZone.printDBM(false, true);
 
         state.getZone().updateLowerBounds(prevZone, absZone.getRawRowMax());
-        state.getZone().printDBM(false, true);
+        //state.getZone().printDBM(false, true);
 
         assertArrayEquals(state.getZone().getDbm(), new int[]{1, -1015, -15, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
     }

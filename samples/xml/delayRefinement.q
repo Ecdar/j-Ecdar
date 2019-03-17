@@ -79,3 +79,18 @@ refinement:N1<=N2
 
 */
 refinement:N3<=N4
+
+/*
+
+*/
+refinement:K1<=K2
+
+/*
+
+*/
+refinement:K3<=K4
+
+/*
+
+*/
+refinement:K5<=K6

@@ -191,13 +191,13 @@ public class UniversityTest {
         );
     }
 
-//    @Test
-//    public void testCompRefinesSelf() {
-//        Refinement ref = new Refinement(
-//                new Composition(new TransitionSystem[]{adm, machine, researcher}),
-//                new Composition(new TransitionSystem[]{machine, researcher, adm}));
-//        assertTrue(ref.check());
-//    }
+    @Test
+    public void testCompRefinesSelf() {
+        Refinement ref = new Refinement(
+                new Composition(new TransitionSystem[]{adm, machine, researcher}),
+                new Composition(new TransitionSystem[]{machine, researcher, adm}));
+        assertTrue(ref.check());
+    }
 
     @Test
     public void testUncomposable() {
