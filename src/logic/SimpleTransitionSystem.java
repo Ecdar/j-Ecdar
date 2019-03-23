@@ -120,7 +120,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
 
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (currState.getZone().canDelayIndefinetly() && canPrune)
+        if (currState.getZone().canDelayIndefinitely() && canPrune)
             return true;
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
@@ -143,7 +143,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                if (!currState.getZone().canDelayIndefinetly())
+                if (!currState.getZone().canDelayIndefinitely())
                     return false;
                 return true;
 

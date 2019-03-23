@@ -94,3 +94,8 @@ refinement:K3<=K4
 
 */
 refinement:K5<=K6
+
+/*
+
+*/
+refinement:P0<=P1

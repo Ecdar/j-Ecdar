@@ -42,6 +42,10 @@ public class Zone {
         LibLoader.load();
     }
 
+    public int getSize() {
+        return size;
+    }
+
     public int getElementAt(int i) {
         return dbm[i];
     }
@@ -235,6 +239,17 @@ public class Zone {
         return rowMax;
     }
 
+    public int getRawColumnMin() {
+        int colMin = DBM_INF;
+
+        for (int i = 1; i < size; i++) {
+            int curr = dbm[i * size];
+            if (curr < colMin) colMin = curr;
+        }
+
+        return colMin;
+    }
+
     public boolean isSubset(Zone zone2) {
         return DBMLib.dbm_isSubsetEq(this.dbm, zone2.dbm, size);
     }
@@ -249,7 +264,7 @@ public class Zone {
         return DBMLib.dbm_intersection(dbm, zone.dbm, size);
     }
 
-    public boolean canDelayIndefinetly(){
+    public boolean canDelayIndefinitely(){
         for (int i = 1; i < size; i++) {
             int curr = dbm[size * i];
             if (curr < DBM_INF) return false;

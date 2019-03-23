@@ -28,12 +28,12 @@ public class DelayRefinementTest {
 
     @Test
     public void C1RefinesC2() {
-        assertFalse(new Refinement(new SimpleTransitionSystem(automata[3]), new SimpleTransitionSystem(automata[4])).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[3]), new SimpleTransitionSystem(automata[4])).check());
     }
 
     @Test
     public void C2RefinesC1() {
-        assertFalse(new Refinement(new SimpleTransitionSystem(automata[4]), new SimpleTransitionSystem(automata[3])).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[4]), new SimpleTransitionSystem(automata[3])).check());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class DelayRefinementTest {
 
     @Test
     public void T6RefinesT5() {
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check());
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check());
     }
 
     @Test
@@ -117,5 +117,15 @@ public class DelayRefinementTest {
     @Test
     public void K3RefinesK4() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[27]), new SimpleTransitionSystem(automata[28])).check());
+    }
+
+    @Test
+    public void K5RefinesK6() {
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[29]), new SimpleTransitionSystem(automata[30])).check());
+    }
+
+    @Test
+    public void P0RefinesP1() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[31]), new SimpleTransitionSystem(automata[32])).check());
     }
 }

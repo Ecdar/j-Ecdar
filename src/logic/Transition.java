@@ -26,6 +26,10 @@ public class Transition {
         return target;
     }
 
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
     public List<Guard> getGuards() {
         // collect guards from each Edge and flatten the list
         return edges.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());

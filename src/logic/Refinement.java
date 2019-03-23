@@ -1,5 +1,6 @@
 package logic;
 
+import lib.DBMLib;
 import models.Channel;
 
 import java.util.*;
@@ -39,6 +40,7 @@ public class Refinement {
 
         while (!waiting.isEmpty()) {
             if (waiting.size() > waitingAmount) waitingAmount = waiting.size();
+
             StatePair curr = waiting.pop();
 
             // ignore if the zones are included in zones belonging to pairs of states that we already visited
@@ -74,17 +76,55 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State source1 = new State(t1.getSource());
-        State target1 = new State(t1.getTarget().getLocation(), new Zone(t1.getSource().getZone()));
+        State target1 = new State(t1.getTarget().getLocation(), new Zone(t1.getSource().getZone()), new Zone(t1.getTarget().getArrivalZone()));
         State source2 = new State(t2.getSource());
-        State target2 = new State(t2.getTarget().getLocation(), new Zone(t2.getSource().getZone()));
+        State target2 = new State(t2.getTarget().getLocation(), new Zone(t2.getSource().getZone()), new Zone(t2.getTarget().getArrivalZone()));
 
         Zone absZone1 = source1.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
         Zone absZone2 = source2.getZone().getAbsoluteZone(t2.getGuards(), ts2.getClocks());
 
-        if (!absZone1.absoluteZonesIntersect(absZone2)) return null;
+        if (!absZone1.absoluteZonesIntersect(absZone2))
+            return null;
 
         target1.applyGuards(t1.getGuards(), ts1.getClocks());
         target2.applyGuards(t2.getGuards(), ts2.getClocks());
+
+        Zone guardZone1 = target1.getZone();
+        Zone guardZone2 = target2.getZone();
+
+        Zone arrZone1 = source1.getArrivalZone();
+        Zone arrZone2 = source2.getArrivalZone();
+
+        // if we have self loop, skip the checks
+        if (!t1.getEdges().isEmpty() && !t2.getEdges().isEmpty()) {
+            int gMin1 = guardZone1.getRawRowMax();
+            int gMax1 = guardZone1.getRawColumnMin();
+
+            int gMin2 = guardZone2.getRawRowMax();
+            int gMax2 = guardZone2.getRawColumnMin();
+
+            int aMin1 = arrZone1.getRawRowMax();
+            int aMax1 = arrZone1.getRawColumnMin();
+
+            int aMin2 = arrZone2.getRawRowMax();
+            int aMax2 = arrZone2.getRawColumnMin();
+
+            // if we have resets, min and max of arrival zone will both be 0
+            if ((aMin1 == 1 && aMax1 == 1) || (aMin2 == 1 && aMax2 == 1)) {
+                if (!(gMin1 == gMin2 && gMax1 == gMax2 && aMin1 == aMin2 && aMax1 == aMax2)) {
+                    // for left side
+                    int lfmin1 = valueDiff(gMin1, aMax1);
+                    int lfmax1 = valueDiff(gMax1, aMin1);
+
+                    // for right side
+                    int lfmin2 = valueDiff(gMin2, aMin2);
+                    int lfMax2 = valueDiff(gMax2, aMax2);
+
+                    if (!(lfmin1 >= lfmin2) || !(lfmax1 <= lfMax2))
+                        return null;
+                }
+            }
+        }
 
         // Update lower bounds with the most minimal delay one of the states has to take
         int rowMax1 = absZone1.getRawRowMax();
@@ -93,10 +133,15 @@ public class Refinement {
         target1.getZone().updateLowerBounds(source1.getZone(), rowMax);
         target2.getZone().updateLowerBounds(source2.getZone(), rowMax);
 
-        if (!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
+        if (!target1.getZone().isValid() || !target2.getZone().isValid())
+            return null;
 
         target1.applyResets(t1.getUpdates(), ts1.getClocks());
         target2.applyResets(t2.getUpdates(), ts2.getClocks());
+
+        // no edges means it's most likely a self loop so we don't need to update arrival zone
+        if (!t1.getEdges().isEmpty()) target1.setArrivalZone(target1.getZone());
+        if (!t2.getEdges().isEmpty()) target2.setArrivalZone(target2.getZone());
 
         target1.getZone().delay();
         target2.getZone().delay();
@@ -104,7 +149,8 @@ public class Refinement {
         target1.applyInvariants(ts1.getClocks());
         target2.applyInvariants(ts2.getClocks());
 
-        if (!target1.getZone().isValid() || !target2.getZone().isValid()) return null;
+        if (!target1.getZone().isValid() || !target2.getZone().isValid())
+            return null;
 
         return new StatePair(target1, target2);
     }
@@ -142,7 +188,8 @@ public class Refinement {
                 if (toCheck.contains(action)) {
                     transitions2 = isInput ? ts1.getNextTransitions(state1, action) : ts2.getNextTransitions(state2, action);
 
-                    if (transitions2.isEmpty()) return false;
+                    if (transitions2.isEmpty())
+                        return false;
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
@@ -151,7 +198,8 @@ public class Refinement {
                 }
 
                 List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2);
-                if (pairs.isEmpty()) return false;
+                if (pairs.isEmpty())
+                    return false;
                 waiting.addAll(pairs);
             }
         }
@@ -178,5 +226,18 @@ public class Refinement {
         }
 
         return false;
+    }
+
+    // difference between two raw values (converted)
+    private int valueDiff(int v1, int v2) {
+        int dbmInf = Integer.MAX_VALUE - 1;
+
+        if (v1 == dbmInf) return dbmInf;
+
+        if (v2 == dbmInf) return 0;
+
+        v1 = Math.abs(DBMLib.raw2bound(v1));
+        v2 = Math.abs(DBMLib.raw2bound(v2));
+        return v1 - v2;
     }
 }
