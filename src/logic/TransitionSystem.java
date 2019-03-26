@@ -43,8 +43,7 @@ public abstract class TransitionSystem {
             List<Update> updates = move.getUpdates();
 
             // need to make a copy of the zone
-            Zone copiedZone = new Zone(currentState.getZone());
-            State targetState = new State(move.getTarget(), copiedZone);
+            State targetState = new State(move.getTarget(), currentState.getZone());
             // get the new zone by applying guards and resets on the zone of the target state
             Zone absZone = targetState.getZone().getAbsoluteZone(guards, clocks);
             if (absZone.containsNegatives()) continue;
@@ -57,6 +56,8 @@ public abstract class TransitionSystem {
             if (!targetState.getZone().isValid()) continue;
 
             if (!updates.isEmpty()) targetState.applyResets(updates, clocks);
+
+            targetState.setArrivalZone(targetState.getZone());
 
             targetState.getZone().delay();
 

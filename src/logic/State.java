@@ -9,23 +9,28 @@ import java.util.List;
 public class State {
     private final SymbolicLocation location;
     private Zone zone, arrivalZone;
+    // delay sum
+    private int dSum;
 
     public State(SymbolicLocation location, Zone zone) {
         this.location = location;
-        this.zone = zone;
+        this.zone = new Zone(zone);
         this.arrivalZone = new Zone(zone.getSize());
+        this.dSum = 0;
     }
 
-    public State(SymbolicLocation location, Zone zone, Zone arrivalZone) {
+    public State(SymbolicLocation location, Zone zone, Zone arrivalZone, int sum) {
         this.location = location;
-        this.zone = zone;
-        this.arrivalZone = arrivalZone;
+        this.zone = new Zone(zone);
+        this.arrivalZone = new Zone(arrivalZone);
+        this.dSum = sum;
     }
 
     public State(State oldState) {
         this.location = oldState.getLocation();
         this.zone = new Zone(oldState.getZone());
         this.arrivalZone = new Zone(oldState.getArrivalZone());
+        this.dSum = oldState.dSum;
     }
 
     public SymbolicLocation getLocation() {
@@ -38,6 +43,10 @@ public class State {
 
     public Zone getArrivalZone() {
         return arrivalZone;
+    }
+
+    public int getDSum() {
+        return dSum;
     }
 
     private int getIndexOfClock(Clock clock, List<Clock> clocks) {
@@ -65,6 +74,10 @@ public class State {
 
     public void setArrivalZone(Zone arrivalZone) {
         this.arrivalZone = new Zone(arrivalZone);
+    }
+
+    public void setDSum(int sum) {
+        this.dSum = sum;
     }
 
     @Override

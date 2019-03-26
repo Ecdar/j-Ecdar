@@ -1,6 +1,5 @@
 package logic;
 
-import models.Automaton;
 import models.Channel;
 
 import java.util.*;

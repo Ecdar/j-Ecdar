@@ -10,12 +10,15 @@ public class Refinement {
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
+    private boolean ref;
+    private int INF = 1073741823;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
         this.ts2 = system2;
         this.waiting = new ArrayDeque<>();
         this.passed = new ArrayList<>();
+        this.ref = true;
 
         // the first states we look at are the initial ones
         waiting.push(new StatePair(ts1.getInitialState(), ts2.getInitialState()));
@@ -68,17 +71,19 @@ public class Refinement {
                 if (!(left.getZone().getMaxRawDelay() <= right.getZone().getMaxRawDelay()))
                     return false;
             }
+
+            if (!ref) return false;
         }
 
         // if we got here it means refinement property holds
         return true;
     }
 
-    private StatePair buildStatePair(Transition t1, Transition t2) {
+    private StatePair buildStatePair(Transition t1, Transition t2, boolean isInput) {
         State source1 = new State(t1.getSource());
-        State target1 = new State(t1.getTarget().getLocation(), new Zone(t1.getSource().getZone()), new Zone(t1.getTarget().getArrivalZone()));
+        State target1 = new State(t1.getTarget().getLocation(), t1.getSource().getZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
         State source2 = new State(t2.getSource());
-        State target2 = new State(t2.getTarget().getLocation(), new Zone(t2.getSource().getZone()), new Zone(t2.getTarget().getArrivalZone()));
+        State target2 = new State(t2.getTarget().getLocation(), t2.getSource().getZone(), t2.getTarget().getArrivalZone(), t2.getTarget().getDSum());
 
         Zone absZone1 = source1.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
         Zone absZone2 = source2.getZone().getAbsoluteZone(t2.getGuards(), ts2.getClocks());
@@ -95,22 +100,56 @@ public class Refinement {
         Zone arrZone1 = source1.getArrivalZone();
         Zone arrZone2 = source2.getArrivalZone();
 
+        int gMin1 = Math.abs(DBMLib.raw2bound(guardZone1.getRawRowMax()));
+        int gMax1 = DBMLib.raw2bound(guardZone1.getRawColumnMin());
+
+        int gMin2 = Math.abs(DBMLib.raw2bound(guardZone2.getRawRowMax()));
+        int gMax2 = DBMLib.raw2bound(guardZone2.getRawColumnMin());
+
+        int aMin1 = Math.abs(DBMLib.raw2bound(arrZone1.getRawRowMax()));
+        int aMax1 = DBMLib.raw2bound(arrZone1.getRawColumnMin());
+
+        int aMin2 = Math.abs(DBMLib.raw2bound(arrZone2.getRawRowMax()));
+        int aMax2 = DBMLib.raw2bound(arrZone2.getRawColumnMin());
+
+        // arrival zone on the left is [0, 0]
+        if (aMin1 == 0 && aMax1 == 0) {
+            if (source1.getDSum() == INF || gMax1 == INF)
+                target1.setDSum(INF);
+            else
+                target1.setDSum(source1.getDSum() + gMax1);
+        } else {
+            target1.setDSum(gMax1);
+        }
+
+        if (aMin2 == 0 && aMax2 == 0) {
+            if (source2.getDSum() == INF || gMax2 == INF)
+                target2.setDSum(INF);
+            else
+                target2.setDSum(source2.getDSum() + gMax2);
+        } else {
+            target2.setDSum(gMax2);
+        }
+
         // if we have self loop, skip the checks
         if (!t1.getEdges().isEmpty() && !t2.getEdges().isEmpty()) {
-            int gMin1 = guardZone1.getRawRowMax();
-            int gMax1 = guardZone1.getRawColumnMin();
 
-            int gMin2 = guardZone2.getRawRowMax();
-            int gMax2 = guardZone2.getRawColumnMin();
-
-            int aMin1 = arrZone1.getRawRowMax();
-            int aMax1 = arrZone1.getRawColumnMin();
-
-            int aMin2 = arrZone2.getRawRowMax();
-            int aMax2 = arrZone2.getRawColumnMin();
+            if (isInput) {
+                // if right side can delay more than left side
+                if (target2.getDSum() > target1.getDSum()) {
+                    ref = false;
+                    return null;
+                }
+            } else {
+                // if left side can delay more than right side
+                if (target1.getDSum() > target2.getDSum()) {
+                    ref = false;
+                    return null;
+                }
+            }
 
             // if we have resets, min and max of arrival zone will both be 0
-            if ((aMin1 == 1 && aMax1 == 1) || (aMin2 == 1 && aMax2 == 1)) {
+            if ((aMin1 == 0 && aMax1 == 0) || (aMin2 == 0 && aMax2 == 0)) {
                 if (!(gMin1 == gMin2 && gMax1 == gMax2 && aMin1 == aMin2 && aMax1 == aMax2)) {
                     // for left side
                     int lfmin1 = valueDiff(gMin1, aMax1);
@@ -120,8 +159,10 @@ public class Refinement {
                     int lfmin2 = valueDiff(gMin2, aMin2);
                     int lfMax2 = valueDiff(gMax2, aMax2);
 
-                    if (!(lfmin1 >= lfmin2) || !(lfmax1 <= lfMax2))
+                    if (!(lfmin1 >= lfmin2) || !(lfmax1 <= lfMax2)) {
+                        ref = false;
                         return null;
+                    }
                 }
             }
         }
@@ -155,12 +196,12 @@ public class Refinement {
         return new StatePair(target1, target2);
     }
 
-    private List<StatePair> createNewStatePairs(List<Transition> transitions1, List<Transition> transitions2) {
+    private List<StatePair> createNewStatePairs(List<Transition> transitions1, List<Transition> transitions2, boolean isInput) {
         List<StatePair> pairs = new ArrayList<>();
 
         for (Transition transition1 : transitions1) {
             for (Transition transition2 : transitions2) {
-                StatePair pair = buildStatePair(transition1, transition2);
+                StatePair pair = buildStatePair(transition1, transition2, isInput);
                 if (pair != null)
                     pairs.add(pair);
             }
@@ -197,7 +238,7 @@ public class Refinement {
                     transitions2.add(loop);
                 }
 
-                List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2);
+                List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1, isInput) : createNewStatePairs(transitions1, transitions2, isInput);
                 if (pairs.isEmpty())
                     return false;
                 waiting.addAll(pairs);
@@ -230,14 +271,10 @@ public class Refinement {
 
     // difference between two raw values (converted)
     private int valueDiff(int v1, int v2) {
-        int dbmInf = Integer.MAX_VALUE - 1;
+        if (v1 == INF) return INF;
 
-        if (v1 == dbmInf) return dbmInf;
+        if (v2 == INF) return 0;
 
-        if (v2 == dbmInf) return 0;
-
-        v1 = Math.abs(DBMLib.raw2bound(v1));
-        v2 = Math.abs(DBMLib.raw2bound(v2));
         return v1 - v2;
     }
 }
