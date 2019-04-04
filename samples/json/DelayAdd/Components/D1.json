@@ -5,24 +5,24 @@
     {
       "id": "L14",
       "nickname": "",
-      "invariant": "",
-      "type": "INITIAL",
+      "invariant": "x \u003c\u003d 6",
+      "type": "NORMAL",
       "urgency": "NORMAL",
-      "x": 120.0,
+      "x": 340.0,
       "y": 260.0,
       "color": "7",
       "nicknameX": 30.0,
       "nicknameY": -10.0,
-      "invariantX": 30.0,
-      "invariantY": 10.0
+      "invariantX": -20.0,
+      "invariantY": 30.0
     },
     {
       "id": "L16",
       "nickname": "",
       "invariant": "",
-      "type": "NORMAL",
+      "type": "INITIAL",
       "urgency": "NORMAL",
-      "x": 330.0,
+      "x": 90.0,
       "y": 260.0,
       "color": "7",
       "nicknameX": 30.0,
@@ -34,27 +34,46 @@
   "edges": [
     {
       "sourceLocation": "L14",
-      "targetLocation": "L16",
+      "targetLocation": "L14",
+      "status": "OUTPUT",
+      "select": "",
+      "guard": "",
+      "update": "",
+      "sync": "o",
+      "isLocked": false,
+      "nails": [
+        {
+          "x": 340.0,
+          "y": 200.0,
+          "propertyType": "SYNCHRONIZATION",
+          "propertyX": 10.0,
+          "propertyY": -10.0
+        },
+        {
+          "x": 410.0,
+          "y": 180.0,
+          "propertyType": "NONE",
+          "propertyX": 0.0,
+          "propertyY": 0.0
+        }
+      ]
+    },
+    {
+      "sourceLocation": "L16",
+      "targetLocation": "L14",
       "status": "INPUT",
       "select": "",
-      "guard": "x \u003c\u003d 6",
+      "guard": "",
       "update": "",
       "sync": "i",
       "isLocked": false,
       "nails": [
         {
-          "x": 230.0,
-          "y": 260.0,
-          "propertyType": "GUARD",
-          "propertyX": -10.0,
-          "propertyY": 20.0
-        },
-        {
           "x": 180.0,
           "y": 260.0,
           "propertyType": "SYNCHRONIZATION",
-          "propertyX": -10.0,
-          "propertyY": 20.0
+          "propertyX": 10.0,
+          "propertyY": -10.0
         }
       ]
     }

@@ -177,7 +177,7 @@
       "targetLocation": "L1",
       "status": "INPUT",
       "select": "",
-      "guard": "x \u003c\u003d 4",
+      "guard": "x \u003c 5",
       "update": "",
       "sync": "i1",
       "isLocked": false,

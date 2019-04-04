@@ -1,6 +1,6 @@
 {
   "name": "T1",
-  "declarations": "",
+  "declarations": "clock x;",
   "locations": [
     {
       "id": "L24",
@@ -8,7 +8,7 @@
       "invariant": "",
       "type": "INITIAL",
       "urgency": "NORMAL",
-      "x": 120.0,
+      "x": 50.0,
       "y": 210.0,
       "color": "0",
       "nicknameX": 30.0,
@@ -18,6 +18,20 @@
     },
     {
       "id": "L25",
+      "nickname": "",
+      "invariant": "x \u003c\u003d 3",
+      "type": "NORMAL",
+      "urgency": "NORMAL",
+      "x": 150.0,
+      "y": 210.0,
+      "color": "0",
+      "nicknameX": 30.0,
+      "nicknameY": -10.0,
+      "invariantX": -20.0,
+      "invariantY": 20.0
+    },
+    {
+      "id": "L26",
       "nickname": "",
       "invariant": "",
       "type": "NORMAL",
@@ -31,12 +45,12 @@
       "invariantY": 10.0
     },
     {
-      "id": "L26",
+      "id": "L32",
       "nickname": "",
       "invariant": "",
       "type": "NORMAL",
       "urgency": "NORMAL",
-      "x": 370.0,
+      "x": 380.0,
       "y": 210.0,
       "color": "0",
       "nicknameX": 30.0,
@@ -49,15 +63,15 @@
     {
       "sourceLocation": "L24",
       "targetLocation": "L25",
-      "status": "INPUT",
+      "status": "OUTPUT",
       "select": "",
       "guard": "",
       "update": "",
-      "sync": "ri",
+      "sync": "ro",
       "isLocked": false,
       "nails": [
         {
-          "x": 200.0,
+          "x": 90.0,
           "y": 210.0,
           "propertyType": "SYNCHRONIZATION",
           "propertyX": -10.0,
@@ -76,10 +90,36 @@
       "isLocked": false,
       "nails": [
         {
-          "x": 320.0,
+          "x": 200.0,
           "y": 210.0,
           "propertyType": "SYNCHRONIZATION",
           "propertyX": -20.0,
+          "propertyY": 10.0
+        }
+      ]
+    },
+    {
+      "sourceLocation": "L26",
+      "targetLocation": "L32",
+      "status": "INPUT",
+      "select": "",
+      "guard": "x \u003c\u003d 5",
+      "update": "",
+      "sync": "ri",
+      "isLocked": false,
+      "nails": [
+        {
+          "x": 300.0,
+          "y": 210.0,
+          "propertyType": "GUARD",
+          "propertyX": -20.0,
+          "propertyY": 10.0
+        },
+        {
+          "x": 340.0,
+          "y": 210.0,
+          "propertyType": "SYNCHRONIZATION",
+          "propertyX": -10.0,
           "propertyY": 10.0
         }
       ]

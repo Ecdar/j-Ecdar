@@ -8,8 +8,8 @@
       "invariant": "",
       "type": "INITIAL",
       "urgency": "NORMAL",
-      "x": 100.0,
-      "y": 270.0,
+      "x": 140.0,
+      "y": 230.0,
       "color": "3",
       "nicknameX": 30.0,
       "nicknameY": -10.0,
@@ -19,42 +19,61 @@
     {
       "id": "L17",
       "nickname": "",
-      "invariant": "",
+      "invariant": "x \u003c\u003d 5",
       "type": "NORMAL",
       "urgency": "NORMAL",
-      "x": 310.0,
-      "y": 270.0,
+      "x": 270.0,
+      "y": 230.0,
       "color": "3",
       "nicknameX": 30.0,
       "nicknameY": -10.0,
-      "invariantX": 30.0,
-      "invariantY": 10.0
+      "invariantX": -20.0,
+      "invariantY": 20.0
     }
   ],
   "edges": [
+    {
+      "sourceLocation": "L17",
+      "targetLocation": "L17",
+      "status": "OUTPUT",
+      "select": "",
+      "guard": "",
+      "update": "",
+      "sync": "o2",
+      "isLocked": false,
+      "nails": [
+        {
+          "x": 370.0,
+          "y": 190.0,
+          "propertyType": "SYNCHRONIZATION",
+          "propertyX": 0.0,
+          "propertyY": -30.0
+        },
+        {
+          "x": 250.0,
+          "y": 180.0,
+          "propertyType": "NONE",
+          "propertyX": 0.0,
+          "propertyY": 0.0
+        }
+      ]
+    },
     {
       "sourceLocation": "L15",
       "targetLocation": "L17",
       "status": "INPUT",
       "select": "",
-      "guard": "x \u003c\u003d 7",
+      "guard": "",
       "update": "",
       "sync": "i",
       "isLocked": false,
       "nails": [
         {
-          "x": 210.0,
-          "y": 270.0,
-          "propertyType": "GUARD",
-          "propertyX": -10.0,
-          "propertyY": 20.0
-        },
-        {
-          "x": 150.0,
-          "y": 270.0,
+          "x": 200.0,
+          "y": 230.0,
           "propertyType": "SYNCHRONIZATION",
-          "propertyX": -10.0,
-          "propertyY": 20.0
+          "propertyX": 10.0,
+          "propertyY": -10.0
         }
       ]
     }

@@ -55,15 +55,18 @@ public class XMLParser {
     private static Clock[] setClocks(Element el) {
         List<Clock> clockList = new ArrayList<>();
 
-        String clocks = el.getChildText("declaration")
-                .replaceAll("clock", "")
-                .replaceAll(";", "")
-                .replaceAll(" ", "");
+        String text = el.getChildText("declaration");
 
-        String[] clockArr = clocks.split(",");
+        if (text != null) {
+            String clocks = text.replaceAll("clock", "")
+                    .replaceAll(";", "")
+                    .replaceAll(" ", "");
 
-        for (String clk : clockArr)
-            clockList.add(new Clock(clk));
+            String[] clockArr = clocks.split(",");
+
+            for (String clk : clockArr)
+                clockList.add(new Clock(clk));
+        }
 
         return clockList.toArray(new Clock[0]);
     }

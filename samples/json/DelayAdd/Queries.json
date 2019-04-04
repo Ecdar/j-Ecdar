@@ -10,7 +10,7 @@
     "isPeriodic": false
   },
   {
-    "query": "consistency: C1",
+    "query": "consistency: D1",
     "comment": "",
     "isPeriodic": false
   },
@@ -30,12 +30,17 @@
     "isPeriodic": false
   },
   {
-    "query": "consistency: E1",
+    "query": "consistency: T1",
     "comment": "",
     "isPeriodic": false
   },
   {
     "query": "refinement: (T1 || T2) \u003c\u003d T3",
+    "comment": "",
+    "isPeriodic": false
+  },
+  {
+    "query": "consistency: T2",
     "comment": "",
     "isPeriodic": false
   }

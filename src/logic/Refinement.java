@@ -79,7 +79,7 @@ public class Refinement {
         return true;
     }
 
-    private StatePair buildStatePair(Transition t1, Transition t2, boolean isInput) {
+    private StatePair buildStatePair(Transition t1, Transition t2) {
         State source1 = new State(t1.getSource());
         State target1 = new State(t1.getTarget().getLocation(), t1.getSource().getZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
         State source2 = new State(t2.getSource());
@@ -134,19 +134,11 @@ public class Refinement {
         // if we have self loop, skip the checks
         if (!t1.getEdges().isEmpty() && !t2.getEdges().isEmpty()) {
 
-            if (isInput) {
-                // if right side can delay more than left side
-                if (target2.getDSum() > target1.getDSum()) {
-                    ref = false;
-                    return null;
-                }
-            } else {
                 // if left side can delay more than right side
                 if (target1.getDSum() > target2.getDSum()) {
                     ref = false;
                     return null;
                 }
-            }
 
             // if we have resets, min and max of arrival zone will both be 0
             if ((aMin1 == 0 && aMax1 == 0) || (aMin2 == 0 && aMax2 == 0)) {
@@ -196,12 +188,12 @@ public class Refinement {
         return new StatePair(target1, target2);
     }
 
-    private List<StatePair> createNewStatePairs(List<Transition> transitions1, List<Transition> transitions2, boolean isInput) {
+    private List<StatePair> createNewStatePairs(List<Transition> transitions1, List<Transition> transitions2) {
         List<StatePair> pairs = new ArrayList<>();
 
         for (Transition transition1 : transitions1) {
             for (Transition transition2 : transitions2) {
-                StatePair pair = buildStatePair(transition1, transition2, isInput);
+                StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null)
                     pairs.add(pair);
             }
@@ -238,7 +230,7 @@ public class Refinement {
                     transitions2.add(loop);
                 }
 
-                List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1, isInput) : createNewStatePairs(transitions1, transitions2, isInput);
+                List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2);
                 if (pairs.isEmpty())
                     return false;
                 waiting.addAll(pairs);

@@ -99,3 +99,8 @@ refinement:K5<=K6
 
 */
 refinement:P0<=P1
+
+/*
+
+*/
+refinement:(Q0||Q1)<=Q2
