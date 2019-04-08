@@ -1,4 +1,14 @@
-//This file was generated from (Academic) UPPAAL 4.1.4 (rev. 5264), April 2013
+//This file was generated from (Academic) UPPAAL 4.1.4 (rev. 5535), March 2014
+
+/*
+
+*/
+refinement:P2<=P3
+
+/*
+
+*/
+refinement:P0<=P1
 
 /*
 
@@ -94,13 +104,3 @@ refinement:K3<=K4
 
 */
 refinement:K5<=K6
-
-/*
-
-*/
-refinement:P0<=P1
-
-/*
-
-*/
-refinement:(Q0||Q1)<=Q2
