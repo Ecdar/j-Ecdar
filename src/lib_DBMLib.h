@@ -119,6 +119,22 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict
 JNIEXPORT jint JNICALL Java_lib_DBMLib_dbm_1addRawRaw
   (JNIEnv *, jclass, jint, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_minus_dbm
+ * Signature: ([I[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_dbm_1minus_1dbm
+  (JNIEnv *, jclass, jintArray, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_minus_dbm
+ * Signature: ([[I[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm
+  (JNIEnv *, jclass, jobjectArray, jintArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

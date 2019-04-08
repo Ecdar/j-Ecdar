@@ -2,10 +2,7 @@ package dbm;
 
 import global.LibLoader;
 import lib.DBMLib;
-import logic.SimpleLocation;
-import logic.State;
-import logic.SymbolicLocation;
-import logic.Zone;
+import logic.*;
 import models.Clock;
 import models.Guard;
 import models.Location;
@@ -388,6 +385,27 @@ public class DBMTest {
         //state.getZone().printDBM(false, true);
 
         assertArrayEquals(state.getZone().getDbm(), new int[]{1, -1015, -15, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
+    }
+
+    @Test
+    public void testDbmMinusDbm() {
+        int dim = 3;
+
+        int[] dbm1 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
+        int[] dbm2 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
+
+        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 0, 1, -2, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 0, 2, -3, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 1, 0, 4, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 2, 0, 5, false);
+
+        int[][] arr = DBMLib.dbm_minus_dbm(dbm1, dbm2, dim);
+        Federation fed = new Federation(arr);
+
+        for (Zone zone : fed.getZones()) {
+            zone.printDBM(true, true);
+        }
+        assertTrue(true);
     }
 
     @Test

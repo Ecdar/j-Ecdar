@@ -1,6 +1,7 @@
 #include "lib_DBMLib.h"
 #include "../dbm/constraints.h"
 #include "../dbm/dbm.h"
+#include "../dbm/fed.h"
 #include <string.h>
 
 namespace helper_functions
@@ -14,7 +15,7 @@ namespace helper_functions
         return t;
     }
 
-    jintArray cToJint(JNIEnv *env, raw_t *t, jsize len) {
+    jintArray cToJint(JNIEnv *env, const raw_t *t, jsize len) {
         // convert updated array to jintArray
         jintArray newT = env->NewIntArray(len);
         int *arr = new int[len];
@@ -23,6 +24,35 @@ namespace helper_functions
         }
         env->SetIntArrayRegion(newT, 0, len, arr);
         return newT;
+    }
+
+    jobjectArray cFedtoJavaFed(JNIEnv *env, dbm::fed_t fed, jsize len) {
+        jint fedSize = fed.size();
+
+        jclass intArray1DClass = env->FindClass("[I");
+        jobjectArray zoneArray = env->NewObjectArray(fedSize, intArray1DClass, NULL);
+
+        jint y = 0;
+        for (auto i = fed.begin(); i != fed.end(); ++i) {
+            auto x = i->const_dbm();
+            env->SetObjectArrayElement(zoneArray, y, helper_functions::cToJint(env, x, len));
+            y++;
+        }
+
+        return zoneArray;
+    }
+
+    dbm::fed_t* javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize size, jint fedLen) {
+        jsize length = env->GetArrayLength(fed);
+
+        dbm::fed_t* cFed = new dbm::fed_t(length);
+
+        for (int i = 0; i < length; i++) {
+            /*jintArray obj = env->GetObjectArrayElement(fed, i);
+            cFed = cFed->add(helper_functions::jintToC(env, obj, size), size);*/
+        }
+
+        return cFed;
     }
 }
 
@@ -130,6 +160,28 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict(JNIEnv *env, jclass 
 
 JNIEXPORT jint JNICALL Java_lib_DBMLib_dbm_1addRawRaw(JNIEnv *env, jclass cls, jint raw1, jint raw2) {
    return dbm_addRawRaw(raw1, raw2);
+}
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_dbm_1minus_1dbm(JNIEnv *env, jclass cls, jintArray dbm1, jintArray dbm2, jint dim) {
+    jsize len = env->GetArrayLength(dbm1);
+
+    auto converted1 = helper_functions::jintToC(env, dbm1, len);
+    auto converted2 = helper_functions::jintToC(env, dbm2, len);
+
+    auto fed = dbm::fed_t::subtract(converted1, converted2, dim);
+
+    return helper_functions::cFedtoJavaFed(env, fed, len);
+}
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm(JNIEnv *env, jclass cls, jobjectArray fed, jintArray dbm, jint fedLen) {
+    jsize len = env->GetArrayLength(dbm);
+
+    dbm::fed_t convertedFed = (*helper_functions::javaFedtoCFed(env, fed, len, fedLen));
+    auto convertedDbm = helper_functions::jintToC(env, dbm, len);
+
+    convertedFed -= convertedDbm;
+
+    return helper_functions::cFedtoJavaFed(env, convertedFed, len);
 }
 
 int main() { return 0; }

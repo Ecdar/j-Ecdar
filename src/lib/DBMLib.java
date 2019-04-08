@@ -30,4 +30,8 @@ public class DBMLib {
     public static native boolean dbm_rawIsStrict(int raw);
 
     public static native int dbm_addRawRaw(int raw1, int raw2);
+
+    public static native int[][] dbm_minus_dbm(int[] dbm1, int[] dbm2, int dim);
+
+    public static native int[][] fed_minus_dbm(int[][]fed, int[] dbm, int fedLen);
 }
