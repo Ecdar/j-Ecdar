@@ -28,7 +28,7 @@ public class Transition {
 
     public List<Guard> getGuards() {
         // collect guards from each Edge and flatten the list
-        return edges.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
+        return edges.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
     }
 
     public List<Update> getUpdates() {

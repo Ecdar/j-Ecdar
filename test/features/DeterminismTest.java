@@ -16,7 +16,7 @@ public class DeterminismTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        automata = XMLParser.parse("./samples/xml/ConsTests.xml");
+        automata = XMLParser.parse("./samples/xml/ConsTests.xml", true);
     }
 
     @Test

@@ -1,6 +1,5 @@
 package models;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +15,7 @@ public class SimpleLocation extends SymbolicLocation {
     }
 
     public List<Guard> getInvariants() {
-        return Arrays.asList(location.getInvariant());
+        return location.getInvariant();
     }
 
     @Override

@@ -21,7 +21,7 @@ public class ConjunctionTest {
                 "Components/Test1.json",
                 "Components/Test2.json",
                 "Components/Test3.json"};
-        Automaton[] machines = JSONParser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components, true);
 
         test1 = new SimpleTransitionSystem(machines[0]);
         test2 = new SimpleTransitionSystem(machines[1]);

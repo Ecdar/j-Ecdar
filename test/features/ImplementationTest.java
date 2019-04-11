@@ -16,7 +16,7 @@ public class ImplementationTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        automata = XMLParser.parse("./samples/xml/ImplTests.xml");
+        automata = XMLParser.parse("./samples/xml/ImplTests.xml", true);
     }
 
     @Test

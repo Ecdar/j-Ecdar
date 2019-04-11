@@ -24,7 +24,7 @@ public class DBMTest {
     public static void setUpBeforeClass() {
         LibLoader.load();
 
-        Location l1 = new Location("L0", new Guard[]{}, false, false, false, false);
+        Location l1 = new Location("L0", new ArrayList<>(), false, false, false, false);
         SymbolicLocation sl1 = new SimpleLocation(l1);
 
         Clock x = new Clock("x");
@@ -368,7 +368,7 @@ public class DBMTest {
 
         Zone absZone = prevZone.getAbsoluteZone(guardList, clockList);
 
-        Location l2 = new Location("L0", new Guard[]{}, false, false, false, false);
+        Location l2 = new Location("L0", new ArrayList<>(), false, false, false, false);
         SymbolicLocation sl2 = new SimpleLocation(l2);
         State state = new State(sl2, targetZone);
 

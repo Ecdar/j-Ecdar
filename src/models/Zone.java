@@ -3,6 +3,7 @@ package models;
 import global.LibLoader;
 import lib.DBMLib;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -324,6 +325,31 @@ public class Zone {
                 }
             }
         }
+    }
+
+    public List<Guard> buildGuardsFromZone(List<Clock> clocks) {
+        List<Guard> guards = new ArrayList<>();
+
+        for (int i = 1; i < size; i++) {
+            Clock clock = clocks.get(i - 1);
+
+            // values from first row, lower bounds
+            int lb = dbm[i];
+            // lower bound must be different from 1 (==0)
+            if (lb != 1) {
+                Guard g1 = new Guard(clock, (-1) * DBMLib.raw2bound(lb), true, DBMLib.dbm_rawIsStrict(lb));
+                guards.add(g1);
+            }
+            // values from first column, upper bounds
+            int ub = dbm[size*i];
+            // upper bound must be different from infinity
+            if (ub != DBM_INF) {
+                Guard g2 = new Guard(clock, DBMLib.raw2bound(ub), false, DBMLib.dbm_rawIsStrict(ub));
+                guards.add(g2);
+            }
+        }
+
+        return guards;
     }
 
     @Override

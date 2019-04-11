@@ -17,7 +17,7 @@ import java.util.List;
 
 public class XMLParser {
 
-    public static Automaton[] parse(String fileName) {
+    public static Automaton[] parse(String fileName, boolean makeInpEnabled) {
         List<Automaton> automata = new ArrayList<>();
 
         try {
@@ -32,7 +32,7 @@ public class XMLParser {
                 String name = el.getChildText("name");
 
                 // clocks
-                Clock[] clocks = setClocks(el);
+                List<Clock> clocks = setClocks(el);
 
                 // initial location
                 String initId = el.getChild("init").getAttributeValue("ref");
@@ -41,9 +41,9 @@ public class XMLParser {
                 Location[] locations = setLocations(el, clocks, initId);
 
                 // edges
-                Edge[] edges = setEdges(el, clocks, locations);
+                List<Edge> edges = setEdges(el, clocks, locations);
 
-                automata.add(new Automaton(name, locations, edges, clocks));
+                automata.add(new Automaton(name, locations, edges, clocks, makeInpEnabled));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class XMLParser {
         return automata.toArray(new Automaton[0]);
     }
 
-    private static Clock[] setClocks(Element el) {
+    private static List<Clock> setClocks(Element el) {
         List<Clock> clockList = new ArrayList<>();
 
         String text = el.getChildText("declaration");
@@ -68,10 +68,10 @@ public class XMLParser {
                 clockList.add(new Clock(clk));
         }
 
-        return clockList.toArray(new Clock[0]);
+        return clockList;
     }
 
-    private static Location[] setLocations(Element el, Clock[] clocks, String initId) {
+    private static Location[] setLocations(Element el, List<Clock> clocks, String initId) {
         List<Location> locationList = new ArrayList<>();
 
         List<Element> locations = el.getChildren("location");
@@ -86,14 +86,14 @@ public class XMLParser {
                 }
             }
 
-            Location newLoc = new Location(locName, invariants.toArray(new Guard[0]), isInitial, false, false, false);
+            Location newLoc = new Location(locName, invariants, isInitial, false, false, false);
             locationList.add(newLoc);
         }
 
         return locationList.toArray(new Location[0]);
     }
 
-    private static Edge[] setEdges(Element el, Clock[] clocks, Location[] locations) {
+    private static List<Edge> setEdges(Element el, List<Clock> clocks, Location[] locations) {
         List<Edge> edgeList = new ArrayList<>();
 
         List<Channel> channelList = new ArrayList<>();
@@ -131,13 +131,13 @@ public class XMLParser {
                 }
             }
 
-            edgeList.add(new Edge(source, target, chan, isInput, guards.toArray(new Guard[0]), updates.toArray(new Update[0])));
+            edgeList.add(new Edge(source, target, chan, isInput, guards, updates.toArray(new Update[0])));
         }
 
-        return edgeList.toArray(new Edge[0]);
+        return edgeList;
     }
 
-    private static Clock findClock(Clock[] clocks, String name) {
+    private static Clock findClock(List<Clock> clocks, String name) {
         for (Clock clock : clocks)
             if (clock.getName().equals(name))
                 return clock;
@@ -163,7 +163,7 @@ public class XMLParser {
         return chan;
     }
 
-    private static List<Guard> addGuardsOrInvariants(String text, Clock[] clockList) {
+    private static List<Guard> addGuardsOrInvariants(String text, List<Clock> clockList) {
         List<Guard> list = new ArrayList<>();
 
         String[] rawInvariants = text.split("&&");
@@ -207,7 +207,7 @@ public class XMLParser {
         return list;
     }
 
-    private static List<Update> addUpdates(String text, Clock[] clockList) {
+    private static List<Update> addUpdates(String text, List<Clock> clockList) {
         List<Update> list = new ArrayList<>();
         String[] rawUpdates = text.split(",");
         for (String rawUpdate : rawUpdates) {

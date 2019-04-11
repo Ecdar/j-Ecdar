@@ -184,4 +184,15 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm(JNIEnv *env, jcla
     return helper_functions::cFedtoJavaFed(env, convertedFed, len);
 }
 
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed(JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
+    jint len = dim * dim;
+
+    auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+    auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+    convertedFed1 -= convertedFed2;
+
+    return helper_functions::cFedtoJavaFed(env, convertedFed1, len);
+}
+
 int main() { return 0; }

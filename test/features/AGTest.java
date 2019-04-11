@@ -24,7 +24,7 @@ public class AGTest {
                 "Components/Imp.json",
                 "Components/AA.json"
         };
-        Automaton[] machines = JSONParser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components, true);
 
         a = new SimpleTransitionSystem(machines[0]);
         g = new SimpleTransitionSystem(machines[1]);

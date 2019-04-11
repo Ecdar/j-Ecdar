@@ -21,7 +21,7 @@ public class BigRefinementTest {
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Comp1.json",
                 "Components/Ref1.json"};
-        Automaton[] machines = JSONParser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components, true);
 
         comp1 = new SimpleTransitionSystem(machines[0]);
         ref1 = new SimpleTransitionSystem(machines[1]);

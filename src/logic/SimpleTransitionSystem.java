@@ -13,7 +13,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
 
     public SimpleTransitionSystem(Automaton automaton) {
         this.automaton = automaton;
-        clocks.addAll(Arrays.asList(automaton.getClocks()));
+        clocks.addAll(automaton.getClocks());
 
         this.waiting = new ArrayDeque<>();
         this.passed = new ArrayList<>();

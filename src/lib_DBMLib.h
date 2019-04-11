@@ -135,6 +135,14 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_dbm_1minus_1dbm
 JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm
   (JNIEnv *, jclass, jobjectArray, jintArray, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_minus_fed
+ * Signature: ([[I[[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
+
 #ifdef __cplusplus
 }
 #endif

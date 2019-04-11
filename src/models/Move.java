@@ -16,7 +16,7 @@ public class Move {
         this.source = source;
         this.target = target;
         this.edges = edges;
-        this.guards = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getGuards).flatMap(Arrays::stream).collect(Collectors.toList());
+        this.guards = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
         this.updates = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
     }
 

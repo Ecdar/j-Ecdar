@@ -18,7 +18,7 @@ public class DelayRefinementTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        automata = XMLParser.parse("./samples/xml/delayRefinement.xml");
+        automata = XMLParser.parse("./samples/xml/delayRefinement.xml", true);
     }
 
     @Test

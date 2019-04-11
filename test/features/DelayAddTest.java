@@ -26,7 +26,7 @@ public class DelayAddTest {
                 "Components/C2.json",
                 "Components/D1.json",
                 "Components/D2.json"};
-        automata = JSONParser.parse(base, components);
+        automata = JSONParser.parse(base, components, true);
     }
 
     @Test

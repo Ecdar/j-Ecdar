@@ -21,7 +21,7 @@ public class UnspecTest {
                 "Components/A.json",
                 "Components/AA.json",
                 "Components/B.json"};
-        Automaton[] machines = JSONParser.parse(base, components);
+        Automaton[] machines = JSONParser.parse(base, components, true);
 
         a = new SimpleTransitionSystem(machines[0]);
         aa = new SimpleTransitionSystem(machines[1]);

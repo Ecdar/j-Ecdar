@@ -30,7 +30,7 @@ public class Controller {
     }
 
     public static void parseComponents(String folderLocation) {
-        cmpt = JSONParser.parse(folderLocation);
+        cmpt = JSONParser.parse(folderLocation, true);
     }
 
     private static List<Boolean> runQueries() throws Exception {

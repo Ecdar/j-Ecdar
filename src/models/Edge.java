@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Edge {
@@ -8,10 +9,10 @@ public class Edge {
     private final Location source, target;
     private final Channel chan;
     private final boolean isInput;
-    private final Guard[] guards;
+    private final List<Guard> guards;
     private final Update[] updates;
 
-    public Edge(Location source, Location target, Channel chan, boolean isInput, Guard[] guards, Update[] updates) {
+    public Edge(Location source, Location target, Channel chan, boolean isInput, List<Guard> guards, Update[] updates) {
         this.source = source;
         this.target = target;
         this.chan = chan;
@@ -36,8 +37,12 @@ public class Edge {
         return isInput;
     }
 
-    public Guard[] getGuards() {
+    public List<Guard> getGuards() {
         return guards;
+    }
+
+    public void addGuards(List<Guard> newGuards) {
+        this.guards.addAll(newGuards);
     }
 
     public Update[] getUpdates() {
@@ -53,7 +58,7 @@ public class Edge {
                 source.equals(that.source) &&
                 target.equals(that.target) &&
                 chan.equals(that.chan) &&
-                Arrays.equals(guards, that.guards) &&
+                Arrays.equals(guards.toArray(), that.guards.toArray()) &&
                 Arrays.equals(updates, that.updates);
     }
 
@@ -64,7 +69,7 @@ public class Edge {
                 ", target=" + target +
                 ", chan=" + chan +
                 ", isInput=" + isInput +
-                ", guards=" + Arrays.toString(guards) +
+                ", guards=" + Arrays.toString(guards.toArray()) +
                 ", updates=" + Arrays.toString(updates) +
                 '}';
     }

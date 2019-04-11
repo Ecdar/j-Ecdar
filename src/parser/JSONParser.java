@@ -18,7 +18,7 @@ public class JSONParser {
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
     private static final List<Clock> componentClocks = new ArrayList<>();
 
-    public static Automaton[] parse(String folderPath) {
+    public static Automaton[] parse(String folderPath, boolean makeInpEnabled) {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
 
@@ -26,14 +26,14 @@ public class JSONParser {
         locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
 
         objectList = parseFiles(locations);
-        return distrubuteObjects(objectList);
+        return distrubuteObjects(objectList, makeInpEnabled);
     }
 
-    public static Automaton[] parse(String base, String[] components) {
+    public static Automaton[] parse(String base, String[] components, boolean makeInpEnabled) {
         ArrayList<String> locations = Arrays.stream(components).map(c -> base + c).collect(Collectors.toCollection(ArrayList::new));
 
         objectList = parseFiles(locations);
-        return distrubuteObjects(objectList);
+        return distrubuteObjects(objectList, makeInpEnabled);
     }
 
     //---------------------------Testing-----------------
@@ -55,7 +55,7 @@ public class JSONParser {
         return returnList;
     }
 
-    private static Automaton[] distrubuteObjects(ArrayList<JSONObject> objList) {
+    private static Automaton[] distrubuteObjects(ArrayList<JSONObject> objList, boolean makeInpEnabled) {
         ArrayList<Automaton> automata = new ArrayList<>();
 
         try {
@@ -65,8 +65,8 @@ public class JSONParser {
                     JSONArray locationList = (JSONArray) obj.get("locations");
                     Location[] locations = addLocations(locationList);
                     JSONArray edgeList = (JSONArray) obj.get("edges");
-                    Edge[] edges = addEdges(edgeList, locations);
-                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, componentClocks.toArray(new Clock[0]));
+                    List<Edge> edges = addEdges(edgeList, locations);
+                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
                     automata.add(automaton);
                     componentClocks.clear();
                 } else {
@@ -124,7 +124,7 @@ public class JSONParser {
 
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            Guard[] invariant = ("".equals(jsonObject.get("invariant").toString()) ? new Guard[]{} :
+            List<Guard> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
                     addGuards(jsonObject.get("invariant").toString()));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
@@ -135,7 +135,7 @@ public class JSONParser {
         return returnLocList.toArray(new Location[0]);
     }
 
-    private static Guard[] addGuards(String invariant) {
+    private static List<Guard> addGuards(String invariant) {
         ArrayList<Guard> guards = new ArrayList<>();
         String[] listOfInv = invariant.split("&&");
 
@@ -179,7 +179,7 @@ public class JSONParser {
                 guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
         }
 
-        return guards.toArray(new Guard[0]);
+        return guards;
     }
 
     private static Clock findClock(String clockName) {
@@ -189,19 +189,19 @@ public class JSONParser {
         return null;
     }
 
-    private static Edge[] addEdges(JSONArray edgeList, Location[] locations) {
+    private static List<Edge> addEdges(JSONArray edgeList, Location[] locations) {
         ArrayList<Edge> edges = new ArrayList<>();
 
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            Guard[] guards;
+            List<Guard> guards;
             Update[] updates;
 
             if (!jsonObject.get("guard").toString().equals(""))
                 guards = addGuards((String) jsonObject.get("guard"));
             else
-                guards = new Guard[]{};
+                guards = new ArrayList<>();
 
             if (!jsonObject.get("update").toString().equals(""))
                 updates = addUpdates((String) jsonObject.get("update"));
@@ -219,7 +219,7 @@ public class JSONParser {
                 edges.add(edge);
             }
         }
-        return edges.toArray(new Edge[0]);
+        return edges;
     }
 
     private static Update[] addUpdates(String update) {
