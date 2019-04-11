@@ -1,8 +1,4 @@
-package logic;
-
-import models.Clock;
-import models.Guard;
-import models.Update;
+package models;
 
 import java.util.List;
 

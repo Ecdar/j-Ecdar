@@ -1,8 +1,4 @@
-package logic;
-
-import models.Edge;
-import models.Guard;
-import models.Update;
+package models;
 
 import java.util.Arrays;
 import java.util.List;

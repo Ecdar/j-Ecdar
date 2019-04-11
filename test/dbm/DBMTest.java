@@ -2,10 +2,7 @@ package dbm;
 
 import global.LibLoader;
 import lib.DBMLib;
-import logic.*;
-import models.Clock;
-import models.Guard;
-import models.Location;
+import models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

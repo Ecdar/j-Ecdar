@@ -1,9 +1,6 @@
 package logic;
 
-import models.Channel;
-import models.Clock;
-import models.Guard;
-import models.Update;
+import models.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

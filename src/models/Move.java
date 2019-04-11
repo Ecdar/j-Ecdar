@@ -1,15 +1,11 @@
-package logic;
-
-import models.Edge;
-import models.Guard;
-import models.Update;
+package models;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Move {
+public class Move {
 
     private final SymbolicLocation source, target;
     private final List<Edge> edges;

@@ -1,6 +1,6 @@
 package logic;
 
-import models.Channel;
+import models.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

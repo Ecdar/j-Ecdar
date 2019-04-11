@@ -1,7 +1,7 @@
 package logic;
 
 import lib.DBMLib;
-import models.Channel;
+import models.*;
 
 import java.util.*;
 

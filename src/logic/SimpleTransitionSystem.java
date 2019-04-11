@@ -1,9 +1,6 @@
 package logic;
 
-import models.Automaton;
-import models.Channel;
-import models.Edge;
-import models.Location;
+import models.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -143,9 +140,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                if (!currState.getZone().canDelayIndefinitely())
-                    return false;
-                return true;
+                return currState.getZone().canDelayIndefinitely();
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check

@@ -1,7 +1,4 @@
-package logic;
-
-import models.Guard;
-import models.Location;
+package models;
 
 import java.util.Arrays;
 import java.util.List;

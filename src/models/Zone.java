@@ -1,9 +1,7 @@
-package logic;
+package models;
 
 import global.LibLoader;
 import lib.DBMLib;
-import models.Clock;
-import models.Guard;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +20,10 @@ public class Zone {
 
         LibLoader.load();
         int[] temp = new int[actualSize];
-        this.dbm = DBMLib.dbm_init(temp, size);
+
+        // zone for initial state is dbm_zero with delay
+        this.dbm = DBMLib.dbm_zero(temp, size);
+        delay();
     }
 
     public Zone(int[] dbm) {

@@ -1,6 +1,6 @@
-package logic;
+package models;
 
-class StatePair {
+public class StatePair {
     private final State left, right;
 
     public StatePair(State state1, State state2) {
