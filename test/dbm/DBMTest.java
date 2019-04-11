@@ -394,17 +394,32 @@ public class DBMTest {
         int[] dbm1 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
         int[] dbm2 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
 
-        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 0, 1, -2, false);
-        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 0, 2, -3, false);
-        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 1, 0, 4, false);
-        dbm2 = DBMLib.dbm_constrain1(dbm2, 3, 2, 0, 5, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 0, 1, -2, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 0, 2, -3, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 1, 0, 4, false);
+        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 2, 0, 5, false);
 
-        int[][] arr = DBMLib.dbm_minus_dbm(dbm1, dbm2, dim);
-        Federation fed = new Federation(arr);
+        int[][] arr1 = DBMLib.dbm_minus_dbm(dbm1, dbm2, dim);
+        Federation fed1 = new Federation(arr1);
 
-        for (Zone zone : fed.getZones()) {
+        for (Zone zone : fed1.getZones()) {
             zone.printDBM(true, true);
         }
+
+        int[] dbm3 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
+
+        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 0, 1, 0, false);
+        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 0, 2, 0, false);
+        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 1, 0, 1, false);
+        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 2, 0, 1, false);
+
+        int[][] arr2 = DBMLib.fed_minus_dbm(arr1, dbm3, dim);
+        Federation fed2 = new Federation(arr2);
+
+        for (Zone zone : fed2.getZones()) {
+            zone.printDBM(true, true);
+        }
+
         assertTrue(true);
     }
 
