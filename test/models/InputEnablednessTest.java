@@ -50,11 +50,11 @@ public class InputEnablednessTest {
         Guard e9_g1 = new Guard(x, 10, false, false);
         Guard e9_g2 = new Guard(y, 10, false, false);
 
-        Edge e1 = new Edge(l0, l1, i1, true, noguard, noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new ArrayList<>(Collections.singletonList(invL1)), noUpdate);
         Edge e2 = new Edge(l0, l2, i2, true, new ArrayList<>(Arrays.asList(e2_g1, e2_g2, e2_g3)), noUpdate);
         Edge e3 = new Edge(l0, l3, i2, true, new ArrayList<>(Arrays.asList(e3_g1, e3_g2)), noUpdate);
         Edge e4 = new Edge(l1, l4, o, false, noguard, noUpdate);
-        //Edge e5 = new Edge(l0, l0, i1, true, new ArrayList<>(Arrays.asList(e5_g1, e5_g2)), noUpdate);
+        Edge e5 = new Edge(l0, l0, i1, true, new ArrayList<>(Arrays.asList(e5_g1, e5_g2)), noUpdate);
         Edge e6 = new Edge(l0, l0, i2, true, new ArrayList<>(Arrays.asList(e6_g1, e6_g2, e6_g3, e6_g4)), noUpdate);
         Edge e7 = new Edge(l0, l0, i2, true, new ArrayList<>(Arrays.asList(e7_g1, e7_g2)), noUpdate);
         Edge e8 = new Edge(l1, l1, i1, true, new ArrayList<>(Arrays.asList(e8_g1, e8_g2)), noUpdate);
@@ -67,8 +67,7 @@ public class InputEnablednessTest {
         Edge e15 = new Edge(l4, l4, i2, true, noguard, noUpdate);
 
         Location[] locations = new Location[]{l0, l1, l2, l3, l4};
-        //List<Edge> edges = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15));
-        List<Edge> edges = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15));
+        List<Edge> edges = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15));
         List<Clock> clocks = new ArrayList<>(Arrays.asList(x, y));
 
         expected = new Automaton("Automaton", locations, edges, clocks, false);

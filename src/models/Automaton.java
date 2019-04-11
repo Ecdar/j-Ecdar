@@ -30,8 +30,10 @@ public class Automaton {
         setActions(edges);
         this.clocks = clocks;
 
-        //addTargetInvariantToEdges();
-        if (makeInpEnabled) makeInputEnabled();
+        if (makeInpEnabled) {
+            addTargetInvariantToEdges();
+            makeInputEnabled();
+        }
     }
 
     private void makeInputEnabled() {
