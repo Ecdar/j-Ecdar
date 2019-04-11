@@ -425,30 +425,12 @@ public class DBMTest {
 
     @Test
     public void testDBM() {
-//        int[] t1 = new int[]{1, 1, 1, 1, 1, 1,
-//                9, 1, 9, 9, 9, 9,
-//                DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF,
-//                DBM_INF, DBM_INF, DBM_INF, 1, DBM_INF, DBM_INF,
-//                DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1, DBM_INF,
-//                DBM_INF, DBM_INF, DBM_INF, DBM_INF, DBM_INF, 1};
+        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-//        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
-//
-//
-//        t1 = DBMLib.dbm_init(t1, 3);
-//
-//        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 4, false);
-//
-//        printDBM(t1, true, true);
-//
-//        t1 = DBMLib.dbm_up(t1, 3);
-//
-//        printDBM(t1, true, true);
-//
-//        t1 = DBMLib.dbm_constrain1(t1, 3, 1, 0, 5, true);
-//        t1 = DBMLib.dbm_constrain1(t1, 3, 0, 2, -8, false);
-//
-//        printDBM(t1, true, true);
+        t1 = DBMLib.dbm_zero(t1, 3);
+
+        t1 = DBMLib.dbm_up(t1, 3);
+        printDBM(t1, false, true);
 
     }
 }
