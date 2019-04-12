@@ -15,7 +15,7 @@ public class Zone {
     private int actualSize;
     private static final int DBM_INF = Integer.MAX_VALUE - 1;
 
-    public Zone(int size) {
+    public Zone(int size, boolean delay) {
         this.size = size;
         this.actualSize = size * size;
 
@@ -24,7 +24,7 @@ public class Zone {
 
         // zone for initial state is dbm_zero with delay
         this.dbm = DBMLib.dbm_zero(temp, size);
-        delay();
+        if(delay) delay();
     }
 
     public Zone(int[] dbm) {
@@ -133,14 +133,14 @@ public class Zone {
                 isStrict = DBMLib.dbm_rawIsStrict(rawNewLB);
                 int newLB = DBMLib.raw2bound(rawNewLB);
 
-                result = DBMLib.dbm_constrain1(result, size, 0, index, (-1) * newLB, isStrict);
+                result = DBMLib.dbm_constrainBound(result, size, 0, index, (-1) * newLB, isStrict);
 
                 if (firstVisit && rawClockUB != DBM_INF) {
                     int rawNewUB = DBMLib.dbm_addRawRaw(rawClockUB, rawClockLB);
                     isStrict = DBMLib.dbm_rawIsStrict(rawNewUB);
                     int newUB = DBMLib.raw2bound(rawNewUB);
 
-                    result = DBMLib.dbm_constrain1(result, size, index, 0, newUB, isStrict);
+                    result = DBMLib.dbm_constrainBound(result, size, index, 0, newUB, isStrict);
                 }
 
 
@@ -157,7 +157,7 @@ public class Zone {
 
                 int newUB = DBMLib.raw2bound(rawNewUB);
 
-                result = DBMLib.dbm_constrain1(result, size, index, 0, newUB, isStrict);
+                result = DBMLib.dbm_constrainBound(result, size, index, 0, newUB, isStrict);
             }
         }
 
@@ -174,7 +174,7 @@ public class Zone {
                     int rawNewUB = DBMLib.dbm_addRawRaw(clockUB, clockLB);
                     isStrict = DBMLib.dbm_rawIsStrict(rawNewUB);
                     int newUB = DBMLib.raw2bound(rawNewUB);
-                    result = DBMLib.dbm_constrain1(result, size, index, 0, newUB, isStrict);
+                    result = DBMLib.dbm_constrainBound(result, size, index, 0, newUB, isStrict);
                 }
             }
         }
@@ -225,7 +225,7 @@ public class Zone {
             if (currRawValue != targetRawValue) {
                 boolean isStrict = DBMLib.dbm_rawIsStrict(targetRawValue);
 
-                dbm = DBMLib.dbm_constrain1(dbm, size, 0, i, DBMLib.raw2bound(targetRawValue), isStrict);
+                dbm = DBMLib.dbm_constrainBound(dbm, size, 0, i, DBMLib.raw2bound(targetRawValue), isStrict);
             }
         }
     }
@@ -284,9 +284,44 @@ public class Zone {
         return true;
     }
 
+    // Computes timeline from arrival zone given guard zone as a parameter.
+    public Zone createTimeline(Zone guardZone){
+        int LB, UB, FLB = 1, FUB = DBM_INF;
+        for (int i = 1; i < size; i++) {
+            LB = DBMLib.dbm_addRawRaw(dbm[size * i], guardZone.getElementAt(i));
+            UB = DBMLib.dbm_addRawRaw(dbm[i], guardZone.getElementAt(size * i));
+
+            // LB cannot be a positive bound by definition, therefore it has to be <=0
+            if(LB > 1) LB = 1;
+            // If UB is a negative bound (semantics of lower bound), then arrZone and guardZone never intersect.
+            if(UB < 1) return null;
+
+            if(LB < FLB) FLB = LB;
+            if(UB < FUB) FUB = UB;
+        }
+
+        return new Zone(new int[]{1, FLB, FUB, 1});
+    }
+
+    public void updateArrivalZone(Zone timeline){
+        int LB, UB, NLB, NUB;
+        for (int i = 1; i < size; i++) {
+            LB = dbm[i];
+            dbm = DBMLib.dbm_constrainRaw(dbm, size, i, 0, DBMLib.dbm_addRawRaw(LB, timeline.getElementAt(1)));
+
+
+
+            dbm = DBMLib.dbm_constrainRaw(dbm, size, 0, i, DBMLib.dbm_addRawRaw(LB, timeline.getElementAt(1)));
+        }
+    }
+
+    public int lowerBoundToUpperBound(int raw){
+        return raw * (-1) + (raw & 1) * 2;
+    }
+
     // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
     public void constrain1(int i, int j, int constraint, boolean isStrict) {
-        dbm = DBMLib.dbm_constrain1(dbm, size, i, j, constraint, isStrict);
+        dbm = DBMLib.dbm_constrainBound(dbm, size, i, j, constraint, isStrict);
     }
 
     public void init() {

@@ -122,14 +122,14 @@ public class DBMTest {
     @Test
     public void testDbmConstrain1() {
         assertArrayEquals(new int[]{1, 1, 11, 1},
-                DBMLib.dbm_constrain1(new int[]{1, 1, DBM_INF, 1}, 2, 1, 0, 5, false)
+                DBMLib.dbm_constrainBound(new int[]{1, 1, DBM_INF, 1}, 2, 1, 0, 5, false)
         );
     }
 
     @Test
     public void testDbmConstrain2() {
         assertArrayEquals(new int[]{1, -3, 11, 1},
-                DBMLib.dbm_constrain1(new int[]{1, 1, 11, 1}, 2, 0, 1, -2, false)
+                DBMLib.dbm_constrainBound(new int[]{1, 1, 11, 1}, 2, 0, 1, -2, false)
         );
     }
 
@@ -210,28 +210,28 @@ public class DBMTest {
 
     @Test
     public void testAZNoGuards1() {
-        Zone t1 = state1.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+        Zone t1 = state1.getInvZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1.getDbm(), new int[]{1, 1, DBM_INF, 1});
     }
 
     @Test
     public void testAZNoGuards2() {
-        Zone t1 = state2.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+        Zone t1 = state2.getInvZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1.getDbm(), new int[]{1, 1, DBM_INF, 1});
     }
 
     @Test
     public void testAZNoGuards3() {
-        Zone t1 = state3.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+        Zone t1 = state3.getInvZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1.getDbm(), new int[]{1, 1, 11, 1});
     }
 
     @Test
     public void testAZNoGuards4() {
-        Zone t1 = state4.getZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
+        Zone t1 = state4.getInvZone().getAbsoluteZone(new ArrayList<>(), new ArrayList<>());
 
         assertArrayEquals(t1.getDbm(), new int[]{1, 1, 19, 1});
     }
@@ -241,8 +241,8 @@ public class DBMTest {
         List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g1));
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g2));
 
-        Zone t1 = state4.getZone().getAbsoluteZone(guardList1, clockList);
-        Zone t2 = state4.getZone().getAbsoluteZone(guardList2, clockList);
+        Zone t1 = state4.getInvZone().getAbsoluteZone(guardList1, clockList);
+        Zone t2 = state4.getInvZone().getAbsoluteZone(guardList2, clockList);
 
         assertArrayEquals(t1.getDbm(), new int[]{1, -3, 19, 1});
         assertArrayEquals(t2.getDbm(), new int[]{1, 1, 19, 1});
@@ -253,8 +253,8 @@ public class DBMTest {
         List<Guard> guardList1 = new ArrayList<>(Collections.singletonList(g3));
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g4));
 
-        Zone t1 = state4.getZone().getAbsoluteZone(guardList1, clockList);
-        Zone t2 = state4.getZone().getAbsoluteZone(guardList2, clockList);
+        Zone t1 = state4.getInvZone().getAbsoluteZone(guardList1, clockList);
+        Zone t2 = state4.getInvZone().getAbsoluteZone(guardList2, clockList);
 
         assertArrayEquals(t1.getDbm(), new int[]{1, 1, 9, 1});
         assertArrayEquals(t2.getDbm(), new int[]{1, 1, 19, 1});
@@ -266,9 +266,9 @@ public class DBMTest {
         List<Guard> guardList2 = new ArrayList<>(Collections.singletonList(g3));
         List<Guard> guardList3 = new ArrayList<>(Collections.singletonList(g2));
 
-        Zone t1 = state2.getZone().getAbsoluteZone(guardList1, clockList);
-        Zone t2 = state2.getZone().getAbsoluteZone(guardList2, clockList);
-        Zone t3 = state2.getZone().getAbsoluteZone(guardList3, clockList);
+        Zone t1 = state2.getInvZone().getAbsoluteZone(guardList1, clockList);
+        Zone t2 = state2.getInvZone().getAbsoluteZone(guardList2, clockList);
+        Zone t3 = state2.getInvZone().getAbsoluteZone(guardList3, clockList);
 
         assertArrayEquals(t1.getDbm(), new int[]{1, -5, DBM_INF, 1});
         assertArrayEquals(t2.getDbm(), new int[]{1, 1, 11, 1});
@@ -282,10 +282,10 @@ public class DBMTest {
         List<Guard> guardList3 = new ArrayList<>(Collections.singletonList(g3));
         List<Guard> guardList4 = new ArrayList<>(Collections.singletonList(g4));
 
-        Zone t1 = state3.getZone().getAbsoluteZone(guardList1, clockList);
-        Zone t2 = state3.getZone().getAbsoluteZone(guardList2, clockList);
-        Zone t3 = state3.getZone().getAbsoluteZone(guardList3, clockList);
-        Zone t4 = state3.getZone().getAbsoluteZone(guardList4, clockList);
+        Zone t1 = state3.getInvZone().getAbsoluteZone(guardList1, clockList);
+        Zone t2 = state3.getInvZone().getAbsoluteZone(guardList2, clockList);
+        Zone t3 = state3.getInvZone().getAbsoluteZone(guardList3, clockList);
+        Zone t4 = state3.getInvZone().getAbsoluteZone(guardList4, clockList);
 
         assertArrayEquals(t1.getDbm(), new int[]{1, -9, 11, 1});
         assertArrayEquals(t2.getDbm(), new int[]{1, -1, 11, 1});
@@ -315,8 +315,8 @@ public class DBMTest {
         List<Guard> guardList1 = new ArrayList<>(Arrays.asList(g1, g3));
         List<Guard> guardList2 = new ArrayList<>(Arrays.asList(g4, g3, g4));
 
-        Zone t1 = state2.getZone().getAbsoluteZone(guardList1, clockList);
-        Zone t2 = state2.getZone().getAbsoluteZone(guardList2, clockList);
+        Zone t1 = state2.getInvZone().getAbsoluteZone(guardList1, clockList);
+        Zone t2 = state2.getInvZone().getAbsoluteZone(guardList2, clockList);
 
         assertArrayEquals(t1.getDbm(), new int[]{1, -5, 11, 1});
         assertArrayEquals(t2.getDbm(), new int[]{1, 1, 11, 1});
@@ -375,13 +375,13 @@ public class DBMTest {
         state.applyGuards(guardList, clockList);
 
 //        prevZone.printDBM(false, true);
-//        state.getZone().printDBM(false, true);
+//        state.getInvZone().printDBM(false, true);
 //        absZone.printDBM(false, true);
 
-        state.getZone().updateLowerBounds(prevZone, absZone.getRawRowMax());
-        //state.getZone().printDBM(false, true);
+        state.getInvZone().updateLowerBounds(prevZone, absZone.getRawRowMax());
+        //state.getInvZone().printDBM(false, true);
 
-        assertArrayEquals(state.getZone().getDbm(), new int[]{1, -1015, -15, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
+        assertArrayEquals(state.getInvZone().getDbm(), new int[]{1, -1015, -15, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1});
     }
 
     @Test
@@ -391,10 +391,10 @@ public class DBMTest {
         int[] dbm1 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
         int[] dbm2 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
 
-        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 0, 1, -2, false);
-        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 0, 2, -3, false);
-        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 1, 0, 4, false);
-        dbm2 = DBMLib.dbm_constrain1(dbm2, dim, 2, 0, 5, false);
+        dbm2 = DBMLib.dbm_constrainBound(dbm2, dim, 0, 1, -2, false);
+        dbm2 = DBMLib.dbm_constrainBound(dbm2, dim, 0, 2, -3, false);
+        dbm2 = DBMLib.dbm_constrainBound(dbm2, dim, 1, 0, 4, false);
+        dbm2 = DBMLib.dbm_constrainBound(dbm2, dim, 2, 0, 5, false);
 
         int[][] arr1 = DBMLib.dbm_minus_dbm(dbm1, dbm2, dim);
         Federation fed1 = new Federation(arr1);
@@ -405,10 +405,10 @@ public class DBMTest {
 
         int[] dbm3 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
 
-        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 0, 1, 0, false);
-        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 0, 2, 0, false);
-        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 1, 0, 1, false);
-        dbm3 = DBMLib.dbm_constrain1(dbm3, dim, 2, 0, 1, false);
+        dbm3 = DBMLib.dbm_constrainBound(dbm3, dim, 0, 1, 0, false);
+        dbm3 = DBMLib.dbm_constrainBound(dbm3, dim, 0, 2, 0, false);
+        dbm3 = DBMLib.dbm_constrainBound(dbm3, dim, 1, 0, 1, false);
+        dbm3 = DBMLib.dbm_constrainBound(dbm3, dim, 2, 0, 1, false);
 
         int[][] arr2 = DBMLib.fed_minus_dbm(arr1, dbm3, dim);
         Federation fed2 = new Federation(arr2);
@@ -425,8 +425,10 @@ public class DBMTest {
         int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
 
         t1 = DBMLib.dbm_zero(t1, 3);
-
         t1 = DBMLib.dbm_up(t1, 3);
+
+        t1 = DBMLib.dbm_constrainRaw(t1, 3, 1, 0, 7);
+        t1 = DBMLib.dbm_constrainRaw(t1, 3, 2, 0, 5);
         printDBM(t1, false, true);
 
     }

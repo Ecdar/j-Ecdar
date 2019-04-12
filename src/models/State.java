@@ -4,27 +4,27 @@ import java.util.List;
 
 public class State {
     private final SymbolicLocation location;
-    private Zone zone, arrivalZone;
+    private Zone invZone, arrivalZone;
     // delay sum
     private int dSum;
 
     public State(SymbolicLocation location, Zone zone) {
         this.location = location;
-        this.zone = new Zone(zone);
-        this.arrivalZone = new Zone(zone.getSize());
+        this.invZone = new Zone(zone);
+        this.arrivalZone = new Zone(zone);
         this.dSum = 0;
     }
 
     public State(SymbolicLocation location, Zone zone, Zone arrivalZone, int sum) {
         this.location = location;
-        this.zone = new Zone(zone);
+        this.invZone = new Zone(zone);
         this.arrivalZone = new Zone(arrivalZone);
         this.dSum = sum;
     }
 
     public State(State oldState) {
         this.location = oldState.getLocation();
-        this.zone = new Zone(oldState.getZone());
+        this.invZone = new Zone(oldState.getInvZone());
         this.arrivalZone = new Zone(oldState.getArrivalZone());
         this.dSum = oldState.dSum;
     }
@@ -33,8 +33,8 @@ public class State {
         return location;
     }
 
-    public Zone getZone() {
-        return zone;
+    public Zone getInvZone() {
+        return invZone;
     }
 
     public Zone getArrivalZone() {
@@ -55,21 +55,25 @@ public class State {
 
     public void applyGuards(List<Guard> guards, List<Clock> clocks) {
         for (Guard guard : guards)
-            zone.buildConstraintsForGuard(guard, getIndexOfClock(guard.getClock(), clocks));
+            invZone.buildConstraintsForGuard(guard, getIndexOfClock(guard.getClock(), clocks));
     }
 
     public void applyInvariants(List<Clock> clocks) {
         for (Guard invariant : getInvariants())
-            zone.buildConstraintsForGuard(invariant, getIndexOfClock(invariant.getClock(), clocks));
+            invZone.buildConstraintsForGuard(invariant, getIndexOfClock(invariant.getClock(), clocks));
     }
 
     public void applyResets(List<Update> resets, List<Clock> clocks) {
         for (Update reset : resets)
-            zone.updateValue(getIndexOfClock(reset.getClock(), clocks), reset.getValue());
+            invZone.updateValue(getIndexOfClock(reset.getClock(), clocks), reset.getValue());
     }
 
     public void setArrivalZone(Zone arrivalZone) {
         this.arrivalZone = new Zone(arrivalZone);
+    }
+
+    public void updateArrivalZone(Zone timeline){
+        this.arrivalZone.updateArrivalZone(timeline);
     }
 
     public void setDSum(int sum) {
@@ -78,6 +82,6 @@ public class State {
 
     @Override
     public String toString() {
-        return "{" + location + ", " + zone + '}';
+        return "{" + location + ", " + invZone + '}';
     }
 }

@@ -82,13 +82,23 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1zero(JNIEnv *env, jclass cls, j
      return helper_functions::cToJint(env, converted, len);
 }
 
-JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrain1(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrainBound(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
     jint j, jint bound, jboolean strict) {
     jsize len = env->GetArrayLength(dbm);
     auto converted = helper_functions::jintToC(env, dbm, len);
 
     raw_t constraint = dbm_boundbool2raw(bound, strict);
     dbm_constrain1(converted, dim, i, j, constraint);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1constrainRaw(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint i,
+ jint j, jint raw) {
+    jsize len = env->GetArrayLength(dbm);
+    auto converted = helper_functions::jintToC(env, dbm, len);
+
+    dbm_constrain1(converted, dim, i, j, raw);
 
     return helper_functions::cToJint(env, converted, len);
 }

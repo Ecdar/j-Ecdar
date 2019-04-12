@@ -18,8 +18,9 @@ public abstract class TransitionSystem {
     }
 
     public State getInitialState() {
-        Zone zone = new Zone(clocks.size() + 1);
-        State state = new State(getInitialLocation(), zone);
+        Zone zone = new Zone(clocks.size() + 1, true);
+        Zone arrivalZone = new Zone(clocks.size() + 1, false);
+        State state = new State(getInitialLocation(), zone, arrivalZone, 0);
         state.applyInvariants(clocks);
 
         return state;
@@ -42,32 +43,40 @@ public abstract class TransitionSystem {
             List<Guard> guards = move.getGuards();
             List<Update> updates = move.getUpdates();
 
-            // need to make a copy of the zone
-            State targetState = new State(move.getTarget(), currentState.getZone());
-            // get the new zone by applying guards and resets on the zone of the target state
-            Zone absZone = targetState.getZone().getAbsoluteZone(guards, clocks);
+            // need to make a copy of the zone. Arrival zone of target state is invalid right now
+            State targetState = new State(move.getTarget(), currentState.getInvZone());
+
+//            // get the new zone by applying guards and resets on the zone of the target state
+//            if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
+//            Zone guardZone = new Zone(targetState.getInvZone());
+//
+//            // Compute the flattening of all clocks into a timeline to get absolute values of when the move can be made
+//            Zone timeline = currentState.getArrivalZone().createTimeline(guardZone);
+//            if(timeline == null) continue;
+//
+//            targetState.updateArrivalZone(timeline);
+            Zone absZone = targetState.getInvZone().getAbsoluteZone(guards, clocks);
             if (absZone.containsNegatives()) continue;
 
             if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
-            if (!targetState.getZone().isValid()) continue;
+            if (!targetState.getInvZone().isValid()) continue;
 
 
-            targetState.getZone().updateLowerBounds(currentState.getZone(), absZone.getRawRowMax());
-            if (!targetState.getZone().isValid()) continue;
+            targetState.getInvZone().updateLowerBounds(currentState.getInvZone(), absZone.getRawRowMax());
+            if (!targetState.getInvZone().isValid()) continue;
 
             if (!updates.isEmpty()) targetState.applyResets(updates, clocks);
 
-            targetState.setArrivalZone(targetState.getZone());
+            targetState.setArrivalZone(targetState.getInvZone());
 
-            targetState.getZone().delay();
+            targetState.getInvZone().delay();
 
             targetState.applyInvariants(clocks);
 
-            if (!targetState.getZone().isValid()) continue;
+            if (!targetState.getInvZone().isValid()) continue;
 
-            transitions.add(new Transition(currentState, targetState, move.getEdges()));
+            transitions.add(new Transition(currentState, targetState, move.getEdges(), currentState.getInvZone().getSize()));
         }
-
         return transitions;
     }
 

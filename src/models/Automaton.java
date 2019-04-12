@@ -40,7 +40,7 @@ public class Automaton {
         if (clocks.size() > 0) {
             for (Location loc : locations) {
                 // build the zone for this location
-                Zone zone = new Zone(clocks.size() + 1);
+                Zone zone = new Zone(clocks.size() + 1, true);
                 List<Guard> invariants = loc.getInvariant();
                 for (Guard invariant : invariants) {
                     zone.buildConstraintsForGuard(invariant, clocks.indexOf(invariant.getClock()) + 1);

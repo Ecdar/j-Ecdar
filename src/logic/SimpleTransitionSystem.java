@@ -78,8 +78,8 @@ public class SimpleTransitionSystem extends TransitionSystem {
                 state1.applyGuards(trans.get(i).getGuards(), clocks);
                 state2.applyGuards(trans.get(j).getGuards(), clocks);
 
-                if (state1.getZone().isValid() && state2.getZone().isValid()) {
-                    return state1.getZone().intersects(state2.getZone());
+                if (state1.getInvZone().isValid() && state2.getInvZone().isValid()) {
+                    return state1.getInvZone().intersects(state2.getInvZone());
                 }
             }
         }
@@ -117,7 +117,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
 
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (currState.getZone().canDelayIndefinitely() && canPrune)
+        if (currState.getInvZone().canDelayIndefinitely() && canPrune)
             return true;
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
@@ -140,7 +140,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                return currState.getZone().canDelayIndefinitely();
+                return currState.getInvZone().canDelayIndefinitely();
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
@@ -187,7 +187,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
             State state = new State(ts.getSource());
             state.applyGuards(ts.getGuards(), clocks);
 
-            if(!state.getZone().isUrgent())
+            if(!state.getInvZone().isUrgent())
                 return false;
         }
         return true;
@@ -197,7 +197,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
         for (State passedState : passed) {
             // check for zone inclusion
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    state.getZone().isSubset(passedState.getZone())) {
+                    state.getInvZone().isSubset(passedState.getInvZone())) {
                 return true;
             }
         }

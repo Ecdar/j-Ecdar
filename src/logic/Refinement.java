@@ -68,7 +68,7 @@ public class Refinement {
                     return false;
 
                 // check if TS 2 can delay at least as much as TS 1
-                if (!(left.getZone().getMaxRawDelay() <= right.getZone().getMaxRawDelay()))
+                if (!(left.getInvZone().getMaxRawDelay() <= right.getInvZone().getMaxRawDelay()))
                     return false;
             }
 
@@ -81,12 +81,12 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State source1 = new State(t1.getSource());
-        State target1 = new State(t1.getTarget().getLocation(), t1.getSource().getZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
+        State target1 = new State(t1.getTarget().getLocation(), t1.getSource().getInvZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
         State source2 = new State(t2.getSource());
-        State target2 = new State(t2.getTarget().getLocation(), t2.getSource().getZone(), t2.getTarget().getArrivalZone(), t2.getTarget().getDSum());
+        State target2 = new State(t2.getTarget().getLocation(), t2.getSource().getInvZone(), t2.getTarget().getArrivalZone(), t2.getTarget().getDSum());
 
-        Zone absZone1 = source1.getZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
-        Zone absZone2 = source2.getZone().getAbsoluteZone(t2.getGuards(), ts2.getClocks());
+        Zone absZone1 = source1.getInvZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
+        Zone absZone2 = source2.getInvZone().getAbsoluteZone(t2.getGuards(), ts2.getClocks());
 
         if (!absZone1.absoluteZonesIntersect(absZone2))
             return null;
@@ -94,8 +94,8 @@ public class Refinement {
         target1.applyGuards(t1.getGuards(), ts1.getClocks());
         target2.applyGuards(t2.getGuards(), ts2.getClocks());
 
-        Zone guardZone1 = target1.getZone();
-        Zone guardZone2 = target2.getZone();
+        Zone guardZone1 = target1.getInvZone();
+        Zone guardZone2 = target2.getInvZone();
 
         Zone arrZone1 = source1.getArrivalZone();
         Zone arrZone2 = source2.getArrivalZone();
@@ -163,26 +163,26 @@ public class Refinement {
         int rowMax1 = absZone1.getRawRowMax();
         int rowMax2 = absZone2.getRawRowMax();
         int rowMax = rowMax1 < rowMax2 ? rowMax1 : rowMax2;
-        target1.getZone().updateLowerBounds(source1.getZone(), rowMax);
-        target2.getZone().updateLowerBounds(source2.getZone(), rowMax);
+        target1.getInvZone().updateLowerBounds(source1.getInvZone(), rowMax);
+        target2.getInvZone().updateLowerBounds(source2.getInvZone(), rowMax);
 
-        if (!target1.getZone().isValid() || !target2.getZone().isValid())
+        if (!target1.getInvZone().isValid() || !target2.getInvZone().isValid())
             return null;
 
         target1.applyResets(t1.getUpdates(), ts1.getClocks());
         target2.applyResets(t2.getUpdates(), ts2.getClocks());
 
         // no edges means it's most likely a self loop so we don't need to update arrival zone
-        if (!t1.getEdges().isEmpty()) target1.setArrivalZone(target1.getZone());
-        if (!t2.getEdges().isEmpty()) target2.setArrivalZone(target2.getZone());
+        if (!t1.getEdges().isEmpty()) target1.setArrivalZone(target1.getInvZone());
+        if (!t2.getEdges().isEmpty()) target2.setArrivalZone(target2.getInvZone());
 
-        target1.getZone().delay();
-        target2.getZone().delay();
+        target1.getInvZone().delay();
+        target2.getInvZone().delay();
 
         target1.applyInvariants(ts1.getClocks());
         target2.applyInvariants(ts2.getClocks());
 
-        if (!target1.getZone().isValid() || !target2.getZone().isValid())
+        if (!target1.getInvZone().isValid() || !target2.getInvZone().isValid())
             return null;
 
         return new StatePair(target1, target2);
@@ -226,7 +226,8 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
-                    Transition loop = isInput ? new Transition(state1, state1, new ArrayList<>()) : new Transition(state2, state2, new ArrayList<>());
+                    Transition loop = isInput ? new Transition(state1, state1, new ArrayList<>(), state1.getInvZone().getSize()) :
+                            new Transition(state2, state2, new ArrayList<>(), state2.getInvZone().getSize());
                     transitions2.add(loop);
                 }
 
@@ -251,8 +252,8 @@ public class Refinement {
 
             if (passedLeft.getLocation().equals(currLeft.getLocation()) &&
                     passedRight.getLocation().equals(currRight.getLocation())) {
-                if (currLeft.getZone().isSubset(passedLeft.getZone()) &&
-                        currRight.getZone().isSubset(passedRight.getZone())) {
+                if (currLeft.getInvZone().isSubset(passedLeft.getInvZone()) &&
+                        currRight.getInvZone().isSubset(passedRight.getInvZone())) {
                     return true;
                 }
             }

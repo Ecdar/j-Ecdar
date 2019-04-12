@@ -3,6 +3,11 @@
 /*
 
 */
+refinement:L6<=L5
+
+/*
+
+*/
 refinement: (L1||L2) <= L3
 
 /*
