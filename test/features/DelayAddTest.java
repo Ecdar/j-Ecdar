@@ -45,6 +45,7 @@ public class DelayAddTest {
 
     @Test
     public void D1NotRefinesD2() {
+        // should fail because outputs are different
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[5]), new SimpleTransitionSystem(automata[6])).check());
     }
 }

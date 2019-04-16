@@ -75,8 +75,9 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void T7RefinesT8() {
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[14]), new SimpleTransitionSystem(automata[15])).check());
+    public void T7NotRefinesT8() {
+        // should fail because left side has more inputs
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[14]), new SimpleTransitionSystem(automata[15])).check());
     }
 
     @Test
@@ -85,8 +86,9 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void T10RefinesT11() {
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[17]), new SimpleTransitionSystem(automata[18])).check());
+    public void T10NotRefinesT11() {
+        // should fail because left side has more inputs
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[17]), new SimpleTransitionSystem(automata[18])).check());
     }
 
     @Test
@@ -95,8 +97,9 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void N3RefinesN4() {
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[21]), new SimpleTransitionSystem(automata[22])).check());
+    public void N3NotRefinesN4() {
+        // should fail because right side has more inputs
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[21]), new SimpleTransitionSystem(automata[22])).check());
     }
 
     @Test
@@ -105,7 +108,8 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void D1RefinesD2() {
+    public void D1NotRefinesD2() {
+        // should fail because right side has more outputs
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[23]), new SimpleTransitionSystem(automata[24])).check());
     }
 

@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UnspecTest {
@@ -44,7 +45,8 @@ public class UnspecTest {
     }
 
     @Test
-    public void compRefinesB() {
-        assertTrue(new Refinement(new Composition(new TransitionSystem[]{a, aa}), b).check());
+    public void compNotRefinesB() {
+        // should fail because right side has more inputs
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{a, aa}), b).check());
     }
 }

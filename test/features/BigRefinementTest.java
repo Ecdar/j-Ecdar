@@ -28,8 +28,9 @@ public class BigRefinementTest {
     }
 
     @Test
-    public void testRef1RefinesComp1() {
-        assertTrue(new Refinement(ref1, comp1).check());
+    public void testRef1NotRefinesComp1() {
+        // should fail because left side has more inputs
+        assertFalse(new Refinement(ref1, comp1).check());
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AGTest {
@@ -54,24 +55,27 @@ public class AGTest {
     }
 
     @Test
-    public void AGRefinesAImp() {
-        assertTrue(new Refinement(
+    public void AGNotRefinesAImp() {
+        // should fail because left side has more inputs
+        assertFalse(new Refinement(
                 new Composition(new TransitionSystem[]{a, g}),
                 new Composition(new TransitionSystem[]{a, imp})).check()
         );
     }
 
     @Test
-    public void AImpRefinesAG() {
-        assertTrue(new Refinement(
+    public void AImpNotRefinesAG() {
+        // should fail because the right side has more inputs
+        assertFalse(new Refinement(
                 new Composition(new TransitionSystem[]{a, imp}),
                 new Composition(new TransitionSystem[]{a, g})).check()
         );
     }
 
     @Test
-    public void GRefinesImp() {
-        assertTrue(new Refinement(g, imp).check());
+    public void GNotRefinesImp() {
+        // should fail because right side has more outputs
+        assertFalse(new Refinement(g, imp).check());
     }
 
     @Test
@@ -90,8 +94,9 @@ public class AGTest {
     }
 
     @Test
-    public void QRefinesImp() {
-        assertTrue(new Refinement(q, imp).check());
+    public void QNotRefinesImp() {
+        // should fail because right side has more outputs
+        assertFalse(new Refinement(q, imp).check());
     }
 
     @Test
@@ -100,8 +105,9 @@ public class AGTest {
     }
 
     @Test
-    public void ARefinesAA() {
-        assertTrue(new Refinement(a, aa).check());
+    public void ANotRefinesAA() {
+        // should fail because right side has more inputs
+        assertFalse(new Refinement(a, aa).check());
     }
 
 //    @Test
