@@ -34,6 +34,16 @@ public class Refinement {
     }
 
     public boolean check() {
+        // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
+        // with the exception that the left side is allowed to have more outputs
+
+        // inputs on the left must be equal to inputs on the right side
+        if (!inputs1.equals(inputs2))
+            return false;
+        // the left side must contain all outputs from the right side
+        if (!outputs1.containsAll(outputs2))
+            return false;
+
         // Temp waiting list peak counter
         int waitingAmount = 0;
         // keep looking at states from Waiting as long as it contains elements
