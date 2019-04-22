@@ -75,7 +75,7 @@ public abstract class TransitionSystem {
 
             if (!targetState.getInvZone().isValid()) continue;
 
-            transitions.add(new Transition(currentState, targetState, move.getEdges(), currentState.getInvZone().getSize()));
+            transitions.add(new Transition(currentState, targetState, move, currentState.getInvZone().getSize()));
         }
         return transitions;
     }

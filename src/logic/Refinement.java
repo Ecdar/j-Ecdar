@@ -236,8 +236,8 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
-                    Transition loop = isInput ? new Transition(state1, state1, new ArrayList<>(), state1.getInvZone().getSize()) :
-                            new Transition(state2, state2, new ArrayList<>(), state2.getInvZone().getSize());
+                    Transition loop = isInput ? new Transition(state1, state1.getInvZone().getSize()) :
+                            new Transition(state2, state2.getInvZone().getSize());
                     transitions2.add(loop);
                 }
 

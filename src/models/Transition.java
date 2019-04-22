@@ -1,28 +1,32 @@
 package models;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Transition {
     private State source, target;
-    private final List<Edge> edges;
+    private final Move move;
     private Zone guardZone, timeline;
 
-    public Transition(State source, State target, List<Edge> edges, int dim) {
+    public Transition(State source, State target, Move move, int dim) {
         this.source = source;
         this.target = target;
-        this.edges = edges;
+        this.move = move;
         this.guardZone = new Zone(dim, true);
         this.timeline = new Zone(2, true);
     }
 
-    public Transition(State source, State target, List<Edge> edges, Zone guardZone, Zone tline) {
+    public Transition(State source, State target, Move move, Zone guardZone, Zone tline) {
         this.source = source;
         this.target = target;
-        this.edges = edges;
+        this.move = move;
         this.guardZone = guardZone;
         this.timeline = tline;
+    }
+
+    // self loop
+    public Transition(State state, int dim) {
+        this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), dim);
     }
 
     public State getSource() {
@@ -38,15 +42,14 @@ public class Transition {
     }
 
     public List<Edge> getEdges() {
-        return edges;
+        return move.getEdges();
     }
 
     public List<Guard> getGuards() {
-        // collect guards from each Edge and flatten the list
-        return edges.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
+        return move.getGuards();
     }
 
     public List<Update> getUpdates() {
-        return edges.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
+        return move.getUpdates();
     }
 }
