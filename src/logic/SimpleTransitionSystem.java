@@ -79,7 +79,8 @@ public class SimpleTransitionSystem extends TransitionSystem {
                 state2.applyGuards(trans.get(j).getGuards(), clocks);
 
                 if (state1.getInvZone().isValid() && state2.getInvZone().isValid()) {
-                    return state1.getInvZone().intersects(state2.getInvZone());
+                    if(state1.getInvZone().intersects(state2.getInvZone()))
+                        return true;
                 }
             }
         }
@@ -94,7 +95,6 @@ public class SimpleTransitionSystem extends TransitionSystem {
         if (!isDeterministic())
             return false;
         passed = new ArrayList<>();
-        State test = getInitialState();
         return checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
     }
 
@@ -117,13 +117,12 @@ public class SimpleTransitionSystem extends TransitionSystem {
 
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (currState.getInvZone().canDelayIndefinitely() && canPrune)
+        if (canPrune && currState.getInvZone().canDelayIndefinitely())
             return true;
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
         else {
             for (Channel channel : outputs) {
-
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
 
                 for (Transition ts : tempTrans) {
@@ -131,11 +130,9 @@ public class SimpleTransitionSystem extends TransitionSystem {
                     boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                     if (outputConsistent && canPrune)
                         return true;
-
                     if(!outputConsistent && !canPrune)
                         return false;
                 }
-
             }
             if(!canPrune) {
                 if (outputExisted)

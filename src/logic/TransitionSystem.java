@@ -26,6 +26,15 @@ public abstract class TransitionSystem {
         return state;
     }
 
+    public State getInitialStateRef(List<Clock> allClocks) {
+        Zone zone = new Zone(allClocks.size() + 1, true);
+        Zone arrivalZone = new Zone(allClocks.size() + 1, false);
+        State state = new State(getInitialLocation(), zone, arrivalZone, 0);
+        state.applyInvariants(allClocks);
+
+        return state;
+    }
+
     protected abstract SymbolicLocation getInitialLocation();
 
     SymbolicLocation getInitialLocation(TransitionSystem[] systems) {
@@ -46,31 +55,12 @@ public abstract class TransitionSystem {
             // need to make a copy of the zone. Arrival zone of target state is invalid right now
             State targetState = new State(move.getTarget(), currentState.getInvZone());
 
-//            // get the new zone by applying guards and resets on the zone of the target state
-//            if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
-//            Zone guardZone = new Zone(targetState.getInvZone());
-//
-//            // Compute the flattening of all clocks into a timeline to get absolute values of when the move can be made
-//            Zone timeline = currentState.getArrivalZone().createTimeline(guardZone);
-//            if(timeline == null) continue;
-//
-//            targetState.updateArrivalZone(timeline);
-            Zone absZone = targetState.getInvZone().getAbsoluteZone(guards, clocks);
-            if (absZone.containsNegatives()) continue;
-
             if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
             if (!targetState.getInvZone().isValid()) continue;
-
-
-            targetState.getInvZone().updateLowerBounds(currentState.getInvZone(), absZone.getRawRowMax());
-            if (!targetState.getInvZone().isValid()) continue;
-
             if (!updates.isEmpty()) targetState.applyResets(updates, clocks);
 
             targetState.setArrivalZone(targetState.getInvZone());
-
             targetState.getInvZone().delay();
-
             targetState.applyInvariants(clocks);
 
             if (!targetState.getInvZone().isValid()) continue;
