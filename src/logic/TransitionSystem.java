@@ -26,11 +26,12 @@ public abstract class TransitionSystem {
         return state;
     }
 
-    public State getInitialStateRef(List<Clock> allClocks) {
+    public State getInitialStateRef(List<Clock> allClocks, List<Guard> invs) {
         Zone zone = new Zone(allClocks.size() + 1, true);
         Zone arrivalZone = new Zone(allClocks.size() + 1, false);
         State state = new State(getInitialLocation(), zone, arrivalZone, 0);
         state.applyInvariants(allClocks);
+        state.applyGuards(invs, allClocks);
 
         return state;
     }

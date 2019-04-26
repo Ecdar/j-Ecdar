@@ -22,8 +22,10 @@ public class Refinement {
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
 
+        State left = ts1.getInitialStateRef(allClocks, ts2.getInitialLocation().getInvariants());
+        State right = ts2.getInitialStateRef(allClocks, ts1.getInitialLocation().getInvariants());
         // the first states we look at are the initial ones
-        waiting.push(new StatePair(ts1.getInitialStateRef(allClocks), ts2.getInitialStateRef(allClocks)));
+        waiting.push(new StatePair(left, right));
 
         inputs1 = ts1.getInputs();
         inputs2 = ts2.getInputs();
@@ -113,7 +115,8 @@ public class Refinement {
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         Federation fed = Federation.dbmMinusDbm(invariantTest, target1.getInvZone());
-        if(!fed.isEmpty()) return null;
+        if(!fed.isEmpty())
+            return null;
 
         if (!target1.getInvZone().isValid())
             return null;
@@ -173,8 +176,8 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
-                    Transition loop = isInput ? new Transition(state1, state1.getInvZone().getSize()) :
-                            new Transition(state2, state2.getInvZone().getSize());
+                    Transition loop = isInput ? new Transition(state1, state1.getInvZone()) :
+                            new Transition(state2, state2.getInvZone());
                     transitions2.add(loop);
                 }
 

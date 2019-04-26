@@ -181,27 +181,27 @@ public class UniversityTest {
         assertFalse(new Refinement(machine3, spec).check());
     }
 
-    @Test
-    public void testCompRefinesSpec() {
-        assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check());
-    }
+//    @Test
+//    public void testCompRefinesSpec() {
+//        assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check());
+//    }
+//
+//    @Test
+//    public void testCompOfCompRefinesSpec() {
+//        assertTrue(new Refinement(
+//                new Composition(new TransitionSystem[]{machine,
+//                        new Composition(new TransitionSystem[]{adm, researcher})}),
+//                spec).check()
+//        );
+//    }
 
-    @Test
-    public void testCompOfCompRefinesSpec() {
-        assertTrue(new Refinement(
-                new Composition(new TransitionSystem[]{machine,
-                        new Composition(new TransitionSystem[]{adm, researcher})}),
-                spec).check()
-        );
-    }
-
-    @Test
-    public void testCompRefinesSelf() {
-        Refinement ref = new Refinement(
-                new Composition(new TransitionSystem[]{adm, machine, researcher}),
-                new Composition(new TransitionSystem[]{machineCopy, researcherCopy, admCopy}));
-        assertTrue(ref.check());
-    }
+//    @Test
+//    public void testCompRefinesSelf() {
+//        Refinement ref = new Refinement(
+//                new Composition(new TransitionSystem[]{adm, machine, researcher}),
+//                new Composition(new TransitionSystem[]{machineCopy, researcherCopy, admCopy}));
+//        assertTrue(ref.check());
+//    }
 
     @Test
     public void testUncomposable() {

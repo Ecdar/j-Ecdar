@@ -27,6 +27,11 @@ public class Transition {
         this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), dim);
     }
 
+    // self loop
+    public Transition(State state, Zone guardZone) {
+        this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), new Zone(guardZone));
+    }
+
     public State getSource() {
         return source;
     }

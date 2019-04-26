@@ -542,6 +542,41 @@ public class DBMTest {
     }
 
     @Test
+    public void testDBMZ1Z2() {
+        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+        t1 = DBMLib.dbm_zero(t1, 3);
+        t1 = DBMLib.dbm_up(t1, 3);
+
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 20, false);
+        printDBM(t1, true, true);
+
+        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
+        t1 = DBMLib.dbm_up(t1, 3);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 7, false);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 20, false);
+        printDBM(t1, true, true);
+
+
+        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
+        t1 = DBMLib.dbm_up(t1, 3);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 8, false);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 20, false);
+        printDBM(t1, true, true);
+
+
+
+
+//        int[][] fedL = new int[][]{t1};
+//        int[][] fedR = new int[][]{t2};
+//
+//        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
+
+        assertTrue(true);
+    }
+
+    @Test
     public void testDBMCustom() {
         int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
 

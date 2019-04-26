@@ -3,6 +3,16 @@
 /*
 
 */
+refinement:Z3<=Z4
+
+/*
+
+*/
+refinement:Z1<=Z2
+
+/*
+
+*/
 refinement:L6<=L7
 
 /*
