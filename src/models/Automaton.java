@@ -36,6 +36,27 @@ public class Automaton {
         }
     }
 
+    // Copy constructor
+    public Automaton(Automaton copy){
+        this.name = copy.name;
+        this.locations = copy.locations;
+
+        this.clocks = new ArrayList<>();
+        for (Clock c : copy.clocks) {
+            this.clocks.add(new Clock(c));
+        }
+
+        this.edges = new ArrayList<>();
+        for (Edge e : copy.edges) {
+            this.edges.add(new Edge(e, this.clocks));
+        }
+
+        this.inputAct = copy.inputAct;
+        this.outputAct = copy.outputAct;
+        this.actions = copy.actions;
+        this.initLoc = copy.initLoc;
+    }
+
     private void makeInputEnabled() {
         if (clocks.size() > 0) {
             for (Location loc : locations) {

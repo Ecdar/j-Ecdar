@@ -46,16 +46,24 @@ public class State {
     }
 
     private int getIndexOfClock(Clock clock, List<Clock> clocks) {
-        return clocks.indexOf(clock) + 1;
+        for (int i = 0; i < clocks.size(); i++){
+            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
+        }
+        return 0;
     }
 
-    private List<Guard> getInvariants() {
+    public List<Guard> getInvariants() {
         return location.getInvariants();
     }
 
     public void applyGuards(List<Guard> guards, List<Clock> clocks) {
         for (Guard guard : guards)
             invZone.buildConstraintsForGuard(guard, getIndexOfClock(guard.getClock(), clocks));
+    }
+
+    public void applyInvariants(List<Guard> invariants, List<Clock> clocks) {
+        for (Guard invariant : invariants)
+            invZone.buildConstraintsForGuard(invariant, getIndexOfClock(invariant.getClock(), clocks));
     }
 
     public void applyInvariants(List<Clock> clocks) {

@@ -17,6 +17,10 @@ public class Federation {
         }
     }
 
+    public boolean isEmpty(){
+        return zones.isEmpty();
+    }
+
     public Federation(List<Zone> zones) {
         this.zones = new ArrayList<>(zones);
     }
@@ -33,5 +37,11 @@ public class Federation {
 
         int[][] result = DBMLib.fed_minus_fed(zones1, zones2, dim);
         return new Federation(result);
+    }
+
+    public static Federation dbmMinusDbm(Zone z1, Zone z2){
+        if(z1.getSize() != z2.getSize()) throw new IllegalArgumentException("Zones must be of the same size");
+
+        return new Federation(DBMLib.dbm_minus_dbm(z1.getDbm(), z2.getDbm(), z1.getSize()));
     }
 }

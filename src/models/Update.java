@@ -1,5 +1,6 @@
 package models;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Update {
@@ -10,6 +11,11 @@ public class Update {
     public Update(Clock clock, int value) {
         this.clock = clock;
         this.value = value;
+    }
+
+    public Update(Update copy, List<Clock> clocks){
+        this.clock = clocks.get(clocks.indexOf(copy.clock));
+        this.value = copy.value;
     }
 
     public Clock getClock() {

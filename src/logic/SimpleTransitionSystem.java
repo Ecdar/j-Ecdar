@@ -2,10 +2,11 @@ package logic;
 
 import models.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SimpleTransitionSystem extends TransitionSystem {
+public class SimpleTransitionSystem extends TransitionSystem{
 
     private final Automaton automaton;
     private Deque<State> waiting;
@@ -31,7 +32,7 @@ public class SimpleTransitionSystem extends TransitionSystem {
         return new SimpleLocation(automaton.getInitLoc());
     }
 
-    public List<TransitionSystem> getSystems() {
+    public List<SimpleTransitionSystem> getSystems() {
         return Collections.singletonList(this);
     }
 
@@ -201,10 +202,10 @@ public class SimpleTransitionSystem extends TransitionSystem {
         return false;
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         List<Move> moves = getNextMoves(currentState.getLocation(), channel);
 
-        return createNewTransitions(currentState, moves);
+        return createNewTransitions(currentState, moves, allClocks);
     }
 
     protected List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {

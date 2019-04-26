@@ -22,6 +22,15 @@ public class DelayRefinementTest {
     }
 
     @Test
+    public void T1T2RefinesT3() {
+        TransitionSystem comp = new Composition(
+                new TransitionSystem[]{
+                        new SimpleTransitionSystem(automata[0]),
+                        new SimpleTransitionSystem(automata[1])});
+        assertTrue(new Refinement(comp, new SimpleTransitionSystem(automata[2])).check());
+    }
+
+    @Test
     public void C1RefinesC1() {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[3]), new SimpleTransitionSystem(automata[3])).check());
     }
@@ -34,15 +43,6 @@ public class DelayRefinementTest {
     @Test
     public void C2RefinesC1() {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[4]), new SimpleTransitionSystem(automata[3])).check());
-    }
-
-    @Test
-    public void T1T2RefinesT3() {
-        TransitionSystem comp = new Composition(
-                new TransitionSystem[]{
-                        new SimpleTransitionSystem(automata[0]),
-                        new SimpleTransitionSystem(automata[1])});
-        assertTrue(new Refinement(comp, new SimpleTransitionSystem(automata[2])).check());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class DelayRefinementTest {
 
     @Test
     public void T6RefinesT5() {
-        assertFalse(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class DelayRefinementTest {
 
     @Test
     public void T9RefinesT8() {
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[16]), new SimpleTransitionSystem(automata[15])).check());
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[16]), new SimpleTransitionSystem(automata[15])).check());
     }
 
     @Test
@@ -132,4 +132,40 @@ public class DelayRefinementTest {
     public void P0RefinesP1() {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[31]), new SimpleTransitionSystem(automata[32])).check());
     }
+
+    @Test
+    public void P2RefinesP3() {
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[33]), new SimpleTransitionSystem(automata[34])).check());
+    }
+
+    @Test
+    public void P4RefinesP5() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[35]), new SimpleTransitionSystem(automata[36])).check());
+    }
+
+    @Test
+    public void P6RefinesP7() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[37]), new SimpleTransitionSystem(automata[38])).check());
+    }
+
+    @Test
+    public void L1L2RefinesL3(){
+        TransitionSystem comp = new Composition(
+                new TransitionSystem[]{
+                        new SimpleTransitionSystem(automata[39]),
+                        new SimpleTransitionSystem(automata[40])});
+        assertFalse(new Refinement(comp, new SimpleTransitionSystem(automata[41])).check());
+    }
+
+    @Test
+    public void L4RefinesL5() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[42]), new SimpleTransitionSystem(automata[43])).check());
+    }
+
+    @Test
+    public void L6RefinesL7() {
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[44]), new SimpleTransitionSystem(automata[45])).check());
+    }
+
+
 }

@@ -42,7 +42,7 @@ public abstract class TransitionSystem {
         return new ComplexLocation(Arrays.stream(systems).map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
     }
 
-    List<Transition> createNewTransitions(State currentState, List<Move> moves) {
+    List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
         List<Transition> transitions = new ArrayList<>();
 
         // loop through moves
@@ -55,17 +55,18 @@ public abstract class TransitionSystem {
             // need to make a copy of the zone. Arrival zone of target state is invalid right now
             State targetState = new State(move.getTarget(), currentState.getInvZone());
 
-            if (!guards.isEmpty()) targetState.applyGuards(guards, clocks);
+            if (!guards.isEmpty()) targetState.applyGuards(guards, allClocks);
             if (!targetState.getInvZone().isValid()) continue;
-            if (!updates.isEmpty()) targetState.applyResets(updates, clocks);
+            Zone guardZone = new Zone(targetState.getInvZone());
+            if (!updates.isEmpty()) targetState.applyResets(updates, allClocks);
 
             targetState.setArrivalZone(targetState.getInvZone());
             targetState.getInvZone().delay();
-            targetState.applyInvariants(clocks);
+            targetState.applyInvariants(allClocks);
 
             if (!targetState.getInvZone().isValid()) continue;
 
-            transitions.add(new Transition(currentState, targetState, move, currentState.getInvZone().getSize()));
+            transitions.add(new Transition(currentState, targetState, move, guardZone));
         }
         return transitions;
     }
@@ -74,7 +75,7 @@ public abstract class TransitionSystem {
 
     public abstract Set<Channel> getOutputs();
 
-    public abstract List<TransitionSystem> getSystems();
+    public abstract List<SimpleTransitionSystem> getSystems();
 
     public Set<Channel> getSyncs() {
         return new HashSet<>();
@@ -89,7 +90,7 @@ public abstract class TransitionSystem {
     }
 
     public boolean isDeterministic(){
-        List<TransitionSystem> systems = getSystems();
+        List<SimpleTransitionSystem> systems = getSystems();
 
         for (TransitionSystem ts : systems){
             if(!ts.isDeterministic())
@@ -99,7 +100,7 @@ public abstract class TransitionSystem {
     }
 
     public boolean isConsistent(){
-        List<TransitionSystem> systems = getSystems();
+        List<SimpleTransitionSystem> systems = getSystems();
 
         for (TransitionSystem ts : systems){
             if(!ts.isConsistent())
@@ -111,7 +112,7 @@ public abstract class TransitionSystem {
 
 
     public boolean isImplementation(){
-        List<TransitionSystem> systems = getSystems();
+        List<SimpleTransitionSystem> systems = getSystems();
 
         for (TransitionSystem ts : systems){
             if(!ts.isImplementation())
@@ -120,7 +121,11 @@ public abstract class TransitionSystem {
         return true;
     }
 
-    public abstract List<Transition> getNextTransitions(State currentState, Channel channel);
+    public List<Transition> getNextTransitions(State currentState, Channel channel){
+        return getNextTransitions(currentState, channel, clocks);
+    }
+
+    public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 

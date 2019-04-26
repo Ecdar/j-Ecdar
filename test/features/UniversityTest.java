@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public class UniversityTest {
 
-    private static TransitionSystem adm, machine, researcher, spec, machine3, adm2, half1, half2;
+    private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy, machine3, adm2, half1, half2;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -28,9 +28,13 @@ public class UniversityTest {
         Automaton[] machines = JSONParser.parse(base, components, true);
 
         adm = new SimpleTransitionSystem(machines[0]);
+        admCopy = new SimpleTransitionSystem(new Automaton(machines[0]));
         machine = new SimpleTransitionSystem(machines[1]);
+        machineCopy = new SimpleTransitionSystem(new Automaton(machines[1]));
         researcher = new SimpleTransitionSystem(machines[2]);
+        researcherCopy = new SimpleTransitionSystem(new Automaton(machines[2]));
         spec = new SimpleTransitionSystem(machines[3]);
+        specCopy = new SimpleTransitionSystem(new Automaton(machines[3]));
         machine3 = new SimpleTransitionSystem(machines[4]);
         adm2 = new SimpleTransitionSystem(machines[5]);
         half1 = new SimpleTransitionSystem(machines[6]);
@@ -129,7 +133,7 @@ public class UniversityTest {
 
     @Test
     public void testSpecRefinesSpec() {
-        assertTrue(new Refinement(spec, spec).check());
+        assertTrue(new Refinement(spec, specCopy).check());
     }
 
     @Test
@@ -191,14 +195,13 @@ public class UniversityTest {
         );
     }
 
-    // TODO: uncomment when it stops looping forever
-    /*@Test
+    @Test
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
                 new Composition(new TransitionSystem[]{adm, machine, researcher}),
-                new Composition(new TransitionSystem[]{machine, researcher, adm}));
+                new Composition(new TransitionSystem[]{machineCopy, researcherCopy, admCopy}));
         assertTrue(ref.check());
-    }*/
+    }
 
     @Test
     public void testUncomposable() {

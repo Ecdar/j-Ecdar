@@ -8,6 +8,10 @@ public class Clock {
         this.name = name;
     }
 
+    public Clock(Clock copy){
+        this.name = copy.name;
+    }
+
     public String getName() {
         return name;
     }

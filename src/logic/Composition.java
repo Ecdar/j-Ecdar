@@ -80,8 +80,8 @@ public class Composition extends TransitionSystem {
         return getInitialLocation(systems);
     }
 
-    public List<TransitionSystem> getSystems(){
-        List<TransitionSystem> result = new ArrayList<>();
+    public List<SimpleTransitionSystem> getSystems(){
+        List<SimpleTransitionSystem> result = new ArrayList<>();
         for(TransitionSystem ts : systems){
             result.addAll(ts.getSystems());
         }
@@ -89,7 +89,7 @@ public class Composition extends TransitionSystem {
     }
 
     // build a list of transitions from a given state and a signal
-    public List<Transition> getNextTransitions(State currentState, Channel channel) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
         // these will store the locations of the target states and the corresponding transitions
@@ -115,7 +115,7 @@ public class Composition extends TransitionSystem {
             // inputs in the other TS's
             if (checkForInputs(channel, locations)) resultMoves = computeResultMoves(locations, channel);
         }
-        return createNewTransitions(currentState, resultMoves);
+        return createNewTransitions(currentState, resultMoves, allClocks);
     }
 
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {

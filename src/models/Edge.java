@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +20,23 @@ public class Edge {
         this.isInput = isInput;
         this.guards = guards;
         this.updates = updates;
+    }
+
+    public Edge(Edge copy, List<Clock> clocks){
+        this.source = copy.source;
+        this.target = copy.target;
+        this.chan = copy.chan;
+        this.isInput = copy.isInput;
+
+        this.guards = new ArrayList<>();
+        for (Guard g : copy.guards) {
+            this.guards.add(new Guard(g, clocks));
+        }
+
+        this.updates = new Update[copy.updates.length];
+        for (int i = 0; i < copy.updates.length; i++) {
+            this.updates[i] = new Update(copy.updates[i], clocks);
+        }
     }
 
     public Location getSource() {

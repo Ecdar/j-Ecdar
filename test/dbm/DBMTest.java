@@ -438,12 +438,15 @@ public class DBMTest {
         printDBM(t1, true, true);
 
         t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 500, false);
-
-
         printDBM(t1, true, true);
 
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 500, false);
-        printDBM(t1, true, true);
+        int[] t2 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 500, false);
+        printDBM(t2, true, true);
+
+        int[][] fedL = new int[][]{t1};
+        int[][] fedR = new int[][]{t2};
+
+        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
 
         assertTrue(true);
     }
@@ -502,21 +505,66 @@ public class DBMTest {
     }
 
     @Test
+    public void testDBMT4T3() {
+        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+        t1 = DBMLib.dbm_zero(t1, 3);
+        t1 = DBMLib.dbm_up(t1, 3);
+
+        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
+        t1 = DBMLib.dbm_updateValue(t1, 3, 2, 0);
+        t1 = DBMLib.dbm_up(t1, 3);
+        printDBM(t1, true, true);
+
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 6, false);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 12, false);
+        printDBM(t1, true, true);
+
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 3, false);
+        printDBM(t1, true, true);
+
+        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
+        printDBM(t1, true, true);
+
+        t1 = DBMLib.dbm_up(t1, 3);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 9, false);
+        printDBM(t1, true, true);
+
+        int[] t2 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 11, false);
+        printDBM(t2, true, true);
+
+        int[][] fedL = new int[][]{t1};
+        int[][] fedR = new int[][]{t2};
+
+        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
+
+        assertTrue(true);
+    }
+
+    @Test
     public void testDBMCustom() {
         int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
 
         t1 = DBMLib.dbm_zero(t1, 3);
         t1 = DBMLib.dbm_up(t1, 3);
+
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 2, false);
         printDBM(t1, true, true);
 
-        int[] t2 = DBMLib.dbm_updateValue(t1, 3, 2, 5);
-        printDBM(t2, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 0, 1, -5, false);
+        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
         printDBM(t1, true, true);
 
+        t1 = DBMLib.dbm_updateValue(t1, 3, 2, 0);
+        printDBM(t1, true, true);
 
+        Clock c1 = new Clock("x");
+        Clock c2 = new Clock("x");
+
+        List<Clock> clocks = new ArrayList<>();
+        clocks.add(c1);
+        clocks.add(c1);
+
+        int index = clocks.indexOf(c2);
         assertTrue(true);
     }
 }

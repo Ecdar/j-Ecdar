@@ -1,5 +1,6 @@
 package models;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Guard {
@@ -33,6 +34,13 @@ public class Guard {
         this.isStrict = false;
         this.upperBound = value;
         this.lowerBound = value;
+    }
+
+    public Guard(Guard copy, List<Clock> clocks){
+        this.clock = clocks.get(clocks.indexOf(copy.clock));
+        this.isStrict = copy.isStrict;
+        this.upperBound = copy.upperBound;
+        this.lowerBound = copy.lowerBound;
     }
 
     public Clock getClock() {

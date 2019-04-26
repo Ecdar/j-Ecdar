@@ -1,16 +1,16 @@
 package logic;
 
-import lib.DBMLib;
 import models.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Refinement {
     private final TransitionSystem ts1, ts2;
+    private final List<Clock> allClocks;
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
-    private boolean ref;
     private int INF = 1073741823;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
@@ -18,10 +18,12 @@ public class Refinement {
         this.ts2 = system2;
         this.waiting = new ArrayDeque<>();
         this.passed = new ArrayList<>();
-        this.ref = true;
+
+        allClocks = new ArrayList<>(ts1.getClocks());
+        allClocks.addAll(ts2.getClocks());
 
         // the first states we look at are the initial ones
-        waiting.push(new StatePair(ts1.getInitialState(), ts2.getInitialState()));
+        waiting.push(new StatePair(ts1.getInitialStateRef(allClocks), ts2.getInitialStateRef(allClocks)));
 
         inputs1 = ts1.getInputs();
         inputs2 = ts2.getInputs();
@@ -48,7 +50,10 @@ public class Refinement {
         int waitingAmount = 0;
         // keep looking at states from Waiting as long as it contains elements
 
-        if(!ts1.isConsistent() || !ts2.isConsistent())
+        if(!ts1.isConsistent())
+            return false;
+
+        if(!ts2.isConsistent())
             return false;
 
         while (!waiting.isEmpty()) {
@@ -78,11 +83,9 @@ public class Refinement {
                     return false;
 
                 // check if TS 2 can delay at least as much as TS 1
-                if (!(left.getInvZone().getMaxRawDelay() <= right.getInvZone().getMaxRawDelay()))
-                    return false;
+                //if (!(left.getInvZone().getMaxRawDelay() <= right.getInvZone().getMaxRawDelay()))
+                //   return false;
             }
-
-            if (!ref) return false;
         }
 
         // if we got here it means refinement property holds
@@ -90,119 +93,51 @@ public class Refinement {
     }
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
-        State source1 = new State(t1.getSource());
-        State target1 = new State(t1.getTarget().getLocation(), t1.getSource().getInvZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
-        State source2 = new State(t2.getSource());
-        State target2 = new State(t2.getTarget().getLocation(), t2.getSource().getInvZone(), t2.getTarget().getArrivalZone(), t2.getTarget().getDSum());
+        State target1 = new State(t1.getTarget().getLocation(), t1.getGuardZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
 
-        Zone absZone1 = source1.getInvZone().getAbsoluteZone(t1.getGuards(), ts1.getClocks());
-        Zone absZone2 = source2.getInvZone().getAbsoluteZone(t2.getGuards(), ts2.getClocks());
+        target1.applyGuards(t2.getGuards(), allClocks);
 
-        if (!absZone1.absoluteZonesIntersect(absZone2))
+        if (!target1.getInvZone().isValid())
             return null;
 
-        target1.applyGuards(t1.getGuards(), ts1.getClocks());
-        target2.applyGuards(t2.getGuards(), ts2.getClocks());
+        target1.applyResets(t1.getUpdates(), allClocks);
+        target1.applyResets(t2.getUpdates(), allClocks);
 
-        Zone guardZone1 = target1.getInvZone();
-        Zone guardZone2 = target2.getInvZone();
-
-        Zone arrZone1 = source1.getArrivalZone();
-        Zone arrZone2 = source2.getArrivalZone();
-
-        int gMin1 = Math.abs(DBMLib.raw2bound(guardZone1.getRawRowMax()));
-        int gMax1 = DBMLib.raw2bound(guardZone1.getRawColumnMin());
-
-        int gMin2 = Math.abs(DBMLib.raw2bound(guardZone2.getRawRowMax()));
-        int gMax2 = DBMLib.raw2bound(guardZone2.getRawColumnMin());
-
-        int aMin1 = Math.abs(DBMLib.raw2bound(arrZone1.getRawRowMax()));
-        int aMax1 = DBMLib.raw2bound(arrZone1.getRawColumnMin());
-
-        int aMin2 = Math.abs(DBMLib.raw2bound(arrZone2.getRawRowMax()));
-        int aMax2 = DBMLib.raw2bound(arrZone2.getRawColumnMin());
-
-        // arrival zone on the left is [0, 0]
-        if (aMin1 == 0 && aMax1 == 0) {
-            if (source1.getDSum() == INF || gMax1 == INF)
-                target1.setDSum(INF);
-            else
-                target1.setDSum(source1.getDSum() + gMax1);
-        } else {
-            target1.setDSum(gMax1);
-        }
-
-        if (aMin2 == 0 && aMax2 == 0) {
-            if (source2.getDSum() == INF || gMax2 == INF)
-                target2.setDSum(INF);
-            else
-                target2.setDSum(source2.getDSum() + gMax2);
-        } else {
-            target2.setDSum(gMax2);
-        }
-
-        // if we have self loop, skip the checks
-        if (!t1.getEdges().isEmpty() && !t2.getEdges().isEmpty()) {
-
-                // if left side can delay more than right side
-                if (target1.getDSum() > target2.getDSum()) {
-                    ref = false;
-                    return null;
-                }
-
-            // if we have resets, min and max of arrival zone will both be 0
-            if ((aMin1 == 0 && aMax1 == 0) || (aMin2 == 0 && aMax2 == 0)) {
-                if (!(gMin1 == gMin2 && gMax1 == gMax2 && aMin1 == aMin2 && aMax1 == aMax2)) {
-                    // for left side
-                    int lfmin1 = valueDiff(gMin1, aMax1);
-                    int lfmax1 = valueDiff(gMax1, aMin1);
-
-                    // for right side
-                    int lfmin2 = valueDiff(gMin2, aMin2);
-                    int lfMax2 = valueDiff(gMax2, aMax2);
-
-                    if (!(lfmin1 >= lfmin2) || !(lfmax1 <= lfMax2)) {
-                        ref = false;
-                        return null;
-                    }
-                }
-            }
-        }
-
-        // Update lower bounds with the most minimal delay one of the states has to take
-        int rowMax1 = absZone1.getRawRowMax();
-        int rowMax2 = absZone2.getRawRowMax();
-        int rowMax = rowMax1 < rowMax2 ? rowMax1 : rowMax2;
-        target1.getInvZone().updateLowerBounds(source1.getInvZone(), rowMax);
-        target2.getInvZone().updateLowerBounds(source2.getInvZone(), rowMax);
-
-        if (!target1.getInvZone().isValid() || !target2.getInvZone().isValid())
-            return null;
-
-        target1.applyResets(t1.getUpdates(), ts1.getClocks());
-        target2.applyResets(t2.getUpdates(), ts2.getClocks());
-
-        // no edges means it's most likely a self loop so we don't need to update arrival zone
-        if (!t1.getEdges().isEmpty()) target1.setArrivalZone(target1.getInvZone());
-        if (!t2.getEdges().isEmpty()) target2.setArrivalZone(target2.getInvZone());
+        target1.setArrivalZone(target1.getInvZone());
 
         target1.getInvZone().delay();
-        target2.getInvZone().delay();
 
-        target1.applyInvariants(ts1.getClocks());
-        target2.applyInvariants(ts2.getClocks());
+        target1.applyInvariants(target1.getInvariants(), allClocks);
+        Zone invariantTest = new Zone(target1.getInvZone());
+        target1.applyInvariants(t2.getTarget().getInvariants(), allClocks);
 
-        if (!target1.getInvZone().isValid() || !target2.getInvZone().isValid())
+        // Check if the invariant of the other side does not cut solutions and if so, report failure
+        Federation fed = Federation.dbmMinusDbm(invariantTest, target1.getInvZone());
+        if(!fed.isEmpty()) return null;
+
+        if (!target1.getInvZone().isValid())
             return null;
+
+        State target2 = new State(t2.getTarget().getLocation(), target1.getInvZone(), target1.getArrivalZone(), target1.getDSum());
 
         return new StatePair(target1, target2);
     }
 
-    private List<StatePair> createNewStatePairs(List<Transition> transitions1, List<Transition> transitions2) {
+    private List<StatePair> createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
         List<StatePair> pairs = new ArrayList<>();
 
-        for (Transition transition1 : transitions1) {
-            for (Transition transition2 : transitions2) {
+        List<Zone> gzLeft = trans1.stream().map(Transition::getGuardZone).collect(Collectors.toList());
+        List<Zone> gzRight = trans2.stream().map(Transition::getGuardZone).collect(Collectors.toList());
+
+        Federation fedL = new Federation(gzLeft);
+        Federation fedR = new Federation(gzRight);
+
+        // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
+        if(!Federation.fedMinusFed(fedL, fedR).isEmpty())
+            return pairs;
+
+        for (Transition transition1 : trans1) {
+            for (Transition transition2 : trans2) {
                 StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null)
                     pairs.add(pair);
@@ -222,14 +157,16 @@ public class Refinement {
 
     private boolean checkActions(State state1, State state2, boolean isInput) {
         for (Channel action : (isInput ? inputs2 : outputs1)) {
-            List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action) : ts1.getNextTransitions(state1, action);
+            List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action, allClocks)
+                    : ts1.getNextTransitions(state1, action, allClocks);
 
             if (!transitions1.isEmpty()) {
 
                 List<Transition> transitions2;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
-                    transitions2 = isInput ? ts1.getNextTransitions(state1, action) : ts2.getNextTransitions(state2, action);
+                    transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
+                            : ts2.getNextTransitions(state2, action, allClocks);
 
                     if (transitions2.isEmpty())
                         return false;

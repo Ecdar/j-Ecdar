@@ -34,8 +34,8 @@ public class Conjunction extends TransitionSystem {
         return outputs;
     }
 
-    public List<TransitionSystem> getSystems(){
-        List<TransitionSystem> result = new ArrayList<>();
+    public List<SimpleTransitionSystem> getSystems(){
+        List<SimpleTransitionSystem> result = new ArrayList<>();
         for(TransitionSystem ts : systems){
             result.addAll(ts.getSystems());
         }
@@ -46,14 +46,14 @@ public class Conjunction extends TransitionSystem {
         return getInitialLocation(systems);
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
         // these will store the locations of the target states and the corresponding transitions
         List<Move> resultMoves = computeResultMoves(locations, channel);
         if (resultMoves.isEmpty()) return new ArrayList<>();
 
-        return createNewTransitions(currentState, resultMoves);
+        return createNewTransitions(currentState, resultMoves, allClocks);
     }
 
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {

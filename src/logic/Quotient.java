@@ -51,18 +51,18 @@ public class Quotient extends TransitionSystem {
         return outputs;
     }
 
-    public List<TransitionSystem> getSystems(){
-        List<TransitionSystem> result = new ArrayList<>();
+    public List<SimpleTransitionSystem> getSystems(){
+        List<SimpleTransitionSystem> result = new ArrayList<>();
         result.addAll(ts1.getSystems());
         result.addAll(ts2.getSystems());
         return result;
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         SymbolicLocation location = currentState.getLocation();
 
         List<Move> moves = getNextMoves(location, channel);
-        return createNewTransitions(currentState, moves);
+        return createNewTransitions(currentState, moves, allClocks);
     }
 
     public List<Move> getNextMoves(SymbolicLocation location, Channel channel) {
