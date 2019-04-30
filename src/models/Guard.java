@@ -36,6 +36,7 @@ public class Guard {
         this.lowerBound = value;
     }
 
+    // Copy constructor
     public Guard(Guard copy, List<Clock> clocks){
         this.clock = clocks.get(clocks.indexOf(copy.clock));
         this.isStrict = copy.isStrict;
@@ -52,6 +53,12 @@ public class Guard {
     }
 
     public int getUpperBound() {
+        return upperBound;
+    }
+
+    // Returns a bound of a guard in the automaton
+    public int getActiveBound(){
+        if(upperBound == Integer.MAX_VALUE) return lowerBound;
         return upperBound;
     }
 

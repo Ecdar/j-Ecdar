@@ -205,4 +205,14 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed(JNIEnv *env, jcla
     return helper_functions::cFedtoJavaFed(env, convertedFed1, len);
 }
 
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBounds(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    auto convertedMax = helper_functions::jintToC(env, max, len);
+    dbm_extrapolateMaxBounds(converted, dim, convertedMax);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
 int main() { return 0; }

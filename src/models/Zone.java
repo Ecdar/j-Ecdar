@@ -103,6 +103,14 @@ public class Zone {
         dbm = DBMLib.dbm_up(dbm, size);
     }
 
+    public void extrapolateMaxBounds(int constant){
+        int[] maxBounds = new int[size];
+        if(constant != 0)
+        Arrays.fill(maxBounds, 1, size, constant);
+
+        dbm = DBMLib.dbm_extrapolateMaxBounds(dbm, size, maxBounds);
+    }
+
     public Zone getAbsoluteZone(List<Guard> guards, List<Clock> clocks) {
         int[] result = dbm;
         boolean isStrict;

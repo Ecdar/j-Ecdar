@@ -36,6 +36,10 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return Collections.singletonList(this);
     }
 
+    public int getMaxConstant(){
+        return automaton.getMaxConstant();
+    }
+
     // Checks if automaton is deterministic
     public boolean isDeterministic() {
         Set<Channel> actions = getActions();

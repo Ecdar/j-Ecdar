@@ -19,8 +19,7 @@ public abstract class TransitionSystem {
 
     public State getInitialState() {
         Zone zone = new Zone(clocks.size() + 1, true);
-        Zone arrivalZone = new Zone(clocks.size() + 1, false);
-        State state = new State(getInitialLocation(), zone, arrivalZone, 0);
+        State state = new State(getInitialLocation(), zone);
         state.applyInvariants(clocks);
 
         return state;
@@ -28,8 +27,7 @@ public abstract class TransitionSystem {
 
     public State getInitialStateRef(List<Clock> allClocks, List<Guard> invs) {
         Zone zone = new Zone(allClocks.size() + 1, true);
-        Zone arrivalZone = new Zone(allClocks.size() + 1, false);
-        State state = new State(getInitialLocation(), zone, arrivalZone, 0);
+        State state = new State(getInitialLocation(), zone);
         state.applyInvariants(allClocks);
         state.applyGuards(invs, allClocks);
 
@@ -61,7 +59,6 @@ public abstract class TransitionSystem {
             Zone guardZone = new Zone(targetState.getInvZone());
             if (!updates.isEmpty()) targetState.applyResets(updates, allClocks);
 
-            targetState.setArrivalZone(targetState.getInvZone());
             targetState.getInvZone().delay();
             targetState.applyInvariants(allClocks);
 
@@ -110,8 +107,16 @@ public abstract class TransitionSystem {
         return true;
     }
 
+    public int getMaxConstant(){
+        List<SimpleTransitionSystem> systems = getSystems();
+        int constant = 0;
 
+        for (TransitionSystem ts : systems){
+            if(ts.getMaxConstant() > constant) constant = ts.getMaxConstant();
+        }
 
+        return constant;
+    }
     public boolean isImplementation(){
         List<SimpleTransitionSystem> systems = getSystems();
 

@@ -151,6 +151,14 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm
 JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed
   (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
 
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_extrapolateMaxBounds
+ * Signature: ([II[I)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBounds
+  (JNIEnv *, jclass, jintArray, jint, jintArray);
+
 #ifdef __cplusplus
 }
 #endif

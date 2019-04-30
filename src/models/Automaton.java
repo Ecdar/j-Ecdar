@@ -39,11 +39,16 @@ public class Automaton {
     // Copy constructor
     public Automaton(Automaton copy){
         this.name = copy.name;
-        this.locations = copy.locations;
 
         this.clocks = new ArrayList<>();
         for (Clock c : copy.clocks) {
             this.clocks.add(new Clock(c));
+        }
+
+        this.locations = new Location[copy.locations.length];
+        for (int i = 0; i < copy.locations.length; i++) {
+            this.locations[i] = new Location(copy.locations[i], clocks);
+            if(this.locations[i].isInitial()) this.initLoc = this.locations[i];
         }
 
         this.edges = new ArrayList<>();
@@ -54,7 +59,20 @@ public class Automaton {
         this.inputAct = copy.inputAct;
         this.outputAct = copy.outputAct;
         this.actions = copy.actions;
-        this.initLoc = copy.initLoc;
+    }
+
+    public int getMaxConstant(){
+        int constant = 0;
+
+        for(Edge edge : edges){
+            if(edge.getMaxConstant() > constant) constant = edge.getMaxConstant();
+        }
+
+        for(Location location : locations){
+            if(location.getMaxConstant() > constant) constant = location.getMaxConstant();
+        }
+
+        return constant;
     }
 
     private void makeInputEnabled() {

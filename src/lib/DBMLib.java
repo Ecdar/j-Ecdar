@@ -38,4 +38,6 @@ public class DBMLib {
     public static native int[][] fed_minus_dbm(int[][]fed, int[] dbm, int dim);
 
     public static native int[][] fed_minus_fed(int[][]fed1, int[][] fed2, int dim);
+
+    public static native int[] dbm_extrapolateMaxBounds(int[] dbm, int dim, int[] max);
 }

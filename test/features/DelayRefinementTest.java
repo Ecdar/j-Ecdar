@@ -172,10 +172,10 @@ public class DelayRefinementTest {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[46]), new SimpleTransitionSystem(automata[47])).check());
     }
 
-//    @Test
-//    public void Z3RefinesZ4() {
-//        assertTrue(new Refinement(new SimpleTransitionSystem(automata[48]), new SimpleTransitionSystem(automata[49])).check());
-//    }
+    @Test
+    public void Z3RefinesZ4() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[48]), new SimpleTransitionSystem(automata[49])).check());
+    }
 
 
 

@@ -11,6 +11,7 @@ public class Refinement {
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
+    private int constant;
     private int INF = 1073741823;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
@@ -22,10 +23,8 @@ public class Refinement {
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
 
-        State left = ts1.getInitialStateRef(allClocks, ts2.getInitialLocation().getInvariants());
-        State right = ts2.getInitialStateRef(allClocks, ts1.getInitialLocation().getInvariants());
         // the first states we look at are the initial ones
-        waiting.push(new StatePair(left, right));
+        waiting.push(getInitialStatePair());
 
         inputs1 = ts1.getInputs();
         inputs2 = ts2.getInputs();
@@ -35,6 +34,8 @@ public class Refinement {
 
         outputs2 = new HashSet<>(ts2.getOutputs());
         outputs2.addAll(ts2.getSyncs());
+
+        setConstant();
     }
 
     public boolean check() {
@@ -83,10 +84,6 @@ public class Refinement {
                 boolean holds2 = checkInputs(left, right);
                 if (!holds2)
                     return false;
-
-                // check if TS 2 can delay at least as much as TS 1
-                //if (!(left.getInvZone().getMaxRawDelay() <= right.getInvZone().getMaxRawDelay()))
-                //   return false;
             }
         }
 
@@ -95,7 +92,7 @@ public class Refinement {
     }
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
-        State target1 = new State(t1.getTarget().getLocation(), t1.getGuardZone(), t1.getTarget().getArrivalZone(), t1.getTarget().getDSum());
+        State target1 = new State(t1.getTarget().getLocation(), t1.getGuardZone());
 
         target1.applyGuards(t2.getGuards(), allClocks);
 
@@ -105,8 +102,6 @@ public class Refinement {
         target1.applyResets(t1.getUpdates(), allClocks);
         target1.applyResets(t2.getUpdates(), allClocks);
 
-        target1.setArrivalZone(target1.getInvZone());
-
         target1.getInvZone().delay();
 
         target1.applyInvariants(target1.getInvariants(), allClocks);
@@ -114,6 +109,7 @@ public class Refinement {
         target1.applyInvariants(t2.getTarget().getInvariants(), allClocks);
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
+        // This also happens to be a delay check
         Federation fed = Federation.dbmMinusDbm(invariantTest, target1.getInvZone());
         if(!fed.isEmpty())
             return null;
@@ -121,7 +117,9 @@ public class Refinement {
         if (!target1.getInvZone().isValid())
             return null;
 
-        State target2 = new State(t2.getTarget().getLocation(), target1.getInvZone(), target1.getArrivalZone(), target1.getDSum());
+        target1.extrapolateMaxBounds(constant);
+
+        State target2 = new State(t2.getTarget().getLocation(), target1.getInvZone());
 
         return new StatePair(target1, target2);
     }
@@ -212,12 +210,14 @@ public class Refinement {
         return false;
     }
 
-    // difference between two raw values (converted)
-    private int valueDiff(int v1, int v2) {
-        if (v1 == INF) return INF;
+    public StatePair getInitialStatePair(){
+        State left = ts1.getInitialStateRef(allClocks, ts2.getInitialLocation().getInvariants());
+        State right = ts2.getInitialStateRef(allClocks, ts1.getInitialLocation().getInvariants());
 
-        if (v2 == INF) return 0;
+        return new StatePair(left, right);
+    }
 
-        return v1 - v2;
+    public void setConstant(){
+        constant =  ts1.getMaxConstant() > ts2.getMaxConstant() ? ts1.getMaxConstant() : ts2.getMaxConstant();
     }
 }

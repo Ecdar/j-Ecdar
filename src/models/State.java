@@ -4,29 +4,16 @@ import java.util.List;
 
 public class State {
     private final SymbolicLocation location;
-    private Zone invZone, arrivalZone;
-    // delay sum
-    private int dSum;
+    private Zone invZone;
 
     public State(SymbolicLocation location, Zone zone) {
         this.location = location;
         this.invZone = new Zone(zone);
-        this.arrivalZone = new Zone(zone);
-        this.dSum = 0;
-    }
-
-    public State(SymbolicLocation location, Zone zone, Zone arrivalZone, int sum) {
-        this.location = location;
-        this.invZone = new Zone(zone);
-        this.arrivalZone = new Zone(arrivalZone);
-        this.dSum = sum;
     }
 
     public State(State oldState) {
         this.location = oldState.getLocation();
         this.invZone = new Zone(oldState.getInvZone());
-        this.arrivalZone = new Zone(oldState.getArrivalZone());
-        this.dSum = oldState.dSum;
     }
 
     public SymbolicLocation getLocation() {
@@ -35,14 +22,6 @@ public class State {
 
     public Zone getInvZone() {
         return invZone;
-    }
-
-    public Zone getArrivalZone() {
-        return arrivalZone;
-    }
-
-    public int getDSum() {
-        return dSum;
     }
 
     private int getIndexOfClock(Clock clock, List<Clock> clocks) {
@@ -76,16 +55,8 @@ public class State {
             invZone.updateValue(getIndexOfClock(reset.getClock(), clocks), reset.getValue());
     }
 
-    public void setArrivalZone(Zone arrivalZone) {
-        this.arrivalZone = new Zone(arrivalZone);
-    }
-
-    public void updateArrivalZone(Zone timeline){
-        this.arrivalZone.updateArrivalZone(timeline);
-    }
-
-    public void setDSum(int sum) {
-        this.dSum = sum;
+    public void extrapolateMaxBounds(int maxConstant){
+        invZone.extrapolateMaxBounds(maxConstant);
     }
 
     @Override

@@ -39,6 +39,16 @@ public class Edge {
         }
     }
 
+    public int getMaxConstant(){
+        int constant = 0;
+
+        for(Guard guard : guards){
+            if(guard.getActiveBound() > constant) constant = guard.getActiveBound();
+        }
+
+        return constant;
+    }
+
     public Location getSource() {
         return source;
     }

@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,6 +19,20 @@ public class Location {
         this.isInconsistent = isInconsistent;
     }
 
+    public Location(Location copy, List<Clock> clocks){
+        this.name = copy.name;
+
+        this.invariant = new ArrayList<>();
+        for (Guard g : copy.invariant) {
+            this.invariant.add(new Guard(g, clocks));
+        }
+
+        this.isInitial = copy.isInitial;
+        this.isUrgent = copy.isUrgent;
+        this.isUniversal = copy.isUniversal;
+        this.isInconsistent = copy.isInconsistent;
+    }
+
     public String getName() {
         return name;
     }
@@ -32,6 +47,16 @@ public class Location {
 
     public boolean isUniversal() {
         return isUniversal;
+    }
+
+    public int getMaxConstant(){
+        int constant = 0;
+
+        for(Guard guard : invariant){
+            if(guard.getActiveBound() > constant) constant = guard.getActiveBound();
+        }
+
+        return constant;
     }
 
     @Override

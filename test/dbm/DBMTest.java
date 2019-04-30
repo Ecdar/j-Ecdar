@@ -580,26 +580,32 @@ public class DBMTest {
     public void testDBMCustom() {
         int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
 
+        int[] maxBounds = new int[9];
+        Arrays.fill(maxBounds, 1, 9, 3);
+
+
+
+        //int test = DBMLib.boundbool2raw(10, false);
+        int[] max = new int[]{1, 4, 15};
+
         t1 = DBMLib.dbm_zero(t1, 3);
         t1 = DBMLib.dbm_up(t1, 3);
 
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 2, false);
-        printDBM(t1, true, true);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
 
         t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
+        t1 = DBMLib.dbm_up(t1, 3);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
+
+        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
+        t1 = DBMLib.dbm_up(t1, 3);
+        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
         printDBM(t1, true, true);
 
-        t1 = DBMLib.dbm_updateValue(t1, 3, 2, 0);
+
+        t1 = DBMLib.dbm_extrapolateMaxBounds(t1, 3, max);
         printDBM(t1, true, true);
 
-        Clock c1 = new Clock("x");
-        Clock c2 = new Clock("x");
-
-        List<Clock> clocks = new ArrayList<>();
-        clocks.add(c1);
-        clocks.add(c1);
-
-        int index = clocks.indexOf(c2);
         assertTrue(true);
     }
 }
