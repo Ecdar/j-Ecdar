@@ -66,7 +66,7 @@ public class InputEnablednessTest {
         Edge e14 = new Edge(l4, l4, i1, true, noguard, noUpdate);
         Edge e15 = new Edge(l4, l4, i2, true, noguard, noUpdate);
 
-        Location[] locations = new Location[]{l0, l1, l2, l3, l4};
+        List<Location> locations = new ArrayList<>(Arrays.asList(l0, l1, l2, l3, l4));
         List<Edge> edges = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15));
         List<Clock> clocks = new ArrayList<>(Arrays.asList(x, y));
 

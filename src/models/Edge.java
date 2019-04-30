@@ -22,9 +22,9 @@ public class Edge {
         this.updates = updates;
     }
 
-    public Edge(Edge copy, List<Clock> clocks){
-        this.source = copy.source;
-        this.target = copy.target;
+    public Edge(Edge copy, List<Clock> clocks, Location sourceR, Location targetR){
+        this.source = sourceR;
+        this.target = targetR;
         this.chan = copy.chan;
         this.isInput = copy.isInput;
 

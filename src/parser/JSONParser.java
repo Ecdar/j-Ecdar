@@ -63,7 +63,7 @@ public class JSONParser {
                 if (!obj.get("name").toString().equals("Global Declarations")) {
                     addDeclarations((String) obj.get("declarations"));
                     JSONArray locationList = (JSONArray) obj.get("locations");
-                    Location[] locations = addLocations(locationList);
+                    List<Location> locations = addLocations(locationList);
                     JSONArray edgeList = (JSONArray) obj.get("edges");
                     List<Edge> edges = addEdges(edgeList, locations);
                     Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
@@ -101,7 +101,7 @@ public class JSONParser {
         }
     }
 
-    private static Location[] addLocations(JSONArray locationList) {
+    private static List<Location> addLocations(JSONArray locationList) {
         ArrayList<Location> returnLocList = new ArrayList<>();
 
         for (Object obj : locationList) {
@@ -132,7 +132,7 @@ public class JSONParser {
             returnLocList.add(loc);
         }
 
-        return returnLocList.toArray(new Location[0]);
+        return returnLocList;
     }
 
     private static List<Guard> addGuards(String invariant) {
@@ -189,7 +189,7 @@ public class JSONParser {
         return null;
     }
 
-    private static List<Edge> addEdges(JSONArray edgeList, Location[] locations) {
+    private static List<Edge> addEdges(JSONArray edgeList, List<Location> locations) {
         ArrayList<Edge> edges = new ArrayList<>();
 
         for (Object obj : edgeList) {
@@ -238,8 +238,8 @@ public class JSONParser {
     }
 
     //Helper method for addEdge in order to find which Location is source and which one is target
-    private static Location findLoc(Location[] locations, String name) {
-        List<Location> locs = Arrays.stream(locations).filter(location -> location.getName().equals(name)).collect(Collectors.toList());
+    private static Location findLoc(List<Location> locations, String name) {
+        List<Location> locs = locations.stream().filter(location -> location.getName().equals(name)).collect(Collectors.toList());
 
         if (locs.isEmpty()) return null;
 

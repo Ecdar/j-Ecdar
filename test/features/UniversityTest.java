@@ -199,7 +199,7 @@ public class UniversityTest {
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
                 new Composition(new TransitionSystem[]{adm, machine, researcher}),
-                new Composition(new TransitionSystem[]{admCopy, machineCopy, researcherCopy}));
+                new Composition(new TransitionSystem[]{machineCopy, researcherCopy, admCopy}));
         assertTrue(ref.check());
     }
 

@@ -32,7 +32,7 @@ public class XMLParserTest {
         Location l0 = new Location("id0", new ArrayList<>(Arrays.asList(inv0_0, inv0_1)), false, false, false, false);
         Location l1 = new Location("id1", noGuards, false, false, false, false);
         Location l2 = new Location("id2", noGuards, true, false, false, false);
-        Location[] locations = new Location[]{l0, l1, l2};
+        List<Location> locations = new ArrayList<>(Arrays.asList(l0, l1, l2));
 
         Guard g2 = new Guard(x, 4);
         Update u2_0 = new Update(x, 0);

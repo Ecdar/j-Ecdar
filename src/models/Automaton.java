@@ -5,17 +5,17 @@ import java.util.stream.Collectors;
 
 public class Automaton {
     private final String name;
-    private final Location[] locations;
+    private final List<Location> locations;
     private final List<Edge> edges;
     private final List<Clock> clocks;
     private Set<Channel> inputAct, outputAct, actions;
     private Location initLoc;
 
-    public Automaton(String name, Location[] locations, List<Edge> edges, List<Clock> clocks) {
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks) {
         this(name, locations, edges, clocks, true);
     }
 
-    public Automaton(String name, Location[] locations, List<Edge> edges, List<Clock> clocks, boolean makeInpEnabled) {
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, boolean makeInpEnabled) {
         this.name = name;
         this.locations = locations;
 
@@ -45,15 +45,18 @@ public class Automaton {
             this.clocks.add(new Clock(c));
         }
 
-        this.locations = new Location[copy.locations.length];
-        for (int i = 0; i < copy.locations.length; i++) {
-            this.locations[i] = new Location(copy.locations[i], clocks);
-            if(this.locations[i].isInitial()) this.initLoc = this.locations[i];
+        this.locations = new ArrayList<>();
+        for (Location loc : copy.locations) {
+            this.locations.add(new Location(loc, clocks));
+            if(loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
         }
 
         this.edges = new ArrayList<>();
         for (Edge e : copy.edges) {
-            this.edges.add(new Edge(e, this.clocks));
+            int sourceIndex = this.locations.indexOf(e.getSource());
+            int targetIndex = this.locations.indexOf(e.getTarget());
+
+            this.edges.add(new Edge(e, this.clocks, locations.get(sourceIndex), locations.get(targetIndex)));
         }
 
         this.inputAct = copy.inputAct;
@@ -186,7 +189,7 @@ public class Automaton {
         if (!(o instanceof Automaton)) return false;
         Automaton automaton = (Automaton) o;
         return name.equals(automaton.name) &&
-                Arrays.equals(locations, automaton.locations) &&
+                Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
                 Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&
                 Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) &&
                 Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
@@ -198,7 +201,7 @@ public class Automaton {
     public String toString() {
         return "Automaton{" +
                 "name='" + name + '\'' +
-                ", locations=" + Arrays.toString(locations) +
+                ", locations=" + Arrays.toString(locations.toArray()) +
                 ", edges=" + Arrays.toString(edges.toArray()) +
                 ", clocks=" + Arrays.toString(clocks.toArray()) +
                 ", inputAct=" + inputAct +

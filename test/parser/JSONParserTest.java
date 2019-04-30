@@ -57,10 +57,10 @@ public class JSONParserTest {
         Edge t16 = new Edge(l0, l1, button2, true, emptyGuards, emptyUpdates);
 
 
-        A = new Automaton("A", new Location[]{l2}, new ArrayList<>(Arrays.asList(t1, t2, t3)), emptyClocks, false);
-        G = new Automaton("G", new Location[]{l3}, new ArrayList<>(Arrays.asList(t4, t5, t6)), emptyClocks, false);
-        Q = new Automaton("Q", new Location[]{l5, u0}, new ArrayList<>(Arrays.asList(t7, t8, t9)), emptyClocks, false);
-        Imp = new Automaton("Imp", new Location[]{l0, l1}, new ArrayList<>(Arrays.asList(t10, t11, t12, t13, t14, t15, t16)), emptyClocks, false);
+        A = new Automaton("A", new ArrayList<>(Collections.singletonList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), emptyClocks, false);
+        G = new Automaton("G", new ArrayList<>(Collections.singletonList(l3)), new ArrayList<>(Arrays.asList(t4, t5, t6)), emptyClocks, false);
+        Q = new Automaton("Q", new ArrayList<>(Arrays.asList(l5, u0)), new ArrayList<>(Arrays.asList(t7, t8, t9)), emptyClocks, false);
+        Imp = new Automaton("Imp", new ArrayList<>(Arrays.asList(l0, l1)), new ArrayList<>(Arrays.asList(t10, t11, t12, t13, t14, t15, t16)), emptyClocks, false);
 
 
         // Adding BigRefinement example automata
@@ -121,7 +121,7 @@ public class JSONParserTest {
         t12 = new Edge(l17, l14, i6, true, emptyGuards, emptyUpdates);
         t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(g_l12_l13)), emptyUpdates);
 
-        Ref1 = new Automaton("Ref1", new Location[]{l12, l13, l14, l15, l16, l17, l18},
+        Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)), false);
     }
 

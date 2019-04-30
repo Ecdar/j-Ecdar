@@ -38,7 +38,7 @@ public class XMLParser {
                 String initId = el.getChild("init").getAttributeValue("ref");
 
                 // locations
-                Location[] locations = setLocations(el, clocks, initId);
+                List<Location> locations = setLocations(el, clocks, initId);
 
                 // edges
                 List<Edge> edges = setEdges(el, clocks, locations);
@@ -71,7 +71,7 @@ public class XMLParser {
         return clockList;
     }
 
-    private static Location[] setLocations(Element el, List<Clock> clocks, String initId) {
+    private static List<Location> setLocations(Element el, List<Clock> clocks, String initId) {
         List<Location> locationList = new ArrayList<>();
 
         List<Element> locations = el.getChildren("location");
@@ -90,10 +90,10 @@ public class XMLParser {
             locationList.add(newLoc);
         }
 
-        return locationList.toArray(new Location[0]);
+        return locationList;
     }
 
-    private static List<Edge> setEdges(Element el, List<Clock> clocks, Location[] locations) {
+    private static List<Edge> setEdges(Element el, List<Clock> clocks, List<Location> locations) {
         List<Edge> edgeList = new ArrayList<>();
 
         List<Channel> channelList = new ArrayList<>();
@@ -145,7 +145,7 @@ public class XMLParser {
         return null;
     }
 
-    private static Location findLocations(Location[] locations, String name) {
+    private static Location findLocations(List<Location> locations, String name) {
         for (Location loc : locations)
             if (loc.getName().equals(name))
                 return loc;
