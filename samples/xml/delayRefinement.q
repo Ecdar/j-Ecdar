@@ -3,7 +3,7 @@
 /*
 
 */
-refinement: (Z5||Z6)<=Z5
+refinement: (Z5||Z6)<=Z7
 
 /*
 

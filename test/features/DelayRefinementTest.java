@@ -416,11 +416,11 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void Z5Z6RefinesZ6() {
+    public void Z5Z6RefinesZ7() {
         TransitionSystem comp = new Composition(
                 new TransitionSystem[]{
                         new SimpleTransitionSystem(automata[50]),
                         new SimpleTransitionSystem(automata[51])});
-        assertTrue(new Refinement(comp, new SimpleTransitionSystem(new Automaton(automata[51]))).check());
+        assertFalse(new Refinement(comp, new SimpleTransitionSystem(automata[52])).check());
     }
 }

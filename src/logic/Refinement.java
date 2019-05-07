@@ -11,7 +11,7 @@ public class Refinement {
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
-    private int constant;
+    private int[] maxBounds;
     private int INF = 1073741823;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
@@ -35,7 +35,7 @@ public class Refinement {
         outputs2 = new HashSet<>(ts2.getOutputs());
         outputs2.addAll(ts2.getSyncs());
 
-        setConstant();
+        setMaxBounds();
     }
 
     public boolean check() {
@@ -117,7 +117,8 @@ public class Refinement {
         if (!target1.getInvZone().isValid())
             return null;
 
-        target1.extrapolateMaxBounds(constant);
+        //target1.extrapolateMaxBounds(constant);
+        target1.extrapolateMaxBounds(maxBounds);
 
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvZone());
 
@@ -144,7 +145,6 @@ public class Refinement {
                     pairs.add(pair);
             }
         }
-
         return pairs;
     }
 
@@ -217,7 +217,12 @@ public class Refinement {
         return new StatePair(left, right);
     }
 
-    public void setConstant(){
-        constant =  ts1.getMaxConstant() > ts2.getMaxConstant() ? ts1.getMaxConstant() : ts2.getMaxConstant();
+    public void setMaxBounds(){
+        List<Integer> res = new ArrayList<>();
+        res.add(0);
+        res.addAll(ts1.getMaxBounds());
+        res.addAll(ts2.getMaxBounds());
+
+        maxBounds = res.stream().mapToInt(i -> i).toArray();
     }
 }

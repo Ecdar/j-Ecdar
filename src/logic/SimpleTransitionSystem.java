@@ -36,8 +36,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return Collections.singletonList(this);
     }
 
-    public int getMaxConstant(){
-        return automaton.getMaxConstant();
+    public List<Integer> getMaxBounds(){
+        return automaton.getMaxBoundsForAllClocks();
     }
 
     // Checks if automaton is deterministic

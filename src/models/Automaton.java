@@ -64,18 +64,21 @@ public class Automaton {
         this.actions = copy.actions;
     }
 
-    public int getMaxConstant(){
-        int constant = 0;
+    public List<Integer> getMaxBoundsForAllClocks(){
+        List<Integer> res = new ArrayList<>(Collections.nCopies(clocks.size(), 0));
 
-        for(Edge edge : edges){
-            if(edge.getMaxConstant() > constant) constant = edge.getMaxConstant();
+        for(int i = 0; i < clocks.size(); i++) {
+            for (Edge edge : edges) {
+                int clockMaxBound = edge.getMaxConstant(clocks.get(i));
+                if (clockMaxBound > res.get(i)) res.set(i, clockMaxBound);
+            }
+
+            for (Location location : locations) {
+                int clockMaxBound = location.getMaxConstant(clocks.get(i));
+                if (clockMaxBound > res.get(i)) res.set(i, clockMaxBound);
+            }
         }
-
-        for(Location location : locations){
-            if(location.getMaxConstant() > constant) constant = location.getMaxConstant();
-        }
-
-        return constant;
+        return res;
     }
 
     private void makeInputEnabled() {

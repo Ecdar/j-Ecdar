@@ -55,8 +55,8 @@ public class State {
             invZone.updateValue(getIndexOfClock(reset.getClock(), clocks), reset.getValue());
     }
 
-    public void extrapolateMaxBounds(int maxConstant){
-        invZone.extrapolateMaxBounds(maxConstant);
+    public void extrapolateMaxBounds(int[] maxBounds){
+        invZone.extrapolateMaxBounds(maxBounds);
     }
 
     @Override

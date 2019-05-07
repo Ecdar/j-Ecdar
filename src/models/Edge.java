@@ -39,11 +39,13 @@ public class Edge {
         }
     }
 
-    public int getMaxConstant(){
+    public int getMaxConstant(Clock clock){
         int constant = 0;
 
         for(Guard guard : guards){
-            if(guard.getActiveBound() > constant) constant = guard.getActiveBound();
+            if(clock.equals(guard.getClock())) {
+                if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
+            }
         }
 
         return constant;

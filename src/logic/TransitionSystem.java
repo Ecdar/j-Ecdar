@@ -107,16 +107,16 @@ public abstract class TransitionSystem {
         return true;
     }
 
-    public int getMaxConstant(){
+    public List<Integer> getMaxBounds(){
         List<SimpleTransitionSystem> systems = getSystems();
-        int constant = 0;
+        List<Integer> res = new ArrayList<>();
 
         for (TransitionSystem ts : systems){
-            if(ts.getMaxConstant() > constant) constant = ts.getMaxConstant();
+            res.addAll(ts.getMaxBounds());
         }
-
-        return constant;
+        return res;
     }
+
     public boolean isImplementation(){
         List<SimpleTransitionSystem> systems = getSystems();
 

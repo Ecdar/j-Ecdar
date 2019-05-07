@@ -49,11 +49,13 @@ public class Location {
         return isUniversal;
     }
 
-    public int getMaxConstant(){
+    public int getMaxConstant(Clock clock){
         int constant = 0;
 
         for(Guard guard : invariant){
-            if(guard.getActiveBound() > constant) constant = guard.getActiveBound();
+            if(clock.equals(guard.getClock())) {
+                if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
+            }
         }
 
         return constant;
