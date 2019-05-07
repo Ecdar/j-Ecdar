@@ -189,8 +189,8 @@ public class UniversityTest {
     @Test
     public void testCompOfCompRefinesSpec() {
         assertTrue(new Refinement(
-                new Composition(new TransitionSystem[]{machine,
-                        new Composition(new TransitionSystem[]{adm, researcher})}),
+                new Composition(new TransitionSystem[]{adm,
+                        new Composition(new TransitionSystem[]{machine, researcher})}),
                 spec).check()
         );
     }
