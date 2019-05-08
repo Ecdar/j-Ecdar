@@ -187,10 +187,28 @@ public class UniversityTest {
     }
 
     @Test
-    public void testCompOfCompRefinesSpec() {
+    public void testCompOfCompRefinesSpec1() {
         assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{adm,
                         new Composition(new TransitionSystem[]{machine, researcher})}),
+                spec).check()
+        );
+    }
+
+    @Test
+    public void testCompOfCompRefinesSpec2() {
+        assertTrue(new Refinement(
+                new Composition(new TransitionSystem[]{machine,
+                        new Composition(new TransitionSystem[]{adm, researcher})}),
+                spec).check()
+        );
+    }
+
+    @Test
+    public void testCompOfCompRefinesSpec3() {
+        assertTrue(new Refinement(
+                new Composition(new TransitionSystem[]{researcher,
+                        new Composition(new TransitionSystem[]{machine, adm})}),
                 spec).check()
         );
     }

@@ -95,26 +95,9 @@ public class Composition extends TransitionSystem {
         // these will store the locations of the target states and the corresponding transitions
         List<Move> resultMoves = new ArrayList<>();
 
-        if (outputs.contains(channel)) {
-            // if the signal is an output, loop through the TS's to find the one sending the output
-            for (int i = 0; i < locations.size(); i++) {
-                List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
+        if (checkForOutputs(channel, locations))
+            resultMoves = computeResultMoves(locations, channel);
 
-                for (Move move : moves) {
-                    // the new locations will contain the locations of the source state, but the location corresponding
-                    // to the TS sending the output will be replaced by the location that can be reached following the output
-                    List<SymbolicLocation> newLocations = new ArrayList<>(locations);
-                    newLocations.set(i, move.getTarget());
-                    Move newMove = new Move(currentState.getLocation(), new ComplexLocation(newLocations), move.getEdges());
-
-                    resultMoves.add(newMove);
-                }
-            }
-        } else if (inputs.contains(channel) || (syncs.contains(channel))) {
-            // for syncs, we have to check if that output is being sent by a TS, otherwise we do not look at the
-            // inputs in the other TS's
-            if (checkForInputs(channel, locations)) resultMoves = computeResultMoves(locations, channel);
-        }
         return createNewTransitions(currentState, resultMoves, allClocks);
     }
 
@@ -123,66 +106,56 @@ public class Composition extends TransitionSystem {
         if (!outputs.contains(channel) && !inputs.contains(channel) && !syncs.contains(channel))
             return new ArrayList<>();
 
-        // If action is sync, then check if there is corresponding input and output in TS
-        if (!checkForInputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
+        // If action is sync, then check if there is corresponding output in TS
+        if (!checkForOutputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
 
         List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
 
-        List<Move> resultMoves = computeResultMoves(symLocs, channel);
-
-        // if there are no actual moves, then return empty list
-        Move move = resultMoves.get(0);
-        if (move.getSource().equals(move.getTarget())) {
-            return new ArrayList<>();
-        }
-
-        return resultMoves;
+        return computeResultMoves(symLocs, channel);
     }
 
     private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
+        boolean moveExisted = false;
+
         List<Move> resultMoves = systems[0].getNextMoves(locations.get(0), channel);
         // used when there are no moves for some TS
         if (resultMoves.isEmpty())
             resultMoves = new ArrayList<>(Collections.singletonList(new Move(locations.get(0), locations.get(0), new ArrayList<>())));
+        else
+            moveExisted = true;
+
 
         for (int i = 1; i < systems.length; i++) {
             List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
 
             if (moves.isEmpty())
                 moves = new ArrayList<>(Collections.singletonList(new Move(locations.get(i), locations.get(i), new ArrayList<>())));
+            else
+                moveExisted = true;
 
             resultMoves = moveProduct(resultMoves, moves, i == 1);
         }
 
+        if (!moveExisted) return new ArrayList<>();
         return resultMoves;
     }
 
-    private boolean checkForInputs(Channel channel, List<SymbolicLocation> locations) {
-        // assume we should check for inputs
-        boolean checkOutput = true;
-        boolean checkInput = false;
-
+    private boolean checkForOutputs(Channel channel, List<SymbolicLocation> locations) {
         // for syncs, we must make sure we have an output first
         if (syncs.contains(channel)) {
             // loop through all automata to find the one sending the output
             for (int i = 0; i < systems.length; i++) {
-                if (systems[i].getOutputs().contains(channel)) {
+                if (systems[i].getOutputs().contains(channel) || systems[i].getSyncs().contains(channel)) {
                     List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
                     if (moves.isEmpty()) {
-                        // do not check for inputs if the state in the corresponding automaton does not send that output
-                        checkOutput = false;
-                        break;
+                        // do not check for outputs if the state in the corresponding automaton does not send that output
+                        return false;
                     }
-                } else if (systems[i].getInputs().contains(channel)) {
-                    List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
-                    // do not check for inputs if the state in the corresponding automaton does not send that input
-                    if (!moves.isEmpty())
-                        checkInput = true;
                 }
             }
-        } else checkInput = true;
+        }
 
-        return checkOutput && checkInput;
+        return true;
     }
 
     private Set<Channel> setIntersection(Set<Channel> set1, Set<Channel> set2) {
