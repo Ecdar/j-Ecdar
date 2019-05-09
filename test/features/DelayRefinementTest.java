@@ -262,6 +262,21 @@ public class DelayRefinementTest {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[49]), new SimpleTransitionSystem(new Automaton(automata[49]))).check());
     }
 
+    @Test
+    public void Z5RefinesSelf() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[50]), new SimpleTransitionSystem(new Automaton(automata[50]))).check());
+    }
+
+    @Test
+    public void Z6RefinesSelf() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[51]), new SimpleTransitionSystem(new Automaton(automata[51]))).check());
+    }
+
+    @Test
+    public void Z7RefinesSelf() {
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[52]), new SimpleTransitionSystem(new Automaton(automata[52]))).check());
+    }
+
     // Rest of the tests
 
     @Test
@@ -319,7 +334,7 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void T9RefinesT8() {
+    public void T9NotRefinesT8() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[16]), new SimpleTransitionSystem(automata[15])).check());
     }
 
@@ -352,17 +367,17 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void K1RefinesK2() {
+    public void K1NotRefinesK2() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[25]), new SimpleTransitionSystem(automata[26])).check());
     }
 
     @Test
-    public void K3RefinesK4() {
+    public void K3NotRefinesK4() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[27]), new SimpleTransitionSystem(automata[28])).check());
     }
 
     @Test
-    public void K5RefinesK6() {
+    public void K5NotRefinesK6() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[29]), new SimpleTransitionSystem(automata[30])).check());
     }
 
@@ -372,7 +387,7 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void P2RefinesP3() {
+    public void P2NotRefinesP3() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[33]), new SimpleTransitionSystem(automata[34])).check());
     }
 
@@ -387,7 +402,7 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void L1L2RefinesL3(){
+    public void L1L2NotRefinesL3(){
         TransitionSystem comp = new Composition(
                 new TransitionSystem[]{
                         new SimpleTransitionSystem(automata[39]),
@@ -401,7 +416,7 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void L6RefinesL7() {
+    public void L6NotRefinesL7() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[44]), new SimpleTransitionSystem(automata[45])).check());
     }
 
@@ -416,7 +431,7 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void Z5Z6RefinesZ7() {
+    public void Z5Z6NotRefinesZ7() {
         TransitionSystem comp = new Composition(
                 new TransitionSystem[]{
                         new SimpleTransitionSystem(automata[50]),

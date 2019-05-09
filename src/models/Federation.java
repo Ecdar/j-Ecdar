@@ -21,6 +21,10 @@ public class Federation {
         return zones.isEmpty();
     }
 
+    public int size(){
+        return zones.size();
+    }
+
     public Federation(List<Zone> zones) {
         this.zones = new ArrayList<>(zones);
     }

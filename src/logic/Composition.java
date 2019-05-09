@@ -154,7 +154,6 @@ public class Composition extends TransitionSystem {
                 }
             }
         }
-
         return true;
     }
 

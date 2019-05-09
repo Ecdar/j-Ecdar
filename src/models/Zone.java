@@ -52,30 +52,6 @@ public class Zone {
         return dbm[i];
     }
 
-    public int[] getZoneValues() {
-        int[] newZone = new int[actualSize];
-
-        for (int i = 0; i < actualSize; i++) {
-            newZone[i] = DBMLib.raw2bound(dbm[i]);
-        }
-
-        return newZone;
-    }
-
-    public int getMaxRawDelay() {
-        int max = DBM_INF;
-
-        for (int i = 1; i < size; i++) {
-            // upper bound - lower bound of corresponding clock
-            int ub = dbm[size * i];
-            int lb = dbm[i];
-            int diff = DBMLib.dbm_addRawRaw(ub, lb);
-            if (diff < max) max = diff;
-        }
-
-        return max;
-    }
-
     public void buildConstraintsForGuard(Guard g, int index) {
         boolean isStrict = g.isStrict();
 
@@ -139,6 +115,31 @@ public class Zone {
         return true;
     }
 
+    public List<Guard> buildGuardsFromZone(List<Clock> clocks) {
+        List<Guard> guards = new ArrayList<>();
+
+        for (int i = 1; i < size; i++) {
+            Clock clock = clocks.get(i - 1);
+
+            // values from first row, lower bounds
+            int lb = dbm[i];
+            // lower bound must be different from 1 (==0)
+            if (lb != 1) {
+                Guard g1 = new Guard(clock, (-1) * DBMLib.raw2bound(lb), true, DBMLib.dbm_rawIsStrict(lb));
+                guards.add(g1);
+            }
+            // values from first column, upper bounds
+            int ub = dbm[size*i];
+            // upper bound must be different from infinity
+            if (ub != DBM_INF) {
+                Guard g2 = new Guard(clock, DBMLib.raw2bound(ub), false, DBMLib.dbm_rawIsStrict(ub));
+                guards.add(g2);
+            }
+        }
+
+        return guards;
+    }
+
     // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
     public void constrain1(int i, int j, int constraint, boolean isStrict) {
         dbm = DBMLib.dbm_constrainBound(dbm, size, i, j, constraint, isStrict);
@@ -180,31 +181,6 @@ public class Zone {
                 }
             }
         }
-    }
-
-    public List<Guard> buildGuardsFromZone(List<Clock> clocks) {
-        List<Guard> guards = new ArrayList<>();
-
-        for (int i = 1; i < size; i++) {
-            Clock clock = clocks.get(i - 1);
-
-            // values from first row, lower bounds
-            int lb = dbm[i];
-            // lower bound must be different from 1 (==0)
-            if (lb != 1) {
-                Guard g1 = new Guard(clock, (-1) * DBMLib.raw2bound(lb), true, DBMLib.dbm_rawIsStrict(lb));
-                guards.add(g1);
-            }
-            // values from first column, upper bounds
-            int ub = dbm[size*i];
-            // upper bound must be different from infinity
-            if (ub != DBM_INF) {
-                Guard g2 = new Guard(clock, DBMLib.raw2bound(ub), false, DBMLib.dbm_rawIsStrict(ub));
-                guards.add(g2);
-            }
-        }
-
-        return guards;
     }
 
     @Override

@@ -196,24 +196,6 @@ public class UniversityTest {
     }
 
     @Test
-    public void testCompOfCompRefinesSpec2() {
-        assertTrue(new Refinement(
-                new Composition(new TransitionSystem[]{machine,
-                        new Composition(new TransitionSystem[]{adm, researcher})}),
-                spec).check()
-        );
-    }
-
-    @Test
-    public void testCompOfCompRefinesSpec3() {
-        assertTrue(new Refinement(
-                new Composition(new TransitionSystem[]{researcher,
-                        new Composition(new TransitionSystem[]{machine, adm})}),
-                spec).check()
-        );
-    }
-
-    @Test
     public void testCompRefinesSelf() {
         Refinement ref = new Refinement(
                 new Composition(new TransitionSystem[]{adm, machine, researcher}),

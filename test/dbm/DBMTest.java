@@ -241,163 +241,8 @@ public class DBMTest {
 //            zone.printDBM(true, true);
 //        }
 
-        assertTrue(true);
-    }
-
-    @Test
-    public void testDBMK3K4() {
-        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
-
-        t1 = DBMLib.dbm_zero(t1, 3);
-        t1 = DBMLib.dbm_up(t1, 3);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 250, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 250, false);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_up(t1, 3);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 500, false);
-        printDBM(t1, true, true);
-
-        int[] t2 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 500, false);
-        printDBM(t2, true, true);
-
-        int[][] fedL = new int[][]{t1};
-        int[][] fedR = new int[][]{t2};
-
-        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
-
-        assertTrue(true);
-    }
-
-    @Test
-    public void testDBMK1K2() {
-        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
-
-        t1 = DBMLib.dbm_zero(t1, 3);
-        t1 = DBMLib.dbm_up(t1, 3);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 0, 1, -250, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 0, 2, -250, false);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 2, 0);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_up(t1, 3);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 0, 1, -500, false);
-
-
-        printDBM(t1, true, true);
-
-        int[] t2 = DBMLib.dbm_constrainBound(t1, 3, 0, 2, -250, false);
-        printDBM(t2, true, true);
-
-        int[][] fedL = new int[][]{t1};
-        int[][] fedR = new int[][]{t2};
-
-        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
-
-        assertTrue(true);
-    }
-
-    @Test
-    public void testDBMK5K6() {
-        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
-
-        t1 = DBMLib.dbm_zero(t1, 3);
-        t1 = DBMLib.dbm_up(t1, 3);
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 10, false);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 10, false);
-        printDBM(t1, true, true);
-
-
-        assertTrue(true);
-    }
-
-    @Test
-    public void testDBMT4T3() {
-        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
-
-        t1 = DBMLib.dbm_zero(t1, 3);
-        t1 = DBMLib.dbm_up(t1, 3);
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
-        t1 = DBMLib.dbm_updateValue(t1, 3, 2, 0);
-        t1 = DBMLib.dbm_up(t1, 3);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 6, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 12, false);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 3, false);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_up(t1, 3);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 9, false);
-        printDBM(t1, true, true);
-
-        int[] t2 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 11, false);
-        printDBM(t2, true, true);
-
-        int[][] fedL = new int[][]{t1};
-        int[][] fedR = new int[][]{t2};
-
-        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
-
-        assertTrue(true);
-    }
-
-    @Test
-    public void testDBMZ1Z2() {
-        int[] t1 = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1};
-
-        t1 = DBMLib.dbm_zero(t1, 3);
-        t1 = DBMLib.dbm_up(t1, 3);
-
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 20, false);
-        printDBM(t1, true, true);
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
-        t1 = DBMLib.dbm_up(t1, 3);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 7, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 20, false);
-        printDBM(t1, true, true);
-
-
-        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
-        t1 = DBMLib.dbm_up(t1, 3);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 8, false);
-        t1 = DBMLib.dbm_constrainBound(t1, 3, 2, 0, 20, false);
-        printDBM(t1, true, true);
-
-
-
-
-//        int[][] fedL = new int[][]{t1};
-//        int[][] fedR = new int[][]{t2};
-//
-//        int[][] fed = DBMLib.fed_minus_fed(fedL, fedR, 3);
-
-        assertTrue(true);
+        assertEquals(fed1.size(), 4);
+        assertEquals(fed2.size(), 5);
     }
 
     @Test
@@ -417,11 +262,11 @@ public class DBMTest {
 //        t1 = DBMLib.dbm_updateValue(t1, 3, 1, 0);
 //        t1 = DBMLib.dbm_up(t1, 3);
 //        t1 = DBMLib.dbm_constrainBound(t1, 3, 1, 0, 5, false);
-        printDBM(t1, true, true);
-
-
-        t1 = DBMLib.dbm_extrapolateMaxBounds(t1, 3, max);
-        printDBM(t1, true, true);
+//        printDBM(t1, true, true);
+//
+//
+//        t1 = DBMLib.dbm_extrapolateMaxBounds(t1, 3, max);
+//        printDBM(t1, true, true);
 
         assertTrue(true);
     }

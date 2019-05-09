@@ -117,7 +117,6 @@ public class Refinement {
         if (!target1.getInvZone().isValid())
             return null;
 
-        //target1.extrapolateMaxBounds(constant);
         target1.extrapolateMaxBounds(maxBounds);
 
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvZone());
