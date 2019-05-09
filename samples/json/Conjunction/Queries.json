@@ -13,5 +13,15 @@
     "query": "refinement: (Test2 \u0026\u0026 Test3) \u003c\u003d Test1",
     "comment": "",
     "isPeriodic": false
+  },
+  {
+    "query": "refinement: (Test1 \u0026\u0026 Test2 \u0026\u0026 Test4) \u003c\u003d Test5",
+    "comment": "",
+    "isPeriodic": false
+  },
+  {
+    "query": "refinement: ((Test1 \u0026\u0026 Test2) \u0026\u0026 Test4) \u003c\u003d Test5",
+    "comment": "",
+    "isPeriodic": false
   }
 ]

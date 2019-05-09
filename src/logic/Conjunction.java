@@ -62,12 +62,6 @@ public class Conjunction extends TransitionSystem {
         List<Move> resultMoves = computeResultMoves(symLocs, channel);
         if (resultMoves.isEmpty()) return new ArrayList<>();
 
-        // if there are no actual moves, then return empty list
-        Move move = resultMoves.get(0);
-        if (move.getSource().equals(move.getTarget())) {
-            return new ArrayList<>();
-        }
-
         return resultMoves;
     }
 

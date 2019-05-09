@@ -12,7 +12,7 @@ import parser.JSONParser;
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
-    private static TransitionSystem test1, test2, test3;
+    private static TransitionSystem t1, t2, t3, t4, t5;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -20,41 +20,63 @@ public class ConjunctionTest {
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Test1.json",
                 "Components/Test2.json",
-                "Components/Test3.json"};
+                "Components/Test3.json",
+                "Components/Test4.json",
+                "Components/Test5.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
 
-        test1 = new SimpleTransitionSystem(machines[0]);
-        test2 = new SimpleTransitionSystem(machines[1]);
-        test3 = new SimpleTransitionSystem(machines[2]);
+        t1 = new SimpleTransitionSystem(machines[0]);
+        t2 = new SimpleTransitionSystem(machines[1]);
+        t3 = new SimpleTransitionSystem(machines[2]);
+        t4 = new SimpleTransitionSystem(machines[3]);
+        t5 = new SimpleTransitionSystem(machines[4]);
     }
 
     @Test
-    public void Test1RefinesTest1() {
-        assertTrue(new Refinement(test1, test1).check());
+    public void T1RefinesTt1() {
+        assertTrue(new Refinement(t1, t1).check());
     }
 
     @Test
-    public void Test2RefinesTest2() {
-        assertTrue(new Refinement(test2, test2).check());
+    public void T2RefinesT2() {
+        assertTrue(new Refinement(t2, t2).check());
     }
 
     @Test
-    public void Test3RefinesTest3() {
-        assertTrue(new Refinement(test3, test3).check());
+    public void T3RefinesT3() {
+        assertTrue(new Refinement(t3, t3).check());
     }
 
     @Test
-    public void testTest1ConjTest2RefinesTest3() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{test1, test2}), test3).check());
+    public void T1ConjT2RefinesT3() {
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t1, t2}), t3).check());
     }
 
     @Test
-    public void testTest2ConjTest3RefinesTest1() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{test2, test3}), test1).check());
+    public void T2ConjT3RefinesT1() {
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t2, t3}), t1).check());
     }
 
     @Test
-    public void testTest1ConjTest3RefinesTest2() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{test1, test3}), test2).check());
+    public void T1ConjT3RefinesT2() {
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t1, t3}), t2).check());
+    }
+
+    @Test
+    public void T1ConjT2ConjT4RefinesT5() {
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t1, t2, t4}), t5).check());
+    }
+
+    @Test
+    public void T3ConjT4RefinesT5() {
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t3, t4}), t5).check());
+    }
+
+    @Test
+    public void test1NestedConjRefinesT5() {
+        TransitionSystem ts1 = new Conjunction(new TransitionSystem[]{t1, t2});
+        TransitionSystem ts2 = new Conjunction(new TransitionSystem[]{ts1, t4});
+
+        assertTrue(new Refinement(ts2, t5).check());
     }
 }

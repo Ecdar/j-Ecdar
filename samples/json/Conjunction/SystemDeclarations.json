@@ -1,4 +1,4 @@
 {
   "name": "System Declarations",
-  "declarations": "system Test1, Test2, Test3;\n\nIO Test1 { a?, b!}\nIO Test2 { a?, b!}\nIO Test3 { a?, b!}"
+  "declarations": "system Test1, Test2, Test3, Test4, Test5;\n\nIO Test1 { a?, b!}\nIO Test2 { a?, b!}\nIO Test3 { a?, b!}\nIO Test4 { a?, b!}\nIO Test5 { a?, b!}"
 }
