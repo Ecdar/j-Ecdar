@@ -7,6 +7,7 @@ import org.junit.Test;
 import parser.XMLParser;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ConjunctionXMLTest {
     private static Automaton[] automata;
@@ -31,5 +32,11 @@ public class ConjunctionXMLTest {
     public void P7ConjP8ConjP9RefP10() {
         TransitionSystem ts = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(automata[7]), new SimpleTransitionSystem(automata[8]),new SimpleTransitionSystem(automata[9])});
         assertFalse(new Refinement(ts, new SimpleTransitionSystem(automata[10])).check());
+    }
+
+    @Test
+    public void P11ConjP12RefP13() {
+        TransitionSystem ts = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(automata[11]), new SimpleTransitionSystem(automata[12])});
+        assertTrue(new Refinement(ts, new SimpleTransitionSystem(automata[13])).check());
     }
 }
