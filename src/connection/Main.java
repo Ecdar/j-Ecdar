@@ -49,7 +49,7 @@ class Main {
                 }
             case "-help":
                 return "In order to check version type:-version\n"
-                        + "In order to run query type:-rq folderPath query query...\n"
+                        + "In order to run query type:-rq -json/-xml folderPath query query...\n"
                         + "In order to check the validity of a query type:-vq query";
             default:
                 return "Unknown command: \"" + query + "\"\nwrite -help to get list of commands";
