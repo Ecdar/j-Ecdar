@@ -37,6 +37,6 @@ public class ConjunctionXMLTest {
     @Test
     public void P11ConjP12RefP13() {
         TransitionSystem ts = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(automata[11]), new SimpleTransitionSystem(automata[12])});
-        assertTrue(new Refinement(ts, new SimpleTransitionSystem(automata[13])).check());
+        assertFalse(new Refinement(ts, new SimpleTransitionSystem(automata[13])).check());
     }
 }
