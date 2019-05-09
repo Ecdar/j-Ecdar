@@ -1,5 +1,6 @@
 package features;
 
+import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
@@ -13,17 +14,19 @@ import static org.junit.Assert.assertFalse;
 public class ConsistencyTest {
 
     static Automaton[] automata;
+    private static TransitionSystem G1, G5, G8;
 
     @BeforeClass
     public static void setUpBeforeClass() {
         automata = XMLParser.parse("./samples/xml/ConsTests.xml", true);
+        G1 = new SimpleTransitionSystem(automata[0]);
+        G5 = new SimpleTransitionSystem(automata[4]);
+        G8 = new SimpleTransitionSystem(automata[7]);
     }
 
     @Test
     public void testG1(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[0]);
-
-        assertTrue(ts.isConsistent());
+        assertTrue(G1.isConsistent());
     }
     @Test
     public void testG2(){
@@ -48,9 +51,21 @@ public class ConsistencyTest {
 
     @Test
     public void testG5(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[4]);
+        assertFalse(G5.isConsistent());
+    }
+
+    @Test
+    public void G1G5IsNotConsistent(){
+        TransitionSystem ts = new Composition(new TransitionSystem[]{G1, G5});
 
         assertFalse(ts.isConsistent());
+    }
+
+    @Test
+    public void G1G8IsConsistent(){
+        TransitionSystem ts = new Composition(new TransitionSystem[]{G1, G8});
+
+        assertTrue(ts.isConsistent());
     }
 
     @Test
@@ -69,9 +84,7 @@ public class ConsistencyTest {
 
     @Test
     public void testG8(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[7]);
-
-        assertTrue(ts.isConsistent());
+        assertTrue(G8.isConsistent());
     }
 
     @Test

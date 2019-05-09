@@ -3,6 +3,11 @@
 /*
 
 */
+refinement:Q1<=Q2
+
+/*
+
+*/
 refinement: (Z5||Z6)<=Z7
 
 /*

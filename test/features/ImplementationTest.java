@@ -1,8 +1,10 @@
 package features;
 
+import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.Transition;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
@@ -13,10 +15,14 @@ import static org.junit.Assert.assertFalse;
 public class ImplementationTest {
 
     static Automaton[] automata;
+    private static TransitionSystem G7, G8, G13;
 
     @BeforeClass
     public static void setUpBeforeClass() {
         automata = XMLParser.parse("./samples/xml/ImplTests.xml", true);
+        G7 = new SimpleTransitionSystem(automata[7]);
+        G8 = new SimpleTransitionSystem(automata[8]);
+        G13 = new SimpleTransitionSystem(automata[13]);
     }
 
     @Test
@@ -54,6 +60,20 @@ public class ImplementationTest {
     }
 
     @Test
+    public void G8G13IsImplementation(){
+        TransitionSystem ts = new Composition(new TransitionSystem[]{G8, G13});
+
+        assertTrue(ts.isImplementation());
+    }
+
+    @Test
+    public void G7G13IsNotImplementation(){
+        TransitionSystem ts = new Composition(new TransitionSystem[]{G7, G13});
+
+        assertFalse(ts.isImplementation());
+    }
+
+    @Test
     public void testG6(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[6]);
 
@@ -62,16 +82,12 @@ public class ImplementationTest {
 
     @Test
     public void testG7(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[7]);
-
-        assertFalse(ts.isImplementation());
+        assertFalse(G7.isImplementation());
     }
 
     @Test
     public void testG8(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[8]);
-
-        assertTrue(ts.isImplementation());
+        assertTrue(G8.isImplementation());
     }
 
     @Test
@@ -104,9 +120,7 @@ public class ImplementationTest {
 
     @Test
     public void testG13(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[13]);
-
-        assertTrue(ts.isImplementation());
+        assertTrue(G13.isImplementation());
     }
 
     @Test

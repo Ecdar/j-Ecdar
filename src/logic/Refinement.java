@@ -114,8 +114,9 @@ public class Refinement {
         if(!fed.isEmpty())
             return null;
 
-        if (!target1.getInvZone().isValid())
-            return null;
+        // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
+        // The exact same check will catch it but in TransitionSystem instead
+        if (!target1.getInvZone().isValid()) return null;
 
         target1.extrapolateMaxBounds(maxBounds);
 

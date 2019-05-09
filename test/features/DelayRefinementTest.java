@@ -438,4 +438,15 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem(automata[51])});
         assertFalse(new Refinement(comp, new SimpleTransitionSystem(automata[52])).check());
     }
+
+    @Test
+    public void Q1RefinesQ2() {
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[53]), new SimpleTransitionSystem(automata[54])).check());
+    }
+
+    @Test
+    public void Q2RefinesQ1() {
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[54]), new SimpleTransitionSystem(automata[53])).check());
+    }
+
 }
