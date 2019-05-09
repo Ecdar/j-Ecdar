@@ -2,6 +2,7 @@ package logic;
 
 import models.Automaton;
 import parser.JSONParser;
+import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,17 +21,20 @@ public class Controller {
 
         // Separates location and Queries
         ArrayList<String> temp = new ArrayList<>(Arrays.asList(locQuery.split(" ")));
-        String folderLoc = temp.get(0);
+        boolean isJson = temp.get(0).equals("-json");
+        String folderLoc = temp.get(1);
+
+        temp.remove(1);
         temp.remove(0);
         Queries.addAll(temp);
 
-        parseComponents(folderLoc); // Parses components and adds them to local variable cmpt
+        parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
         return runQueries();
     }
 
-    public static void parseComponents(String folderLocation) {
-        cmpt = JSONParser.parse(folderLocation, true);
+    public static void parseComponents(String folderLocation, boolean isJson) {
+        cmpt = isJson ? JSONParser.parse(folderLocation, true) : XMLParser.parse(folderLocation, true);
     }
 
     private static List<Boolean> runQueries() throws Exception {
