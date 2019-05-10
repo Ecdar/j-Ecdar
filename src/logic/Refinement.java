@@ -11,8 +11,11 @@ public class Refinement {
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
+    private Node refTree;
+    private Node currNode;
+    private int treeSize;
     private int[] maxBounds;
-    private int INF = 1073741823;
+    private static boolean RET_REF = false;
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
@@ -38,7 +41,25 @@ public class Refinement {
         setMaxBounds();
     }
 
+    public boolean check(boolean ret_ref) {
+        RET_REF = ret_ref;
+        return checkRef();
+    }
+
     public boolean check() {
+        RET_REF = false;
+        return checkRef();
+    }
+
+    public Node getTree() {
+        return refTree;
+    }
+
+    public List<StatePair> getTrace() {
+        return currNode.getTrace();
+    }
+
+    public boolean checkRef() {
         // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
         // with the exception that the left side is allowed to have more outputs
 
@@ -53,38 +74,55 @@ public class Refinement {
         int waitingAmount = 0;
         // keep looking at states from Waiting as long as it contains elements
 
-        if(!ts1.isConsistent())
+        if (!ts1.isConsistent())
             return false;
 
-        if(!ts2.isConsistent())
+        if (!ts2.isConsistent())
             return false;
+
+        if (RET_REF) {
+            refTree = new Node(waiting.getFirst());
+            currNode = refTree;
+            treeSize++;
+        }
 
         while (!waiting.isEmpty()) {
             if (waiting.size() > waitingAmount) waitingAmount = waiting.size();
 
             StatePair curr = waiting.pop();
 
-            // ignore if the zones are included in zones belonging to pairs of states that we already visited
-            if (!passedContainsStatePair(curr)) {
-                State left = curr.getLeft();
-                State right = curr.getRight();
-
-                // need to make deep copy
-                State newState1 = new State(left);
-                State newState2 = new State(right);
-                // mark the pair of states as visited
-                passed.add(new StatePair(newState1, newState2));
-
-                // check that for every output in TS 1 there is a corresponding output in TS 2
-                boolean holds1 = checkOutputs(left, right);
-                if (!holds1)
-                    return false;
-
-                // check that for every input in TS 2 there is a corresponding input in TS 1
-                boolean holds2 = checkInputs(left, right);
-                if (!holds2)
-                    return false;
+            if (RET_REF) {
+                Node child = currNode.getChild(curr);
+                if (child != null)
+                    currNode = child;
+                else {
+                    if (currNode.getParent() != null) {
+                        child = currNode.getParent().getChild(curr);
+                        if (child != null)
+                            currNode = child;
+                    }
+                }
             }
+
+            State left = curr.getLeft();
+            State right = curr.getRight();
+
+            // need to make deep copy
+            State newState1 = new State(left);
+            State newState2 = new State(right);
+            // mark the pair of states as visited
+            passed.add(new StatePair(newState1, newState2));
+
+            // check that for every output in TS 1 there is a corresponding output in TS 2
+            boolean holds1 = checkOutputs(left, right);
+            if (!holds1)
+                return false;
+
+            // check that for every input in TS 2 there is a corresponding input in TS 1
+            boolean holds2 = checkInputs(left, right);
+            if (!holds2)
+                return false;
+
         }
 
         // if we got here it means refinement property holds
@@ -111,7 +149,7 @@ public class Refinement {
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
         Federation fed = Federation.dbmMinusDbm(invariantTest, target1.getInvZone());
-        if(!fed.isEmpty())
+        if (!fed.isEmpty())
             return null;
 
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
@@ -135,7 +173,7 @@ public class Refinement {
         Federation fedR = new Federation(gzRight);
 
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
-        if(!Federation.fedMinusFed(fedL, fedR).isEmpty())
+        if (!Federation.fedMinusFed(fedL, fedR).isEmpty())
             return pairs;
 
         for (Transition transition1 : trans1) {
@@ -182,18 +220,27 @@ public class Refinement {
                 List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2);
                 if (pairs.isEmpty())
                     return false;
-                waiting.addAll(pairs);
+
+                for (StatePair pair : pairs) {
+                    if (!listContainsStatePair(pair, true) && !listContainsStatePair(pair, false)) {
+                        waiting.add(pair);
+                        if (RET_REF) {
+                            currNode.addChild(pair);
+                            treeSize++;
+                        }
+                    }
+                }
             }
         }
 
         return true;
     }
 
-    private boolean passedContainsStatePair(StatePair state) {
+    private boolean listContainsStatePair(StatePair state, boolean isPassed) {
         State currLeft = state.getLeft();
         State currRight = state.getRight();
 
-        for (StatePair passedState : passed) {
+        for (StatePair passedState : (isPassed ? passed : waiting)) {
             // check for zone inclusion
             State passedLeft = passedState.getLeft();
             State passedRight = passedState.getRight();
@@ -210,14 +257,14 @@ public class Refinement {
         return false;
     }
 
-    public StatePair getInitialStatePair(){
+    public StatePair getInitialStatePair() {
         State left = ts1.getInitialStateRef(allClocks, ts2.getInitialLocation().getInvariants());
         State right = ts2.getInitialStateRef(allClocks, ts1.getInitialLocation().getInvariants());
 
         return new StatePair(left, right);
     }
 
-    public void setMaxBounds(){
+    public void setMaxBounds() {
         List<Integer> res = new ArrayList<>();
         res.add(0);
         res.addAll(ts1.getMaxBounds());

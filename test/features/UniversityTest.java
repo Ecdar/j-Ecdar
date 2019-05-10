@@ -11,7 +11,8 @@ import static org.junit.Assert.assertTrue;
 
 public class UniversityTest {
 
-    private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy, machine3, adm2, half1, half2;
+    private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
+            machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -36,29 +37,53 @@ public class UniversityTest {
         spec = new SimpleTransitionSystem(machines[3]);
         specCopy = new SimpleTransitionSystem(new Automaton(machines[3]));
         machine3 = new SimpleTransitionSystem(machines[4]);
+        machine3Copy = new SimpleTransitionSystem(new Automaton(machines[4]));
         adm2 = new SimpleTransitionSystem(machines[5]);
+        adm2Copy = new SimpleTransitionSystem(new Automaton(machines[5]));
         half1 = new SimpleTransitionSystem(machines[6]);
+        half1Copy = new SimpleTransitionSystem(new Automaton(machines[6]));
         half2 = new SimpleTransitionSystem(machines[7]);
+        half2Copy = new SimpleTransitionSystem(new Automaton(machines[7]));
     }
 
     @Test
-    public void testAdm2RefinesAdm2() {
-        assertTrue(new Refinement(adm2, adm2).check());
+    public void testAdm2RefinesSelf() {
+        assertTrue(new Refinement(adm2, adm2Copy).check());
     }
 
     @Test
-    public void testHal1RefinesHalf1() {
-        assertTrue(new Refinement(half1, half1).check());
+    public void testHalf1RefinesSelf() {
+        assertTrue(new Refinement(half1, half1Copy).check());
     }
 
     @Test
-    public void testHalf2RefinesHalf2() {
-        assertTrue(new Refinement(half2, half2).check());
+    public void testHalf2RefinesSelf() {
+        assertTrue(new Refinement(half2, half2Copy).check());
     }
 
     @Test
-    public void testAdmRefinesAdm() {
-        assertTrue(new Refinement(adm, adm).check());
+    public void testAdmRefinesSelf() {
+        assertTrue(new Refinement(adm, admCopy).check());
+    }
+
+    @Test
+    public void testMachineRefinesSelf() {
+        assertTrue(new Refinement(machine, machineCopy).check());
+    }
+
+    @Test
+    public void testResRefinesSelf() {
+        assertTrue(new Refinement(researcher, researcherCopy).check());
+    }
+
+    @Test
+    public void testSpecRefinesSelf() {
+        assertTrue(new Refinement(spec, specCopy).check());
+    }
+
+    @Test
+    public void testMachine3RefinesSelf() {
+        assertTrue(new Refinement(machine3, machine3Copy).check());
     }
 
     @Test
@@ -82,11 +107,6 @@ public class UniversityTest {
     }
 
     @Test
-    public void testMachineRefinesMachine() {
-        assertTrue(new Refinement(machine, machine).check());
-    }
-
-    @Test
     public void testMachineNotRefinesAdm() {
         assertFalse(new Refinement(machine, adm).check());
     }
@@ -104,11 +124,6 @@ public class UniversityTest {
     @Test
     public void testMachineNotRefinesMachine3() {
         assertFalse(new Refinement(machine, machine3).check());
-    }
-
-    @Test
-    public void testResRefinesRes() {
-        assertTrue(new Refinement(researcher, researcher).check());
     }
 
     @Test
@@ -132,11 +147,6 @@ public class UniversityTest {
     }
 
     @Test
-    public void testSpecRefinesSpec() {
-        assertTrue(new Refinement(spec, specCopy).check());
-    }
-
-    @Test
     public void testSpecNotRefinesAdm() {
         assertFalse(new Refinement(spec, adm).check());
     }
@@ -154,11 +164,6 @@ public class UniversityTest {
     @Test
     public void testSpecNotRefinesMachine3() {
         assertFalse(new Refinement(spec, machine3).check());
-    }
-
-    @Test
-    public void testMachine3RefinesMachine3() {
-        assertTrue(new Refinement(machine3, machine3).check());
     }
 
     @Test

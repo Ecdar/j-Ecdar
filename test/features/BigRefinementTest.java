@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BigRefinementTest {
 
-    private static TransitionSystem comp1, ref1;
+    private static TransitionSystem comp1, comp1Copy, ref1, ref1Copy;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -24,7 +24,9 @@ public class BigRefinementTest {
         Automaton[] machines = JSONParser.parse(base, components, true);
 
         comp1 = new SimpleTransitionSystem(machines[0]);
+        comp1Copy = new SimpleTransitionSystem(new Automaton(machines[0]));
         ref1 = new SimpleTransitionSystem(machines[1]);
+        ref1Copy = new SimpleTransitionSystem(new Automaton(machines[1]));
     }
 
     @Test
@@ -39,12 +41,12 @@ public class BigRefinementTest {
     }
 
     @Test
-    public void testRef1RefinesRef1() {
-        assertTrue(new Refinement(ref1, ref1).check());
+    public void testRef1RefinesSelf() {
+        assertTrue(new Refinement(ref1, ref1Copy).check());
     }
 
     @Test
-    public void testComp1RefinesComp1() {
-        assertTrue(new Refinement(comp1, comp1).check());
+    public void testComp1RefinesSelf() {
+        assertTrue(new Refinement(comp1, comp1Copy).check());
     }
 }

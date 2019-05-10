@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AGTest {
-    private static TransitionSystem a, g, q, imp, aa;
+    private static TransitionSystem a, aCopy, g, gCopy, q, qCopy, imp, impCopy, aa, aaCopy;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -28,30 +28,40 @@ public class AGTest {
         Automaton[] machines = JSONParser.parse(base, components, true);
 
         a = new SimpleTransitionSystem(machines[0]);
+        aCopy = new SimpleTransitionSystem(new Automaton(machines[0]));
         g = new SimpleTransitionSystem(machines[1]);
+        gCopy = new SimpleTransitionSystem(new Automaton(machines[1]));
         q = new SimpleTransitionSystem(machines[2]);
+        qCopy = new SimpleTransitionSystem(new Automaton(machines[2]));
         imp = new SimpleTransitionSystem(machines[3]);
+        impCopy = new SimpleTransitionSystem(new Automaton(machines[3]));
         aa = new SimpleTransitionSystem(machines[4]);
+        aaCopy = new SimpleTransitionSystem(new Automaton(machines[4]));
     }
 
     @Test
-    public void ARefinesA() {
-        assertTrue(new Refinement(a, a).check());
+    public void ARefinesSelf() {
+        assertTrue(new Refinement(a, aCopy).check());
     }
 
     @Test
-    public void GRefinesG() {
-        assertTrue(new Refinement(g, g).check());
+    public void GRefinesSelf() {
+        assertTrue(new Refinement(g, gCopy).check());
     }
 
     @Test
-    public void QRefinesQ() {
-        assertTrue(new Refinement(q, q).check());
+    public void QRefinesSelf() {
+        assertTrue(new Refinement(q, qCopy).check());
     }
 
     @Test
-    public void ImpRefinesImp() {
-        assertTrue(new Refinement(imp, imp).check());
+    public void ImpRefinesSelf() {
+        assertTrue(new Refinement(imp, impCopy).check());
+    }
+
+    @Test
+    public void AaRefinesSelf() {
+        assertTrue(new Refinement(aa, aaCopy).check());
     }
 
     @Test
@@ -109,19 +119,4 @@ public class AGTest {
         // should fail because right side has more inputs
         assertFalse(new Refinement(a, aa).check());
     }
-
-//    @Test
-//    public void GRefinesAGQuotientA() {
-//        assertTrue(new Refinement(g, new Quotient(new Composition(new TransitionSystem[]{a, g}), a)).check());
-//    }
-//
-//    @Test
-//    public void AGQuotientANotRefinesG() {
-//        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), g).check());
-//    }
-//
-//    @Test
-//    public void AGQuotientANotRefinesImp() {
-//        assertFalse(new Refinement(new Quotient(new Composition(new TransitionSystem[]{a, g}), a), imp).check());
-//    }
 }

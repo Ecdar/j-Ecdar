@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UnspecTest {
-    private static TransitionSystem a, aa, b;
+    private static TransitionSystem a, aCopy, aa, aaCopy, b, bCopy;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -25,23 +25,26 @@ public class UnspecTest {
         Automaton[] machines = JSONParser.parse(base, components, true);
 
         a = new SimpleTransitionSystem(machines[0]);
+        aCopy = new SimpleTransitionSystem(new Automaton(machines[0]));
         aa = new SimpleTransitionSystem(machines[1]);
+        aaCopy = new SimpleTransitionSystem(new Automaton(machines[1]));
         b = new SimpleTransitionSystem(machines[2]);
+        bCopy = new SimpleTransitionSystem(new Automaton(machines[2]));
     }
 
     @Test
-    public void testARefinesA() {
-        assertTrue(new Refinement(a, a).check());
+    public void testARefinesSelf() {
+        assertTrue(new Refinement(a, aCopy).check());
     }
 
     @Test
-    public void testAaRefinesAa() {
-        assertTrue(new Refinement(aa, aa).check());
+    public void testAaRefinesSelf() {
+        assertTrue(new Refinement(aa, aaCopy).check());
     }
 
     @Test
-    public void testBRefinesB() {
-        assertTrue(new Refinement(b, b).check());
+    public void testBRefinesSelf() {
+        assertTrue(new Refinement(b, bCopy).check());
     }
 
     @Test
