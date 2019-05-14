@@ -2,7 +2,6 @@ package logic;
 
 import models.*;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,10 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public List<SimpleTransitionSystem> getSystems() {
         return Collections.singletonList(this);
+    }
+
+    public String getName() {
+        return automaton.getName();
     }
 
     public List<Integer> getMaxBounds(){

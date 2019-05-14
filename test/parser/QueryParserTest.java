@@ -134,34 +134,34 @@ public class QueryParserTest {
     @Test
     public void testCompRefinesSpec() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec").get(0), "true");
         } catch (Exception e) {
             fail();
         }
     }
 
     @Test
-    public void testSpecRefinesSpec() {
+    public void testSpecNotRefinesSpec() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Spec)<=(Spec)").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Spec)<=(Spec)").get(0), "false");
         } catch (Exception e) {
             fail();
         }
     }
 
     @Test
-    public void testMachRefinesMach() {
+    public void testMachNotRefinesMach() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Machine<=Machine").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Machine<=Machine").get(0), "false");
         } catch (Exception e) {
             fail();
         }
     }
 
     @Test
-    public void testMach3RefinesMach3() {
+    public void testMach3NotRefinesMach3() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Machine3<=Machine3").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Machine3<=Machine3").get(0), "false");
         } catch (Exception e) {
             fail();
         }
@@ -170,7 +170,7 @@ public class QueryParserTest {
     @Test
     public void testMach3RefinesMach() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Machine3<=Machine").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Machine3<=Machine").get(0), "true");
         } catch (Exception e) {
             fail();
         }
@@ -179,7 +179,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesAdm() {
         try {
-            assertFalse(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Administration").get(0));
+            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Administration").get(0), "true");
         } catch (Exception e) {
             fail();
         }
@@ -188,7 +188,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesMachine() {
         try {
-            assertFalse(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Machine").get(0));
+            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Machine").get(0), "true");
         } catch (Exception e) {
             fail();
         }
@@ -197,7 +197,7 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesResearcher() {
         try {
-            assertFalse(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Researcher").get(0));
+            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Researcher").get(0), "true");
         } catch (Exception e) {
             fail();
         }
@@ -207,16 +207,16 @@ public class QueryParserTest {
     @Test
     public void testSpecNotRefinesMachine3() {
         try {
-            assertFalse(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Machine3").get(0));
+            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Machine3").get(0), "true");
         } catch (Exception e) {
             fail();
         }
     }
 
     @Test
-    public void testCompRefinesComp() {
+    public void testCompNotRefinesComp() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)").get(0), "false");
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -226,7 +226,7 @@ public class QueryParserTest {
     @Test
     public void testConjRefinesAdm2() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2").get(0), "true");
         } catch (Exception e) {
             fail();
         }
@@ -235,7 +235,7 @@ public class QueryParserTest {
     @Test
     public void testAdm2RefinesConj() {
         try {
-            assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)").get(0));
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)").get(0), "true");
         } catch (Exception e) {
             fail();
         }
@@ -244,8 +244,8 @@ public class QueryParserTest {
     @Test
     public void testSeveralQueries1() {
         try {
-            List<Boolean> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine");
-            assertTrue(result.get(0) && result.get(1));
+            List<String> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine");
+            assertTrue(result.get(0).equals("false") && result.get(3).equals("false"));
         } catch (Exception e) {
             fail();
         }
@@ -254,8 +254,8 @@ public class QueryParserTest {
     @Test
     public void testSeveralQueries2() {
         try {
-            List<Boolean> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3");
-            assertTrue(result.get(0) && result.get(1));
+            List<String> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3");
+            assertTrue(result.get(0).equals("true") && result.get(2).equals("false"));
         } catch (Exception e) {
             fail();
         }
@@ -264,7 +264,7 @@ public class QueryParserTest {
     @Test
     public void testDelayRefZ3RefinesZ4() {
         try {
-            assertTrue(Controller.handleRequest("-xml ./samples/xml/delayRefinement.xml refinement:Z3<=Z4").get(0));
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/delayRefinement.xml refinement:Z3<=Z4").get(0), "true");
         } catch (Exception e) {
             fail();
         }

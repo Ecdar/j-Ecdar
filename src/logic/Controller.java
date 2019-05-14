@@ -10,13 +10,13 @@ import java.util.List;
 
 public class Controller {
     private static final List<String> Queries = new ArrayList<>();
-    private static Automaton[] cmpt;
+    private static List<SimpleTransitionSystem> transitionSystems = new ArrayList<>();
     private static final int FEATURE_REFINEMENT = 0;
     private static final int FEATURE_COMPOSITION = 1;
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public static List<Boolean> handleRequest(String locQuery) throws Exception {
+    public static List<String> handleRequest(String locQuery) throws Exception {
         Queries.clear();
 
         // Separates location and Queries
@@ -34,11 +34,14 @@ public class Controller {
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
-        cmpt = isJson ? JSONParser.parse(folderLocation, true) : XMLParser.parse(folderLocation, true);
+        Automaton[] cmpt = isJson ? JSONParser.parse(folderLocation, true) : XMLParser.parse(folderLocation, true);
+        for (Automaton automaton : cmpt) {
+            transitionSystems.add(new SimpleTransitionSystem(automaton));
+        }
     }
 
-    private static List<Boolean> runQueries() throws Exception {
-        List<Boolean> returnlist = new ArrayList<>();
+    private static List<String> runQueries() throws Exception {
+        List<String> returnlist = new ArrayList<>();
 
         for (int i = 0; i < Queries.size(); i++) {
             isQueryValid(Queries.get(i));
@@ -46,7 +49,11 @@ public class Controller {
             if (Queries.get(i).contains("refinement")) {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
                 Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
-                returnlist.add(ref.check());
+                boolean refCheck = ref.check();
+                returnlist.add(refCheck ? "true" : "false");
+                if (i == Queries.size()-1 && refCheck) continue;
+                returnlist.add("\n");
+                if (!refCheck) returnlist.add(ref.getErrMsg());
             }
             //add if contains specification or smth else
         }
@@ -75,12 +82,12 @@ public class Controller {
                 while (check) {
                     if (i + j < part.length()) {
                         if (!Character.isLetter(part.charAt(i + j)) && !Character.isDigit(part.charAt(i + j))) {
-                            transitionSystems.add(new SimpleTransitionSystem(findComponent(part.substring(i, j + i))));
+                            transitionSystems.add(findComponent(part.substring(i, j + i)));
                             j--;
                             check = false;
                         }
                     } else {
-                        transitionSystems.add(new SimpleTransitionSystem(findComponent(part.substring(i, j + i))));
+                        transitionSystems.add(findComponent(part.substring(i, j + i)));
                         break outerLoop;
                     }
                     j++;
@@ -123,9 +130,9 @@ public class Controller {
     }
 
     // Finds and returns Automaton given the name of that component
-    private static Automaton findComponent(String str) {
-        for (Automaton automaton : cmpt)
-            if (automaton.getName().equalsIgnoreCase(str)) return automaton;
+    private static TransitionSystem findComponent(String str) {
+        for (SimpleTransitionSystem ts : transitionSystems)
+            if (ts.getName().equalsIgnoreCase(str)) return ts;
 
         System.out.println("Automaton does not exist  " + str);
         return null;

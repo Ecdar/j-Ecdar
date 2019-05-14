@@ -72,6 +72,13 @@ public class UniversityTest {
     }
 
     @Test
+    public void testMachineRefinesSelfDuplicate() {
+        Refinement ref = new Refinement(machine, machine);
+        assertFalse(ref.check());
+        assert ref.getErrMsg().contains("Duplicate process instance");
+    }
+
+    @Test
     public void testResRefinesSelf() {
         assertTrue(new Refinement(researcher, researcherCopy).check());
     }
@@ -206,6 +213,16 @@ public class UniversityTest {
                 new Composition(new TransitionSystem[]{adm, machine, researcher}),
                 new Composition(new TransitionSystem[]{machineCopy, researcherCopy, admCopy}));
         assertTrue(ref.check());
+    }
+
+    @Test
+    public void testCompRefinesSelfDuplicate() {
+        Refinement ref = new Refinement(
+                new Composition(new TransitionSystem[]{adm, machine, researcher}),
+                new Composition(new TransitionSystem[]{machine, researcher, adm}));
+
+        assertFalse(ref.check(true));
+        assert ref.getErrMsg().contains("Duplicate process instance");
     }
 
     @Test
