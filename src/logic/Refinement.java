@@ -97,17 +97,40 @@ public class Refinement {
             errMsg.append("Not all outputs of the right side are present on the left side.\n");
         }
 
+        List<String> inconsistentTs = new ArrayList<>();
+
         if (!ts1.isConsistent()) {
             precondMet = false;
-            errMsg.append("The left side is inconsistent.\n");
+            inconsistentTs.addAll(ts1.getInconsistentTs());
         }
 
         if (!ts2.isConsistent()) {
             precondMet = false;
-            errMsg.append("The right side is inconsistent.\n");
+            inconsistentTs.addAll(ts2.getInconsistentTs());
         }
 
+        if (inconsistentTs.size() > 0) buildInconsistentMessage(inconsistentTs);
+
         return precondMet;
+    }
+
+    public void buildInconsistentMessage(List<String> inc) {
+        if (inc.size() == 1) {
+            errMsg.append("Automaton ");
+            errMsg.append(inc.get(0));
+            errMsg.append(" is inconsistent.\n");
+        } else {
+            errMsg.append("Automata ");
+            for (int i = 0; i < inc.size(); i++) {
+                if (i == inc.size() - 1)
+                    errMsg.append(inc.get(i));
+                else {
+                    errMsg.append(inc.get(i));
+                    errMsg.append(", ");
+                }
+            }
+            errMsg.append(" are inconsistent.\n");
+        }
     }
 
     public boolean checkRef() {

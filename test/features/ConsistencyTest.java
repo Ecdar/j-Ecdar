@@ -1,8 +1,6 @@
 package features;
 
-import logic.Composition;
-import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
+import logic.*;
 import models.Automaton;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -10,24 +8,33 @@ import parser.XMLParser;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 public class ConsistencyTest {
 
     static Automaton[] automata;
-    private static TransitionSystem G1, G5, G8;
+    private static TransitionSystem G1, G3, G4, G5, G7, G8, G9, G10, G12, G21;
 
     @BeforeClass
     public static void setUpBeforeClass() {
         automata = XMLParser.parse("./samples/xml/ConsTests.xml", true);
         G1 = new SimpleTransitionSystem(automata[0]);
+        G3 = new SimpleTransitionSystem(automata[2]);
+        G4 = new SimpleTransitionSystem(automata[3]);
         G5 = new SimpleTransitionSystem(automata[4]);
+        G7 = new SimpleTransitionSystem(automata[6]);
         G8 = new SimpleTransitionSystem(automata[7]);
+        G9 = new SimpleTransitionSystem(automata[8]);
+        G10 = new SimpleTransitionSystem(automata[9]);
+        G12 = new SimpleTransitionSystem(automata[11]);
+        G21 = new SimpleTransitionSystem(automata[20]);
     }
 
     @Test
     public void testG1(){
         assertTrue(G1.isConsistent());
     }
+
     @Test
     public void testG2(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[1]);
@@ -176,5 +183,16 @@ public class ConsistencyTest {
         TransitionSystem ts = new SimpleTransitionSystem(automata[20]);
 
         assertTrue(ts.isConsistent());
+    }
+
+    @Test
+    public void multipleInconsistenciesError() {
+        TransitionSystem ts1 = new Conjunction(new TransitionSystem[] {G3, G4});
+        TransitionSystem ts2 = new Composition(new TransitionSystem[] {G5, G7, G9, G10, G12});
+        TransitionSystem comp = new Composition(new TransitionSystem[] {ts1, ts2});
+
+        Refinement ref = new Refinement(comp, G21);
+        assertFalse(ref.check());
+        assertEquals(ref.getErrMsg(), "Automata G3, G4, G5, G7, G9, G10, G12 are inconsistent.\n");
     }
 }
