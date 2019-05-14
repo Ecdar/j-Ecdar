@@ -62,7 +62,7 @@ public abstract class TransitionSystem {
             targetState.getInvZone().delay();
             targetState.applyInvariants(allClocks);
 
-            //if (!targetState.getInvZone().isValid()) continue;
+            if (!targetState.getInvZone().isValid()) continue;
 
             transitions.add(new Transition(currentState, targetState, move, guardZone));
         }
