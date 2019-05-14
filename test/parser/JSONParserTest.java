@@ -56,8 +56,13 @@ public class JSONParserTest {
         Edge t15 = new Edge(l1, l1, bad, false, emptyGuards, emptyUpdates);
         Edge t16 = new Edge(l0, l1, button2, true, emptyGuards, emptyUpdates);
 
+        Clock a = new Clock("a");
+        Clock b = new Clock("b");
+        Clock z = new Clock("z");
+        Clock m = new Clock("m");
+        List<Clock> clocksOfA = new ArrayList<>(Arrays.asList(a, b, z, m));
 
-        A = new Automaton("A", new ArrayList<>(Collections.singletonList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), emptyClocks, false);
+        A = new Automaton("A", new ArrayList<>(Collections.singletonList(l2)), new ArrayList<>(Arrays.asList(t1, t2, t3)), clocksOfA, false);
         G = new Automaton("G", new ArrayList<>(Collections.singletonList(l3)), new ArrayList<>(Arrays.asList(t4, t5, t6)), emptyClocks, false);
         Q = new Automaton("Q", new ArrayList<>(Arrays.asList(l5, u0)), new ArrayList<>(Arrays.asList(t7, t8, t9)), emptyClocks, false);
         Imp = new Automaton("Imp", new ArrayList<>(Arrays.asList(l0, l1)), new ArrayList<>(Arrays.asList(t10, t11, t12, t13, t14, t15, t16)), emptyClocks, false);

@@ -58,9 +58,13 @@ public class XMLParser {
         String text = el.getChildText("declaration");
 
         if (text != null) {
-            String clocks = text.replaceAll("clock", "")
+            String clocks = text.replaceAll("//.*\n", "")
+                    .replaceFirst("clock", "");
+
+            clocks = clocks.replaceAll("clock", ",")
                     .replaceAll(";", "")
-                    .replaceAll(" ", "");
+                    .replaceAll(" ", "")
+                    .replaceAll("\n", "");
 
             String[] clockArr = clocks.split(",");
 

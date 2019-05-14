@@ -69,8 +69,6 @@ public class JSONParser {
                     Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
                     automata.add(automaton);
                     componentClocks.clear();
-                } else {
-                    addDeclarations((String) obj.get("declarations"));
                 }
             }
         } catch (Exception e) {
@@ -84,18 +82,23 @@ public class JSONParser {
         String[] firstList = declarations.split(";");
 
         for (int i = 0; i < firstList.length; i++) {
-            boolean isChan = firstList[i].contains("broadcast chan");
             boolean isClock = firstList[i].contains("clock");
 
-            if (isChan || isClock) {
-                firstList[i] = firstList[i].replaceFirst("^broadcast chan", "");//get rid of starting text
-                firstList[i] = firstList[i].replaceFirst("^clock", "");//get rid of starting text
-                firstList[i] = firstList[i].replaceAll("\\s+", ""); //get rid of spaces
-                String[] secondList = (firstList[i].split(","));
+            if (isClock) {
+                String clocks = firstList[i];
 
-                for (String s : secondList) {
-                    if (isChan) globalChannels.add(new Channel(s));
-                    if (isClock) componentClocks.add(new Clock(s));
+                clocks = clocks.replaceAll("//.*\n", "")
+                        .replaceFirst("clock", "");
+
+                clocks = clocks.replaceAll("clock", ",")
+                        .replaceAll(";", "")
+                        .replaceAll(" ", "")
+                        .replaceAll("\n", "");
+
+                String[] clockArr = clocks.split(",");
+
+                for (String s : clockArr) {
+                    componentClocks.add(new Clock(s));
                 }
             }
         }
@@ -213,13 +216,25 @@ public class JSONParser {
 
             boolean isInput = "INPUT".equals(jsonObject.get("status").toString());
 
-            List<Channel> c = globalChannels.stream().filter(channel -> channel.getName().equals(jsonObject.get("sync"))).collect(Collectors.toList());
-            if (!c.isEmpty()) {
-                Edge edge = new Edge(sourceLocation, targetLocation, c.get(0), isInput, guards, updates);
+            Channel c = addChannel(jsonObject.get("sync").toString());
+            if (c != null) {
+                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updates);
                 edges.add(edge);
             }
         }
         return edges;
+    }
+
+    private static Channel addChannel(String name) {
+        if (name.equals("*")) return null;
+
+        for (Channel channel : globalChannels)
+            if (channel.getName().equals(name))
+                return channel;
+
+        Channel chan = new Channel(name);
+        globalChannels.add(chan);
+        return chan;
     }
 
     private static Update[] addUpdates(String update) {

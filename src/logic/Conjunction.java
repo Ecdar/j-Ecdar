@@ -59,10 +59,7 @@ public class Conjunction extends TransitionSystem {
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
         List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
 
-        List<Move> resultMoves = computeResultMoves(symLocs, channel);
-        if (resultMoves.isEmpty()) return new ArrayList<>();
-
-        return resultMoves;
+        return computeResultMoves(symLocs, channel);
     }
 
     private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {

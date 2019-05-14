@@ -51,13 +51,13 @@ public class Refinement {
         return checkRef();
     }
 
-    public Node getTree() {
+    /*public Node getTree() {
         return refTree;
     }
 
     public List<StatePair> getTrace() {
         return currNode.getTrace();
-    }
+    }*/
 
     public boolean checkRef() {
         // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
@@ -154,7 +154,7 @@ public class Refinement {
 
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
-        if (!target1.getInvZone().isValid()) return null;
+        //if (!target1.getInvZone().isValid()) return null;
 
         target1.extrapolateMaxBounds(maxBounds);
 
@@ -212,8 +212,7 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
-                    Transition loop = isInput ? new Transition(state1, state1.getInvZone()) :
-                            new Transition(state2, state2.getInvZone());
+                    Transition loop = new Transition(state2, state2.getInvZone());
                     transitions2.add(loop);
                 }
 
