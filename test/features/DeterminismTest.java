@@ -8,8 +8,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 public class DeterminismTest {
 
@@ -38,6 +40,21 @@ public class DeterminismTest {
         G17 = new SimpleTransitionSystem(automata[16]);
         G22 = new SimpleTransitionSystem(automata[21]);
         G23 = new SimpleTransitionSystem(automata[22]);
+    }
+
+    @Test
+    public void testG1EqualsG1(){
+        assertEquals(G1, G1);
+    }
+
+    @Test
+    public void testG1NotEqualsNull(){
+        assertNotEquals(G1, null);
+    }
+
+    @Test
+    public void testG1NotEqualsClock(){
+        assertNotEquals(G1, new Clock("wierd test"));
     }
 
     @Test
