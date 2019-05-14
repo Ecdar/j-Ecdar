@@ -96,6 +96,21 @@ Fail
 consistency: G19
 
 /*
-Pass
+
 */
 consistency: G20
+
+/*
+
+*/
+consistency: G21
+
+/*
+
+*/
+consistency: G22
+
+/*
+Pass
+*/
+consistency: G23

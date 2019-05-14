@@ -74,7 +74,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         for (int i = 0; i < trans.size(); i++) {
             for (int j = i + 1; j < trans.size(); j++) {
-                if (trans.get(i).getTarget().getLocation().equals(trans.get(j).getTarget().getLocation()))
+                if (trans.get(i).getTarget().getLocation().equals(trans.get(j).getTarget().getLocation())
+                 && trans.get(i).getEdges().get(0).hasEqualUpdates(trans.get(j).getEdges().get(0)))
                     continue;
 
                 State state1 = new State(trans.get(i).getSource());

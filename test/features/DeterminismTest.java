@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 public class DeterminismTest {
 
     static Automaton[] automata;
-    private static TransitionSystem G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11, G12, G13, G14, G15, G16, G17;
+    private static TransitionSystem G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11, G12, G13, G14, G15, G16, G17, G22, G23;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -36,6 +36,8 @@ public class DeterminismTest {
         G15 = new SimpleTransitionSystem(automata[14]);
         G16 = new SimpleTransitionSystem(automata[15]);
         G17 = new SimpleTransitionSystem(automata[16]);
+        G22 = new SimpleTransitionSystem(automata[21]);
+        G23 = new SimpleTransitionSystem(automata[22]);
     }
 
     @Test
@@ -135,5 +137,15 @@ public class DeterminismTest {
     @Test
     public void testG17(){
         assertTrue(G17.isDeterministic());
+    }
+
+    @Test
+    public void testG22(){
+        assertTrue(G22.isDeterministic());
+    }
+
+    @Test
+    public void testG23(){
+        assertFalse(G23.isDeterministic());
     }
 }

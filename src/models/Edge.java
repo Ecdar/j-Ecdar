@@ -51,6 +51,32 @@ public class Edge {
         return constant;
     }
 
+    // Used in determinism check to verify if two edges have exactly the same updates
+    public boolean hasEqualUpdates(Edge edge){
+        // If the amount of updates on edges is not the same it means they cannot have equal updates
+        if(this.updates.length != edge.updates.length)
+            return false;
+
+        boolean result;
+
+        for(int i = 0; i < this.updates.length; i++)
+        {
+            result = false;
+            for(int j = 0; i < this.updates.length; i++)
+            {
+                if(this.updates[i].equals(edge.updates[j]))
+                {
+                    result = true;
+                    break;
+                }
+            }
+            if(!result)
+                return false;
+        }
+
+        return true;
+    }
+
     public Location getSource() {
         return source;
     }
