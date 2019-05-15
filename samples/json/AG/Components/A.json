@@ -1,6 +1,6 @@
 {
   "name": "A",
-  "declarations": "",
+  "declarations": "// comment\nclock a;\n// comment\nclock b, z;\n// comment\nclock m;",
   "locations": [
     {
       "id": "L2",
@@ -103,5 +103,5 @@
   "width": 450.0,
   "height": 600.0,
   "color": "3",
-  "includeInPeriodicCheck": true
+  "includeInPeriodicCheck": false
 }

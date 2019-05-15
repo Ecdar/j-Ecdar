@@ -27,14 +27,12 @@ class Main {
                 return ENGINE_NAME + " Version: " + VERSION;
             case "-rq":
                 try {
-                    List<Boolean> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1));
-                    if (temp.size() == 1) return temp.get(0).toString();
+                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1));
+                    if (temp.size() == 1) return temp.get(0);
                     else {
                         StringBuilder str = new StringBuilder();
-                        for (int i = 0; i < temp.size(); i++) {
-                            str.append(temp.get(i).toString());
-                            if (i + 1 < temp.size()) str.append(" ");
-                        }
+                        for (int i = 0; i < temp.size(); i++)
+                            str.append(temp.get(i));
                         return str.toString();
                     }
                 } catch (Exception e) {

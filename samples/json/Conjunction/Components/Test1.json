@@ -129,5 +129,5 @@
   "width": 450.0,
   "height": 600.0,
   "color": "5",
-  "includeInPeriodicCheck": true
+  "includeInPeriodicCheck": false
 }

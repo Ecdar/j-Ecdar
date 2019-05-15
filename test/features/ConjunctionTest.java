@@ -12,7 +12,7 @@ import parser.JSONParser;
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
-    private static TransitionSystem t1, t1Copy, t2, t2Copy, t3, t3Copy, t4, t4Copy, t5, t5Copy;
+    private static TransitionSystem t1, t1Copy, t2, t2Copy, t3, t3Copy, t4, t4Copy, t5, t5Copy, t6, t7, t8, t9, t10, t11, t12;
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -22,7 +22,14 @@ public class ConjunctionTest {
                 "Components/Test2.json",
                 "Components/Test3.json",
                 "Components/Test4.json",
-                "Components/Test5.json"};
+                "Components/Test5.json",
+                "Components/Test6.json",
+                "Components/Test7.json",
+                "Components/Test8.json",
+                "Components/Test9.json",
+                "Components/Test10.json",
+                "Components/Test11.json",
+                "Components/Test12.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
 
         t1 = new SimpleTransitionSystem(machines[0]);
@@ -35,6 +42,13 @@ public class ConjunctionTest {
         t4Copy = new SimpleTransitionSystem(new Automaton(machines[3]));
         t5 = new SimpleTransitionSystem(machines[4]);
         t5Copy = new SimpleTransitionSystem(new Automaton(machines[4]));
+        t6 = new SimpleTransitionSystem(machines[5]);
+        t7 = new SimpleTransitionSystem(machines[6]);
+        t8 = new SimpleTransitionSystem(machines[7]);
+        t9 = new SimpleTransitionSystem(machines[8]);
+        t10 = new SimpleTransitionSystem(machines[9]);
+        t11 = new SimpleTransitionSystem(machines[10]);
+        t12 = new SimpleTransitionSystem(machines[11]);
     }
 
     @Test
@@ -93,5 +107,18 @@ public class ConjunctionTest {
         TransitionSystem ts2 = new Conjunction(new TransitionSystem[]{ts1, t4});
 
         assertTrue(new Refinement(ts2, t5).check());
+    }
+
+    @Test
+    public void T6ConjT7RefinesT8() {
+        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t6, t7}), t8).check());
+    }
+
+    @Test
+    public void test1NestedConjRefinesT12() {
+        TransitionSystem ts1 = new Conjunction(new TransitionSystem[]{t9, t10});
+        TransitionSystem ts2 = new Conjunction(new TransitionSystem[]{ts1, t11});
+
+        assertTrue(new Refinement(ts2, t12).check());
     }
 }

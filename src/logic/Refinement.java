@@ -16,6 +16,7 @@ public class Refinement {
     private int treeSize;
     private int[] maxBounds;
     private static boolean RET_REF = false;
+    private StringBuilder errMsg = new StringBuilder();
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
@@ -41,6 +42,10 @@ public class Refinement {
         setMaxBounds();
     }
 
+    public String getErrMsg() {
+        return errMsg.toString();
+    }
+
     public boolean check(boolean ret_ref) {
         RET_REF = ret_ref;
         return checkRef();
@@ -51,33 +56,86 @@ public class Refinement {
         return checkRef();
     }
 
-    public Node getTree() {
+    /*public Node getTree() {
         return refTree;
     }
 
     public List<StatePair> getTrace() {
         return currNode.getTrace();
-    }
+    }*/
 
-    public boolean checkRef() {
+    public boolean checkPreconditions() {
+        boolean precondMet = true;
+
+        // check for duplicate automata
+        List<SimpleTransitionSystem> leftSystems = ts1.getSystems();
+        List<SimpleTransitionSystem> rightSystems = ts2.getSystems();
+
+        for (SimpleTransitionSystem left : leftSystems) {
+            for (SimpleTransitionSystem right : rightSystems) {
+                if (left.hashCode() == right.hashCode()) {
+                    precondMet = false;
+                    errMsg.append("Duplicate process instance: ");
+                    errMsg.append(left.getName());
+                    errMsg.append(".\n");
+                }
+            }
+        }
+
         // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
         // with the exception that the left side is allowed to have more outputs
 
         // inputs on the left must be equal to inputs on the right side
-        if (!inputs1.equals(inputs2))
-            return false;
+        if (!inputs1.equals(inputs2)) {
+            precondMet = false;
+            errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
+        }
+
         // the left side must contain all outputs from the right side
-        if (!outputs1.containsAll(outputs2))
-            return false;
+        if (!outputs1.containsAll(outputs2)) {
+            precondMet = false;
+            errMsg.append("Not all outputs of the right side are present on the left side.\n");
+        }
 
-        // Temp waiting list peak counter
-        int waitingAmount = 0;
-        // keep looking at states from Waiting as long as it contains elements
+        List<String> inconsistentTs = new ArrayList<>();
 
-        if (!ts1.isConsistent())
-            return false;
+        if (!ts1.isConsistent()) {
+            precondMet = false;
+            inconsistentTs.addAll(ts1.getInconsistentTs());
+        }
 
-        if (!ts2.isConsistent())
+        if (!ts2.isConsistent()) {
+            precondMet = false;
+            inconsistentTs.addAll(ts2.getInconsistentTs());
+        }
+
+        if (inconsistentTs.size() > 0) buildInconsistentMessage(inconsistentTs);
+
+        return precondMet;
+    }
+
+    public void buildInconsistentMessage(List<String> inc) {
+        if (inc.size() == 1) {
+            errMsg.append("Automaton ");
+            errMsg.append(inc.get(0));
+            errMsg.append(" is inconsistent.\n");
+        } else {
+            errMsg.append("Automata ");
+            for (int i = 0; i < inc.size(); i++) {
+                if (i == inc.size() - 1)
+                    errMsg.append(inc.get(i));
+                else {
+                    errMsg.append(inc.get(i));
+                    errMsg.append(", ");
+                }
+            }
+            errMsg.append(" are inconsistent.\n");
+        }
+    }
+
+    public boolean checkRef() {
+        // one or more of the preconditions failed, so fail refinement
+        if (!checkPreconditions())
             return false;
 
         if (RET_REF) {
@@ -87,8 +145,6 @@ public class Refinement {
         }
 
         while (!waiting.isEmpty()) {
-            if (waiting.size() > waitingAmount) waitingAmount = waiting.size();
-
             StatePair curr = waiting.pop();
 
             if (RET_REF) {
@@ -154,7 +210,7 @@ public class Refinement {
 
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
-        if (!target1.getInvZone().isValid()) return null;
+        //if (!target1.getInvZone().isValid()) return null;
 
         target1.extrapolateMaxBounds(maxBounds);
 
@@ -212,8 +268,7 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
-                    Transition loop = isInput ? new Transition(state1, state1.getInvZone()) :
-                            new Transition(state2, state2.getInvZone());
+                    Transition loop = new Transition(state2, state2.getInvZone());
                     transitions2.add(loop);
                 }
 

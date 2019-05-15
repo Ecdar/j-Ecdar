@@ -24,11 +24,12 @@ public class ConnectionTest {
 
     @Test
     public void testRunSingleQuery1() {
-        assertEquals("true", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:Spec<=Spec")));
+        assertEquals("false\nDuplicate process instance: Spec.\n", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:Spec<=Spec")));
     }
 
     @Test
     public void testRunSingleQuery2() {
+        String x = Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
         assertEquals("true", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec")));
     }
 
@@ -40,25 +41,26 @@ public class ConnectionTest {
     @Test
     public void testRunMultipleQueries() {
         String query = "-rq -json ./samples/json/EcdarUniversity refinement:spec<=spec refinement:Machine<=Machine";
-        assertEquals("true true", (Main.chooseCommand(query)));
+        assertEquals("false\nDuplicate process instance: Spec.\nfalse\nDuplicate process instance: Machine.\n", (Main.chooseCommand(query)));
     }
 
     @Test
     public void testRunMultipleQueries2() {
         String query = "-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3";
-        assertEquals("true true", (Main.chooseCommand(query)));
+        String s = Main.chooseCommand(query);
+        assertEquals("true\nfalse\nDuplicate process instance: Machine3.\n", (Main.chooseCommand(query)));
     }
 
     @Test
     public void testRunMultipleQueries3() {
         String query = "-rq -json ./samples/json/EcdarUniversity refinement:Spec<=(Administration||Machine||Researcher) refinement:Machine3<=Machine3";
-        assertEquals("false true", (Main.chooseCommand(query)));
+        assertEquals("false\nNot all outputs of the right side are present on the left side.\nfalse\nDuplicate process instance: Machine3.\n", (Main.chooseCommand(query)));
     }
 
     @Test
     public void testRunMultipleQueries4() {
         String query = "-rq -json ./samples/json/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine refinement:Machine3<=Machine3 refinement:Researcher<=Researcher";
-        assertEquals("true true true true", (Main.chooseCommand(query)));
+        assertEquals("false\nDuplicate process instance: Spec.\nfalse\nDuplicate process instance: Machine.\nfalse\nDuplicate process instance: Machine3.\nfalse\nDuplicate process instance: Researcher.\n", (Main.chooseCommand(query)));
     }
 
     @Test

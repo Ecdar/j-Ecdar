@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
     final List<Clock> clocks;
+    private List<String> inconsistentTs = new ArrayList<>();
 
     TransitionSystem() {
         this.clocks = new ArrayList<>();
@@ -87,6 +88,10 @@ public abstract class TransitionSystem {
         return actions;
     }
 
+    public List<String> getInconsistentTs() {
+        return inconsistentTs;
+    }
+
     public boolean isDeterministic(){
         List<SimpleTransitionSystem> systems = getSystems();
 
@@ -97,14 +102,19 @@ public abstract class TransitionSystem {
         return true;
     }
 
-    public boolean isConsistent(){
+    public boolean isConsistent() {
+        boolean isConsistent = true;
+
         List<SimpleTransitionSystem> systems = getSystems();
 
-        for (TransitionSystem ts : systems){
-            if(!ts.isConsistent())
-                return false;
+        for (SimpleTransitionSystem ts : systems){
+            if(!ts.isConsistent()) {
+                isConsistent = false;
+                inconsistentTs.add(ts.getName());
+            }
         }
-        return true;
+
+        return isConsistent;
     }
 
     public List<Integer> getMaxBounds(){
