@@ -88,8 +88,8 @@ public abstract class TransitionSystem {
         return actions;
     }
 
-    public StringBuilder getLastErr() {
-        return lastErr;
+    public String getLastErr() {
+        return lastErr.toString();
     }
 
     public void clearLastErr() {
@@ -109,7 +109,7 @@ public abstract class TransitionSystem {
                 nondetermTs.add(ts.getName());
             }
         }
-        buildErrMessage(nondetermTs, "non-deterministic");
+        if(!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
         return isDeterministic;
     }
 
@@ -122,7 +122,8 @@ public abstract class TransitionSystem {
     }
 
     private boolean isConsistent(boolean canPrune) {
-        boolean isConsistent = isDeterministic();
+        boolean isDeterm = isDeterministic();
+        boolean isConsistent = true;
         List<String> inconsistentTs = new ArrayList<>();
 
         List<SimpleTransitionSystem> systems = getSystems();
@@ -134,22 +135,23 @@ public abstract class TransitionSystem {
             }
         }
 
-        buildErrMessage(inconsistentTs, "inconsistent");
-        return isConsistent;
+        if(!isConsistent) buildErrMessage(inconsistentTs, "inconsistent");
+        return isConsistent && isDeterm;
     }
 
     public boolean isImplementation(){
-        boolean isImpl = isDeterministic();
-        if(!isFullyConsistent()) isImpl = false;
+        boolean isCons = isFullyConsistent();
+        boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
 
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isImplementationHelper())
                 isImpl = false;
+            nonImpl.add(ts.getName());
         }
-        buildErrMessage(nonImpl, "not output urgent");
-        return isImpl;
+        if(!isImpl) buildErrMessage(nonImpl, "not output urgent");
+        return isImpl && isCons;
     }
 
     public List<Integer> getMaxBounds(){

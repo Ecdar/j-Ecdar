@@ -62,6 +62,12 @@ public class ConnectionTest {
     }
 
     @Test
+    public void testRunMultipleQueries5() {
+        String query = "-rq -xml ./samples/xml/ImplTests.xml refinement:G17<=G17 implementation:G14";
+        assertEquals("false\nDuplicate process instance: G17.\nfalse\nAutomaton G14 is non-deterministic.\nAutomaton G14 is not output urgent.\n", (Main.chooseCommand(query)));
+    }
+
+    @Test
     public void testRunInvalidQuery() {
         assertEquals("Error: null", (Main.chooseCommand("-rq -json sdfsd xcv")));
     }

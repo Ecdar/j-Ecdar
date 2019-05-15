@@ -192,7 +192,6 @@ public class ConsistencyTest {
 
         Refinement ref = new Refinement(comp, G21);
         assertFalse(ref.check());
-        assertEquals(ref.getErrMsg(), "Automaton G9 is non-deterministic.\n" +
-                        "Automata G3, G4, G5, G7, G10, G12 are inconsistent.\n");
+        assertEquals("Automaton G9 is non-deterministic.\n" + "Automata G3, G4, G5, G7, G10, G12 are inconsistent.\n", ref.getErrMsg());
     }
 }

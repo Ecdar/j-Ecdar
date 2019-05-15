@@ -1,6 +1,7 @@
 package logic;
 
 import models.Automaton;
+import models.Transition;
 import parser.JSONParser;
 import parser.XMLParser;
 
@@ -65,13 +66,17 @@ public class Controller {
             }
             if (Queries.get(i).contains("consistency")) {
                 String cons = Queries.get(i).replace("consistency:", "");
-                returnlist.add(String.valueOf(runQuery(cons).isFullyConsistent()));
-
+                TransitionSystem ts = runQuery(cons);
+                boolean passed = ts.isLeastConsistent();
+                returnlist.add(String.valueOf(passed));
+                if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
             if (Queries.get(i).contains("implementation")) {
                 String impl = Queries.get(i).replace("implementation:", "");
-                runQuery(impl).isImplementation();
-                returnlist.add(String.valueOf(runQuery(impl).isImplementation()));
+                TransitionSystem ts = runQuery(impl);
+                boolean passed = ts.isImplementation();
+                returnlist.add(String.valueOf(passed));
+                if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
             //add if contains specification or smth else
         }
