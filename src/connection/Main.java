@@ -27,7 +27,20 @@ class Main {
                 return ENGINE_NAME + " Version: " + VERSION;
             case "-rq":
                 try {
-                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1));
+                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), false);
+                    if (temp.size() == 1) return temp.get(0);
+                    else {
+                        StringBuilder str = new StringBuilder();
+                        for (int i = 0; i < temp.size(); i++)
+                            str.append(temp.get(i));
+                        return str.toString();
+                    }
+                } catch (Exception e) {
+                    return "Error: " + e.getMessage();//e.printStackTrace();
+                }
+            case "-rqrr":
+                try {
+                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), true);
                     if (temp.size() == 1) return temp.get(0);
                     else {
                         StringBuilder str = new StringBuilder();

@@ -38,7 +38,7 @@ public class JSONParser {
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList, makeInpEnabled);
     }
-    public static JSONObject writeRefinement(Node refTree){
+    public static String writeRefinement(Node refTree){
         JSONObject obj = new JSONObject();
         JSONArray list1 = new JSONArray();
         List<Node> children = refTree.getChildren();
@@ -54,7 +54,7 @@ public class JSONParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return obj;
+        return obj.toJSONString();
     }
     private static JSONArray helper(List<Node> children, JSONArray fList){
         JSONArray list1 = new JSONArray();

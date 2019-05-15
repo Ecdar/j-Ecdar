@@ -16,7 +16,7 @@ public class Controller {
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public static List<String> handleRequest(String locQuery) throws Exception {
+    public static List<String> handleRequest(String locQuery, boolean trace) throws Exception {
         Queries.clear();
 
         // Separates location and Queries
@@ -30,7 +30,7 @@ public class Controller {
 
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
-        return runQueries();
+        return runQueries(trace);
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
@@ -40,7 +40,7 @@ public class Controller {
         }
     }
 
-    private static List<String> runQueries() throws Exception {
+    private static List<String> runQueries(boolean trace) throws Exception {
         List<String> returnlist = new ArrayList<>();
 
         for (int i = 0; i < Queries.size(); i++) {
@@ -49,11 +49,29 @@ public class Controller {
             if (Queries.get(i).contains("refinement")) {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
                 Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
-                boolean refCheck = ref.check();
-                returnlist.add(refCheck ? "true" : "false");
+                boolean refCheck;
+                if(trace) {
+                    refCheck = ref.check(true);
+                    returnlist.add(refCheck ? "true " + JSONParser.writeRefinement(ref.getTree()) : "false ");
+                }
+                else {
+                    refCheck = ref.check();
+                    returnlist.add(refCheck ? "true " : "false ");
+                }
+
                 if (i == Queries.size()-1 && refCheck) continue;
                 returnlist.add("\n");
                 if (!refCheck) returnlist.add(ref.getErrMsg());
+            }
+            if (Queries.get(i).contains("consistency")) {
+                String cons = Queries.get(i).replace("consistency:", "");
+                returnlist.add(String.valueOf(runQuery(cons).isConsistent()));
+
+            }
+            if (Queries.get(i).contains("implementation")) {
+                String impl = Queries.get(i).replace("implementation:", "");
+                runQuery(impl).isImplementation();
+                returnlist.add(String.valueOf(runQuery(impl).isImplementation()));
             }
             //add if contains specification or smth else
         }

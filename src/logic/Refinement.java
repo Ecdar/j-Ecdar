@@ -56,13 +56,13 @@ public class Refinement {
         return checkRef();
     }
 
-    /*public Node getTree() {
+    public Node getTree() {
         return refTree;
     }
 
     public List<StatePair> getTrace() {
         return currNode.getTrace();
-    }*/
+    }
 
     public boolean checkPreconditions() {
         boolean precondMet = true;
