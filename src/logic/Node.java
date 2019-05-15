@@ -43,6 +43,9 @@ public class Node {
 
         return res.get(0);
     }
+    public List<Node> getChildren(){
+        return children;
+    }
 
     public List<StatePair> getTrace() {
         Node curr = this;

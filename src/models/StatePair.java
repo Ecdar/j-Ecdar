@@ -15,7 +15,9 @@ public class StatePair {
     public State getRight() {
         return right;
     }
-
+    public String prettyPrint(){
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvZone();
+    }
     @Override
     public String toString() {
         //return "L=" + left + ", R=" + right;
