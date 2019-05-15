@@ -233,6 +233,72 @@ public class QueryParserTest {
     }
 
     @Test
+    public void testConsistencyOne() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity consistency:HalfAdm1", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testConsistencyConj() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity consistency:HalfAdm1&&HalfAdm2", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testConsistencyComp() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity consistency:Administration||Machine", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testConsistencyCompConj() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity consistency:Administration||Machine&&Researcher", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testImplementationComp() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml implementation:G8||G13", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testFailImplementationComp() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml implementation:G8||G15", false).get(0), "false");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testImplementationOne() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml implementation:G8", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testFailImplementationOne() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml implementation:G9", false).get(0), "false");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
     public void testAdm2RefinesConj() {
         try {
             assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:Adm2<=(HalfAdm1&&HalfAdm2)", false).get(0), "true");
