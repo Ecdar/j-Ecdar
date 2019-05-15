@@ -56,7 +56,7 @@ public class Controller {
                 }
                 else {
                     refCheck = ref.check();
-                    returnlist.add(refCheck ? "true " : "false ");
+                    returnlist.add(refCheck ? "true" : "false");
                 }
 
                 if (i == Queries.size()-1 && refCheck) continue;
@@ -65,7 +65,7 @@ public class Controller {
             }
             if (Queries.get(i).contains("consistency")) {
                 String cons = Queries.get(i).replace("consistency:", "");
-                returnlist.add(String.valueOf(runQuery(cons).isConsistent()));
+                returnlist.add(String.valueOf(runQuery(cons).isFullyConsistent()));
 
             }
             if (Queries.get(i).contains("implementation")) {

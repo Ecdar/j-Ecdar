@@ -29,12 +29,14 @@ public class ImplementationTest {
     public void testG1(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[1]);
 
+        
         assertFalse(ts.isImplementation());
     }
     @Test
     public void testG2(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[2]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -42,6 +44,7 @@ public class ImplementationTest {
     public void testG3(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[3]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -49,6 +52,7 @@ public class ImplementationTest {
     public void testG4(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[4]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -56,6 +60,7 @@ public class ImplementationTest {
     public void testG5(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -63,6 +68,7 @@ public class ImplementationTest {
     public void G8G13IsImplementation(){
         TransitionSystem ts = new Composition(new TransitionSystem[]{G8, G13});
 
+        
         assertTrue(ts.isImplementation());
     }
 
@@ -70,13 +76,14 @@ public class ImplementationTest {
     public void G7G13IsNotImplementation(){
         TransitionSystem ts = new Composition(new TransitionSystem[]{G7, G13});
 
+        
         assertFalse(ts.isImplementation());
     }
 
     @Test
     public void testG6(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[6]);
-
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -94,6 +101,8 @@ public class ImplementationTest {
     public void testG9(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[9]);
 
+
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -101,6 +110,7 @@ public class ImplementationTest {
     public void testG10(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[10]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -108,6 +118,7 @@ public class ImplementationTest {
     public void testG11(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[11]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -115,6 +126,7 @@ public class ImplementationTest {
     public void testG12(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[12]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -127,6 +139,7 @@ public class ImplementationTest {
     public void testG14(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[14]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -134,6 +147,7 @@ public class ImplementationTest {
     public void testG15(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[15]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -141,6 +155,7 @@ public class ImplementationTest {
     public void testG16(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[16]);
 
+        
         assertFalse(ts.isImplementation());
     }
 
@@ -148,6 +163,7 @@ public class ImplementationTest {
     public void testG17(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[17]);
 
+        
         assertTrue(ts.isImplementation());
     }
 }

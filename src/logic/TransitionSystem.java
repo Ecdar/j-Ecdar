@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
     final List<Clock> clocks;
-    private List<String> inconsistentTs = new ArrayList<>();
+    private StringBuilder lastErr = new StringBuilder();
 
     TransitionSystem() {
         this.clocks = new ArrayList<>();
@@ -88,33 +88,68 @@ public abstract class TransitionSystem {
         return actions;
     }
 
-    public List<String> getInconsistentTs() {
-        return inconsistentTs;
+    public StringBuilder getLastErr() {
+        return lastErr;
     }
+
+    public void clearLastErr() {
+        lastErr = new StringBuilder();
+    }
+
 
     public boolean isDeterministic(){
-        List<SimpleTransitionSystem> systems = getSystems();
-
-        for (TransitionSystem ts : systems){
-            if(!ts.isDeterministic())
-                return false;
-        }
-        return true;
-    }
-
-    public boolean isConsistent() {
-        boolean isConsistent = true;
+        boolean isDeterministic = true;
+        List<String> nondetermTs = new ArrayList<>();
 
         List<SimpleTransitionSystem> systems = getSystems();
 
         for (SimpleTransitionSystem ts : systems){
-            if(!ts.isConsistent()) {
+            if(!ts.isDeterministicHelper()){
+                isDeterministic = false;
+                nondetermTs.add(ts.getName());
+            }
+        }
+        buildErrMessage(nondetermTs, "non-deterministic");
+        return isDeterministic;
+    }
+
+    public boolean isLeastConsistent(){
+        return isConsistent(true);
+    }
+
+    public boolean isFullyConsistent(){
+        return isConsistent(false);
+    }
+
+    private boolean isConsistent(boolean canPrune) {
+        boolean isConsistent = isDeterministic();
+        List<String> inconsistentTs = new ArrayList<>();
+
+        List<SimpleTransitionSystem> systems = getSystems();
+
+        for (SimpleTransitionSystem ts : systems){
+            if(!ts.isConsistentHelper(canPrune)) {
                 isConsistent = false;
                 inconsistentTs.add(ts.getName());
             }
         }
 
+        buildErrMessage(inconsistentTs, "inconsistent");
         return isConsistent;
+    }
+
+    public boolean isImplementation(){
+        boolean isImpl = isDeterministic();
+        if(!isFullyConsistent()) isImpl = false;
+        List<String> nonImpl = new ArrayList<>();
+        List<SimpleTransitionSystem> systems = getSystems();
+
+        for (SimpleTransitionSystem ts : systems){
+            if(!ts.isImplementationHelper())
+                isImpl = false;
+        }
+        buildErrMessage(nonImpl, "not output urgent");
+        return isImpl;
     }
 
     public List<Integer> getMaxBounds(){
@@ -125,16 +160,6 @@ public abstract class TransitionSystem {
             res.addAll(ts.getMaxBounds());
         }
         return res;
-    }
-
-    public boolean isImplementation(){
-        List<SimpleTransitionSystem> systems = getSystems();
-
-        for (TransitionSystem ts : systems){
-            if(!ts.isImplementation())
-                return false;
-        }
-        return true;
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel){
@@ -173,8 +198,26 @@ public abstract class TransitionSystem {
                 moves.add(newMove);
             }
         }
-
         return moves;
+    }
+
+    public void buildErrMessage(List<String> inc, String checkType) {
+        if (inc.size() == 1) {
+            lastErr.append("Automaton ");
+            lastErr.append(inc.get(0));
+            lastErr.append(" is ").append(checkType).append(".\n");
+        } else {
+            lastErr.append("Automata ");
+            for (int i = 0; i < inc.size(); i++) {
+                if (i == inc.size() - 1)
+                    lastErr.append(inc.get(i));
+                else {
+                    lastErr.append(inc.get(i));
+                    lastErr.append(", ");
+                }
+            }
+            lastErr.append(" are ").append(checkType).append(".\n");
+        }
     }
 
     @Override

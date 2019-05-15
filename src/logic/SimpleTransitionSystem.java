@@ -44,7 +44,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     // Checks if automaton is deterministic
-    public boolean isDeterministic() {
+    public boolean isDeterministicHelper() {
         Set<Channel> actions = getActions();
 
         waiting = new ArrayDeque<>();
@@ -96,13 +96,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return false;
     }
 
-    public boolean isConsistent(){
-        return isConsistentHelper(true);
-    }
-
     public boolean isConsistentHelper(boolean canPrune) {
-        if (!isDeterministic())
-            return false;
+        //if (!isDeterministic())
+        //    return false;
         passed = new ArrayList<>();
         return checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
     }
@@ -155,10 +151,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         }
     }
 
-    public boolean isImplementation(){
-        if(!isConsistentHelper(false))
-            return false;
-
+    public boolean isImplementationHelper(){
         Set<Channel> outputs = getOutputs();
         Set<Channel> actions = getActions();
 

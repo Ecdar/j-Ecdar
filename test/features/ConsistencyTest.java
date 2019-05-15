@@ -32,157 +32,156 @@ public class ConsistencyTest {
 
     @Test
     public void testG1(){
-        assertTrue(G1.isConsistent());
+        assertTrue(G1.isLeastConsistent());
     }
 
     @Test
     public void testG2(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[1]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG3(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[2]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG4(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[3]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG5(){
-        assertFalse(G5.isConsistent());
+        assertFalse(G5.isDeterministic() && G5.isLeastConsistent());
     }
 
     @Test
     public void G1G5IsNotConsistent(){
         TransitionSystem ts = new Composition(new TransitionSystem[]{G1, G5});
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
-    public void G1G8IsConsistent(){
+    public void G1G8isLeastConsistent(){
         TransitionSystem ts = new Composition(new TransitionSystem[]{G1, G8});
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG6(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG7(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[6]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG8(){
-        assertTrue(G8.isConsistent());
+        assertTrue(G8.isLeastConsistent());
     }
 
     @Test
     public void testG9(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[8]);
-
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG10(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[9]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG11(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[10]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG12(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[11]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG13(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[12]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG14(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[13]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG15(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[14]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG16(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[15]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG17(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[16]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG18(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[17]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG19(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[18]);
 
-        assertFalse(ts.isConsistent());
+        assertFalse(ts.isLeastConsistent());
     }
 
     @Test
     public void testG20(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[19]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
     public void testG21(){
         TransitionSystem ts = new SimpleTransitionSystem(automata[20]);
 
-        assertTrue(ts.isConsistent());
+        assertTrue(ts.isLeastConsistent());
     }
 
     @Test
@@ -193,6 +192,7 @@ public class ConsistencyTest {
 
         Refinement ref = new Refinement(comp, G21);
         assertFalse(ref.check());
-        assertEquals(ref.getErrMsg(), "Automata G3, G4, G5, G7, G9, G10, G12 are inconsistent.\n");
+        assertEquals(ref.getErrMsg(), "Automaton G9 is non-deterministic.\n" +
+                        "Automata G3, G4, G5, G7, G10, G12 are inconsistent.\n");
     }
 }

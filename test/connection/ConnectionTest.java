@@ -29,7 +29,6 @@ public class ConnectionTest {
 
     @Test
     public void testRunSingleQuery2() {
-        String x = Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec");
         assertEquals("true", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec")));
     }
 
@@ -47,7 +46,6 @@ public class ConnectionTest {
     @Test
     public void testRunMultipleQueries2() {
         String query = "-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3";
-        String s = Main.chooseCommand(query);
         assertEquals("true\nfalse\nDuplicate process instance: Machine3.\n", (Main.chooseCommand(query)));
     }
 

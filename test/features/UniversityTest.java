@@ -199,7 +199,7 @@ public class UniversityTest {
     }
 
     @Test
-    public void testCompOfCompRefinesSpec1() {
+    public void testCompOfCompRefinesSpec() {
         assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{adm,
                         new Composition(new TransitionSystem[]{machine, researcher})}),
