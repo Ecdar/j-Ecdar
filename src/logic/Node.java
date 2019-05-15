@@ -43,7 +43,8 @@ public class Node {
 
         return res.get(0);
     }
-    public List<Node> getChildren(){
+
+    public List<Node> getChildren() {
         return children;
     }
 
@@ -51,7 +52,7 @@ public class Node {
         Node curr = this;
         List<StatePair> trace = new ArrayList<>();
 
-        while(curr != null) {
+        while (curr != null) {
             trace.add(curr.getStatePair());
             curr = curr.getParent();
         }

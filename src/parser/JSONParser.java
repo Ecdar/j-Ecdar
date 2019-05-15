@@ -5,16 +5,11 @@ import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class JSONParser {
 
     private static ArrayList<JSONObject> objectList = new ArrayList<>();
@@ -38,40 +33,43 @@ public class JSONParser {
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList, makeInpEnabled);
     }
-    public static String writeRefinement(Node refTree){
+
+    public static String writeRefinement(Node refTree) {
         JSONObject obj = new JSONObject();
-        JSONArray list1 = new JSONArray();
-        List<Node> children = refTree.getChildren();
-        JSONObject obj1 = new JSONObject();
-        obj1.put("left", refTree.getStatePair().getLeft().getLocation());
-        obj1.put("right", refTree.getStatePair().getRight().getLocation());
-        obj1.put("zone", refTree.getStatePair().getLeft().getInvZone());
-        list1.add(obj1);
-        obj.put("Initial StatePair", list1);
-        helper(children, list1);
-        try (FileWriter file = new FileWriter("c:\\projects\\test1.json")) {
+        obj.put("initialStatePair", buildNode(refTree, buildChildren(refTree)));
+
+        try (FileWriter file = new FileWriter("./refTree.json")) {
             file.write(obj.toJSONString());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return obj.toJSONString();
     }
-    private static JSONArray helper(List<Node> children, JSONArray fList){
-        JSONArray list1 = new JSONArray();
-        for(int i = 0; i < children.size();i++ ){
-            JSONObject obj = new JSONObject();
-            JSONObject obj1 = new JSONObject();
-            obj1.put("left", children.get(i).getStatePair().getLeft().getLocation());
-            obj1.put("right", children.get(i).getStatePair().getRight().getLocation());
-            obj1.put("zone", children.get(i).getStatePair().getLeft().getInvZone());
-            obj.put("StatePair", obj1);
-            list1.add(obj);
-            helper(children.get(i).getChildren(), list1);
-        }
-        if(children.size() != 0)
-        fList.add(list1);
-        return fList;
+
+    private static JSONObject buildNode(Node node, JSONArray children) {
+        JSONObject obj = new JSONObject();
+
+        obj.put("left", node.getStatePair().getLeft().getLocation().toString());
+        obj.put("right", node.getStatePair().getRight().getLocation().toString());
+        obj.put("zone", node.getStatePair().getLeft().getInvZone());
+        obj.put("children", children);
+
+        return obj;
     }
+
+    private static JSONArray buildChildren(Node parent) {
+        JSONArray arr = new JSONArray();
+
+        for (Node child : parent.getChildren()) {
+            JSONObject childObj = new JSONObject();
+            childObj.put("statePair", buildNode(child, buildChildren(child)));
+            arr.add(childObj);
+        }
+
+        return arr;
+    }
+
     //---------------------------Testing-----------------
 
     private static ArrayList<JSONObject> parseFiles(ArrayList<String> locations) {
