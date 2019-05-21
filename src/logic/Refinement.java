@@ -1,7 +1,5 @@
 package logic;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import models.*;
 
 import java.util.*;
@@ -10,7 +8,7 @@ import java.util.stream.Collectors;
 public class Refinement {
     private final TransitionSystem ts1, ts2;
     private final List<Clock> allClocks;
-    private final Multimap<LocationPair, StatePair> passed;
+    private final Map<LocationPair, List<StatePair>> passed;
     private final Deque<StatePair> waiting;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
     private GraphNode refGraph;
@@ -25,7 +23,7 @@ public class Refinement {
         this.ts1 = system1;
         this.ts2 = system2;
         this.waiting = new ArrayDeque<>();
-        this.passed = ArrayListMultimap.create();
+        this.passed = new HashMap<>();
 
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
@@ -134,7 +132,12 @@ public class Refinement {
             State newState2 = new State(right);
             // mark the pair of states as visited
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
-            passed.put(locPair, new StatePair(newState1, newState2, currNode));
+            List<StatePair> statePairs = new ArrayList<>();
+            if (passed.containsKey(locPair)) {
+                statePairs = passed.get(locPair);
+            }
+            statePairs.add(new StatePair(newState1, newState2, currNode));
+            passed.put(locPair, statePairs);
 
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
