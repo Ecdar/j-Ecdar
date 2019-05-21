@@ -195,7 +195,7 @@ public class UniversityTest {
 
     @Test
     public void testCompRefinesSpec() {
-        assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check(true));
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check());
     }
 
     @Test

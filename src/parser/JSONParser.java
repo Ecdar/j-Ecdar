@@ -1,6 +1,6 @@
 package parser;
 
-import logic.Node;
+import logic.GraphNode;
 import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,42 +32,6 @@ public class JSONParser {
 
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList, makeInpEnabled);
-    }
-
-    public static String writeRefinement(Node refTree) {
-        JSONObject obj = new JSONObject();
-        obj.put("initialStatePair", buildNode(refTree, buildChildren(refTree)));
-
-        try (FileWriter file = new FileWriter("./refTree.json")) {
-            file.write(obj.toJSONString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return obj.toJSONString();
-    }
-
-    private static JSONObject buildNode(Node node, JSONArray children) {
-        JSONObject obj = new JSONObject();
-
-        obj.put("left", node.getStatePair().getLeft().getLocation().toString());
-        obj.put("right", node.getStatePair().getRight().getLocation().toString());
-        obj.put("zone", node.getStatePair().getLeft().getInvZone());
-        obj.put("children", children);
-
-        return obj;
-    }
-
-    private static JSONArray buildChildren(Node parent) {
-        JSONArray arr = new JSONArray();
-
-        for (Node child : parent.getChildren()) {
-            JSONObject childObj = new JSONObject();
-            childObj.put("statePair", buildNode(child, buildChildren(child)));
-            arr.add(childObj);
-        }
-
-        return arr;
     }
 
     //---------------------------Testing-----------------

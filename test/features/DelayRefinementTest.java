@@ -324,7 +324,7 @@ public class DelayRefinementTest {
 
     @Test
     public void T6RefinesT5() {
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check(true));
     }
 
     @Test

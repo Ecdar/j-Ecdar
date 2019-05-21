@@ -53,7 +53,7 @@ public class Controller {
                 boolean refCheck;
                 if(trace) {
                     refCheck = ref.check(true);
-                    returnlist.add(refCheck ? "true " + JSONParser.writeRefinement(ref.getTree()) : "false ");
+                    returnlist.add(refCheck ? "true " : "false ");
                 }
                 else {
                     refCheck = ref.check();

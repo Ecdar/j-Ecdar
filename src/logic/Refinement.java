@@ -11,8 +11,9 @@ public class Refinement {
     private final Deque<StatePair> waiting;
     private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
-    private Node refTree;
-    private Node currNode;
+    private GraphNode refGraph;
+    private GraphNode currNode;
+    private GraphNode supersetNode;
     private int treeSize;
     private int[] maxBounds;
     private static boolean RET_REF = false;
@@ -56,12 +57,8 @@ public class Refinement {
         return checkRef();
     }
 
-    public Node getTree() {
-        return refTree;
-    }
-
-    public List<StatePair> getTrace() {
-        return currNode.getTrace();
+    public GraphNode getTree() {
+        return refGraph;
     }
 
     public boolean checkPreconditions() {
@@ -116,26 +113,16 @@ public class Refinement {
             return false;
 
         if (RET_REF) {
-            refTree = new Node(waiting.getFirst());
-            currNode = refTree;
+            refGraph = new GraphNode(waiting.getFirst());
+            currNode = refGraph;
             treeSize++;
         }
 
         while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
 
-            if (RET_REF) {
-                Node child = currNode.getChild(curr);
-                if (child != null)
-                    currNode = child;
-                else {
-                    if (currNode.getParent() != null) {
-                        child = currNode.getParent().getChild(curr);
-                        if (child != null)
-                            currNode = child;
-                    }
-                }
-            }
+            if (RET_REF)
+                currNode = curr.getNode();
 
             State left = curr.getLeft();
             State right = curr.getRight();
@@ -144,7 +131,7 @@ public class Refinement {
             State newState1 = new State(left);
             State newState2 = new State(right);
             // mark the pair of states as visited
-            passed.add(new StatePair(newState1, newState2));
+            passed.add(new StatePair(newState1, newState2, currNode));
 
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
@@ -196,8 +183,8 @@ public class Refinement {
         return new StatePair(target1, target2);
     }
 
-    private List<StatePair> createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
-        List<StatePair> pairs = new ArrayList<>();
+    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
+        boolean pairFound = false;
 
         List<Zone> gzLeft = trans1.stream().map(Transition::getGuardZone).collect(Collectors.toList());
         List<Zone> gzRight = trans2.stream().map(Transition::getGuardZone).collect(Collectors.toList());
@@ -207,16 +194,32 @@ public class Refinement {
 
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (!Federation.fedMinusFed(fedL, fedR).isEmpty())
-            return pairs;
+            return false;
 
         for (Transition transition1 : trans1) {
             for (Transition transition2 : trans2) {
                 StatePair pair = buildStatePair(transition1, transition2);
-                if (pair != null)
-                    pairs.add(pair);
+                if (pair != null) {
+                    pairFound = true;
+                    if (!listContainsStatePair(pair, true) && !listContainsStatePair(pair, false)) {
+                        waiting.add(pair);
+                        if (RET_REF) {
+                            GraphEdge edge = currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
+                            edge.getTarget().addPredecessor(edge);
+                            treeSize++;
+                        }
+                    } else {
+                        if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
+                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), true);
+                            currNode.addSuccessor(edge);
+                            supersetNode.addPredecessor(edge);
+                        }
+                    }
+                }
             }
         }
-        return pairs;
+
+        return pairFound;
     }
 
     private boolean checkInputs(State state1, State state2) {
@@ -249,19 +252,8 @@ public class Refinement {
                     transitions2.add(loop);
                 }
 
-                List<StatePair> pairs = isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2);
-                if (pairs.isEmpty())
+                if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
                     return false;
-
-                for (StatePair pair : pairs) {
-                    if (!listContainsStatePair(pair, true) && !listContainsStatePair(pair, false)) {
-                        waiting.add(pair);
-                        if (RET_REF) {
-                            currNode.addChild(pair);
-                            treeSize++;
-                        }
-                    }
-                }
             }
         }
 
@@ -281,6 +273,7 @@ public class Refinement {
                     passedRight.getLocation().equals(currRight.getLocation())) {
                 if (currLeft.getInvZone().isSubset(passedLeft.getInvZone()) &&
                         currRight.getInvZone().isSubset(passedRight.getInvZone())) {
+                    supersetNode = passedState.getNode();
                     return true;
                 }
             }
