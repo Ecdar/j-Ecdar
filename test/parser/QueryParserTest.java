@@ -231,7 +231,70 @@ public class QueryParserTest {
             fail();
         }
     }
-
+    @Test
+    public void testDetermOne() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity determinism:HalfAdm1", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermConj() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity determinism:HalfAdm1&&HalfAdm2", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermComp() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity determinism:Administration||Machine", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermCompConj() {
+        try {
+            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity determinism:Administration||Machine&&Researcher", false).get(0), "true");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermOneFail() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml determinism:G9", false).get(0), "false");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermCompFail() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml determinism:G9||G10", false).get(0), "false");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermConjFail() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml determinism:G9&&G10", false).get(0), "false");
+        } catch (Exception e) {
+            fail();
+        }
+    }
+    @Test
+    public void testDetermConjCompFail() {
+        try {
+            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml determinism:G9&&G10||G11", false).get(0), "false");
+        } catch (Exception e) {
+            fail();
+        }
+    }
     @Test
     public void testConsistencyOne() {
         try {

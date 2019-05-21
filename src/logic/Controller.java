@@ -78,6 +78,13 @@ public class Controller {
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
+            if (Queries.get(i).contains("determinism")) {
+                String impl = Queries.get(i).replace("determinism:", "");
+                TransitionSystem ts = runQuery(impl);
+                boolean passed = ts.isDeterministic();
+                returnlist.add(String.valueOf(passed));
+                if(!passed) returnlist.add("\n" + ts.getLastErr());
+            }
             //add if contains specification or smth else
         }
 
