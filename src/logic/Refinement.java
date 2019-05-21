@@ -132,12 +132,11 @@ public class Refinement {
             State newState2 = new State(right);
             // mark the pair of states as visited
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
-            List<StatePair> statePairs = new ArrayList<>();
-            if (passed.containsKey(locPair)) {
-                statePairs = passed.get(locPair);
-            }
-            statePairs.add(new StatePair(newState1, newState2, currNode));
-            passed.put(locPair, statePairs);
+            StatePair pair = new StatePair(newState1, newState2, currNode);
+            if (passed.containsKey(locPair))
+                passed.get(locPair).add(pair);
+            else
+                passed.put(locPair, new ArrayList<>(Collections.singletonList(pair)));
 
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
