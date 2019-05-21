@@ -1,13 +1,14 @@
 package logic;
 
 import models.Edge;
+import models.Zone;
 
 import java.util.List;
 
 public class GraphEdge {
     private GraphNode source, target;
     private List<Edge> edgesL, edgesR;
-    private boolean leadsToSuperset = false;
+    private Zone subsetZone;
 
     public GraphEdge(GraphNode source, GraphNode target, List<Edge> edgesL, List<Edge> edgesR) {
         this.source = source;
@@ -16,9 +17,9 @@ public class GraphEdge {
         this.edgesR = edgesR;
     }
 
-    public GraphEdge(GraphNode source, GraphNode target, List<Edge> edgesL, List<Edge> edgesR, boolean leadsToSuperset) {
+    public GraphEdge(GraphNode source, GraphNode target, List<Edge> edgesL, List<Edge> edgesR, Zone subsetZone) {
         this(source, target, edgesL, edgesR);
-        this.leadsToSuperset = leadsToSuperset;
+        this.subsetZone = subsetZone;
     }
 
     public GraphNode getSource() {

@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class Refinement {
     private final TransitionSystem ts1, ts2;
     private final List<Clock> allClocks;
+    private final Map<LocationPair, List<StatePair>> passed;
     private final Deque<StatePair> waiting;
-    private final List<StatePair> passed;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
     private GraphNode refGraph;
     private GraphNode currNode;
@@ -23,7 +23,7 @@ public class Refinement {
         this.ts1 = system1;
         this.ts2 = system2;
         this.waiting = new ArrayDeque<>();
-        this.passed = new ArrayList<>();
+        this.passed = new HashMap<>();
 
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
@@ -131,7 +131,13 @@ public class Refinement {
             State newState1 = new State(left);
             State newState2 = new State(right);
             // mark the pair of states as visited
-            passed.add(new StatePair(newState1, newState2, currNode));
+            LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
+            List<StatePair> statePairs = new ArrayList<>();
+            if (passed.containsKey(locPair)) {
+                statePairs = passed.get(locPair);
+            }
+            statePairs.add(new StatePair(newState1, newState2, currNode));
+            passed.put(locPair, statePairs);
 
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
@@ -201,7 +207,7 @@ public class Refinement {
                 StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null) {
                     pairFound = true;
-                    if (!listContainsStatePair(pair, true) && !listContainsStatePair(pair, false)) {
+                    if (!passedContainsStatePair(pair) && !waitingContainsStatePair(pair)) {
                         waiting.add(pair);
                         if (RET_REF) {
                             GraphEdge edge = currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
@@ -210,7 +216,7 @@ public class Refinement {
                         }
                     } else {
                         if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
-                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), true);
+                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), pair.getLeft().getInvZone());
                             currNode.addSuccessor(edge);
                             supersetNode.addPredecessor(edge);
                         }
@@ -260,20 +266,34 @@ public class Refinement {
         return true;
     }
 
-    private boolean listContainsStatePair(StatePair state, boolean isPassed) {
-        State currLeft = state.getLeft();
-        State currRight = state.getRight();
+    private boolean passedContainsStatePair(StatePair pair) {
+       LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
 
-        for (StatePair passedState : (isPassed ? passed : waiting)) {
+        if (passed.containsKey(locPair)) {
+            return listContainsStatePair(pair, passed.get(locPair));
+        }
+
+        return false;
+    }
+
+    private boolean waitingContainsStatePair(StatePair pair) {
+        return listContainsStatePair(pair, waiting);
+    }
+
+    private boolean listContainsStatePair(StatePair pair, Iterable<StatePair> pairs) {
+        State currLeft = pair.getLeft();
+        State currRight = pair.getRight();
+
+        for (StatePair state : pairs) {
             // check for zone inclusion
-            State passedLeft = passedState.getLeft();
-            State passedRight = passedState.getRight();
+            State passedLeft = state.getLeft();
+            State passedRight = state.getRight();
 
             if (passedLeft.getLocation().equals(currLeft.getLocation()) &&
                     passedRight.getLocation().equals(currRight.getLocation())) {
                 if (currLeft.getInvZone().isSubset(passedLeft.getInvZone()) &&
                         currRight.getInvZone().isSubset(passedRight.getInvZone())) {
-                    supersetNode = passedState.getNode();
+                    supersetNode = state.getNode();
                     return true;
                 }
             }
