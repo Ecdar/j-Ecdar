@@ -1,5 +1,6 @@
 package parser;
 
+import logic.GraphEdge;
 import logic.GraphNode;
 import models.*;
 import org.json.simple.JSONArray;
@@ -33,7 +34,40 @@ public class JSONParser {
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList, makeInpEnabled);
     }
-
+    public static String writeRefinement(GraphNode refTree){
+        JSONObject obj = new JSONObject();
+        JSONArray list1 = new JSONArray();
+        List<GraphEdge> children = refTree.getSuccessors();
+        JSONObject obj1 = new JSONObject();
+        obj1.put("left", refTree.getStatePair().getLeft().getLocation());
+        obj1.put("right", refTree.getStatePair().getRight().getLocation());
+        obj1.put("zone", refTree.getStatePair().getLeft().getInvZone());
+        list1.add(obj1);
+        obj.put("Initial StatePair", list1);
+        helper(children, list1);
+        try (FileWriter file = new FileWriter("c:\\projects\\test1.json")) {
+            file.write(obj.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return obj.toJSONString();
+    }
+    private static JSONArray helper(List<GraphEdge> children, JSONArray fList){
+        JSONArray list1 = new JSONArray();
+        for(int i = 0; i < children.size();i++ ){
+            JSONObject obj = new JSONObject();
+            JSONObject obj1 = new JSONObject();
+            obj1.put("left", children.get(i).getTarget().getStatePair().getLeft().getLocation());
+            obj1.put("right", children.get(i).getTarget().getStatePair().getRight().getLocation());
+            obj1.put("zone", children.get(i).getTarget().getStatePair().getLeft().getInvZone());
+            obj.put("StatePair", obj1);
+            list1.add(obj);
+            helper(children.get(i).getTarget().getSuccessors(), list1);
+        }
+        if(children.size() != 0)
+            fList.add(list1);
+        return fList;
+    }
     //---------------------------Testing-----------------
 
     private static ArrayList<JSONObject> parseFiles(ArrayList<String> locations) {
