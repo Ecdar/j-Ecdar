@@ -224,13 +224,9 @@ public class Refinement {
                         }
                     } else {
                         if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
-                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges());
+                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), pair.getLeft().getInvZone());
                             currNode.addSuccessor(edge);
                             supersetNode.addPredecessor(edge);
-                            if(currNode.getStatePair().getLeft().getInvZone().equals(supersetNode.getStatePair().getLeft().getInvZone()))
-                            {
-                                edge.setSubsetZone(pair.getLeft().getInvZone());
-                            }
                         }
                     }
                 }
