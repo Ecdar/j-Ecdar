@@ -17,6 +17,7 @@ public class Refinement {
     private int treeSize;
     private int[] maxBounds;
     private static boolean RET_REF = false;
+    public static int NODE_ID = 0;
     private StringBuilder errMsg = new StringBuilder();
 
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
@@ -48,12 +49,13 @@ public class Refinement {
     }
 
     public boolean check(boolean ret_ref) {
-        RET_REF = ret_ref;
+        Refinement.NODE_ID = 0;
+        Refinement.RET_REF = ret_ref;
         return checkRef();
     }
 
     public boolean check() {
-        RET_REF = false;
+        Refinement.RET_REF = false;
         return checkRef();
     }
 

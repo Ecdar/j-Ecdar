@@ -9,7 +9,7 @@ import java.util.List;
 public class GraphNode {
     private StatePair statePair;
     private List<GraphEdge> successors, predecessors;
-
+    private int nodeId;
 
 
     public GraphNode(StatePair statePair) {
@@ -17,6 +17,8 @@ public class GraphNode {
         this.successors = new ArrayList<>();
         this.predecessors = new ArrayList<>();
         this.statePair.setNode(this);
+        this.nodeId = Refinement.NODE_ID;
+        Refinement.NODE_ID ++;
     }
 
     public GraphEdge constructSuccessor(StatePair pair, List<Edge> edgesL, List<Edge> edgesR) {
@@ -31,6 +33,10 @@ public class GraphNode {
         return statePair;
     }
 
+    public int getNodeId() {
+        return nodeId;
+    }
+
     public void addSuccessor(GraphEdge succ) {
         this.successors.add(succ);
     }
@@ -41,9 +47,5 @@ public class GraphNode {
 
     public List<GraphEdge> getSuccessors() {
         return successors;
-    }
-
-    public StatePair getStatePair() {
-        return statePair;
     }
 }
