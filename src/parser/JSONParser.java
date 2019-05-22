@@ -36,37 +36,46 @@ public class JSONParser {
     }
     public static String writeRefinement(GraphNode refTree){
         JSONObject obj = new JSONObject();
-        JSONArray list1 = new JSONArray();
         List<GraphEdge> children = refTree.getSuccessors();
-        JSONObject obj1 = new JSONObject();
-        obj1.put("left", refTree.getStatePair().getLeft().getLocation());
-        obj1.put("right", refTree.getStatePair().getRight().getLocation());
-        obj1.put("zone", refTree.getStatePair().getLeft().getInvZone());
-        list1.add(obj1);
-        obj.put("Initial StatePair", list1);
-        helper(children, list1);
-        try (FileWriter file = new FileWriter("c:\\projects\\test1.json")) {
+        obj.put("initial sp id", ""+refTree.getNodeId());
+        obj.put("left", ""+refTree.getStatePair().getLeft().getLocation());
+        obj.put("right", ""+refTree.getStatePair().getRight().getLocation());
+        obj.put("zone", ""+refTree.getStatePair().getLeft().getInvZone());
+        obj.put("transitions", helper(children));
+        try (FileWriter file = new FileWriter("./refTree.json")) {
             file.write(obj.toJSONString());
         } catch (IOException e) {
             e.printStackTrace();
         }
         return obj.toJSONString();
     }
-    private static JSONArray helper(List<GraphEdge> children, JSONArray fList){
-        JSONArray list1 = new JSONArray();
-        for(int i = 0; i < children.size();i++ ){
-            JSONObject obj = new JSONObject();
-            JSONObject obj1 = new JSONObject();
-            obj1.put("left", children.get(i).getTarget().getStatePair().getLeft().getLocation());
-            obj1.put("right", children.get(i).getTarget().getStatePair().getRight().getLocation());
-            obj1.put("zone", children.get(i).getTarget().getStatePair().getLeft().getInvZone());
-            obj.put("StatePair", obj1);
-            list1.add(obj);
-            helper(children.get(i).getTarget().getSuccessors(), list1);
+    private static JSONArray helper(List<GraphEdge> children){
+        JSONArray transitions = new JSONArray();
+        for(int i = 0; i < children.size();i++ ) {
+            JSONObject transition = new JSONObject();
+
+            if (children.get(i).getSubsetZone() == null) {
+                JSONObject statePair = new JSONObject();
+                statePair.put("state pair id", ""+children.get(i).getTarget().getNodeId());
+                statePair.put("left", ""+children.get(i).getTarget().getStatePair().getLeft().getLocation());
+                statePair.put("right", ""+children.get(i).getTarget().getStatePair().getRight().getLocation());
+                statePair.put("zone", ""+children.get(i).getTarget().getStatePair().getLeft().getInvZone());
+                transition.put("source sp id", ""+children.get(i).getSource().getNodeId());
+                transition.put("target sp id", ""+children.get(i).getTarget().getNodeId());
+                transition.put("target sp", statePair);
+                transitions.add(transition);
+                if(children.get(i).getTarget().getSuccessors().size() !=0)
+                statePair.put("transitions", helper(children.get(i).getTarget().getSuccessors()));
+            }
+            else{
+                transition.put("source sp id", ""+children.get(i).getSource().getNodeId());
+                transition.put("target sp id", ""+children.get(i).getTarget().getNodeId());
+                transitions.add(transition);
+            }
         }
-        if(children.size() != 0)
-            fList.add(list1);
-        return fList;
+
+
+        return transitions;
     }
     //---------------------------Testing-----------------
 

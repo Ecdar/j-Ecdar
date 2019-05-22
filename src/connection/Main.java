@@ -38,7 +38,7 @@ class Main {
                 } catch (Exception e) {
                     return "Error: " + e.getMessage();//e.printStackTrace();
                 }
-            case "-rqrr":
+            case "-rqrrr":
                 try {
                     List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), true);
                     if (temp.size() == 1) return temp.get(0);

@@ -45,4 +45,12 @@ public class GraphEdge {
     public void setTarget(GraphNode target) {
         this.target = target;
     }
+
+    public List<Edge> getEdgesL() {
+        return edgesL;
+    }
+
+    public List<Edge> getEdgesR() {
+        return edgesR;
+    }
 }
