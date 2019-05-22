@@ -6,6 +6,7 @@ import lib.DBMLib;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -151,6 +152,16 @@ public class Zone {
 
     public int[] getDbm() {
         return dbm;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Zone zone = (Zone) o;
+        return size == zone.size &&
+                actualSize == zone.actualSize &&
+                Arrays.equals(dbm, zone.dbm);
     }
 
     // Method to nicely print DBM for testing purposes.

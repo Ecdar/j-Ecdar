@@ -22,6 +22,14 @@ public class GraphEdge {
         this.subsetZone = subsetZone;
     }
 
+    public Zone getSubsetZone() {
+        return subsetZone;
+    }
+
+    public void setSubsetZone(Zone subsetZone) {
+        this.subsetZone = subsetZone;
+    }
+
     public GraphNode getSource() {
         return source;
     }

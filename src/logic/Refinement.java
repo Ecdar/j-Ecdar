@@ -149,9 +149,19 @@ public class Refinement {
                 return false;
 
         }
-
+        int passedSize = getHashMapTotalSize(passed);
         // if we got here it means refinement property holds
         return true;
+    }
+
+    public int getHashMapTotalSize(Map<LocationPair, List<StatePair>> map){
+        int result = 0;
+
+        for (Map.Entry<LocationPair, List<StatePair>> entry : map.entrySet()) {
+            result += entry.getValue().size();
+        }
+
+        return result;
     }
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
@@ -209,15 +219,18 @@ public class Refinement {
                     if (!passedContainsStatePair(pair) && !waitingContainsStatePair(pair)) {
                         waiting.add(pair);
                         if (RET_REF) {
-                            GraphEdge edge = currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
-                            edge.getTarget().addPredecessor(edge);
+                            currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
                             treeSize++;
                         }
                     } else {
                         if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
-                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), pair.getLeft().getInvZone());
+                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges());
                             currNode.addSuccessor(edge);
                             supersetNode.addPredecessor(edge);
+                            if(currNode.getStatePair().getLeft().getInvZone().equals(supersetNode.getStatePair().getLeft().getInvZone()))
+                            {
+                                edge.setSubsetZone(pair.getLeft().getInvZone());
+                            }
                         }
                     }
                 }
