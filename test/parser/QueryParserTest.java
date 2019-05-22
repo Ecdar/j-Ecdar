@@ -337,14 +337,14 @@ public class QueryParserTest {
         }
     }
 
-    @Test
-    public void testReturnRefinement() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/delayRefinement.xml refinement:T6<=T5", true).get(0), "true");
-        } catch (Exception e) {
-            fail();
-        }
-    }
+//    @Test
+//    public void testReturnRefinement() {
+//        try {
+//            assertEquals(Controller.handleRequest("-xml ./samples/xml/delayRefinement.xml refinement:T6<=T5", true).get(0), "true");
+//        } catch (Exception e) {
+//            fail();
+//        }
+//    }
 
 
     @Test
