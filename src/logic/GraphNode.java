@@ -38,4 +38,12 @@ public class GraphNode {
     public void addPredecessor(GraphEdge pred) {
         this.predecessors.add(pred);
     }
+
+    public List<GraphEdge> getSuccessors() {
+        return successors;
+    }
+
+    public StatePair getStatePair() {
+        return statePair;
+    }
 }
