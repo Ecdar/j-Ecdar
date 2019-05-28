@@ -1,7 +1,6 @@
 package logic;
 
 import models.Automaton;
-import models.Transition;
 import parser.JSONParser;
 import parser.XMLParser;
 
@@ -51,9 +50,9 @@ public class Controller {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
                 Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
                 boolean refCheck;
-                if(trace) {
+                if (trace) {
                     refCheck = ref.check(true);
-                    returnlist.add(refCheck ? "true " +JSONParser.writeRefinement(ref.getTree()) : "false ");
+                    returnlist.add(refCheck ? "true " + JSONParser.writeRefinement(ref.getTree()) : "false ");
                 }
                 else {
                     refCheck = ref.check();

@@ -6,8 +6,14 @@ import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -34,42 +40,40 @@ public class JSONParser {
         objectList = parseFiles(locations);
         return distrubuteObjects(objectList, makeInpEnabled);
     }
-    public static String writeRefinement(GraphNode refTree){
+
+    public static String writeRefinement(GraphNode refTree) {
         JSONObject obj = new JSONObject();
         List<GraphEdge> children = refTree.getSuccessors();
-        obj.put("initial sp id", ""+refTree.getNodeId());
-        obj.put("left", ""+refTree.getStatePair().getLeft().getLocation());
-        obj.put("right", ""+refTree.getStatePair().getRight().getLocation());
-        obj.put("zone", ""+refTree.getStatePair().getLeft().getInvZone());
+        obj.put("initial sp id", "" + refTree.getNodeId());
+        obj.put("left", "" + refTree.getStatePair().getLeft().getLocation());
+        obj.put("right", "" + refTree.getStatePair().getRight().getLocation());
+        obj.put("zone", "" + refTree.getStatePair().getLeft().getInvZone());
         obj.put("transitions", helper(children));
-        try (FileWriter file = new FileWriter("./refTree.json")) {
-            file.write(obj.toJSONString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        System.out.println(obj.toJSONString());
         return obj.toJSONString();
     }
-    private static JSONArray helper(List<GraphEdge> children){
+
+    private static JSONArray helper(List<GraphEdge> children) {
         JSONArray transitions = new JSONArray();
-        for(int i = 0; i < children.size();i++ ) {
+        for (GraphEdge child : children) {
             JSONObject transition = new JSONObject();
 
-            if (children.get(i).getSubsetZone() == null) {
+            if (child.getSubsetZone() == null) {
                 JSONObject statePair = new JSONObject();
-                statePair.put("state pair id", ""+children.get(i).getTarget().getNodeId());
-                statePair.put("left", ""+children.get(i).getTarget().getStatePair().getLeft().getLocation());
-                statePair.put("right", ""+children.get(i).getTarget().getStatePair().getRight().getLocation());
-                statePair.put("zone", ""+children.get(i).getTarget().getStatePair().getLeft().getInvZone());
-                transition.put("source sp id", ""+children.get(i).getSource().getNodeId());
-                transition.put("target sp id", ""+children.get(i).getTarget().getNodeId());
+                statePair.put("state pair id", "" + child.getTarget().getNodeId());
+                statePair.put("left", "" + child.getTarget().getStatePair().getLeft().getLocation());
+                statePair.put("right", "" + child.getTarget().getStatePair().getRight().getLocation());
+                statePair.put("zone", "" + child.getTarget().getStatePair().getLeft().getInvZone());
+                transition.put("source sp id", "" + child.getSource().getNodeId());
+                transition.put("target sp id", "" + child.getTarget().getNodeId());
                 transition.put("target sp", statePair);
                 transitions.add(transition);
-                if(children.get(i).getTarget().getSuccessors().size() !=0)
-                statePair.put("transitions", helper(children.get(i).getTarget().getSuccessors()));
-            }
-            else{
-                transition.put("source sp id", ""+children.get(i).getSource().getNodeId());
-                transition.put("target sp id", ""+children.get(i).getTarget().getNodeId());
+                if (child.getTarget().getSuccessors().size() != 0)
+                    statePair.put("transitions", helper(child.getTarget().getSuccessors()));
+            } else {
+                transition.put("source sp id", "" + child.getSource().getNodeId());
+                transition.put("target sp id", "" + child.getTarget().getNodeId());
                 transitions.add(transition);
             }
         }
@@ -122,11 +126,11 @@ public class JSONParser {
     private static void addDeclarations(String declarations) {//add for typedefs
         String[] firstList = declarations.split(";");
 
-        for (int i = 0; i < firstList.length; i++) {
-            boolean isClock = firstList[i].contains("clock");
+        for (String value : firstList) {
+            boolean isClock = value.contains("clock");
 
             if (isClock) {
-                String clocks = firstList[i];
+                String clocks = value;
 
                 clocks = clocks.replaceAll("//.*\n", "")
                         .replaceFirst("clock", "");
@@ -194,19 +198,15 @@ public class JSONParser {
                 symbol = "==";
                 greater = false;
                 isEq = true;
-            }
-            else if (str.contains("<=")) {
+            } else if (str.contains("<=")) {
                 symbol = "<=";
-            }
-            else if (str.contains(">=")) {
+            } else if (str.contains(">=")) {
                 symbol = ">=";
                 greater = true;
-            }
-            else if (str.contains("<") && !str.contains("=")) {
+            } else if (str.contains("<") && !str.contains("=")) {
                 symbol = "<";
                 strict = true;
-            }
-            else if (str.contains(">") && !str.contains("=")) {
+            } else if (str.contains(">") && !str.contains("=")) {
                 symbol = ">";
                 greater = true;
                 strict = true;
