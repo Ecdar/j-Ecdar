@@ -34,12 +34,12 @@ public class StatePair {
     }
 
     public String prettyPrint() {
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvZone();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvFed();
     }
 
     @Override
     public String toString() {
         //return "L=" + left + ", R=" + right;
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvZone() + "  " + right.getInvZone();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvFed() + "  " + right.getInvFed();
     }
 }

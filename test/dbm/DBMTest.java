@@ -36,19 +36,28 @@ public class DBMTest {
         // STATES----------------------
         // From 0 to inf
         Zone z1 = new Zone(new int[]{1, 1, DBM_INF, 1});
-        state1 = new State(sl1, z1);
+        List<Zone> list1 = new ArrayList<>();
+        list1.add(z1);
+
+        state1 = new State(sl1, new Federation(list1));
 
         // From 2 to inf
         Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
-        state2 = new State(sl1, z2);
+        List<Zone> list2 = new ArrayList<>();
+        list2.add(z2);
+        state2 = new State(sl1, new Federation(list2));
 
         // From 0 to 5
         Zone z3 = new Zone(new int[]{1, 1, 11, 1});
-        state3 = new State(sl1, z3);
+        List<Zone> list3 = new ArrayList<>();
+        list3.add(z3);
+        state3 = new State(sl1, new Federation(list3));
 
         // From 3 to 12
         Zone z4 = new Zone(new int[]{1, -5, 25, 1});
-        state4 = new State(sl1, z4);
+        List<Zone> list4 = new ArrayList<>();
+        list4.add(z4);
+        state4 = new State(sl1, new Federation(list4));
 
 
         // GUARDS---------------------

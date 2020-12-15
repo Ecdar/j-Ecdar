@@ -136,6 +136,8 @@ public class QueryParserTest {
         try {
             assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec", false).get(0), "true");
         } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage() );
             fail();
         }
     }

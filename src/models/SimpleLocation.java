@@ -14,7 +14,7 @@ public class SimpleLocation extends SymbolicLocation {
         return location;
     }
 
-    public List<Guard> getInvariants() {
+    public List<List<Guard>> getInvariants() {
         return location.getInvariant();
     }
 

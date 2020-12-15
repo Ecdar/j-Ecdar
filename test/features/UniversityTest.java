@@ -2,9 +2,15 @@ package features;
 
 import logic.*;
 import models.Automaton;
+import models.Clock;
+import models.Guard;
+import models.Zone;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -200,6 +206,16 @@ public class UniversityTest {
 
     @Test
     public void testCompOfCompRefinesSpec() {
+
+        //Clock x = new Clock("x");
+        //List<Clock> l = new ArrayList<>();
+        //l.add(x);
+        //Zone z = new Zone(l.size()+1,true);
+        //Guard g = new Guard(x,5,true,true);
+        //Guard g = new Guard(x,1073741823,5,true);
+        //z.buildConstraintsForGuard(g,1);
+        //z.printDBM(true,true);
+
         assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{adm,
                         new Composition(new TransitionSystem[]{machine, researcher})}),

@@ -1,5 +1,7 @@
 package models;
 
+import com.sun.deploy.security.SelectableSecurityManager;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,13 +9,41 @@ import java.util.Objects;
 
 public class Edge {
 
-    private final Location source, target;
-    private final Channel chan;
-    private final boolean isInput;
-    private final List<Guard> guards;
-    private final Update[] updates;
+    private  Location source, target;
+    private  Channel chan;
+    private  boolean isInput;
+    private  List<List<Guard>> guards;
+    private  Update[] updates;
 
-    public Edge(Location source, Location target, Channel chan, boolean isInput, List<Guard> guards, Update[] updates) {
+    public void setSource(Location source) {
+        this.source = source;
+    }
+
+    public void setTarget(Location target) {
+        this.target = target;
+    }
+
+    public Channel getChan() {
+        return chan;
+    }
+
+    public void setChan(Channel chan) {
+        this.chan = chan;
+    }
+
+    public void setInput(boolean input) {
+        isInput = input;
+    }
+
+    public void setGuards(List<List<Guard>> guards) {
+        this.guards = guards;
+    }
+
+    public void setUpdates(Update[] updates) {
+        this.updates = updates;
+    }
+
+    public Edge(Location source, Location target, Channel chan, boolean isInput, List<List<Guard>> guards, Update[] updates) {
         this.source = source;
         this.target = target;
         this.chan = chan;
@@ -29,8 +59,11 @@ public class Edge {
         this.isInput = copy.isInput;
 
         this.guards = new ArrayList<>();
-        for (Guard g : copy.guards) {
-            this.guards.add(new Guard(g, clocks));
+        List<Guard> temp = new ArrayList<>();
+        for (List<Guard> guardList : copy.guards) {
+            for (Guard g: guardList)
+               temp.add(new Guard(g, clocks));
+            this.guards.add(temp);
         }
 
         this.updates = new Update[copy.updates.length];
@@ -39,12 +72,15 @@ public class Edge {
         }
     }
 
+
     public int getMaxConstant(Clock clock){
         int constant = 0;
 
-        for(Guard guard : guards){
-            if(clock.equals(guard.getClock())) {
-                if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
+        for(List<Guard> guardList : guards) {
+            for (Guard guard : guardList) {
+                if (clock.equals(guard.getClock())) {
+                    if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
+                }
             }
         }
 
@@ -93,12 +129,34 @@ public class Edge {
         return isInput;
     }
 
-    public List<Guard> getGuards() {
+    public List<List<Guard>> getGuards() {
         return guards;
     }
 
-    public void addGuards(List<Guard> newGuards) {
-        this.guards.addAll(newGuards);
+    public void addGuards(List<List<Guard>> newGuards) {
+
+        if (newGuards.isEmpty())
+        {
+            // nothing happens
+        }
+        else {
+            List<List<Guard>> combinedGuards = new ArrayList<>();
+            if (!this.getGuards().isEmpty()) {
+                for (List<Guard> oldDisjunction : this.guards) {
+                    for (List<Guard> newDisjunction : newGuards) {
+                        List<Guard> temp = new ArrayList<>();
+                        temp.addAll(oldDisjunction);
+                        temp.addAll(newDisjunction);
+                        combinedGuards.add(temp);
+
+                    }
+                }
+
+                this.guards = combinedGuards;
+            } else {
+                this.guards = newGuards;
+            }
+        }
     }
 
     public Update[] getUpdates() {
@@ -110,11 +168,48 @@ public class Edge {
         if (this == o) return true;
         if (!(o instanceof Edge)) return false;
         Edge that = (Edge) o;
+        boolean guardsMatch = true;
+        List<List<Guard>> thisGuards = guards;
+        List<List<Guard>> thatGuards = that.guards;
+        if (thisGuards.size()!=thatGuards.size())
+            guardsMatch = false;
+        else
+        {
+            for (int i =0; i<thisGuards.size(); i++)
+            {
+                if (thisGuards.get(i).size()!= thatGuards.get(i).size())
+                    guardsMatch=false;
+                else
+                {
+                    for (int j =0; j<thisGuards.get(i).size(); j++)
+                    {
+                        if (!thisGuards.get(i).get(j).equals(thatGuards.get(i).get(j)))
+                            guardsMatch=false;
+                    }
+                }
+            }
+        }
+        boolean thisGuardsIsEmpty = true;
+        for (List<Guard> thisGuard : thisGuards)
+        {
+            if (!thisGuard.isEmpty() )
+                thisGuardsIsEmpty=false;
+        }
+        boolean thatGuardsIsEmpty = true;
+        for (List<Guard> thatGuard : thisGuards)
+        {
+            if (!thatGuard.isEmpty() )
+                thatGuardsIsEmpty=false;
+        }
+        if (thisGuardsIsEmpty && thatGuardsIsEmpty)
+            guardsMatch=true;
         return isInput == that.isInput &&
                 source.equals(that.source) &&
                 target.equals(that.target) &&
                 chan.equals(that.chan) &&
-                Arrays.equals(guards.toArray(), that.guards.toArray()) &&
+                // TODO: did the stream thing work?
+                guardsMatch &&
+                //Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()) &&
                 Arrays.equals(updates, that.updates);
     }
 

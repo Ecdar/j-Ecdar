@@ -71,7 +71,7 @@ public class XMLParser {
             for (String clk : clockArr)
                 clockList.add(new Clock(clk));
         }
-
+        //System.out.println(clockList);
         return clockList;
     }
 
@@ -83,14 +83,27 @@ public class XMLParser {
             String locName = loc.getAttributeValue("id");
             boolean isInitial = locName.equals(initId);
             List<Element> labels = loc.getChildren("label");
-            List<Guard> invariants = new ArrayList<>();
+            List<List<Guard>> invariants = new ArrayList<>();
             for (Element label : labels) {
                 if (label.getAttributeValue("kind").equals("invariant")) {
-                    invariants = addGuardsOrInvariants(label.getText(), clocks);
+                    if (!label.getText().isEmpty())
+                        invariants = addInvariants(label.getText(), clocks);
+                }
+            }
+            Location  newLoc = new Location(locName, invariants, isInitial, false, false, false);;
+
+
+            List<Element> names = loc.getChildren("name");
+            assert(names.size()<=1);
+            for (Element name : names)
+            {
+                //System.out.println(name.getContent().get(0).getValue().toString());
+                if (name.getContent().get(0).getValue().toString().equals("inc")) {
+                    //System.out.println("Parsed an inconsistent location");
+                    newLoc = new Location(locName, invariants, isInitial, false, false, true);
                 }
             }
 
-            Location newLoc = new Location(locName, invariants, isInitial, false, false, false);
             locationList.add(newLoc);
         }
 
@@ -113,7 +126,7 @@ public class XMLParser {
             Location target = findLocations(locations, edge.getChild("target").getAttributeValue("ref"));
 
             List<Element> labels = edge.getChildren("label");
-            List<Guard> guards = new ArrayList<>();
+            List<List<Guard>> guards = new ArrayList<>();
             List<Update> updates = new ArrayList<>();
             Channel chan = null;
 
@@ -123,14 +136,17 @@ public class XMLParser {
 
                 switch (kind) {
                     case "guard":
-                        guards = addGuardsOrInvariants(text, clocks);
+                        if (!text.isEmpty())
+                            guards = addGuards(text, clocks);
                         break;
                     case "synchronisation":
                         String channel = text.replaceAll("\\?", "").replaceAll("!", "");
-                        chan = addChannel(channelList, channel);
+                        if (!text.isEmpty())
+                            chan = addChannel(channelList, channel);
                         break;
                     case "assignment":
-                        updates = addUpdates(text, clocks);
+                        if (!text.isEmpty())
+                            updates = addUpdates(text, clocks);
                         break;
                 }
             }
@@ -167,10 +183,62 @@ public class XMLParser {
         return chan;
     }
 
-    private static List<Guard> addGuardsOrInvariants(String text, List<Clock> clockList) {
-        List<Guard> list = new ArrayList<>();
+    private static List<List<Guard>> addGuards(String text, List<Clock> clockList) {
+        List<List<Guard>> guardList = new ArrayList<>();
+        for (String part : text.split("or")) {
+            List<Guard> list = new ArrayList<>();
 
-        String[] rawInvariants = text.split("&&");
+            String[] rawInvariants = part.split("&&");
+
+            for (String invariant : rawInvariants) {
+                invariant = invariant.replaceAll(" ", "");
+                String symbol = "";
+                boolean isEq, isGreater, isStrict;
+                isEq = false;
+                isGreater = false;
+                isStrict = false;
+
+                if (invariant.contains("==")) {
+                    symbol = "==";
+                    isEq = true;
+                } else if (invariant.contains(">=")) {
+                    symbol = ">=";
+                    isGreater = true;
+                } else if (invariant.contains("<=")) {
+                    symbol = "<=";
+                } else if (invariant.contains(">")) {
+                    symbol = ">";
+                    isGreater = true;
+                    isStrict = true;
+                } else if (invariant.contains("<")) {
+                    symbol = "<";
+                    isStrict = true;
+                }
+
+                String[] inv = invariant.split(symbol);
+                Clock clk = findClock(clockList, inv[0]);
+                //System.out.println(inv[0] + " " + clk);
+
+                Guard newInv;
+                if (isEq)
+                    newInv = new Guard(clk, Integer.parseInt(inv[1]));
+                else
+                    newInv = new Guard(clk, Integer.parseInt(inv[1]), isGreater, isStrict);
+
+                list.add(newInv);
+            }
+            guardList.add(list);
+        }
+        return guardList;
+    }
+    private static List<List<Guard>> addInvariants(String text, List<Clock> clockList) {
+        List<List<Guard>> outerList = new ArrayList<>();
+
+        String[] disj = text.split("or");
+
+        for (String outer : disj) {
+            List<Guard> list = new ArrayList<>();
+            String[] rawInvariants = outer.split("&&");
 
         for (String invariant : rawInvariants) {
             invariant = invariant.replaceAll(" ", "");
@@ -196,7 +264,6 @@ public class XMLParser {
                 symbol = "<";
                 isStrict = true;
             }
-
             String[] inv = invariant.split(symbol);
             Clock clk = findClock(clockList, inv[0]);
 
@@ -208,7 +275,11 @@ public class XMLParser {
 
             list.add(newInv);
         }
-        return list;
+
+        outerList.add(list);
+        }
+
+        return outerList;
     }
 
     private static List<Update> addUpdates(String text, List<Clock> clockList) {
@@ -231,6 +302,7 @@ public class XMLParser {
         //creating DOM Document
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
+        dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(new File(fileName));
         DOMBuilder domBuilder = new DOMBuilder();

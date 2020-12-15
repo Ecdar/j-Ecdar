@@ -112,6 +112,15 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1up(JNIEnv *env, jclass cls, jin
     return helper_functions::cToJint(env, converted, len);
 }
 
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1close(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_close(converted, dim);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
 JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isSubsetEq(JNIEnv *env, jclass cls, jintArray dbm1, jintArray dbm2, jint dim) {
     jsize len = env->GetArrayLength(dbm2);
 
@@ -136,6 +145,14 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isValid(JNIEnv *env, jclass cls,
     auto converted = helper_functions::jintToC(env, dbm, len);
     return dbm_isValid(converted, dim);
 }
+
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isEmpty(JNIEnv *env, jclass cls, jintArray dbm, jint dim) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    return dbm_isEmpty(converted, dim);
+}
+
 
 JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection(JNIEnv *env, jclass cls, jintArray dbm1, jintArray dbm2, jint dim) {
     jsize len = env->GetArrayLength(dbm2);
@@ -163,6 +180,18 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown(JNIEnv *env, jclass cl
 
     return helper_functions::cToJint(env, converted, len);
 }
+
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeClock(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jint clockIndex) {
+    jsize len = env->GetArrayLength(dbm);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    dbm_freeClock(converted, dim, clockIndex);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+
 
 JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1rawIsStrict(JNIEnv *env, jclass cls, jint raw) {
    return dbm_rawIsStrict(raw);
@@ -194,6 +223,50 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm(JNIEnv *env, jcla
     return helper_functions::cFedtoJavaFed(env, convertedFed, len);
 }
 
+
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1freeClock(JNIEnv *env, jclass cls, jobjectArray fed, jint dim, jint clockIndex) {
+    jint len = dim * dim;
+    auto convertedFed = helper_functions::javaFedtoCFed(env, fed, len, dim);
+    return helper_functions::cFedtoJavaFed(env, convertedFed.freeClock(clockIndex), len);
+}
+
+
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1down(JNIEnv *env, jclass cls, jobjectArray fed, jint dim) {
+    jint len = dim * dim;
+    auto convertedFed = helper_functions::javaFedtoCFed(env, fed, len, dim);
+    return helper_functions::cFedtoJavaFed(env, convertedFed.down(), len);
+}
+
+
+
+
+
+
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1const_1predt(JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
+    jint len = dim * dim;
+
+    auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+    auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+    convertedFed1.predt(convertedFed2);
+
+    return helper_functions::cFedtoJavaFed(env, convertedFed1, len);
+}
+
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1intersects_1dbm  (JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim)
+{
+    jint len = dim * dim;
+
+    auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+    auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+	return convertedFed1.intersects(convertedFed2);
+}
+
+
 JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed(JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
     jint len = dim * dim;
 
@@ -203,6 +276,68 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed(JNIEnv *env, jcla
     convertedFed1 -= convertedFed2;
 
     return helper_functions::cFedtoJavaFed(env, convertedFed1, len);
+}
+
+
+
+
+  JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1isSubsetEq (JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
+  jint len = dim * dim;
+        auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+        auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+        return convertedFed2 >= convertedFed1;
+
+
+  }
+
+
+
+
+    JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1up (JNIEnv *env, jclass cls, jobjectArray fed, jint dim) {
+        jint len = dim * dim;
+        auto convertedFed = helper_functions::javaFedtoCFed(env, fed, len, dim);
+        return helper_functions::cFedtoJavaFed(env, convertedFed.up(), len);
+        }
+
+
+
+
+
+
+
+
+
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1plus_1fed(JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
+    jint len = dim * dim;
+
+    auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+    auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+    convertedFed1 += convertedFed2;
+
+    return helper_functions::cFedtoJavaFed(env, convertedFed1, len);
+}
+
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1intersect_1fed(JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
+    jint len = dim * dim;
+
+    auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+    auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+    convertedFed1 &= convertedFed2;
+
+    return helper_functions::cFedtoJavaFed(env, convertedFed1, len);
+}
+
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1eq_1fed(JNIEnv *env, jclass cls, jobjectArray fed1, jobjectArray fed2, jint dim) {
+    jint len = dim * dim;
+
+    auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
+    auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
+
+    return convertedFed1.eq(convertedFed2);
 }
 
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBounds(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {

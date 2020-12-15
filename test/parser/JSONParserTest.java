@@ -13,7 +13,7 @@ public class JSONParserTest {
     private static Automaton[] machines, machines2;
     private static Automaton A, G, Q, Imp, Ref1;
 
-    private static final List<Guard> emptyGuards = new ArrayList<>();
+    private static final List<List<Guard>> emptyGuards = new ArrayList<>();
     private static final Update[] emptyUpdates = new Update[]{};
     private static final List<Clock> emptyClocks = new ArrayList<>();
 
@@ -89,7 +89,7 @@ public class JSONParserTest {
         Location l12 = new Location("L12", emptyGuards, true, false, false, false);
         Location l13 = new Location("L13", emptyGuards, false, false, false, false);
         Location l14 = new Location("L14", emptyGuards, false, false, false, false);
-        Location l15 = new Location("L15", new ArrayList<>(Collections.singletonList(inv_l15)), false, false, false, false);
+        Location l15 = new Location("L15", new ArrayList<>(Collections.singletonList(Collections.singletonList(inv_l15))), false, false, false, false);
         Location l16 = new Location("L16", emptyGuards, false, false, false, false);
         Location l17 = new Location("L17", emptyGuards, false, false, false, false);
         Location l18 = new Location("L18", emptyGuards, false, false, false, false);
@@ -112,19 +112,19 @@ public class JSONParserTest {
         Channel o10 = new Channel("o10");
 
 
-        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Collections.singletonList(g_l12_l14)), emptyUpdates);
-        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Collections.singletonList(g_l12_l17)), emptyUpdates);
-        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Collections.singletonList(g_l12_l15)), new Update[]{u1});
-        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Collections.singletonList(g_l12_l16)), emptyUpdates);
+        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l14))), emptyUpdates);
+        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l17))), emptyUpdates);
+        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l15))), new Update[]{u1});
+        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l16))), emptyUpdates);
         t5 = new Edge(l17, l18, o8, false, emptyGuards, new Update[]{u1});
         t6 = new Edge(l16, l18, o8, false, emptyGuards, emptyUpdates);
-        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Collections.singletonList(g_l15_l18)), emptyUpdates);
+        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l15_l18))), emptyUpdates);
         t8 = new Edge(l14, l18, o8, false, emptyGuards, emptyUpdates);
         t9 = new Edge(l13, l18, o8, false, emptyGuards, emptyUpdates);
         t10 = new Edge(l17, l17, o3, false, emptyGuards, emptyUpdates);
         t11 = new Edge(l17, l17, o5, false, emptyGuards, emptyUpdates);
         t12 = new Edge(l17, l14, i6, true, emptyGuards, emptyUpdates);
-        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(g_l12_l13)), emptyUpdates);
+        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l13))), emptyUpdates);
 
         Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)), false);

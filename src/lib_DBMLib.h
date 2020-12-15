@@ -89,11 +89,43 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isValid
 
 /*
  * Class:     lib_DBMLib
+ * Method:    dbm_isEmpty
+ * Signature: ([II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1isEmpty
+  (JNIEnv *, jclass, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_close
+ * Signature: ([II)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1close
+  (JNIEnv *, jclass, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
  * Method:    dbm_intersection
  * Signature: ([I[II)Z
  */
 JNIEXPORT jboolean JNICALL Java_lib_DBMLib_dbm_1intersection
   (JNIEnv *, jclass, jintArray, jintArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_up
+ * Signature: ([[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1up
+  (JNIEnv *, jclass, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_isSubsetEq
+ * Signature: ([[I[[II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1isSubsetEq
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
 
 /*
  * Class:     lib_DBMLib
@@ -109,6 +141,14 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeAllDown
  * Signature: ([III)[I
  */
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeDown
+  (JNIEnv *, jclass, jintArray, jint, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    dbm_freeClock
+ * Signature: ([III)[I
+ */
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1freeClock
   (JNIEnv *, jclass, jintArray, jint, jint);
 
 /*
@@ -137,6 +177,30 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_dbm_1minus_1dbm
 
 /*
  * Class:     lib_DBMLib
+ * Method:    fed_const_predt
+ * Signature: ([[I[[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1const_1predt
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_freeClock
+ * Signature: ([[III)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1freeClock
+  (JNIEnv *, jclass, jobjectArray, jint, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_down
+ * Signature: ([[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1down
+  (JNIEnv *, jclass, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
  * Method:    fed_minus_dbm
  * Signature: ([[I[II)[[I
  */
@@ -149,6 +213,38 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1dbm
  * Signature: ([[I[[II)[[I
  */
 JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_plus_fed
+ * Signature: ([[I[[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1plus_1fed
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_intersect_fed
+ * Signature: ([[I[[II)[[I
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1intersect_1fed
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_eq_fed
+ * Signature: ([[I[[II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1eq_1fed
+  (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
+
+/*
+ * Class:     lib_DBMLib
+ * Method:    fed_intersects_dbm
+ * Signature: ([[I[[II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1intersects_1dbm
   (JNIEnv *, jclass, jobjectArray, jobjectArray, jint);
 
 /*
