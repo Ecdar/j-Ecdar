@@ -84,13 +84,26 @@ public class XMLParser {
             boolean isInitial = locName.equals(initId);
             List<Element> labels = loc.getChildren("label");
             List<List<Guard>> invariants = new ArrayList<>();
+            int x=0,y=0;
+            boolean xyDefined = false;
+
+            if (loc.getAttribute("x").isSpecified()) {
+                //System.out.println(loc.getAttributeValue("x"));
+                x = Integer.parseInt(loc.getAttributeValue("x"));
+                y = Integer.parseInt(loc.getAttributeValue("y"));
+                xyDefined=true;
+            }
+
             for (Element label : labels) {
                 if (label.getAttributeValue("kind").equals("invariant")) {
                     if (!label.getText().isEmpty())
                         invariants = addInvariants(label.getText(), clocks);
                 }
             }
-            Location  newLoc = new Location(locName, invariants, isInitial, false, false, false);;
+
+            Location  newLoc;
+            if (xyDefined) newLoc= new Location(locName, invariants, isInitial, false, false, false, x, y);
+            else newLoc= new Location(locName, invariants, isInitial, false, false, false);
 
 
             List<Element> names = loc.getChildren("name");
@@ -100,7 +113,10 @@ public class XMLParser {
                 //System.out.println(name.getContent().get(0).getValue().toString());
                 if (name.getContent().get(0).getValue().toString().equals("inc")) {
                     //System.out.println("Parsed an inconsistent location");
-                    newLoc = new Location(locName, invariants, isInitial, false, false, true);
+                    if (xyDefined)
+                        newLoc = new Location(locName, invariants, isInitial, false, false, true, x,y);
+                    else
+                        newLoc = new Location(locName, invariants, isInitial, false, false, true);
                 }
             }
 

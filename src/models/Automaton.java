@@ -1,5 +1,6 @@
 package models;
 
+import java.security.URIParameter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,7 +102,7 @@ public class Automaton {
             for (Location loc : locations) {
                 // build the zone for this location
 
-                List<Zone> zoneList = new ArrayList<>();
+ /*               List<Zone> zoneList = new ArrayList<>();
                 List<List<Guard>> invariants = loc.getInvariant();
                 //System.out.println("reached makeInputEnabled");
                 // check if done correctly
@@ -124,7 +125,8 @@ public class Automaton {
                     }
                 }
                 Federation fullFed = new Federation(zoneList);
-
+*/
+                Federation fullFed = loc.getInvariantFederation(clocks);
 
 
                 // loop through all inputs
@@ -134,8 +136,20 @@ public class Automaton {
                     List<Zone> zones = new ArrayList<>();
 
                     Federation resFed;
+                    Federation fedOfAllInputs=null;
                     if (!inputEdges.isEmpty()) {
                         for (Edge edge : inputEdges) {
+                            Federation targetFedAfterReset = edge.getTarget().getInvariantFederation(clocks);
+                            for (Update u: edge.getUpdates())
+                                targetFedAfterReset= targetFedAfterReset.free(getIndexOfClock(u.getClock(),clocks));
+
+                            if (fedOfAllInputs == null) {
+                                fedOfAllInputs = edge.getGuardFederation(clocks).intersect(targetFedAfterReset);
+                            } else
+                                fedOfAllInputs = Federation.fedPlusFed(fedOfAllInputs, edge.getGuardFederation(clocks).intersect(targetFedAfterReset));
+                        }
+/*
+
 //                        Federation guardFederation = new Federation(fullFed.getZones());
                             Federation guardFederation = fullFed.getCopy();
                             //Zone guardZone = new Zone(zone);
@@ -164,18 +178,19 @@ public class Automaton {
 
 
                         }
+*/
 
 
 
-                        Federation fed = new Federation(zones);
-
-                        resFed = Federation.fedMinusFed(fullFed, fed);
+                        //Federation fed = new Federation(zones);
+                        // subtract the federation of zones from the original fed
+                        resFed = Federation.fedMinusFed(fullFed, fedOfAllInputs);
                     }
                     else {
                         resFed =fullFed;
                     }
 
-                        // subtract the federation of zones from the original zone
+
 
                         for (Zone edgeZone : resFed.getZones()) {
                             // build guards from zone
@@ -190,9 +205,23 @@ public class Automaton {
         }
     }
 
+
+    private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
+        for (int i = 0; i < clocks.size(); i++) {
+            if (clock.hashCode() == clocks.get(i).hashCode()) return i + 1;
+        }
+        return 0;
+    }
     private void addTargetInvariantToEdges() {
         if (clocks.size() > 0) {
             for (Edge edge : edges) {
+                Federation targetFed = edge.getTarget().getInvariantFederation(clocks);
+                for (Update u : edge.getUpdates())
+                    targetFed.free(getIndexOfClock(u.getClock(), clocks));
+                Federation intersec = targetFed.intersect(edge.getGuardFederation(clocks));
+                edge.setGuards(intersec.turnFederationToGuards(clocks));
+
+                /*
                 // if there are no resets, we should apply the invariant of the target on the guard zone
                 if (edge.getUpdates().length == 0) {
                         //System.out.println("Debug: " +edge.getGuards() + edge.getTarget().getInvariant());
@@ -203,7 +232,7 @@ public class Automaton {
                 else
                 {
                     // FIXME: 17-11-2020 make the else branch
-                }
+                }*/
             }
         }
     }

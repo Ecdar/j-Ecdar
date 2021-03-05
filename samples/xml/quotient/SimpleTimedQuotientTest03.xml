@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+chan a,i,o;</declaration>
+	<template>
+		<name x="5" y="5">comp1</name>
+		<declaration>clock z;</declaration>
+		<location id="id0" x="-272" y="-170">
+		</location>
+		<location id="id1" x="-272" y="-68">
+		</location>
+		<init ref="id0"/>
+		<transition controllable="false">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-238" y="-144">a!</label>
+			<nail x="-238" y="-119"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-331" y="-144">i?</label>
+			<label kind="assignment" x="-348" y="-127">z=0</label>
+			<nail x="-306" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">comp2</name>
+		<declaration>clock y;</declaration>
+		<location id="id2" x="-272" y="-170">
+		</location>
+		<location id="id3" x="-272" y="-68">
+		</location>
+		<init ref="id2"/>
+		<transition controllable="false">
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-238" y="-144">o!</label>
+			<nail x="-238" y="-119"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-331" y="-144">a?</label>
+			<label kind="assignment" x="-348" y="-127">y=0</label>
+			<nail x="-306" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">spec</name>
+		<declaration>clock x;</declaration>
+		<location id="id4" x="-272" y="-170">
+		</location>
+		<location id="id5" x="-272" y="-68">
+			<label kind="invariant" x="-323" y="-68">x&lt;=10</label>
+		</location>
+		<init ref="id4"/>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-288" y="-250">a?</label>
+			<nail x="-306" y="-229"/>
+			<nail x="-246" y="-229"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-288" y="-17">a?</label>
+			<nail x="-306" y="0"/>
+			<nail x="-229" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-238" y="-144">o!</label>
+			<nail x="-238" y="-119"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-331" y="-144">i?</label>
+			<label kind="assignment" x="-340" y="-127">x=0</label>
+			<nail x="-306" y="-119"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Process = Template();
+// List one or more processes to be composed into a system.
+system Process;
+    </system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

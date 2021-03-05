@@ -93,7 +93,7 @@ public class Refinement {
         // the left side must contain all outputs from the right side
         if (!outputs1.containsAll(outputs2)) {
             precondMet = false;
-            errMsg.append("Not all outputs of the right side are present on the left side.\n");
+            errMsg.append("Not all outputs of the right side are present on the left side.\n OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
         }
         //System.out.println("reached pre3");
         if (!ts1.isLeastConsistent()) {
@@ -101,12 +101,12 @@ public class Refinement {
             errMsg.append(ts1.getLastErr());
         }
 
-        //System.out.println("reached pre4" + errMsg);
+       // System.out.println("reached pre4" + errMsg);
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts2.getLastErr());
         }
-        //System.out.println("reached pre5");
+       // System.out.println("reached pre5");
         //System.out.println("Preconditions checked, error message is : " + errMsg);
         return precondMet;
     }
@@ -124,8 +124,9 @@ public class Refinement {
         }
         //System.out.println("reached 1");
         while (!waiting.isEmpty()) {
-            StatePair curr = waiting.pop();
 
+            StatePair curr = waiting.pop();
+            //System.out.println("curr: " + curr.prettyPrint());
             if (RET_REF)
                 currNode = curr.getNode();
 
@@ -157,7 +158,7 @@ public class Refinement {
                 return false;
             }
         }
-        int passedSize = getHashMapTotalSize(passed);
+
         // if we got here it means refinement property holds
         return true;
     }
@@ -368,6 +369,7 @@ public class Refinement {
         res.add(0);
         res.addAll(ts1.getMaxBounds());
         res.addAll(ts2.getMaxBounds());
+System.out.println("here!" + res);
 
         maxBounds = res.stream().mapToInt(i -> i).toArray();
     }

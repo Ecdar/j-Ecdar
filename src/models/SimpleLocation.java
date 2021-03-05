@@ -6,12 +6,48 @@ import java.util.Objects;
 public class SimpleLocation extends SymbolicLocation {
     private final Location location;
 
+
     public SimpleLocation(Location location) {
         this.location = location;
     }
 
     public Location getActualLocation() {
         return location;
+    }
+
+    @Override
+    public String getName() {
+        return location.getName();
+    }
+
+    @Override
+    public boolean getIsInitial() {
+        return location.isInitial();
+    }
+
+    @Override
+    public boolean getIsUrgent() {
+        return location.isUrgent();
+    }
+
+    @Override
+    public boolean getIsUniversal() {
+        return location.isUniversal();
+    }
+
+    @Override
+    public boolean getIsInconsistent() {
+        return location.isInconsistent();
+    }
+
+    @Override
+    public int getY() {
+        return location.getY();
+    }
+
+    @Override
+    public int getX() {
+        return location.getX();
     }
 
     public List<List<Guard>> getInvariants() {

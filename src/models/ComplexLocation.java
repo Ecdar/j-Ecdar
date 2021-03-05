@@ -61,6 +61,76 @@ public class ComplexLocation extends SymbolicLocation {
         return locations;
     }
 
+    @Override
+    public String getName() {
+        String name = "";
+        for (SymbolicLocation l: getLocations())
+        {
+            name+=l.getName();
+        }
+        return name;
+    }
+
+    @Override
+    public boolean getIsInitial() {
+        boolean isInitial = true;
+        for (SymbolicLocation l: getLocations())
+        {
+            isInitial = isInitial && l.getIsInitial();
+        }
+        return isInitial;
+    }
+
+    @Override
+    public int getX() {
+        int x = 0;
+        for (SymbolicLocation l: getLocations())
+        {
+            x= l.getX();
+        }
+        return x/getLocations().size();
+    }
+
+    @Override
+    public int getY() {
+        int y = 0;
+        for (SymbolicLocation l: getLocations())
+        {
+            y= l.getX();
+        }
+        return y/getLocations().size();
+    }
+
+    @Override
+    public boolean getIsUrgent() {
+        boolean isUrgent = false;
+        for (SymbolicLocation l: getLocations())
+        {
+            isUrgent = isUrgent || l.getIsUrgent();
+        }
+        return isUrgent;
+    }
+
+    @Override
+    public boolean getIsUniversal() {
+        boolean isUniversal = false;
+        for (SymbolicLocation l: getLocations())
+        {
+            isUniversal = isUniversal|| l.getIsUrgent();
+        }
+        return isUniversal;
+    }
+
+    @Override
+    public boolean getIsInconsistent() {
+        boolean isInconsistent = false;
+        for (SymbolicLocation l: getLocations())
+        {
+            isInconsistent = isInconsistent|| l.getIsUrgent();
+        }
+        return isInconsistent;
+    }
+
     public List<List<Guard>> getInvariants() {
         return invariants;
     }

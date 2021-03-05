@@ -1,5 +1,8 @@
 package parser;
 
+import logic.JsonFileWriter;
+import logic.Pruning;
+import logic.SimpleTransitionSystem;
 import models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -153,5 +156,25 @@ public class JSONParserTest {
     @Test
     public void testRef1() {
         assert Ref1.equals(machines2[0]);
+    }
+
+    @Test
+    public void parsingNewJson()
+    {
+        SimpleTransitionSystem selfloopZeno;
+        Automaton[] aut3 = XMLParser.parse("samples/xml/quotient/QuotientTestOutputs.xml", false);
+        selfloopZeno = new SimpleTransitionSystem(aut3[2]);
+        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopZeno);
+        pruned.toXML("selfloopNonZeno.xml");
+        JsonFileWriter.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
+
+        String base = "C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1/";
+        String[] components = new String[]{"GlobalDeclarations.json", "SystemDeclarations.json",
+                "Components/selfloopNonZeno.json"};
+        machines = JSONParser.parse(base, components, false);
+        SimpleTransitionSystem s = new SimpleTransitionSystem(machines[0]);
+        s.toXML("jsonToXML.xml");
+        assert(true);
+//        assert Ref1.equals(machines2[0]);
     }
 }

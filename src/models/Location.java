@@ -8,6 +8,7 @@ public class Location {
 
     private final String name;
     private List<List<Guard>> invariant;
+    private int x,y;
 
     public Federation getInconsistentPart() {
         return inconsistentPart;
@@ -37,12 +38,21 @@ public class Location {
             }
             zoneList.add(z);
         }
+        if (invariant.isEmpty()) {
+            Zone z = new Zone(clocks.size() + 1, true);
+            z.init();
+            zoneList.add(z);
+        }
         return new Federation(zoneList);
 
     }
 
     private Federation inconsistentPart;
     private boolean isInitial;
+
+    private  boolean isUrgent;
+    private  boolean isUniversal;
+    private  boolean isInconsistent;
 
     public boolean isUrgent() {
         return isUrgent;
@@ -60,6 +70,21 @@ public class Location {
         isInitial = initial;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     public void setUrgent(boolean urgent) {
         isUrgent = urgent;
     }
@@ -72,9 +97,7 @@ public class Location {
         isInconsistent = inconsistent;
     }
 
-    private  boolean isUrgent;
-    private  boolean isUniversal;
-    private  boolean isInconsistent;
+
 
     public Location(String name, List<List<Guard>> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
         this.name = name;
@@ -84,6 +107,17 @@ public class Location {
         this.isUniversal = isUniversal;
         this.isInconsistent = isInconsistent || this.getName().equals("inc");
         this.inconsistentPart = null;
+    }
+    public Location(String name, List<List<Guard>> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
+        this.name = name;
+        this.invariant = invariant;
+        this.isInitial = isInitial;
+        this.isUrgent = isUrgent;
+        this.isUniversal = isUniversal;
+        this.isInconsistent = isInconsistent || this.getName().equals("inc");
+        this.inconsistentPart = null;
+        this.x=x;
+        this.y=y;
     }
 
     public Location(Location copy, List<Clock> clocks){

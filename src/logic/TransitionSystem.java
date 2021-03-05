@@ -14,6 +14,8 @@ public abstract class TransitionSystem {
         this.clocks = new ArrayList<>();
     }
 
+    public abstract Automaton getAutomaton();
+
     public List<Clock> getClocks() {
         return clocks;
     }
@@ -139,7 +141,7 @@ public abstract class TransitionSystem {
         //System.out.println("reached isdeterm3");
         if(!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
 
-        //System.out.println("reached isdeterm4");
+
         return isDeterministic;
     }
 

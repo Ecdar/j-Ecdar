@@ -73,6 +73,39 @@ public class Edge {
     }
 
 
+
+    public Federation getGuardFederation(List<Clock> clocks)
+    {
+        List<Zone> zoneList = new ArrayList<>();
+        for (List<Guard> list: guards)
+        {
+            Zone z = new Zone(clocks.size() + 1, true);
+            z.init();
+            for (Guard g: list)
+            {
+                z.buildConstraintsForGuard(g, getIndexOfClock(g.getClock(),clocks));
+            }
+            zoneList.add(z);
+        }
+        if (guards.isEmpty()) {
+            Zone z = new Zone(clocks.size() + 1, true);
+            z.init();
+            zoneList.add(z);
+        }
+        return new Federation(zoneList);
+    }
+
+    private int getIndexOfClock(Clock clock, List<Clock> clocks) {
+        for (int i = 0; i < clocks.size(); i++){
+            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
+        }
+        return 0;
+    }
+
+
+
+
+
     public int getMaxConstant(Clock clock){
         int constant = 0;
 

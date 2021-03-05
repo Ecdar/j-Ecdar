@@ -8,9 +8,25 @@ import java.util.stream.Collectors;
 public class Conjunction extends TransitionSystem {
     private final TransitionSystem[] systems;
 
+    private List<State> passed = new ArrayList<>();
+    private List<State> waiting = new ArrayList<>();
+    private int[] maxBounds;
+
+
+    public void setMaxBounds() {
+        List<Integer> res = new ArrayList<>();
+        res.add(0);
+        for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
+            res.addAll(sys.getMaxBounds());
+
+        maxBounds = res.stream().mapToInt(i -> i).toArray();
+    }
+
+
+
     public Conjunction(TransitionSystem[] systems) {
         this.systems = systems;
-
+        setMaxBounds();
         clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
     }
 
@@ -40,6 +56,194 @@ public class Conjunction extends TransitionSystem {
             result.addAll(ts.getSystems());
         }
         return result;
+    }
+
+    public boolean passedContains(State s)
+    {
+        boolean contained = false;
+
+        for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
+        {
+            if (s.getInvFed().isSubset(st.getInvFed()))
+                contained = true;
+        }
+        return contained;
+    }
+
+    public boolean waitingContains(State s)
+    {
+        boolean contained = false;
+
+        for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
+        {
+
+            if (s.getInvFed().isSubset(st.getInvFed())) {
+                contained = true;
+            }
+        }
+        return contained;
+    }
+
+
+
+    public Automaton createComposition(List<Automaton> autList)
+    {
+        String name="";
+        Set<Edge> edgesSet = new HashSet<>();
+        Set<Location> locationsSet = new HashSet<>();
+        Map<String, Location> locMap = new HashMap<>();
+        passed = new ArrayList<>();
+        waiting = new ArrayList<>();
+
+        List<Location> initLoc = new ArrayList<>();
+        for (Automaton aut : autList) {
+            initLoc.add(aut.getInitLoc());
+            if (name.isEmpty())
+                name = aut.getName();
+            else
+                name += " && " + aut.getName();
+        }
+
+        Location initL = createLoc(initLoc);
+        locationsSet.add(initL);
+
+        Set<Channel> all = new HashSet<>();
+        all.addAll(getInputs());
+        all.addAll(getOutputs());
+
+
+        locMap.put(initL.getName(),initL);
+
+        State initState = getInitialState();;
+        waiting.add(initState);
+        while (!waiting.isEmpty())
+        {
+
+            State currentState = (State)waiting.toArray()[0];
+            waiting.remove(currentState);
+            passed.add(currentState);
+            //System.out.println("Processing state " + currentState.getLocation().getName()) ;
+            //if (currentState.getLocation().getName().equals("L0L5L6"))
+            //    currentState.getInvFed().getZones().get(0).printDBM(true,true);
+
+            for (Channel chan : all )
+            {
+
+                List<Transition> transList = getNextTransitions(currentState, chan, clocks);
+                for (Transition trans : transList)
+                {
+                    String targetName = trans.getTarget().getLocation().getName();
+
+                    boolean isInitial = trans.getTarget().getLocation().getIsInitial();
+                    boolean isUrgent = trans.getTarget().getLocation().getIsUrgent();
+                    boolean isUniversal = trans.getTarget().getLocation().getIsUniversal();
+                    boolean isInconsistent = trans.getTarget().getLocation().getIsInconsistent();
+                    List<List<Guard>> invariant = trans.getTarget().getInvariants();
+                    String sourceName = trans.getSource().getLocation().getName();
+                    int x = trans.getTarget().getLocation().getX();
+                    int y = trans.getTarget().getLocation().getX();
+                    Location target;
+                    if (locMap.containsKey(targetName))
+                        target = locMap.get(targetName);
+                    else {
+                        target = new Location(targetName, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
+                        locMap.put(targetName,target);
+                    }
+                    locationsSet.add(target);
+                    if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
+                        trans.getTarget().extrapolateMaxBounds(maxBounds);
+                        waiting.add(trans.getTarget());
+                    }
+                    List<List<Guard>> guardList = trans.getGuards(); // TODO: Check!
+                    List<Update> updateList = trans.getUpdates();
+                    boolean isInput = false;
+                    if (getInputs().contains(chan))
+                        isInput= true;
+                    assert(locMap.get(sourceName)!=null);
+                    assert(locMap.get(targetName)!=null);
+
+                    Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList.toArray(new Update[updateList.size()]));
+                    boolean edgeAlreadyExists=false;
+                    for (Edge otherE : edgesSet) {
+                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(e.getUpdates(),otherE.getUpdates()))
+                        {
+
+                            if (Federation.fedEqFed(e.getGuardFederation(clocks), otherE.getGuardFederation(clocks)));
+                            {
+
+                                edgeAlreadyExists = true;
+                            }
+                        }
+                    }
+                    if (!edgeAlreadyExists)
+                        edgesSet.add(e);
+
+                }
+
+
+
+            }
+
+        }
+
+
+        Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, false);
+        return resAut;
+
+    }
+
+
+
+    public Location createLoc(List<Location> locList)
+    {
+        String name="";
+        List<List<Guard>> invariant = new ArrayList<>();
+
+        List<Zone> emptyZoneList = new ArrayList<>();
+        Zone emptyZone = new Zone(clocks.size() + 1, true);
+        emptyZone.init();
+        emptyZoneList.add(emptyZone);
+        Federation invarFed = new Federation(emptyZoneList);
+        boolean isInitial = true;
+        boolean isUrgent = false;
+        boolean isUniversal = false;
+        boolean isInconsistent = false;
+        int x=0, y=0;
+
+        for (Location l : locList) {
+            if (name.isEmpty())
+                name = l.getName();
+            else
+                name += "" + l.getName();
+
+            invarFed = l.getInvariantFederation(clocks).intersect(invarFed);
+            isInitial = isInitial && l.isInitial();
+            isUrgent = isUrgent || l.isUrgent();
+            isUniversal = isUniversal || l.isUniversal();
+            isInconsistent = isInconsistent || l.isInconsistent();
+            x += l.getX();
+            y += l.getY();
+
+        }
+        invariant = invarFed.turnFederationToGuards(clocks);
+
+        return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
+
+    }
+
+
+    @Override
+    public Automaton getAutomaton()
+    {
+
+        List<Automaton> autList = new ArrayList<>();
+        for (int i=0; i<systems.length;i++)
+            autList.add(systems[i].getAutomaton());
+        Automaton resAut = createComposition(autList);
+
+        return resAut;
+
+
     }
 
     public SymbolicLocation getInitialLocation() {

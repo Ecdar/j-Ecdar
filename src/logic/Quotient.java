@@ -58,6 +58,11 @@ public class Quotient extends TransitionSystem {
 
     }
 
+    @Override
+    public Automaton getAutomaton() {
+        return calculateQuotientAutomaton().getAutomaton();
+    }
+
     public SymbolicLocation getInitialLocation() {
         // the invariant of locations consisting of locations from each transition system should be true
         // which means the location has no invariants

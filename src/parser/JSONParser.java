@@ -26,11 +26,12 @@ public class JSONParser {
     public static Automaton[] parse(String folderPath, boolean makeInpEnabled) {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
-
+        System.out.println(folderPath);
         ArrayList<String> locations = new ArrayList<>(Collections.singletonList(folderPath + "/GlobalDeclarations.json"));
         locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
 
         objectList = parseFiles(locations);
+
         return distrubuteObjects(objectList, makeInpEnabled);
     }
 
@@ -105,7 +106,7 @@ public class JSONParser {
 
         try {
             for (JSONObject obj : objList) {
-                if (!obj.get("name").toString().equals("Global Declarations")) {
+                if (!obj.get("name").toString().equals("Global Declarations")&&!obj.get("name").toString().equals("System Declarations")) {
                     addDeclarations((String) obj.get("declarations"));
                     JSONArray locationList = (JSONArray) obj.get("locations");
                     List<Location> locations = addLocations(locationList);
