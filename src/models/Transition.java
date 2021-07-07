@@ -1,25 +1,30 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Transition {
     private State source, target;
     private final Move move;
-    private Zone guardZone;
+    private Federation guardFederation;
 
     public Transition(State source, State target, Move move, int dim) {
         this.source = source;
         this.target = target;
         this.move = move;
-        this.guardZone = new Zone(dim, true);
+        Zone emptyZone = new Zone(dim, true);
+        ArrayList<Zone> zoneArrayList = new ArrayList<>();
+        zoneArrayList.add(emptyZone);
+        this.guardFederation = new Federation(zoneArrayList);
     }
 
-    public Transition(State source, State target, Move move, Zone guardZone) {
+    public Transition(State source, State target, Move move, Federation guardFederation) {
         this.source = source;
         this.target = target;
         this.move = move;
-        this.guardZone = guardZone;
+        this.guardFederation = guardFederation.getCopy();
     }
 
     // self loop
@@ -28,8 +33,12 @@ public class Transition {
     }
 
     // self loop
-    public Transition(State state, Zone guardZone) {
-        this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), new Zone(guardZone));
+    public Transition(State state, Federation guardFederation) {
+
+        this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), guardFederation.getCopy());
+
+
+
     }
 
     public State getSource() {
@@ -44,15 +53,15 @@ public class Transition {
         return target;
     }
 
-    public Zone getGuardZone() {
-        return guardZone;
+    public Federation getGuardFed() {
+        return guardFederation;
     }
 
     public List<Edge> getEdges() {
         return move.getEdges();
     }
 
-    public List<Guard> getGuards() {
+    public List<List<Guard>> getGuards() {
         return move.getGuards();
     }
 

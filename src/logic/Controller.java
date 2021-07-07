@@ -33,6 +33,23 @@ public class Controller {
         return runQueries(trace);
     }
 
+    public static TransitionSystem handleRequestGetComp(String locQuery, boolean trace) throws Exception {
+        Queries.clear();
+
+        // Separates location and Queries
+        ArrayList<String> temp = new ArrayList<>(Arrays.asList(locQuery.split(" ")));
+        boolean isJson = temp.get(0).equals("-json");
+        String folderLoc = temp.get(1);
+
+        temp.remove(1);
+        temp.remove(0);
+        Queries.addAll(temp);
+
+        parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
+        assert(Queries.size()<=1);
+        return runQuery(Queries.get(0));
+    }
+
     public static void parseComponents(String folderLocation, boolean isJson) {
         Automaton[] cmpt = isJson ? JSONParser.parse(folderLocation, true) : XMLParser.parse(folderLocation, true);
         for (Automaton automaton : cmpt) {
@@ -90,6 +107,7 @@ public class Controller {
         return returnlist;
     }
 
+
     public static TransitionSystem runQuery(String part) {
         ArrayList<TransitionSystem> transitionSystems = new ArrayList<>();
 
@@ -137,7 +155,7 @@ public class Controller {
             case FEATURE_CONJUNCTION:
                 return new Conjunction(transitionSystems.toArray(new TransitionSystem[0]));
             case FEATURE_QUOTIENT:
-                break;
+                return new Quotient(transitionSystems.toArray(new TransitionSystem[0])[0],transitionSystems.toArray(new TransitionSystem[0])[1]); // TODO: Check if correct
             default:
                 break;
         }

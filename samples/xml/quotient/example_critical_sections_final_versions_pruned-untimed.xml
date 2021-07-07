@@ -1,0 +1,3699 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+const int N = 3;  // number of components 
+typedef int[0,N-1] id_t;
+
+broadcast chan i[N], c[N], g[N];
+</declaration>
+	<template>
+		<name>Comp0</name>
+		<location id="id0" x="-384" y="32">
+			<name x="-394" y="2">C0</name>
+		</location>
+		<location id="id1" x="-384" y="-288">
+			<name x="-394" y="-318">I0</name>
+		</location>
+		<init ref="id1"/>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-520" y="-296">g[2]?</label>
+			<nail x="-480" y="-240"/>
+			<nail x="-480" y="-336"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-224" y="-296">i[2]?</label>
+			<nail x="-224" y="-208"/>
+			<nail x="-224" y="-368"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-256" y="-296">i[1]?</label>
+			<nail x="-256" y="-224"/>
+			<nail x="-256" y="-352"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-288" y="-296">c[2]?</label>
+			<nail x="-288" y="-240"/>
+			<nail x="-288" y="-336"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-224" y="24">i[2]?</label>
+			<nail x="-224" y="-48"/>
+			<nail x="-224" y="112"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-256" y="24">i[1]?</label>
+			<nail x="-256" y="-32"/>
+			<nail x="-256" y="96"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-288" y="24">c[2]?</label>
+			<nail x="-288" y="-16"/>
+			<nail x="-288" y="80"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-544" y="24">g[2]?</label>
+			<nail x="-512" y="96"/>
+			<nail x="-512" y="-32"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-512" y="24">g[1]?</label>
+			<nail x="-480" y="80"/>
+			<nail x="-480" y="-16"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-480" y="-296">g[1]?</label>
+			<nail x="-448" y="-320"/>
+			<nail x="-448" y="-256"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-392" y="-376">i[0]!</label>
+			<nail x="-352" y="-352"/>
+			<nail x="-416" y="-352"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-320" y="-296">c[1]?</label>
+			<nail x="-320" y="-256"/>
+			<nail x="-320" y="-320"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-480" y="24">g[0]?</label>
+			<nail x="-448" y="64"/>
+			<nail x="-448" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-400" y="96">c[0]!</label>
+			<nail x="-352" y="96"/>
+			<nail x="-416" y="96"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-320" y="24">c[1]?</label>
+			<nail x="-320" y="0"/>
+			<nail x="-320" y="64"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-320" y="-136">i[0]!</label>
+			<nail x="-320" y="-128"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-488" y="-136">g[0]?</label>
+			<nail x="-448" y="-128"/>
+		</transition>
+	</template>
+	<template>
+		<name>Comp1</name>
+		<location id="id2" x="-384" y="32">
+			<name x="-391" y="-8">C1</name>
+		</location>
+		<location id="id3" x="-384" y="-288">
+			<name x="-391" y="-323">I1</name>
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-520" y="-296">g[2]?</label>
+			<nail x="-480" y="-240"/>
+			<nail x="-480" y="-336"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-224" y="-296">i[2]?</label>
+			<nail x="-224" y="-208"/>
+			<nail x="-224" y="-368"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-256" y="-296">i[0]?</label>
+			<nail x="-256" y="-224"/>
+			<nail x="-256" y="-352"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-288" y="-296">c[2]?</label>
+			<nail x="-288" y="-240"/>
+			<nail x="-288" y="-336"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-224" y="24">i[2]?</label>
+			<nail x="-224" y="-48"/>
+			<nail x="-224" y="112"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-256" y="24">i[0]?</label>
+			<nail x="-256" y="-32"/>
+			<nail x="-256" y="96"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-288" y="24">c[2]?</label>
+			<nail x="-288" y="-16"/>
+			<nail x="-288" y="80"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-544" y="24">g[2]?</label>
+			<nail x="-512" y="96"/>
+			<nail x="-512" y="-32"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-512" y="24">g[1]?</label>
+			<nail x="-480" y="80"/>
+			<nail x="-480" y="-16"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-480" y="-296">g[0]?</label>
+			<nail x="-448" y="-320"/>
+			<nail x="-448" y="-256"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-392" y="-376">i[1]!</label>
+			<nail x="-352" y="-352"/>
+			<nail x="-416" y="-352"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-320" y="-296">c[0]?</label>
+			<nail x="-320" y="-256"/>
+			<nail x="-320" y="-320"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-480" y="24">g[0]?</label>
+			<nail x="-448" y="64"/>
+			<nail x="-448" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-400" y="96">c[1]!</label>
+			<nail x="-352" y="96"/>
+			<nail x="-416" y="96"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-320" y="24">c[0]?</label>
+			<nail x="-320" y="0"/>
+			<nail x="-320" y="64"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-320" y="-136">i[1]!</label>
+			<nail x="-320" y="-128"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-488" y="-136">g[1]?</label>
+			<nail x="-448" y="-128"/>
+		</transition>
+	</template>
+	<template>
+		<name>Comp2</name>
+		<location id="id4" x="-384" y="32">
+			<name x="-394" y="2">C2</name>
+		</location>
+		<location id="id5" x="-384" y="-288">
+			<name x="-394" y="-318">I2</name>
+		</location>
+		<init ref="id5"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-520" y="-296">g[0]?</label>
+			<nail x="-480" y="-240"/>
+			<nail x="-480" y="-336"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-224" y="-296">i[0]?</label>
+			<nail x="-224" y="-208"/>
+			<nail x="-224" y="-368"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-256" y="-296">i[1]?</label>
+			<nail x="-256" y="-224"/>
+			<nail x="-256" y="-352"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-288" y="-296">c[0]?</label>
+			<nail x="-288" y="-240"/>
+			<nail x="-288" y="-336"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-224" y="24">i[0]?</label>
+			<nail x="-224" y="-48"/>
+			<nail x="-224" y="112"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-256" y="24">i[1]?</label>
+			<nail x="-256" y="-32"/>
+			<nail x="-256" y="96"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-288" y="24">c[0]?</label>
+			<nail x="-288" y="-16"/>
+			<nail x="-288" y="80"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-544" y="24">g[2]?</label>
+			<nail x="-512" y="96"/>
+			<nail x="-512" y="-32"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-512" y="24">g[1]?</label>
+			<nail x="-480" y="80"/>
+			<nail x="-480" y="-16"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-480" y="-296">g[1]?</label>
+			<nail x="-448" y="-320"/>
+			<nail x="-448" y="-256"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-392" y="-376">i[2]!</label>
+			<nail x="-352" y="-352"/>
+			<nail x="-416" y="-352"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-320" y="-296">c[1]?</label>
+			<nail x="-320" y="-256"/>
+			<nail x="-320" y="-320"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-480" y="24">g[0]?</label>
+			<nail x="-448" y="64"/>
+			<nail x="-448" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-400" y="96">c[2]!</label>
+			<nail x="-352" y="96"/>
+			<nail x="-416" y="96"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-320" y="24">c[1]?</label>
+			<nail x="-320" y="0"/>
+			<nail x="-320" y="64"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-320" y="-136">i[2]!</label>
+			<nail x="-320" y="-128"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-488" y="-136">g[2]?</label>
+			<nail x="-448" y="-128"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec0General</name>
+		<location id="id6" x="-256" y="96">
+			<name x="-266" y="66">X0</name>
+		</location>
+		<location id="id7" x="-608" y="96">
+			<name x="-618" y="66">O0</name>
+		</location>
+		<init ref="id7"/>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-264" y="-24">i[2]!</label>
+			<nail x="-304" y="0"/>
+			<nail x="-208" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-272" y="224">g[0]!</label>
+			<nail x="-320" y="224"/>
+			<nail x="-192" y="224"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-272" y="192">g[1]!</label>
+			<nail x="-304" y="192"/>
+			<nail x="-208" y="192"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-184" y="88">c[0]!</label>
+			<nail x="-192" y="128"/>
+			<nail x="-192" y="64"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-272" y="160">g[2]!</label>
+			<nail x="-288" y="160"/>
+			<nail x="-224" y="160"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-264" y="8">i[1]!</label>
+			<nail x="-288" y="32"/>
+			<nail x="-224" y="32"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-616" y="-56">i[2]!</label>
+			<nail x="-672" y="-32"/>
+			<nail x="-544" y="-32"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-624" y="136">c[1]!</label>
+			<nail x="-656" y="192"/>
+			<nail x="-560" y="192"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-624" y="200">c[2]!</label>
+			<nail x="-640" y="160"/>
+			<nail x="-576" y="160"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-616" y="-24">i[1]!</label>
+			<nail x="-656" y="0"/>
+			<nail x="-560" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-616" y="8">i[0]!</label>
+			<nail x="-640" y="32"/>
+			<nail x="-576" y="32"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-768" y="80">g[0]!</label>
+			<nail x="-736" y="32"/>
+			<nail x="-736" y="160"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-736" y="80">g[1]!</label>
+			<nail x="-704" y="48"/>
+			<nail x="-704" y="144"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-704" y="80">g[2]!</label>
+			<nail x="-672" y="64"/>
+			<nail x="-672" y="128"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-440" y="-32">i[0]!</label>
+			<nail x="-432" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id7"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-448" y="208">c[0]!</label>
+			<nail x="-432" y="192"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01</name>
+		<declaration>clock x;</declaration>
+		<location id="id8" x="-256" y="96">
+			<name x="-306" y="85">X01</name>
+		</location>
+		<location id="id9" x="-608" y="96">
+			<name x="-586" y="85">O01</name>
+		</location>
+		<init ref="id9"/>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-272" y="238">g[2]!</label>
+			<nail x="-323" y="229"/>
+			<nail x="-187" y="229"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-272" y="161">g[0]!</label>
+			<nail x="-289" y="161"/>
+			<nail x="-221" y="161"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-782" y="85">g[2]!</label>
+			<nail x="-748" y="34"/>
+			<nail x="-748" y="170"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-714" y="85">g[0]!</label>
+			<nail x="-680" y="68"/>
+			<nail x="-680" y="136"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-152" y="88">c[2]!</label>
+			<nail x="-160" y="144"/>
+			<nail x="-160" y="48"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-264" y="-24">i[2]!</label>
+			<nail x="-304" y="0"/>
+			<nail x="-208" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-272" y="195">g[1]!</label>
+			<nail x="-304" y="192"/>
+			<nail x="-208" y="192"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-192" y="88">c[0]!</label>
+			<nail x="-192" y="128"/>
+			<nail x="-192" y="64"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-264" y="8">i[1]!</label>
+			<nail x="-288" y="32"/>
+			<nail x="-224" y="32"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-616" y="-56">i[2]!</label>
+			<nail x="-672" y="-32"/>
+			<nail x="-544" y="-32"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-624" y="136">c[1]!</label>
+			<nail x="-656" y="192"/>
+			<nail x="-560" y="192"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-624" y="200">c[2]!</label>
+			<nail x="-640" y="160"/>
+			<nail x="-576" y="160"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-616" y="-24">i[1]!</label>
+			<nail x="-656" y="0"/>
+			<nail x="-560" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-616" y="8">i[0]!</label>
+			<nail x="-640" y="32"/>
+			<nail x="-576" y="32"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-748" y="85">g[1]!</label>
+			<nail x="-714" y="51"/>
+			<nail x="-714" y="153"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-440" y="-32">i[0]!</label>
+			<nail x="-432" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-448" y="208">c[0]!</label>
+			<nail x="-432" y="192"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01Comp2Final</name>
+		<location id="id10" x="-272" y="102">
+			<name x="-347" y="91">X01I2</name>
+		</location>
+		<location id="id11" x="-612" y="102">
+			<name x="-590" y="91">O01I2</name>
+		</location>
+		<location id="id12" x="-612" y="442">
+			<name x="-586" y="433">O01C2</name>
+		</location>
+		<location id="id13" x="-272" y="442">
+			<name x="-340" y="433">X01C2</name>
+		</location>
+		<location id="id14" x="-1037" y="195">
+			<name x="-1105" y="127">TRUE1</name>
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-884" y="187">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-289" y="578">g[2]!</label>
+			<nail x="-204" y="578"/>
+			<nail x="-340" y="578"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-289" y="510">g[0]!</label>
+			<nail x="-238" y="510"/>
+			<nail x="-306" y="510"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-289" y="170">g[0]!</label>
+			<nail x="-238" y="170"/>
+			<nail x="-306" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-229" y="263">i[2]?</label>
+			<nail x="-238" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id10"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-348" y="263">g[2]!</label>
+			<nail x="-306" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-790" y="433">g[2]!</label>
+			<nail x="-748" y="374"/>
+			<nail x="-748" y="518"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-620" y="552">c[1]!</label>
+			<nail x="-663" y="544"/>
+			<nail x="-561" y="544"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-561" y="246">i[2]?</label>
+			<nail x="-578" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-688" y="255">g[2]!</label>
+			<nail x="-646" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-701" y="91">g[0]!</label>
+			<nail x="-667" y="74"/>
+			<nail x="-667" y="133"/>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-283" y="-24">i[2]?</label>
+			<nail x="-323" y="0"/>
+			<nail x="-227" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-289" y="204">g[1]!</label>
+			<nail x="-323" y="204"/>
+			<nail x="-221" y="204"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-208" y="94">c[0]!</label>
+			<nail x="-208" y="134"/>
+			<nail x="-208" y="70"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-280" y="14">i[1]!</label>
+			<nail x="-304" y="38"/>
+			<nail x="-240" y="38"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-620" y="-50">i[2]?</label>
+			<nail x="-676" y="-26"/>
+			<nail x="-548" y="-26"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-629" y="170">c[1]!</label>
+			<nail x="-637" y="170"/>
+			<nail x="-578" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-875" y="110">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-620" y="-18">i[1]!</label>
+			<nail x="-660" y="6"/>
+			<nail x="-564" y="6"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-620" y="14">i[0]!</label>
+			<nail x="-644" y="38"/>
+			<nail x="-580" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-743" y="91">g[1]!</label>
+			<nail x="-708" y="54"/>
+			<nail x="-709" y="159"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-444" y="-26">i[0]!</label>
+			<nail x="-436" y="6"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id11"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-452" y="214">c[0]!</label>
+			<nail x="-436" y="198"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-701" y="431">g[0]!</label>
+			<nail x="-667" y="414"/>
+			<nail x="-667" y="473"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-168" y="434">c[2]?</label>
+			<nail x="-176" y="490"/>
+			<nail x="-176" y="394"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-289" y="544">g[1]!</label>
+			<nail x="-323" y="544"/>
+			<nail x="-221" y="544"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-208" y="434">c[0]!</label>
+			<nail x="-208" y="474"/>
+			<nail x="-208" y="410"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id13"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-280" y="354">i[1]!</label>
+			<nail x="-304" y="378"/>
+			<nail x="-240" y="378"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-620" y="518">c[2]?</label>
+			<nail x="-644" y="506"/>
+			<nail x="-580" y="506"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-620" y="322">i[1]!</label>
+			<nail x="-660" y="346"/>
+			<nail x="-564" y="346"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-620" y="354">i[0]!</label>
+			<nail x="-644" y="378"/>
+			<nail x="-580" y="378"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-743" y="431">g[1]!</label>
+			<nail x="-708" y="394"/>
+			<nail x="-709" y="499"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-444" y="314">i[0]!</label>
+			<nail x="-436" y="346"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id12"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-452" y="554">c[0]!</label>
+			<nail x="-436" y="538"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1054" y="216">c[2]?</label>
+			<nail x="-1071" y="272"/>
+			<nail x="-1012" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1087" y="250">c[1]!</label>
+			<nail x="-1105" y="340"/>
+			<nail x="-986" y="340"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1113" y="276">c[0]!</label>
+			<nail x="-1131" y="391"/>
+			<nail x="-969" y="391"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1104" y="157">g[2]!</label>
+			<nail x="-1122" y="153"/>
+			<nail x="-1122" y="229"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1155" y="144">g[1]!</label>
+			<nail x="-1173" y="127"/>
+			<nail x="-1173" y="255"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1206" y="131">g[0]!</label>
+			<nail x="-1224" y="102"/>
+			<nail x="-1224" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1064" y="-56">i[0]!</label>
+			<nail x="-944" y="-26"/>
+			<nail x="-1105" y="-26"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1070" y="8">i[1]!</label>
+			<nail x="-1088" y="25"/>
+			<nail x="-969" y="25"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-1053" y="68">i[2]?</label>
+			<nail x="-1071" y="85"/>
+			<nail x="-986" y="85"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01Comp2Comp0Final</name>
+		<location id="id15" x="-272" y="102">
+			<name x="-347" y="91">X01I2I0</name>
+		</location>
+		<location id="id16" x="-612" y="102">
+			<name x="-590" y="91">O01I2I0</name>
+		</location>
+		<location id="id17" x="-612" y="442">
+			<name x="-586" y="433">O01C2I0</name>
+		</location>
+		<location id="id18" x="-272" y="442">
+			<name x="-348" y="433">X01C2I0</name>
+		</location>
+		<location id="id19" x="-263" y="935">
+			<name x="-338" y="924">X01I2C0</name>
+		</location>
+		<location id="id20" x="-263" y="1275">
+			<name x="-339" y="1266">X01C2C0</name>
+		</location>
+		<location id="id21" x="-603" y="1275">
+			<name x="-577" y="1266">O01C2C0</name>
+		</location>
+		<location id="id22" x="-603" y="935">
+			<name x="-581" y="924">O01I2C0</name>
+		</location>
+		<location id="id23" x="-1198" y="629">
+			<name x="-1266" y="561">TRUE2</name>
+		</location>
+		<init ref="id16"/>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1011" y="391">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id18"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-289" y="578">g[2]!</label>
+			<nail x="-204" y="578"/>
+			<nail x="-340" y="578"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-442" y="909">g[0]!</label>
+			<nail x="-408" y="918"/>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-450" y="544">g[0]!</label>
+			<nail x="-416" y="544"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-229" y="263">i[2]?</label>
+			<nail x="-238" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id15"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-348" y="263">g[2]!</label>
+			<nail x="-306" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-790" y="433">g[2]!</label>
+			<nail x="-748" y="374"/>
+			<nail x="-748" y="518"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-620" y="552">c[1]!</label>
+			<nail x="-663" y="544"/>
+			<nail x="-561" y="544"/>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-561" y="246">i[2]?</label>
+			<nail x="-578" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id16"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-688" y="255">g[2]!</label>
+			<nail x="-646" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id16"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-867" y="552">g[0]!</label>
+			<nail x="-824" y="561"/>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-283" y="-24">i[2]?</label>
+			<nail x="-323" y="0"/>
+			<nail x="-227" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id15"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-289" y="204">g[1]!</label>
+			<nail x="-323" y="204"/>
+			<nail x="-221" y="204"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id15"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1028" y="544">c[0]?</label>
+			<nail x="-306" y="136"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id15"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-280" y="14">i[1]!</label>
+			<nail x="-304" y="38"/>
+			<nail x="-240" y="38"/>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-620" y="-50">i[2]?</label>
+			<nail x="-676" y="-26"/>
+			<nail x="-548" y="-26"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-620" y="178">c[1]!</label>
+			<nail x="-646" y="170"/>
+			<nail x="-578" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1020" y="484">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-620" y="-18">i[1]!</label>
+			<nail x="-660" y="6"/>
+			<nail x="-564" y="6"/>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-620" y="14">i[0]?</label>
+			<nail x="-644" y="38"/>
+			<nail x="-580" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id16"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-743" y="91">g[1]!</label>
+			<nail x="-705" y="51"/>
+			<nail x="-705" y="136"/>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-450" y="-25">i[0]?</label>
+			<nail x="-436" y="6"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id16"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1020" y="357">c[0]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id17"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-909" y="901">g[0]!</label>
+			<nail x="-875" y="909"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-168" y="434">c[2]?</label>
+			<nail x="-176" y="490"/>
+			<nail x="-176" y="394"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id18"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-289" y="544">g[1]!</label>
+			<nail x="-323" y="544"/>
+			<nail x="-221" y="544"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id18"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1011" y="620">c[0]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id18"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-280" y="354">i[1]!</label>
+			<nail x="-304" y="378"/>
+			<nail x="-240" y="378"/>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-620" y="518">c[2]?</label>
+			<nail x="-629" y="476"/>
+			<nail x="-644" y="506"/>
+			<nail x="-580" y="506"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-620" y="322">i[1]!</label>
+			<nail x="-660" y="346"/>
+			<nail x="-564" y="346"/>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-620" y="354">i[0]?</label>
+			<nail x="-644" y="378"/>
+			<nail x="-580" y="378"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id17"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-743" y="431">g[1]!</label>
+			<nail x="-708" y="394"/>
+			<nail x="-709" y="499"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-416" y="331">i[0]?</label>
+			<nail x="-436" y="346"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id17"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-977" y="510">c[0]?</label>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-901" y="739">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id20"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-280" y="1411">g[2]!</label>
+			<nail x="-195" y="1411"/>
+			<nail x="-331" y="1411"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id20"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-280" y="1343">g[0]!</label>
+			<nail x="-229" y="1343"/>
+			<nail x="-297" y="1343"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-280" y="1003">g[0]!</label>
+			<nail x="-229" y="1003"/>
+			<nail x="-297" y="1003"/>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-220" y="1096">i[2]?</label>
+			<nail x="-229" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id19"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-339" y="1096">g[2]!</label>
+			<nail x="-297" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id21"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-781" y="1266">g[2]!</label>
+			<nail x="-739" y="1207"/>
+			<nail x="-739" y="1351"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id21"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-611" y="1385">c[1]!</label>
+			<nail x="-654" y="1377"/>
+			<nail x="-552" y="1377"/>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-552" y="1079">i[2]?</label>
+			<nail x="-569" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id22"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-679" y="1088">g[2]!</label>
+			<nail x="-637" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-692" y="924">g[0]!</label>
+			<nail x="-658" y="907"/>
+			<nail x="-658" y="966"/>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-274" y="809">i[2]?</label>
+			<nail x="-314" y="833"/>
+			<nail x="-218" y="833"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-280" y="1037">g[1]!</label>
+			<nail x="-314" y="1037"/>
+			<nail x="-212" y="1037"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-199" y="927">c[0]?</label>
+			<nail x="-199" y="967"/>
+			<nail x="-199" y="903"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-271" y="847">i[1]!</label>
+			<nail x="-295" y="871"/>
+			<nail x="-231" y="871"/>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-611" y="783">i[2]?</label>
+			<nail x="-667" y="807"/>
+			<nail x="-539" y="807"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-611" y="1011">c[1]!</label>
+			<nail x="-637" y="1003"/>
+			<nail x="-569" y="1003"/>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1003" y="765">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-611" y="815">i[1]!</label>
+			<nail x="-651" y="839"/>
+			<nail x="-555" y="839"/>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-807" y="544">i[0]?</label>
+			<nail x="-782" y="561"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-734" y="924">g[1]!</label>
+			<nail x="-699" y="887"/>
+			<nail x="-700" y="992"/>
+		</transition>
+		<transition color="#ff00ff">
+			<source ref="id19"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-484" y="629">i[0]?</label>
+			<nail x="-450" y="841"/>
+			<nail x="-450" y="416"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id22"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-476" y="1028">c[0]?</label>
+			<nail x="-427" y="1031"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id21"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-692" y="1264">g[0]!</label>
+			<nail x="-658" y="1247"/>
+			<nail x="-658" y="1306"/>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-159" y="1267">c[2]?</label>
+			<nail x="-167" y="1323"/>
+			<nail x="-167" y="1227"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id20"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-280" y="1377">g[1]!</label>
+			<nail x="-314" y="1377"/>
+			<nail x="-212" y="1377"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id20"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-199" y="1267">c[0]?</label>
+			<nail x="-199" y="1307"/>
+			<nail x="-199" y="1243"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id20"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-271" y="1187">i[1]!</label>
+			<nail x="-295" y="1211"/>
+			<nail x="-231" y="1211"/>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-611" y="1351">c[2]?</label>
+			<nail x="-635" y="1339"/>
+			<nail x="-571" y="1339"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id21"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-611" y="1155">i[1]!</label>
+			<nail x="-651" y="1179"/>
+			<nail x="-555" y="1179"/>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-858" y="892">i[0]?</label>
+			<nail x="-824" y="909"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id21"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-734" y="1264">g[1]!</label>
+			<nail x="-699" y="1227"/>
+			<nail x="-700" y="1332"/>
+		</transition>
+		<transition color="#ff00ff">
+			<source ref="id20"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-467" y="1139">i[0]?</label>
+			<nail x="-433" y="1181"/>
+			<nail x="-433" y="646"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id21"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-443" y="1387">c[0]?</label>
+			<nail x="-427" y="1371"/>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1216" y="680">c[2]?</label>
+			<nail x="-1232" y="706"/>
+			<nail x="-1173" y="706"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1216" y="736">c[1]!</label>
+			<nail x="-1266" y="774"/>
+			<nail x="-1147" y="774"/>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1232" y="800">c[0]?</label>
+			<nail x="-1292" y="825"/>
+			<nail x="-1130" y="825"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1265" y="591">g[2]!</label>
+			<nail x="-1283" y="587"/>
+			<nail x="-1283" y="663"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1316" y="578">g[1]!</label>
+			<nail x="-1334" y="561"/>
+			<nail x="-1334" y="689"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1367" y="565">g[0]!</label>
+			<nail x="-1385" y="536"/>
+			<nail x="-1385" y="706"/>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1224" y="374">i[0]?</label>
+			<nail x="-1105" y="408"/>
+			<nail x="-1266" y="408"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1231" y="442">i[1]!</label>
+			<nail x="-1249" y="459"/>
+			<nail x="-1130" y="459"/>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-1214" y="502">i[2]?</label>
+			<nail x="-1232" y="519"/>
+			<nail x="-1147" y="519"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01Comp2Comp0Comp1Final</name>
+		<location id="id24" x="-272" y="102">
+			<name x="-347" y="91">X01I2I0I1</name>
+		</location>
+		<location id="id25" x="-612" y="102">
+			<name x="-590" y="91">O01I2I0I1</name>
+		</location>
+		<location id="id26" x="-612" y="442">
+			<name x="-586" y="433">O01C2I0I1</name>
+		</location>
+		<location id="id27" x="-272" y="442">
+			<name x="-348" y="433">X01C2I0I1</name>
+		</location>
+		<location id="id28" x="-263" y="935">
+			<name x="-338" y="924">X01I2C0I1</name>
+		</location>
+		<location id="id29" x="-263" y="1275">
+			<name x="-339" y="1266">X01C2C0I1</name>
+		</location>
+		<location id="id30" x="-603" y="1275">
+			<name x="-577" y="1266">O01C2C0I1</name>
+		</location>
+		<location id="id31" x="-603" y="935">
+			<name x="-581" y="924">O01I2C0I1</name>
+		</location>
+		<location id="id32" x="-594" y="3043">
+			<name x="-568" y="3034">O01C2C0C1</name>
+		</location>
+		<location id="id33" x="-594" y="2703">
+			<name x="-572" y="2692">O01I2C0C1</name>
+		</location>
+		<location id="id34" x="-263" y="1870">
+			<name x="-338" y="1859">X01I2I0C1</name>
+		</location>
+		<location id="id35" x="-263" y="2210">
+			<name x="-339" y="2201">X01C2I0C1</name>
+		</location>
+		<location id="id36" x="-254" y="3043">
+			<name x="-330" y="3034">X01C2C0C1</name>
+		</location>
+		<location id="id37" x="-254" y="2703">
+			<name x="-329" y="2692">X01I2C0C1</name>
+		</location>
+		<location id="id38" x="-603" y="2210">
+			<name x="-577" y="2201">O01C2I0C1</name>
+		</location>
+		<location id="id39" x="-603" y="1870">
+			<name x="-581" y="1859">O01I2I0C1</name>
+		</location>
+		<location id="id40" x="195" y="2193">
+			<name x="178" y="2150">FALSE</name>
+			<urgent/>
+		</location>
+		<location id="id41" x="-1487" y="1861">
+			<name x="-1555" y="1793">TRUE3</name>
+		</location>
+		<init ref="id25"/>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1504" y="1882">c[2]?</label>
+			<nail x="-1521" y="1938"/>
+			<nail x="-1462" y="1938"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1537" y="1916">c[1]?</label>
+			<nail x="-1555" y="2006"/>
+			<nail x="-1436" y="2006"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1563" y="1942">c[0]?</label>
+			<nail x="-1581" y="2057"/>
+			<nail x="-1419" y="2057"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1554" y="1823">g[2]!</label>
+			<nail x="-1572" y="1819"/>
+			<nail x="-1572" y="1895"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1605" y="1810">g[1]!</label>
+			<nail x="-1623" y="1793"/>
+			<nail x="-1623" y="1921"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1656" y="1797">g[0]!</label>
+			<nail x="-1674" y="1768"/>
+			<nail x="-1674" y="1938"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1513" y="1606">i[0]?</label>
+			<nail x="-1394" y="1640"/>
+			<nail x="-1555" y="1640"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1520" y="1674">i[1]?</label>
+			<nail x="-1538" y="1691"/>
+			<nail x="-1419" y="1691"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-1503" y="1734">i[2]?</label>
+			<nail x="-1521" y="1751"/>
+			<nail x="-1436" y="1751"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id36"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="-25" y="2660">c[1]?</label>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id37"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="8" y="2422">c[1]?</label>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id35"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="-8" y="2057">c[1]?</label>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id34"/>
+			<target ref="id40"/>
+			<label kind="synchronisation" x="8" y="1946">c[1]?</label>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-399" y="-93">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id27"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-289" y="578">g[2]!</label>
+			<nail x="-204" y="578"/>
+			<nail x="-340" y="578"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id27"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-442" y="909">g[0]!</label>
+			<nail x="-408" y="918"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id24"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-450" y="544">g[0]!</label>
+			<nail x="-416" y="544"/>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-229" y="263">i[2]?</label>
+			<nail x="-238" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id24"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-348" y="263">g[2]!</label>
+			<nail x="-306" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id26"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-790" y="433">g[2]!</label>
+			<nail x="-748" y="374"/>
+			<nail x="-748" y="518"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id26"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-527" y="476">c[1]?</label>
+			<nail x="-493" y="544"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-561" y="246">i[2]?</label>
+			<nail x="-578" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-688" y="255">g[2]!</label>
+			<nail x="-646" y="272"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id25"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-867" y="552">g[0]!</label>
+			<nail x="-824" y="561"/>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-283" y="-24">i[2]?</label>
+			<nail x="-323" y="0"/>
+			<nail x="-227" y="0"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id24"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="102" y="782">g[1]!</label>
+			<nail x="93" y="782"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id24"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-323" y="-136">c[0]?</label>
+			<nail x="-272" y="-102"/>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-280" y="14">i[1]?</label>
+			<nail x="-304" y="38"/>
+			<nail x="-240" y="38"/>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-620" y="-50">i[2]?</label>
+			<nail x="-676" y="-26"/>
+			<nail x="-548" y="-26"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id25"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-510" y="187">c[1]?</label>
+			<nail x="-493" y="187"/>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-527" y="-76">c[2]?</label>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-620" y="-18">i[1]?</label>
+			<nail x="-660" y="6"/>
+			<nail x="-564" y="6"/>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-620" y="14">i[0]?</label>
+			<nail x="-644" y="38"/>
+			<nail x="-580" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id25"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-1181" y="867">g[1]!</label>
+			<nail x="-1130" y="884"/>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-450" y="-25">i[0]?</label>
+			<nail x="-436" y="6"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id25"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-484" y="76">c[0]?</label>
+			<nail x="-442" y="102"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id26"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-909" y="901">g[0]!</label>
+			<nail x="-875" y="909"/>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-168" y="434">c[2]?</label>
+			<nail x="-176" y="490"/>
+			<nail x="-176" y="394"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id27"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="119" y="1096">g[1]!</label>
+			<nail x="110" y="1079"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id27"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-195" y="-93">c[0]?</label>
+			<nail x="-204" y="442"/>
+			<nail x="-204" y="-102"/>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="-280" y="354">i[1]?</label>
+			<nail x="-304" y="378"/>
+			<nail x="-240" y="378"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-620" y="518">c[2]?</label>
+			<nail x="-629" y="476"/>
+			<nail x="-644" y="506"/>
+			<nail x="-580" y="506"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-620" y="322">i[1]?</label>
+			<nail x="-660" y="346"/>
+			<nail x="-564" y="346"/>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-620" y="354">i[0]?</label>
+			<nail x="-644" y="378"/>
+			<nail x="-580" y="378"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id26"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-1181" y="1266">g[1]!</label>
+			<nail x="-1130" y="1258"/>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-444" y="314">i[0]?</label>
+			<nail x="-436" y="346"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id26"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-464" y="405">c[0]?</label>
+			<nail x="-433" y="442"/>
+		</transition>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-390" y="740">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-280" y="1411">g[2]!</label>
+			<nail x="-195" y="1411"/>
+			<nail x="-331" y="1411"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-280" y="1343">g[0]!</label>
+			<nail x="-229" y="1343"/>
+			<nail x="-297" y="1343"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id28"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-280" y="1003">g[0]!</label>
+			<nail x="-229" y="1003"/>
+			<nail x="-297" y="1003"/>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-220" y="1096">i[2]?</label>
+			<nail x="-229" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id28"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-339" y="1096">g[2]!</label>
+			<nail x="-297" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id30"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-781" y="1266">g[2]!</label>
+			<nail x="-739" y="1207"/>
+			<nail x="-739" y="1351"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id30"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-544" y="1360">c[1]?</label>
+			<nail x="-535" y="1351"/>
+			<nail x="-433" y="773"/>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-552" y="1079">i[2]?</label>
+			<nail x="-569" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id31"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-679" y="1088">g[2]!</label>
+			<nail x="-637" y="1105"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id31"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-692" y="924">g[0]!</label>
+			<nail x="-658" y="907"/>
+			<nail x="-658" y="966"/>
+		</transition>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-274" y="809">i[2]?</label>
+			<nail x="-314" y="833"/>
+			<nail x="-218" y="833"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id28"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="153" y="1504">g[1]!</label>
+			<nail x="136" y="1470"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id28"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-199" y="927">c[0]?</label>
+			<nail x="-199" y="967"/>
+			<nail x="-199" y="903"/>
+		</transition>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-271" y="847">i[1]?</label>
+			<nail x="-295" y="871"/>
+			<nail x="-231" y="871"/>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-611" y="783">i[2]?</label>
+			<nail x="-667" y="807"/>
+			<nail x="-539" y="807"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id31"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-527" y="1003">c[1]?</label>
+			<nail x="-518" y="1003"/>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-518" y="757">c[2]?</label>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-611" y="815">i[1]?</label>
+			<nail x="-651" y="839"/>
+			<nail x="-555" y="839"/>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-807" y="544">i[0]?</label>
+			<nail x="-782" y="561"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id31"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-1156" y="1768">g[1]!</label>
+			<nail x="-1096" y="1785"/>
+		</transition>
+		<transition color="#ff00ff">
+			<source ref="id28"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-484" y="629">i[0]?</label>
+			<nail x="-450" y="841"/>
+			<nail x="-450" y="416"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id31"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-443" y="1047">c[0]?</label>
+			<nail x="-427" y="1031"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id30"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-692" y="1264">g[0]!</label>
+			<nail x="-658" y="1247"/>
+			<nail x="-658" y="1306"/>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-159" y="1267">c[2]?</label>
+			<nail x="-167" y="1323"/>
+			<nail x="-167" y="1227"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id29"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="178" y="1734">g[1]!</label>
+			<nail x="153" y="1768"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-199" y="1267">c[0]?</label>
+			<nail x="-199" y="1307"/>
+			<nail x="-199" y="1243"/>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-271" y="1187">i[1]?</label>
+			<nail x="-295" y="1211"/>
+			<nail x="-231" y="1211"/>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-611" y="1351">c[2]?</label>
+			<nail x="-635" y="1339"/>
+			<nail x="-571" y="1339"/>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-611" y="1155">i[1]?</label>
+			<nail x="-651" y="1179"/>
+			<nail x="-555" y="1179"/>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-858" y="892">i[0]?</label>
+			<nail x="-824" y="909"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id30"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-1139" y="2125">g[1]!</label>
+			<nail x="-1096" y="2125"/>
+		</transition>
+		<transition color="#ff00ff">
+			<source ref="id29"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-467" y="1139">i[0]?</label>
+			<nail x="-433" y="1181"/>
+			<nail x="-433" y="646"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id30"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-443" y="1387">c[0]?</label>
+			<nail x="-427" y="1371"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-390" y="1675">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id35"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-280" y="2346">g[2]!</label>
+			<nail x="-195" y="2346"/>
+			<nail x="-331" y="2346"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id35"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-433" y="2677">g[0]!</label>
+			<nail x="-399" y="2686"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id34"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-441" y="2312">g[0]!</label>
+			<nail x="-407" y="2312"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-220" y="2031">i[2]?</label>
+			<nail x="-229" y="2040"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id34"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-339" y="2031">g[2]!</label>
+			<nail x="-297" y="2040"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id38"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-781" y="2201">g[2]!</label>
+			<nail x="-739" y="2142"/>
+			<nail x="-739" y="2286"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id38"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-611" y="2320">c[1]?</label>
+			<nail x="-654" y="2312"/>
+			<nail x="-552" y="2312"/>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-552" y="2014">i[2]?</label>
+			<nail x="-569" y="2040"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id39"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-679" y="2023">g[2]!</label>
+			<nail x="-637" y="2040"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id39"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-858" y="2320">g[0]!</label>
+			<nail x="-815" y="2329"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-274" y="1744">i[2]?</label>
+			<nail x="-314" y="1768"/>
+			<nail x="-218" y="1768"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id34"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-280" y="1972">g[1]!</label>
+			<nail x="-314" y="1972"/>
+			<nail x="-212" y="1972"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id34"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-314" y="1632">c[0]?</label>
+			<nail x="-263" y="1666"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="42" y="773">i[1]?</label>
+			<nail x="85" y="782"/>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-611" y="1718">i[2]?</label>
+			<nail x="-667" y="1742"/>
+			<nail x="-539" y="1742"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id39"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-611" y="1946">c[1]?</label>
+			<nail x="-637" y="1938"/>
+			<nail x="-569" y="1938"/>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-518" y="1692">c[2]?</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-1088" y="867">i[1]?</label>
+			<nail x="-1113" y="884"/>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-611" y="1782">i[0]?</label>
+			<nail x="-635" y="1806"/>
+			<nail x="-571" y="1806"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id39"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-734" y="1859">g[1]!</label>
+			<nail x="-696" y="1819"/>
+			<nail x="-696" y="1904"/>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-441" y="1743">i[0]?</label>
+			<nail x="-427" y="1774"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id39"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-459" y="1827">c[0]?</label>
+			<nail x="-424" y="1860"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id38"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-900" y="2669">g[0]!</label>
+			<nail x="-866" y="2677"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-159" y="2202">c[2]?</label>
+			<nail x="-167" y="2258"/>
+			<nail x="-167" y="2162"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id35"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-280" y="2312">g[1]!</label>
+			<nail x="-314" y="2312"/>
+			<nail x="-212" y="2312"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id35"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-186" y="1675">c[0]?</label>
+			<nail x="-195" y="2210"/>
+			<nail x="-195" y="1666"/>
+			<nail x="-1496" y="1853"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="59" y="1071">i[1]?</label>
+			<nail x="93" y="1079"/>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-611" y="2286">c[2]?</label>
+			<nail x="-620" y="2244"/>
+			<nail x="-635" y="2274"/>
+			<nail x="-571" y="2274"/>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-1105" y="1249">i[1]?</label>
+			<nail x="-651" y="2114"/>
+			<nail x="-1122" y="1258"/>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-611" y="2122">i[0]?</label>
+			<nail x="-635" y="2146"/>
+			<nail x="-571" y="2146"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id38"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-734" y="2199">g[1]!</label>
+			<nail x="-699" y="2162"/>
+			<nail x="-700" y="2267"/>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-435" y="2082">i[0]?</label>
+			<nail x="-427" y="2114"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id38"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-467" y="1972">c[0]?</label>
+			<nail x="-425" y="2210"/>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-381" y="2508">c[2]?</label>
+		</transition>
+		<transition controllable="false">
+			<source ref="id36"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-271" y="3179">g[2]!</label>
+			<nail x="-186" y="3179"/>
+			<nail x="-322" y="3179"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id36"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-271" y="3111">g[0]!</label>
+			<nail x="-220" y="3111"/>
+			<nail x="-288" y="3111"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id37"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-271" y="2771">g[0]!</label>
+			<nail x="-220" y="2771"/>
+			<nail x="-288" y="2771"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-211" y="2864">i[2]?</label>
+			<nail x="-220" y="2873"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id37"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-330" y="2864">g[2]!</label>
+			<nail x="-288" y="2873"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id32"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-772" y="3034">g[2]!</label>
+			<nail x="-730" y="2975"/>
+			<nail x="-730" y="3119"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id32"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-602" y="3153">c[1]?</label>
+			<nail x="-645" y="3145"/>
+			<nail x="-543" y="3145"/>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-543" y="2847">i[2]?</label>
+			<nail x="-560" y="2873"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id33"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-670" y="2856">g[2]!</label>
+			<nail x="-628" y="2873"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id33"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-683" y="2692">g[0]!</label>
+			<nail x="-649" y="2675"/>
+			<nail x="-649" y="2734"/>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-265" y="2577">i[2]?</label>
+			<nail x="-305" y="2601"/>
+			<nail x="-209" y="2601"/>
+			<nail x="-212" y="2686"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id37"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-271" y="2805">g[1]!</label>
+			<nail x="-305" y="2805"/>
+			<nail x="-203" y="2805"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id37"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-190" y="2695">c[0]?</label>
+			<nail x="-190" y="2735"/>
+			<nail x="-190" y="2671"/>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="85" y="1470">i[1]?</label>
+			<nail x="119" y="1470"/>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-602" y="2551">i[2]?</label>
+			<nail x="-658" y="2575"/>
+			<nail x="-530" y="2575"/>
+		</transition>
+		<transition color="#ff0000">
+			<source ref="id33"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-602" y="2779">c[1]?</label>
+			<nail x="-628" y="2771"/>
+			<nail x="-560" y="2771"/>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-509" y="2525">c[2]?</label>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-1071" y="1768">i[1]?</label>
+			<nail x="-1088" y="1785"/>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-798" y="2312">i[0]?</label>
+			<nail x="-773" y="2329"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id33"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-725" y="2692">g[1]!</label>
+			<nail x="-690" y="2655"/>
+			<nail x="-691" y="2760"/>
+		</transition>
+		<transition color="#ff00ff">
+			<source ref="id37"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-475" y="2397">i[0]?</label>
+			<nail x="-441" y="2609"/>
+			<nail x="-441" y="2184"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id33"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="-434" y="2815">c[0]?</label>
+			<nail x="-418" y="2799"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id32"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-683" y="3032">g[0]!</label>
+			<nail x="-649" y="3015"/>
+			<nail x="-649" y="3074"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-150" y="3035">c[2]?</label>
+			<nail x="-158" y="3091"/>
+			<nail x="-158" y="2995"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id36"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-271" y="3145">g[1]!</label>
+			<nail x="-305" y="3145"/>
+			<nail x="-203" y="3145"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id36"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-190" y="3035">c[0]?</label>
+			<nail x="-190" y="3075"/>
+			<nail x="-190" y="3011"/>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="93" y="1768">i[1]?</label>
+			<nail x="136" y="1768"/>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-602" y="3119">c[2]?</label>
+			<nail x="-626" y="3107"/>
+			<nail x="-562" y="3107"/>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-1079" y="2116">i[1]?</label>
+			<nail x="-642" y="2947"/>
+			<nail x="-1088" y="2125"/>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-849" y="2660">i[0]?</label>
+			<nail x="-815" y="2677"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id32"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-725" y="3032">g[1]!</label>
+			<nail x="-690" y="2995"/>
+			<nail x="-691" y="3100"/>
+		</transition>
+		<transition color="#ff00ff">
+			<source ref="id36"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-458" y="2907">i[0]?</label>
+			<nail x="-424" y="2949"/>
+			<nail x="-424" y="2414"/>
+		</transition>
+		<transition color="#00ff00">
+			<source ref="id32"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-434" y="3155">c[0]?</label>
+			<nail x="-418" y="3139"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01Comp0</name>
+		<location id="id42" x="-238" y="102">
+			<name x="-306" y="102">X01I0New</name>
+		</location>
+		<location id="id43" x="-612" y="102">
+			<name x="-590" y="91">O01I0New</name>
+		</location>
+		<location id="id44" x="-612" y="544">
+			<name x="-569" y="501">O01C0New</name>
+		</location>
+		<location id="id45" x="-1105" y="93">
+			<name x="-1173" y="25">TRUE4</name>
+		</location>
+		<location id="id46" x="-238" y="544">
+			<name x="-306" y="527">X01C0New</name>
+		</location>
+		<init ref="id43"/>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-408" y="314">i[0]?</label>
+		</transition>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-425" y="612">c[0]?</label>
+			<nail x="-408" y="612"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id42"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="-254" y="244">g[2]!</label>
+			<nail x="-305" y="235"/>
+			<nail x="-169" y="235"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id42"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-297" y="323">g[0]!</label>
+			<nail x="-314" y="323"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-786" y="91">g[2]!</label>
+			<nail x="-752" y="40"/>
+			<nail x="-752" y="176"/>
+			<nail x="-667" y="133"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-739" y="314">g[0]!</label>
+			<nail x="-705" y="323"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id42"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="-134" y="94">c[2]!</label>
+			<nail x="-142" y="150"/>
+			<nail x="-142" y="54"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id42"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="-246" y="-18">i[2]!</label>
+			<nail x="-286" y="6"/>
+			<nail x="-190" y="6"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id42"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="-257" y="198">g[1]!</label>
+			<nail x="-289" y="195"/>
+			<nail x="-193" y="195"/>
+		</transition>
+		<transition>
+			<source ref="id42"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-603" y="-136">c[0]?</label>
+			<nail x="-586" y="-102"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id42"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="-246" y="14">i[1]!</label>
+			<nail x="-270" y="38"/>
+			<nail x="-206" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-620" y="-50">i[2]!</label>
+			<nail x="-676" y="-26"/>
+			<nail x="-548" y="-26"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-628" y="142">c[1]!</label>
+			<nail x="-660" y="198"/>
+			<nail x="-564" y="198"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-628" y="206">c[2]!</label>
+			<nail x="-644" y="166"/>
+			<nail x="-580" y="166"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-620" y="-18">i[1]!</label>
+			<nail x="-660" y="6"/>
+			<nail x="-564" y="6"/>
+		</transition>
+		<transition>
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-620" y="14">i[0]?</label>
+			<nail x="-644" y="38"/>
+			<nail x="-580" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-752" y="91">g[1]!</label>
+			<nail x="-718" y="57"/>
+			<nail x="-718" y="159"/>
+		</transition>
+		<transition>
+			<source ref="id42"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-442" y="8">i[0]?</label>
+			<nail x="-432" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id43"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-892" y="-93">c[0]?</label>
+			<nail x="-875" y="-68"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-786" y="533">g[2]!</label>
+			<nail x="-752" y="482"/>
+			<nail x="-752" y="618"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-718" y="533">g[0]!</label>
+			<nail x="-684" y="516"/>
+			<nail x="-684" y="584"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-620" y="392">i[2]!</label>
+			<nail x="-676" y="416"/>
+			<nail x="-548" y="416"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-628" y="584">c[1]!</label>
+			<nail x="-660" y="640"/>
+			<nail x="-564" y="640"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-628" y="648">c[2]!</label>
+			<nail x="-644" y="608"/>
+			<nail x="-580" y="608"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-620" y="424">i[1]!</label>
+			<nail x="-660" y="448"/>
+			<nail x="-564" y="448"/>
+		</transition>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-493" y="314">i[0]?</label>
+			<nail x="-510" y="323"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-752" y="533">g[1]!</label>
+			<nail x="-718" y="499"/>
+			<nail x="-718" y="601"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1122" y="178">c[2]!</label>
+			<nail x="-1139" y="170"/>
+			<nail x="-1080" y="170"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1113" y="238">c[1]!</label>
+			<nail x="-1173" y="238"/>
+			<nail x="-1054" y="238"/>
+		</transition>
+		<transition>
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1122" y="306">c[0]?</label>
+			<nail x="-1199" y="289"/>
+			<nail x="-1037" y="289"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1172" y="55">g[2]!</label>
+			<nail x="-1190" y="51"/>
+			<nail x="-1190" y="127"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1223" y="42">g[1]!</label>
+			<nail x="-1241" y="25"/>
+			<nail x="-1241" y="153"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1274" y="29">g[0]!</label>
+			<nail x="-1292" y="0"/>
+			<nail x="-1292" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1122" y="-153">i[0]?</label>
+			<nail x="-1012" y="-128"/>
+			<nail x="-1173" y="-128"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1122" y="-102">i[1]!</label>
+			<nail x="-1156" y="-77"/>
+			<nail x="-1037" y="-77"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-1121" y="-34">i[2]!</label>
+			<nail x="-1139" y="-17"/>
+			<nail x="-1054" y="-17"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-254" y="686">g[2]!</label>
+			<nail x="-305" y="677"/>
+			<nail x="-169" y="677"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-254" y="609">g[0]!</label>
+			<nail x="-271" y="609"/>
+			<nail x="-203" y="609"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-134" y="536">c[2]!</label>
+			<nail x="-142" y="592"/>
+			<nail x="-142" y="496"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-246" y="424">i[2]!</label>
+			<nail x="-286" y="448"/>
+			<nail x="-190" y="448"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-254" y="643">g[1]!</label>
+			<nail x="-286" y="640"/>
+			<nail x="-190" y="640"/>
+		</transition>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-174" y="536">c[0]?</label>
+			<nail x="-174" y="576"/>
+			<nail x="-174" y="512"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-246" y="456">i[1]!</label>
+			<nail x="-270" y="480"/>
+			<nail x="-206" y="480"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01Comp0Comp1</name>
+		<location id="id47" x="-238" y="102">
+			<name x="-306" y="102">X01I01Newer</name>
+		</location>
+		<location id="id48" x="-612" y="102">
+			<name x="-590" y="91">O01I0I1Newer</name>
+		</location>
+		<location id="id49" x="-612" y="544">
+			<name x="-569" y="501">O01C01Newer</name>
+		</location>
+		<location id="id50" x="-1105" y="93">
+			<name x="-1173" y="25">TRUE5</name>
+		</location>
+		<location id="id51" x="-238" y="544">
+			<name x="-306" y="527">X01C01Newer</name>
+		</location>
+		<location id="id52" x="-238" y="1428">
+			<name x="-306" y="1411">X01C0C1Newer</name>
+		</location>
+		<location id="id53" x="-612" y="986">
+			<name x="-590" y="975">O01IC1Newer</name>
+		</location>
+		<location id="id54" x="-612" y="1428">
+			<name x="-569" y="1385">O01C0C1Newer</name>
+		</location>
+		<location id="id55" x="-238" y="986">
+			<name x="-306" y="986">X01I0C1Newer</name>
+		</location>
+		<location id="id56" x="221" y="1428">
+			<urgent/>
+		</location>
+		<init ref="id48"/>
+		<transition>
+			<source ref="id52"/>
+			<target ref="id56"/>
+			<label kind="synchronisation" x="34" y="1402">c[1]?</label>
+		</transition>
+		<transition>
+			<source ref="id51"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-408" y="314">i[0]?</label>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-425" y="612">c[0]?</label>
+			<nail x="-408" y="612"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id47"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="-254" y="244">g[2]!</label>
+			<nail x="-305" y="235"/>
+			<nail x="-169" y="235"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id47"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-297" y="323">g[0]!</label>
+			<nail x="-314" y="323"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id48"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-786" y="91">g[2]!</label>
+			<nail x="-752" y="40"/>
+			<nail x="-752" y="176"/>
+			<nail x="-667" y="133"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id48"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-739" y="314">g[0]!</label>
+			<nail x="-705" y="323"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id47"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="-134" y="94">c[2]!</label>
+			<nail x="-142" y="150"/>
+			<nail x="-142" y="54"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id47"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="-246" y="-18">i[2]!</label>
+			<nail x="-286" y="6"/>
+			<nail x="-190" y="6"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id47"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="68" y="382">g[1]!</label>
+			<nail x="51" y="391"/>
+		</transition>
+		<transition>
+			<source ref="id47"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-603" y="-136">c[0]?</label>
+			<nail x="-586" y="-102"/>
+		</transition>
+		<transition>
+			<source ref="id47"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="-246" y="14">i[1]?</label>
+			<nail x="-270" y="38"/>
+			<nail x="-206" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id48"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-620" y="-50">i[2]!</label>
+			<nail x="-676" y="-26"/>
+			<nail x="-548" y="-26"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-909" y="204">c[1]?</label>
+			<nail x="-892" y="195"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id48"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-628" y="206">c[2]!</label>
+			<nail x="-644" y="166"/>
+			<nail x="-580" y="166"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-620" y="-18">i[1]?</label>
+			<nail x="-660" y="6"/>
+			<nail x="-564" y="6"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-620" y="14">i[0]?</label>
+			<nail x="-644" y="38"/>
+			<nail x="-580" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id48"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-960" y="595">g[1]!</label>
+			<nail x="-909" y="595"/>
+		</transition>
+		<transition>
+			<source ref="id47"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-442" y="8">i[0]?</label>
+			<nail x="-432" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-892" y="-93">c[0]?</label>
+			<nail x="-875" y="-68"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id49"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-786" y="533">g[2]!</label>
+			<nail x="-752" y="482"/>
+			<nail x="-752" y="618"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id49"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-718" y="533">g[0]!</label>
+			<nail x="-684" y="516"/>
+			<nail x="-684" y="584"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id49"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-620" y="392">i[2]!</label>
+			<nail x="-676" y="416"/>
+			<nail x="-548" y="416"/>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-935" y="365">c[1]?</label>
+			<nail x="-926" y="340"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id49"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-628" y="648">c[2]!</label>
+			<nail x="-644" y="608"/>
+			<nail x="-580" y="608"/>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-620" y="424">i[1]?</label>
+			<nail x="-660" y="448"/>
+			<nail x="-564" y="448"/>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-493" y="314">i[0]?</label>
+			<nail x="-510" y="323"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id49"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-943" y="969">g[1]!</label>
+			<nail x="-892" y="969"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1122" y="114">c[2]!</label>
+			<nail x="-1139" y="170"/>
+			<nail x="-1080" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1155" y="148">c[1]?</label>
+			<nail x="-1173" y="238"/>
+			<nail x="-1054" y="238"/>
+		</transition>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1181" y="174">c[0]?</label>
+			<nail x="-1199" y="289"/>
+			<nail x="-1037" y="289"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1172" y="55">g[2]!</label>
+			<nail x="-1190" y="51"/>
+			<nail x="-1190" y="127"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1223" y="42">g[1]!</label>
+			<nail x="-1241" y="25"/>
+			<nail x="-1241" y="153"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1274" y="29">g[0]!</label>
+			<nail x="-1292" y="0"/>
+			<nail x="-1292" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1122" y="-153">i[0]?</label>
+			<nail x="-1012" y="-128"/>
+			<nail x="-1173" y="-128"/>
+		</transition>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1122" y="-102">i[1]?</label>
+			<nail x="-1156" y="-77"/>
+			<nail x="-1037" y="-77"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id50"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="-1121" y="-34">i[2]!</label>
+			<nail x="-1139" y="-17"/>
+			<nail x="-1054" y="-17"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-254" y="686">g[2]!</label>
+			<nail x="-305" y="677"/>
+			<nail x="-169" y="677"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-254" y="609">g[0]!</label>
+			<nail x="-271" y="609"/>
+			<nail x="-203" y="609"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-134" y="536">c[2]!</label>
+			<nail x="-142" y="592"/>
+			<nail x="-142" y="496"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-246" y="424">i[2]!</label>
+			<nail x="-286" y="448"/>
+			<nail x="-190" y="448"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id51"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="68" y="926">g[1]!</label>
+			<nail x="59" y="926"/>
+		</transition>
+		<transition>
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-174" y="536">c[0]?</label>
+			<nail x="-174" y="576"/>
+			<nail x="-174" y="512"/>
+		</transition>
+		<transition>
+			<source ref="id51"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="-246" y="456">i[1]?</label>
+			<nail x="-270" y="480"/>
+			<nail x="-206" y="480"/>
+		</transition>
+		<transition>
+			<source ref="id52"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-408" y="1198">i[0]?</label>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-425" y="1496">c[0]?</label>
+			<nail x="-408" y="1496"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id55"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="-254" y="1128">g[2]!</label>
+			<nail x="-305" y="1119"/>
+			<nail x="-169" y="1119"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id55"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-297" y="1207">g[0]!</label>
+			<nail x="-314" y="1207"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-786" y="975">g[2]!</label>
+			<nail x="-752" y="924"/>
+			<nail x="-752" y="1060"/>
+			<nail x="-667" y="1017"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id53"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-739" y="1198">g[0]!</label>
+			<nail x="-705" y="1207"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id55"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="-134" y="978">c[2]!</label>
+			<nail x="-142" y="1034"/>
+			<nail x="-142" y="938"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id55"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="-246" y="866">i[2]!</label>
+			<nail x="-286" y="890"/>
+			<nail x="-190" y="890"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id55"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="-257" y="1082">g[1]!</label>
+			<nail x="-289" y="1079"/>
+			<nail x="-193" y="1079"/>
+		</transition>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="76" y="629">i[1]?</label>
+			<nail x="68" y="603"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-620" y="834">i[2]!</label>
+			<nail x="-676" y="858"/>
+			<nail x="-548" y="858"/>
+		</transition>
+		<transition>
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-629" y="1062">c[1]?</label>
+			<nail x="-663" y="1088"/>
+			<nail x="-561" y="1088"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-629" y="1020">c[2]!</label>
+			<nail x="-644" y="1050"/>
+			<nail x="-580" y="1050"/>
+		</transition>
+		<transition>
+			<source ref="id53"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="-459" y="671">i[1]?</label>
+			<nail x="-476" y="680"/>
+		</transition>
+		<transition>
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-620" y="898">i[0]?</label>
+			<nail x="-644" y="922"/>
+			<nail x="-580" y="922"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id53"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-752" y="975">g[1]!</label>
+			<nail x="-718" y="941"/>
+			<nail x="-718" y="1043"/>
+		</transition>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-442" y="892">i[0]?</label>
+			<nail x="-432" y="884"/>
+			<nail x="-552" y="952"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-786" y="1417">g[2]!</label>
+			<nail x="-752" y="1366"/>
+			<nail x="-752" y="1502"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-718" y="1417">g[0]!</label>
+			<nail x="-684" y="1400"/>
+			<nail x="-684" y="1468"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-620" y="1276">i[2]!</label>
+			<nail x="-676" y="1300"/>
+			<nail x="-548" y="1300"/>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-620" y="1530">c[1]?</label>
+			<nail x="-660" y="1524"/>
+			<nail x="-564" y="1524"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-569" y="1470">c[2]!</label>
+			<nail x="-644" y="1492"/>
+			<nail x="-580" y="1492"/>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id49"/>
+			<label kind="synchronisation" x="-433" y="1020">i[1]?</label>
+			<nail x="-425" y="1079"/>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-493" y="1198">i[0]?</label>
+			<nail x="-510" y="1207"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id54"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="-752" y="1417">g[1]!</label>
+			<nail x="-718" y="1383"/>
+			<nail x="-718" y="1485"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-254" y="1570">g[2]!</label>
+			<nail x="-305" y="1561"/>
+			<nail x="-169" y="1561"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-254" y="1493">g[0]!</label>
+			<nail x="-271" y="1493"/>
+			<nail x="-203" y="1493"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-134" y="1420">c[2]!</label>
+			<nail x="-142" y="1476"/>
+			<nail x="-142" y="1380"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-246" y="1308">i[2]!</label>
+			<nail x="-286" y="1332"/>
+			<nail x="-190" y="1332"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-254" y="1527">g[1]!</label>
+			<nail x="-286" y="1524"/>
+			<nail x="-190" y="1524"/>
+		</transition>
+		<transition>
+			<source ref="id52"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-174" y="1420">c[0]?</label>
+			<nail x="-174" y="1460"/>
+			<nail x="-174" y="1396"/>
+		</transition>
+		<transition>
+			<source ref="id52"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="76" y="1139">i[1]?</label>
+			<nail x="68" y="1147"/>
+		</transition>
+	</template>
+	<template>
+		<name>Spec01Comp0Comp1Comp2Pruned</name>
+		<location id="id57" x="-612" y="102">
+			<name x="-590" y="91">O01I0I1New</name>
+		</location>
+		<location id="id58" x="-612" y="544">
+			<name x="-569" y="501">O01C0I1New</name>
+		</location>
+		<location id="id59" x="-1105" y="93">
+			<name x="-1173" y="25">TRUE6</name>
+		</location>
+		<location id="id60" x="-238" y="544">
+			<name x="-306" y="527">X01C0I1New</name>
+		</location>
+		<location id="id61" x="-170" y="102">
+			<name x="-148" y="91">O01I0C1New</name>
+		</location>
+		<init ref="id57"/>
+		<transition>
+			<source ref="id60"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-408" y="314">i[0]?</label>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-425" y="612">c[0]?</label>
+			<nail x="-408" y="612"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id57"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-786" y="91">g[2]!</label>
+			<nail x="-752" y="40"/>
+			<nail x="-752" y="176"/>
+			<nail x="-667" y="133"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id57"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-739" y="314">g[0]!</label>
+			<nail x="-705" y="323"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-620" y="-50">i[2]?</label>
+			<nail x="-676" y="-26"/>
+			<nail x="-548" y="-26"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-909" y="204">c[1]?</label>
+			<nail x="-892" y="195"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-628" y="206">c[2]?</label>
+			<nail x="-644" y="166"/>
+			<nail x="-580" y="166"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-620" y="-18">i[1]?</label>
+			<nail x="-660" y="6"/>
+			<nail x="-564" y="6"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-620" y="14">i[0]?</label>
+			<nail x="-644" y="38"/>
+			<nail x="-580" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id57"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-960" y="595">g[1]!</label>
+			<nail x="-374" y="34"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-892" y="-93">c[0]?</label>
+			<nail x="-875" y="-68"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id58"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-786" y="533">g[2]!</label>
+			<nail x="-752" y="482"/>
+			<nail x="-752" y="618"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id58"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-718" y="533">g[0]!</label>
+			<nail x="-684" y="516"/>
+			<nail x="-684" y="584"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-620" y="392">i[2]?</label>
+			<nail x="-676" y="416"/>
+			<nail x="-548" y="416"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-935" y="365">c[1]?</label>
+			<nail x="-926" y="340"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-629" y="629">c[2]?</label>
+			<nail x="-644" y="608"/>
+			<nail x="-580" y="608"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-620" y="424">i[1]?</label>
+			<nail x="-660" y="448"/>
+			<nail x="-564" y="448"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-493" y="314">i[0]?</label>
+			<nail x="-510" y="323"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1122" y="114">c[2]?</label>
+			<nail x="-1139" y="170"/>
+			<nail x="-1080" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1155" y="148">c[1]?</label>
+			<nail x="-1173" y="238"/>
+			<nail x="-1054" y="238"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1181" y="174">c[0]?</label>
+			<nail x="-1199" y="289"/>
+			<nail x="-1037" y="289"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1172" y="55">g[2]!</label>
+			<nail x="-1190" y="51"/>
+			<nail x="-1190" y="127"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1223" y="42">g[1]!</label>
+			<nail x="-1241" y="25"/>
+			<nail x="-1241" y="153"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1274" y="29">g[0]!</label>
+			<nail x="-1292" y="0"/>
+			<nail x="-1292" y="170"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1122" y="-153">i[0]?</label>
+			<nail x="-1012" y="-128"/>
+			<nail x="-1173" y="-128"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1122" y="-102">i[1]?</label>
+			<nail x="-1156" y="-77"/>
+			<nail x="-1037" y="-77"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-1121" y="-34">i[2]?</label>
+			<nail x="-1139" y="-17"/>
+			<nail x="-1054" y="-17"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-254" y="686">g[2]!</label>
+			<nail x="-305" y="677"/>
+			<nail x="-169" y="677"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-254" y="609">g[0]!</label>
+			<nail x="-271" y="609"/>
+			<nail x="-203" y="609"/>
+		</transition>
+		<transition>
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-134" y="536">c[2]?</label>
+			<nail x="-142" y="592"/>
+			<nail x="-142" y="496"/>
+		</transition>
+		<transition>
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-246" y="424">i[2]?</label>
+			<nail x="-286" y="448"/>
+			<nail x="-190" y="448"/>
+		</transition>
+		<transition>
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-174" y="536">c[0]?</label>
+			<nail x="-174" y="576"/>
+			<nail x="-174" y="512"/>
+		</transition>
+		<transition>
+			<source ref="id60"/>
+			<target ref="id60"/>
+			<label kind="synchronisation" x="-246" y="456">i[1]?</label>
+			<nail x="-270" y="480"/>
+			<nail x="-206" y="480"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-344" y="91">g[2]!</label>
+			<nail x="-310" y="40"/>
+			<nail x="-310" y="176"/>
+			<nail x="-225" y="133"/>
+		</transition>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-178" y="-50">i[2]?</label>
+			<nail x="-234" y="-26"/>
+			<nail x="-106" y="-26"/>
+		</transition>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-187" y="178">c[1]?</label>
+			<nail x="-221" y="204"/>
+			<nail x="-119" y="204"/>
+		</transition>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-187" y="136">c[2]?</label>
+			<nail x="-202" y="166"/>
+			<nail x="-138" y="166"/>
+		</transition>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="-459" y="671">i[1]?</label>
+			<nail x="-374" y="178"/>
+		</transition>
+		<transition>
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-178" y="14">i[0]?</label>
+			<nail x="-202" y="38"/>
+			<nail x="-138" y="38"/>
+		</transition>
+		<transition controllable="false">
+			<source ref="id61"/>
+			<target ref="id61"/>
+			<label kind="synchronisation" x="-310" y="91">g[1]!</label>
+			<nail x="-276" y="57"/>
+			<nail x="-276" y="159"/>
+		</transition>
+	</template>
+	<system>system Comp0, Comp1, Comp2, Spec01, Spec01Comp2Final, Spec01Comp2Comp0Final, Spec01Comp2Comp0Comp1Final, Spec01Comp0, Spec01Comp0Comp1, Spec01Comp0Comp1Comp2;
+
+IO Comp0 { c[0]!, c[1]?, c[2]?, i[0]!, i[1]?, i[2]?, g[0]?, g[1]?, g[2]?}
+IO Comp1 { c[0]?, c[1]!, c[2]?, i[0]?, i[1]!, i[2]?, g[0]?, g[1]?, g[2]?}
+IO Comp2 { c[0]?, c[1]?, c[2]!, i[0]?, i[1]?, i[2]!, g[0]?, g[1]?, g[2]?}
+IO Spec01 { c[0]!, c[1]!, c[2]!, i[0]!, i[1]!, i[2]!, g[0]!, g[1]!, g[2]!}
+IO Spec01Comp2Final { c[0]!, c[1]!, c[2]?, i[0]!, i[1]!, i[2]?, g[0]!, g[1]!, g[2]!}
+IO Spec01Comp2Comp0Final { c[0]?, c[1]!, c[2]?, i[0]?, i[1]!, i[2]?, g[0]!, g[1]!, g[2]!}
+IO Spec01Comp2Comp0Comp1Final { c[0]?, c[1]?, c[2]?, i[0]?, i[1]?, i[2]?, g[0]!, g[1]!, g[2]!}
+IO Spec01Comp0 { c[0]!, c[1]!, c[2]?, i[0]!, i[1]!, i[2]?, g[0]!, g[1]!, g[2]!}
+IO Spec01Comp0Comp1 { c[0]?, c[1]!, c[2]?, i[0]?, i[1]!, i[2]?, g[0]!, g[1]!, g[2]!}
+IO Spec01Comp0Comp1Comp2 { c[0]?, c[1]?, c[2]?, i[0]?, i[1]?, i[2]?, g[0]!, g[1]!, g[2]!}</system>
+	<queries>
+		<query>
+			<formula>refinement: (Comp0 &amp;&amp; Comp1 &amp;&amp; Comp2 &amp;&amp; Spec01) &lt;= Spec01Comp2Comp0Comp1Final</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>refinement: Spec01Comp0Comp1Comp2 &lt;= Spec01Comp2Comp0Comp1Final</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>refinement: Spec01Comp2Comp0Comp1Final &lt;= Spec01Comp0Comp1Comp2</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>consistency: Spec01</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>consistency: Spec01Comp2Final</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>consistency: Spec01Comp2Comp0Final</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>consistency: Spec01Comp2Comp0Comp1Final</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

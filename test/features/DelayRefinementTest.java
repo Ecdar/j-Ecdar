@@ -310,11 +310,19 @@ public class DelayRefinementTest {
 
     @Test
     public void F1F2RefinesF3() {
+
+
         TransitionSystem comp = new Composition(
                 new TransitionSystem[]{
                         new SimpleTransitionSystem(automata[7]),
                         new SimpleTransitionSystem(automata[8])});
-        assertTrue(new Refinement(comp, new SimpleTransitionSystem(automata[9])).check());
+        Refinement ref = new Refinement(comp, new SimpleTransitionSystem(automata[9]));
+        boolean result =ref.check();
+        System.out.println(comp.isImplementation());
+        System.out.println(ref.getErrMsg());
+
+
+        assertTrue(result);
     }
 
     @Test

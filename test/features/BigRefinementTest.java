@@ -27,6 +27,7 @@ public class BigRefinementTest {
         comp1Copy = new SimpleTransitionSystem(new Automaton(machines[0]));
         ref1 = new SimpleTransitionSystem(machines[1]);
         ref1Copy = new SimpleTransitionSystem(new Automaton(machines[1]));
+
     }
 
     @Test

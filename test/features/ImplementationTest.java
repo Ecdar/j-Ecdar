@@ -132,7 +132,9 @@ public class ImplementationTest {
 
     @Test
     public void testG13(){
-        assertTrue(G13.isImplementation());
+        boolean res = G13.isImplementation();
+        System.out.println(G13.getLastErr());
+        assertTrue(res);
     }
 
     @Test

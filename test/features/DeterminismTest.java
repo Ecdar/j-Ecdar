@@ -8,6 +8,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -128,11 +132,19 @@ public class DeterminismTest {
 
     @Test
     public void testG12(){
+
+
+
+
+
+
+
         assertTrue(G12.isDeterministic());
     }
 
     @Test
     public void testG13(){
+        ((SimpleTransitionSystem) (G13)).toXML("st-ic.xml");
         assertTrue(G13.isDeterministic());
     }
 

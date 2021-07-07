@@ -14,23 +14,33 @@ public abstract class TransitionSystem {
         this.clocks = new ArrayList<>();
     }
 
+    public abstract Automaton getAutomaton();
+
     public List<Clock> getClocks() {
         return clocks;
     }
 
     public State getInitialState() {
+        //System.out.println("clocks " + clocks);
         Zone zone = new Zone(clocks.size() + 1, true);
-        State state = new State(getInitialLocation(), zone);
+        List<Zone> zoneList = new ArrayList<>();
+        zoneList.add(zone);
+        Federation initFed = new Federation(zoneList);
+        State state = new State(getInitialLocation(), initFed);
         state.applyInvariants(clocks);
-
+        //System.out.println("Initial Zone size first " + state.getInvFed().size() + " " + initFed.size());
         return state;
     }
 
-    public State getInitialStateRef(List<Clock> allClocks, List<Guard> invs) {
+    public State getInitialStateRef(List<Clock> allClocks, List<List<Guard>> invs) {
         Zone zone = new Zone(allClocks.size() + 1, true);
-        State state = new State(getInitialLocation(), zone);
+        List<Zone> zoneList = new ArrayList<>();
+        zoneList.add(zone);
+        Federation initFed = new Federation(zoneList);
+        State state = new State(getInitialLocation(), initFed);
         state.applyInvariants(allClocks);
         state.applyGuards(invs, allClocks);
+        //System.out.println("Initial Zone size second" + initFed.size());
 
         return state;
     }
@@ -44,29 +54,45 @@ public abstract class TransitionSystem {
 
     List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
         List<Transition> transitions = new ArrayList<>();
-
+        //System.out.println(currentState + " " + moves.size());
         // loop through moves
         for (Move move : moves) {
 
             // gather all the guards and resets of one move
-            List<Guard> guards = move.getGuards();
+            List<List<Guard>> guards = move.getGuards();
             List<Update> updates = move.getUpdates();
-
+            //System.out.println("reached createNewTransitions1");
+            // TODO: just turned zones into feds, need to check whether there is some special behaviour.
             // need to make a copy of the zone. Arrival zone of target state is invalid right now
-            State targetState = new State(move.getTarget(), currentState.getInvZone());
 
+            State targetState = new State(move.getTarget(), currentState.getInvFed());
+            //System.out.println("************************************************************************************************"+currentState.getInvFed().getZones().size());
+           // currentState.getInvFed().getZones().get(0).printDBM(true,true);
             if (!guards.isEmpty()) targetState.applyGuards(guards, allClocks);
-            if (!targetState.getInvZone().isValid()) continue;
-            Zone guardZone = new Zone(targetState.getInvZone());
+            //System.out.println("reached createNewTransitions8");
+            //System.out.println(move.getGuards());
+            //System.out.println(move.getEdges().get(0));
+           // currentState.getInvFed().getZones().get(0).printDBM(true,true);
+            //targetState.getInvFed().getZones().get(0).printDBM(true,true);
+            if (!targetState.getInvFed().isValid()) continue;
+            //System.out.println("reached createNewTransitions9");
+
+            Federation guardFed = new Federation(targetState.getInvFed().getZones());
+            //System.out.println(guardFed.getZones().size());
             if (!updates.isEmpty()) targetState.applyResets(updates, allClocks);
-
-            targetState.getInvZone().delay();
+            //System.out.println("reached createNewTransitions2");
+            //System.out.println(guardFed.getZones().size());
+            targetState.getInvFed().delay();
+            //System.out.println("reached createNewTransitions5");
             targetState.applyInvariants(allClocks);
+            //System.out.println("reached createNewTransitions3");
+            if (!targetState.getInvFed().isValid()) continue;
+            //System.out.println("reached createNewTransitions4");
 
-            if (!targetState.getInvZone().isValid()) continue;
-
-            transitions.add(new Transition(currentState, targetState, move, guardZone));
+            assert(guardFed.getZones().size()!=0);
+            transitions.add(new Transition(currentState, targetState, move, guardFed));
         }
+        //System.out.println(transitions.size());
         return transitions;
     }
 
@@ -98,22 +124,29 @@ public abstract class TransitionSystem {
 
 
     public boolean isDeterministic(){
+       // System.out.println("reached isdeterm1");
         boolean isDeterministic = true;
         List<String> nondetermTs = new ArrayList<>();
 
         List<SimpleTransitionSystem> systems = getSystems();
 
+        //System.out.println("reached isdeterm2");
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isDeterministicHelper()){
                 isDeterministic = false;
                 nondetermTs.add(ts.getName());
             }
         }
+
+        //System.out.println("reached isdeterm3");
         if(!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
+
+
         return isDeterministic;
     }
 
     public boolean isLeastConsistent(){
+        //System.out.println("reached isleastcons1");
         return isConsistent(true);
     }
 
@@ -125,9 +158,9 @@ public abstract class TransitionSystem {
         boolean isDeterm = isDeterministic();
         boolean isConsistent = true;
         List<String> inconsistentTs = new ArrayList<>();
-
+        //System.out.println("reached cons 0");
         List<SimpleTransitionSystem> systems = getSystems();
-
+        //System.out.println("reached cons 1");
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isConsistentHelper(canPrune)) {
                 isConsistent = false;
@@ -174,7 +207,7 @@ public abstract class TransitionSystem {
 
     List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
         List<Move> moves = new ArrayList<>();
-
+        //System.out.println("reached moveProduct");
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
 

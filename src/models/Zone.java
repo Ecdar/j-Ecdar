@@ -36,6 +36,8 @@ public class Zone {
         LibLoader.load();
     }
 
+
+
     // copy constructor
     public Zone(Zone oldZone) {
         this.size = oldZone.size;
@@ -44,6 +46,8 @@ public class Zone {
 
         LibLoader.load();
     }
+
+    public boolean isEmpty() {return DBMLib.dbm_isEmpty(dbm, size);}
 
     public int getSize() {
         return size;
@@ -60,20 +64,30 @@ public class Zone {
         int upperBoundI = g.getUpperBound();
 
         // if guard is of type "clock == value"
+
+//        if (upperBoundI == Integer.MAX_VALUE && (lowerBoundI == 0)) {
+//            constrain1(index, 0, DBM_INF, isStrict);
+//        }
+        if (upperBoundI == Integer.MAX_VALUE && lowerBoundI != 0) {
+            //System.out.println("been here");
+            constrain1(0, index, (-1) * lowerBoundI, isStrict);
+        }
+        else
+        if (lowerBoundI == 0 && upperBoundI != Integer.MAX_VALUE)
+            constrain1(index, 0, upperBoundI, isStrict);
+        else
         if (lowerBoundI == upperBoundI) {
             constrain1(0, index, (-1) * lowerBoundI, isStrict);
             constrain1(index, 0, upperBoundI, isStrict);
         }
-
-        if (upperBoundI == Integer.MAX_VALUE)
-            constrain1(0, index, (-1) * lowerBoundI, isStrict);
-
-        if (lowerBoundI == 0)
-            constrain1(index, 0, upperBoundI, isStrict);
     }
 
     public void updateValue(int index, int value) {
         dbm = DBMLib.dbm_updateValue(dbm, size, index, value);
+    }
+
+    public int[] delayNewDBM() {
+        return DBMLib.dbm_up(dbm, size);
     }
 
     public void delay() {
@@ -104,6 +118,16 @@ public class Zone {
             if (curr < DBM_INF) return false;
         }
         return true;
+    }
+
+    public Zone close(){
+        return new Zone(DBMLib.dbm_close(dbm, size));
+    }
+
+    public Zone freeClock(int index)
+    {
+        return new Zone(DBMLib.dbm_freeClock(dbm, size, index));
+
     }
 
     public boolean isUrgent(){
