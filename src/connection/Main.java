@@ -20,8 +20,8 @@ class Main {
 
     static Options options = new Options();
 
-    static Option inputFolder = Option.builder()
-            .longOpt("inputFolder")
+    static Option inputFolder = Option.builder("i")
+            .longOpt("input-folder")
             .argName("file")
             .hasArg()
             .desc("Provided input folder")
