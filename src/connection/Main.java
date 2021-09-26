@@ -103,7 +103,7 @@ class Main {
 
             String refQuery = cmd.getOptionValue("refinement");
             String quotientQuery = cmd.getOptionValue("quotient");
-            String inputFolderPath = cmd.getOptionValue("inputFolder");
+            String inputFolderPath = cmd.getOptionValue("input-folder");
             String getNewComp = cmd.getOptionValue("get-new-component");
             String[] components = cmd.getOptionValues("comps");
             Automaton[] machines = JSONParser.parse(inputFolderPath, false);
