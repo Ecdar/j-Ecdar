@@ -20,6 +20,7 @@ class Main {
 
     static Options options = new Options();
 
+
     static Option inputFolder = Option.builder("i")
             .longOpt("input-folder")
             .argName("file")
@@ -38,24 +39,18 @@ class Main {
 
     static Option refinement = Option.builder()
             .longOpt("refinement")
-            .argName("ref")
-            .hasArg()
             .desc("Query for refinement check")
             .required(false)
             .build();
 
     static Option get = Option.builder()
             .longOpt("get-new-component")
-            .argName("get")
-            .hasArg()
             .desc("Produce an automaton for the query")
             .required(false)
             .build();
 
     static Option quo = Option.builder()
             .longOpt("quotient")
-            .argName("quo")
-            .hasArg()
             .desc("produce the quotient")
             .required(false)
             .build();
@@ -100,23 +95,24 @@ class Main {
         try {
             cmd = parser.parse(options, args);
 
-
-            String refQuery = cmd.getOptionValue("refinement");
-            String quotientQuery = cmd.getOptionValue("quotient");
             String inputFolderPath = cmd.getOptionValue("input-folder");
-            String getNewComp = cmd.getOptionValue("get-new-component");
             String[] components = cmd.getOptionValues("comps");
             Automaton[] machines = JSONParser.parse(inputFolderPath, false);
+            List<String> argsList = cmd.getArgList();
+            if(argsList.size() != 1){
+                // Error
+            }
+            String queryString = argsList.get(0);
 
             boolean prune = cmd.hasOption("prune");
             boolean bisim = cmd.hasOption("bsim-min");
+            boolean refinment = cmd.hasOption("refinement");
+            boolean getNewComponent = cmd.hasOption("get-new-component");
 
-
-
-            if (getNewComp != null )
+            if (getNewComponent)
             {
                 try {
-                TransitionSystem tr = Controller.handleRequestGetComp("-json " + inputFolderPath + " " + getNewComp,false);
+                TransitionSystem tr = Controller.handleRequestGetComp("-json " + inputFolderPath + " " + queryString,false);
                 Automaton aut = tr.getAutomaton();
                 if (prune)
                 {
@@ -137,10 +133,10 @@ class Main {
                 }
             }
 
-            if (refQuery !=null) {
+            if (refinment) {
                 try {
-                    System.out.println("-json " + inputFolderPath + " " + refQuery);
-                    System.out.println(Controller.handleRequest("-json " + inputFolderPath + " " + refQuery, false));
+                    System.out.println("-json " + inputFolderPath + " " + queryString);
+                    System.out.println(Controller.handleRequest("-json " + inputFolderPath + " " + queryString, false));
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                     e.printStackTrace();
@@ -151,7 +147,7 @@ class Main {
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("utility-name", options);
+            formatter.printHelp("[OPTIONS] <query>", options);
 
             System.exit(1);
         }
