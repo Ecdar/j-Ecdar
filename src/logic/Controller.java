@@ -82,17 +82,29 @@ public class Controller {
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
-            if(Queries.get(i).contains("bisim-minim")){
-                String impl = Queries.get(i).replace("bisim-minim:", "");
-                TransitionSystem ts = runQuery(impl);
-                Automaton aut = ts.getAutomaton();
-                aut = Bisimilarity.checkBisimilarity(aut);
-                JsonFileWriter.writeToJson(aut, folderLocation);
-            }
             if(Queries.get(i).contains("get-component")){
                 String query = Queries.get(i).replace("get-component:", "");
                 TransitionSystem ts = runQuery(query);
                 JsonFileWriter.writeToJson(ts.getAutomaton(), folderLocation);
+            }
+            if(Queries.get(i).contains("bisim-minim")){
+                String impl = Queries.get(i).replace("bisim-minim:", "");
+                TransitionSystem ts = runQuery(impl);
+                Automaton aut = ts.getAutomaton();
+
+                aut = Bisimilarity.checkBisimilarity(aut);
+
+                JsonFileWriter.writeToJson(aut, folderLocation);
+            }
+            if(Queries.get(i).contains("prune")){
+                String impl = Queries.get(i).replace("prune:", "");
+                TransitionSystem ts = runQuery(impl);
+                Automaton aut = ts.getAutomaton();
+
+                SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
+                aut = simp.pruneReachTimed().getAutomaton();
+
+                JsonFileWriter.writeToJson(aut, folderLocation);
             }
             //add if contains specification or smth else
         }
