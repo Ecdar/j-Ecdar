@@ -109,100 +109,21 @@ class Main {
             boolean refinment = cmd.hasOption("refinement");
             boolean getNewComponent = cmd.hasOption("get-new-component");
 
-            if (getNewComponent)
-            {
-                try {
-                TransitionSystem tr = Controller.handleRequestGetComp("-json " + inputFolderPath + " " + queryString,false);
-                Automaton aut = tr.getAutomaton();
-                if (prune)
-                {
-                    SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
-                    aut = simp.pruneReachTimed().getAutomaton();
-                }
-
-                if (bisim)
-                {
-                    aut = Bisimilarity.checkBisimilarity(aut);
-                }
-
-                JsonFileWriter.writeToJson(aut, "./teeeeeest/");
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
-                    fail();
-                }
+            try {
+                System.out.println("-json " + inputFolderPath + " " + queryString);
+                System.out.println(Controller.handleRequest("-json " + inputFolderPath, queryString, false));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+                fail();
             }
-
-            if (refinment) {
-                try {
-                    System.out.println("-json " + inputFolderPath + " " + queryString);
-                    System.out.println(Controller.handleRequest("-json " + inputFolderPath + " " + queryString, false));
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
-                    fail();
-                }
-            }
-
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("[OPTIONS] <query>", options);
+            formatter.printHelp("-i path/to/folder [OPTIONS] [\"QUERIES\"]", options);
 
             System.exit(1);
         }
 
-    }
-
-
-    static String chooseCommand(String query) {
-        String indicator = query;
-        if (query.contains(" ")) {
-            indicator = query.substring(0, query.indexOf(' '));
-        }
-
-        switch (indicator.toLowerCase()) {
-            case "-version":
-                return ENGINE_NAME + " Version: " + VERSION;
-            case "-rq":
-                try {
-                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), false);
-                    if (temp.size() == 1) return temp.get(0);
-                    else {
-                        StringBuilder str = new StringBuilder();
-                        for (int i = 0; i < temp.size(); i++)
-                            str.append(temp.get(i));
-                        return str.toString();
-                    }
-                } catch (Exception e) {
-                    return "Error: " + e.getMessage();//e.printStackTrace();
-                }
-            case "-rqrrr":
-                try {
-                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), true);
-                    if (temp.size() == 1) return temp.get(0);
-                    else {
-                        StringBuilder str = new StringBuilder();
-                        for (int i = 0; i < temp.size(); i++)
-                            str.append(temp.get(i));
-                        return str.toString();
-                    }
-                } catch (Exception e) {
-                    return "Error: " + e.getMessage();//e.printStackTrace();
-                }
-            case "-vq":
-                try {
-                    Controller.isQueryValid(query.substring(query.indexOf(' ') + 1));
-                    return String.valueOf(true);
-                } catch (Exception e) {
-                    return "Error: " + e.getMessage();//e.printStackTrace();
-                }
-            case "-help":
-                return "In order to check version type:-version\n"
-                        + "In order to run query type:-rq -json/-xml folderPath query query...\n"
-                        + "In order to check the validity of a query type:-vq query";
-            default:
-                return "Unknown command: \"" + query + "\"\nwrite -help to get list of commands";
-        }
     }
 }

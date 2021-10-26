@@ -16,38 +16,19 @@ public class Controller {
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public static List<String> handleRequest(String locQuery, boolean trace) throws Exception {
+    public static List<String> handleRequest(String location, String query, boolean trace) throws Exception {
         Queries.clear();
 
         // Separates location and Queries
-        ArrayList<String> temp = new ArrayList<>(Arrays.asList(locQuery.split(" ")));
+        ArrayList<String> temp = new ArrayList<>(Arrays.asList(location.split(" ")));
         boolean isJson = temp.get(0).equals("-json");
         String folderLoc = temp.get(1);
 
-        temp.remove(1);
-        temp.remove(0);
-        Queries.addAll(temp);
+        Queries.addAll(Arrays.asList(query.split(";")));
 
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
-        return runQueries(trace);
-    }
-
-    public static TransitionSystem handleRequestGetComp(String locQuery, boolean trace) throws Exception {
-        Queries.clear();
-
-        // Separates location and Queries
-        ArrayList<String> temp = new ArrayList<>(Arrays.asList(locQuery.split(" ")));
-        boolean isJson = temp.get(0).equals("-json");
-        String folderLoc = temp.get(1);
-
-        temp.remove(1);
-        temp.remove(0);
-        Queries.addAll(temp);
-
-        parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
-        assert(Queries.size()<=1);
-        return runQuery(Queries.get(0));
+        return runQueries(trace, folderLoc);
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
@@ -57,7 +38,7 @@ public class Controller {
         }
     }
 
-    private static List<String> runQueries(boolean trace) throws Exception {
+    private static List<String> runQueries(boolean trace, String folderLocation) throws Exception {
         List<String> returnlist = new ArrayList<>();
 
         for (int i = 0; i < Queries.size(); i++) {
@@ -100,6 +81,11 @@ public class Controller {
                 boolean passed = ts.isDeterministic();
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
+            }
+            if(Queries.get(i).contains("get-component")){
+                String query = Queries.get(i).replace("get-component:", "");
+                TransitionSystem ts = runQuery(query);
+                JsonFileWriter.writeToJson(ts.getAutomaton(), folderLocation);
             }
             //add if contains specification or smth else
         }
