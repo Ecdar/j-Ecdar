@@ -98,11 +98,11 @@ class Main {
             String inputFolderPath = cmd.getOptionValue("input-folder");
             String[] components = cmd.getOptionValues("comps");
             Automaton[] machines = JSONParser.parse(inputFolderPath, false);
+
             List<String> argsList = cmd.getArgList();
-            if(argsList.size() != 1){
-                throw new ParseException("Expected final parameter to be a query string");
-            }
-            String queryString = argsList.get(0);
+            StringBuilder argStrBuilder = new StringBuilder();
+            argsList.forEach(argStrBuilder::append);
+            String queryString = argStrBuilder.toString();
 
             boolean prune = cmd.hasOption("prune");
             boolean bisim = cmd.hasOption("bsim-min");
