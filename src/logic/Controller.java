@@ -82,6 +82,13 @@ public class Controller {
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
+            if(Queries.get(i).contains("bisim-minim")){
+                String impl = Queries.get(i).replace("bisim-minim:", "");
+                TransitionSystem ts = runQuery(impl);
+                Automaton aut = ts.getAutomaton();
+                aut = Bisimilarity.checkBisimilarity(aut);
+                JsonFileWriter.writeToJson(aut, folderLocation);
+            }
             if(Queries.get(i).contains("get-component")){
                 String query = Queries.get(i).replace("get-component:", "");
                 TransitionSystem ts = runQuery(query);
