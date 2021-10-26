@@ -29,6 +29,10 @@ class Main {
             .required(true)
             .build();
 
+    static Option help = Option.builder("h")
+            .longOpt("help")
+            .build();
+
     static Option comps = Option.builder()
             .longOpt("components")
             .argName("comps")
@@ -86,7 +90,7 @@ class Main {
         options.addOption(get);
         options.addOption(prn);
         options.addOption(bsim);
-
+        options.addOption(help);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -94,6 +98,11 @@ class Main {
 
         try {
             cmd = parser.parse(options, args);
+
+            if(cmd.hasOption("help")){
+                printHelp(formatter,options);
+                return;
+            }
 
             String inputFolderPath = cmd.getOptionValue("input-folder");
             String[] components = cmd.getOptionValues("comps");
@@ -120,10 +129,14 @@ class Main {
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("-i path/to/folder [OPTIONS] [\"QUERIES\"]", options);
+            printHelp(formatter,options);
 
             System.exit(1);
         }
 
+    }
+
+    private static void printHelp(HelpFormatter formatter, Options options){
+        formatter.printHelp("-i path/to/folder [OPTIONS] [\"QUERIES\"]", options);
     }
 }
