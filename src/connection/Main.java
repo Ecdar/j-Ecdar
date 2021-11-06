@@ -29,6 +29,11 @@ class Main {
             .required(true)
             .build();
 
+    static Option outputFolder = Option.builder("o")
+            .longOpt("output-folder")
+            .hasArg()
+            .build();
+
     static Option help = Option.builder("h")
             .longOpt("help")
             .build();
@@ -37,6 +42,7 @@ class Main {
     public static void main(String[] args) {
 
         options.addOption(inputFolder);
+        options.addOption(outputFolder);
         options.addOption(help);
 
         CommandLineParser parser = new DefaultParser();
@@ -52,6 +58,7 @@ class Main {
             }
 
             String inputFolderPath = cmd.getOptionValue("input-folder");
+            String outputFolderPath = cmd.getOptionValue("output-folder");
             String[] components = cmd.getOptionValues("comps");
             Automaton[] machines = JSONParser.parse(inputFolderPath, false);
 
@@ -62,7 +69,7 @@ class Main {
 
             try {
                 System.out.println("-json " + inputFolderPath + " " + queryString);
-                System.out.println(Controller.handleRequest("-json " + inputFolderPath, queryString, false));
+                System.out.println(Controller.handleRequest("-json " + inputFolderPath, outputFolderPath, queryString, false));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();

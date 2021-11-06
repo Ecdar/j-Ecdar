@@ -16,7 +16,7 @@ public class Controller {
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public static List<String> handleRequest(String location, String query, boolean trace) throws Exception {
+    public static List<String> handleRequest(String location, String outputLocation, String query, boolean trace) throws Exception {
         Queries.clear();
 
         // Separates location and Queries
@@ -28,7 +28,7 @@ public class Controller {
 
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
-        return runQueries(trace, folderLoc);
+        return runQueries(trace, outputLocation);
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
@@ -85,7 +85,7 @@ public class Controller {
             if(Queries.get(i).contains("get-component")){
                 String query = Queries.get(i).replace("get-component:", "");
                 TransitionSystem ts = runQuery(query);
-                JsonFileWriter.writeToJson(ts.getAutomaton(), folderLocation);
+                saveAutomaton(ts.getAutomaton(), folderLocation);
             }
             if(Queries.get(i).contains("bisim-minim")){
                 String impl = Queries.get(i).replace("bisim-minim:", "");
@@ -94,7 +94,7 @@ public class Controller {
 
                 aut = Bisimilarity.checkBisimilarity(aut);
 
-                JsonFileWriter.writeToJson(aut, folderLocation);
+                saveAutomaton(aut, folderLocation);
             }
             if(Queries.get(i).contains("prune")){
                 String impl = Queries.get(i).replace("prune:", "");
@@ -104,12 +104,20 @@ public class Controller {
                 SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
                 aut = simp.pruneReachTimed().getAutomaton();
 
-                JsonFileWriter.writeToJson(aut, folderLocation);
+                saveAutomaton(aut, folderLocation);
             }
             //add if contains specification or smth else
         }
 
         return returnlist;
+    }
+
+    private static void saveAutomaton(Automaton aut, String folderLocation){
+        if(folderLocation != null){
+            JsonFileWriter.writeToJson(aut, folderLocation);
+        }else{
+            // todo: Save in memory
+        }
     }
 
 
