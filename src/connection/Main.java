@@ -10,8 +10,6 @@ import org.apache.commons.cli.*;
 import parser.JSONParser;
 import parser.XMLParser;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 class Main {
     static final String VERSION = "1.0";
@@ -73,7 +71,7 @@ class Main {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
-                fail();
+                System.exit(1);
             }
 
         } catch (ParseException e) {
