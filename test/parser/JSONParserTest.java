@@ -144,7 +144,7 @@ public class JSONParserTest {
 
     @Test
     public void testA() {
-        assert A.equals(machines[0]);
+        Assert.assertEquals(A,machines[0]);
     }
 
     @Test
@@ -180,8 +180,8 @@ public class JSONParserTest {
         String base = "C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1/";
         String[] components = new String[]{"GlobalDeclarations.json", "SystemDeclarations.json",
                 "Components/selfloopNonZeno.json"};
-        machines = JSONParser.parse(base, components, false);
-        SimpleTransitionSystem s = new SimpleTransitionSystem(machines[0]);
+        Automaton[] parsedMachines = JSONParser.parse(base, components, false);
+        SimpleTransitionSystem s = new SimpleTransitionSystem(parsedMachines[0]);
         s.toXML("jsonToXML.xml");
         assert(true);
 //        assert Ref1.equals(machines2[0]);
