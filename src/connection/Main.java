@@ -76,8 +76,12 @@ class Main {
             String queryString = argStrBuilder.toString();
 
             try {
-                System.out.println("-json " + inputFolderPath + " " + queryString);
-                System.out.println(Controller.handleRequest("-json " + inputFolderPath, outputFolderPath, queryString, false));
+                System.out.println(inputFolderPath + " " + queryString);
+                if(inputFolderPath.endsWith(".xml")){
+                    System.out.println(Controller.handleRequest("-xml " + inputFolderPath, outputFolderPath, queryString, false));
+                }else{
+                    System.out.println(Controller.handleRequest("-json " + inputFolderPath, outputFolderPath, queryString, false));
+                }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
