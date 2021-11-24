@@ -1,6 +1,8 @@
 package logic;
 
+import Exceptions.InvalidQueryException;
 import models.Automaton;
+import org.json.simple.parser.ParseException;
 import parser.JSONParser;
 import parser.XMLParser;
 
@@ -17,18 +19,28 @@ public class Controller {
     private static final int FEATURE_QUOTIENT = 3;
 
     public static List<String> handleRequest(String location, String outputLocation, String query, boolean trace) throws Exception {
-        Queries.clear();
+        addQueries(query);
 
         // Separates location and Queries
         ArrayList<String> temp = new ArrayList<>(Arrays.asList(location.split(" ")));
         boolean isJson = temp.get(0).equals("-json");
         String folderLoc = temp.get(1);
 
-        Queries.addAll(Arrays.asList(query.split(";")));
-
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
         return runQueries(trace, outputLocation);
+    }
+
+    public static String handleRequest(String query) throws Exception {
+        addQueries(query);
+        List<String> responseList = runQueries(false, null);
+
+        return String.join(" ", responseList);
+    }
+
+    private static void addQueries(String query){
+        Queries.clear();
+        Queries.addAll(Arrays.asList(query.split(";")));
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
@@ -38,12 +50,25 @@ public class Controller {
         }
     }
 
+    public static void parseComponentJson(String json) throws ParseException {
+        Automaton automaton = JSONParser.parseJsonString(json, true);
+        transitionSystems.add(new SimpleTransitionSystem(automaton));
+    }
+
+    public static void parseComponentXml(String xml) {
+        Automaton[] automatons = XMLParser.parseXmlString(xml, true);
+        for (Automaton automaton : automatons) {
+            transitionSystems.add(new SimpleTransitionSystem(automaton));
+        }
+    }
+
+
     private static List<String> runQueries(boolean trace, String folderLocation) throws Exception {
         List<String> returnlist = new ArrayList<>();
 
         for (int i = 0; i < Queries.size(); i++) {
-            isQueryValid(Queries.get(i));
             Queries.set(i, Queries.get(i).replaceAll("\\s+", ""));
+            isQueryValid(Queries.get(i));
             if (Queries.get(i).contains("refinement")) {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
                 Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
@@ -116,10 +141,9 @@ public class Controller {
         if(folderLocation != null){
             JsonFileWriter.writeToJson(aut, folderLocation);
         }else{
-            // todo: Save in memory
+            transitionSystems.add(new SimpleTransitionSystem(aut));
         }
     }
-
 
     public static TransitionSystem runQuery(String part) {
         ArrayList<TransitionSystem> transitionSystems = new ArrayList<>();
@@ -223,13 +247,13 @@ public class Controller {
         checkSyntax(query);
     }
 
-    private static void checkRefinementSyntax(String query) throws Exception {
-        if (query.contains("<=") && !query.contains("refinement:")) throw new Exception("Expected: \"refinement:\"");
+    private static void checkRefinementSyntax(String query) throws InvalidQueryException {
+        if (query.contains("<=") && !query.contains("refinement:")) throw new InvalidQueryException("Expected: \"refinement:\"");
 
-        if (query.matches(".*<=.*<=.*")) throw new Exception("There can only be one refinement");
+        if (query.matches(".*<=.*<=.*")) throw new InvalidQueryException("There can only be one refinement");
     }
 
-    private static void isParBalanced(String query) throws Exception {
+    private static void isParBalanced(String query) throws InvalidQueryException {
         int counter = 0;
 
         for (int i = 0; i < query.length(); i++) {
@@ -241,33 +265,33 @@ public class Controller {
             }
         }
 
-        if (counter != 0) throw new Exception("Parentheses are not balanced");
+        if (counter != 0) throw new InvalidQueryException("Parentheses are not balanced");
     }
 
-    private static void beforeAfterParantheses(String query) throws Exception {
+    private static void beforeAfterParantheses(String query) throws InvalidQueryException {
         String testString = "/=|&:(";
 
         for (int i = 0; i < query.length(); i++) {
             if (query.charAt(i) == '(') {
                 if (i != 0) {
                     if (testString.indexOf(query.charAt(i - 1)) == -1)
-                        throw new Exception("Before opening Parentheses can be either operator or second Parentheses");
+                        throw new InvalidQueryException("Before opening Parentheses can be either operator or second Parentheses");
                 }
                 if (i + 1 < query.length()) {
                     if (!(query.charAt(i + 1) == '(' || Character.isLetter(query.charAt(i + 1)) || Character.isDigit(query.charAt(i + 1))))
-                        throw new Exception("After opening Parentheses can be either other Parentheses or component");
+                        throw new InvalidQueryException("After opening Parentheses can be either other Parentheses or component");
                 }
             }
         }
     }
 
-    private static void checkSyntax(String query) throws Exception {
+    private static void checkSyntax(String query) throws InvalidQueryException {
         String testString = "/=|&:";
         for (int i = 0; i < query.length(); i++) {
             if (testString.indexOf(query.charAt(i)) != -1) {
                 return;
             }
         }
-        throw new Exception("Incorrect syntax, does not contain any feature");
+        throw new InvalidQueryException("Incorrect syntax, does not contain any feature");
     }
 }

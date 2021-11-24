@@ -3,21 +3,21 @@ package connection;
 import logic.*;
 
 import java.util.List;
-import java.util.Scanner;
-
-import models.Automaton;
 import org.apache.commons.cli.*;
-import parser.JSONParser;
-import parser.XMLParser;
 
 
 class Main {
     static final String VERSION = "1.0";
     static final String ENGINE_NAME = "JECDAR";
 
-
     static Options options = new Options();
 
+    static Option proto = Option.builder("p")
+            .longOpt("proto")
+            .argName("port")
+            .hasArg()
+            .type(Number.class)
+            .build();
 
     static Option inputFolder = Option.builder("i")
             .longOpt("input-folder")
@@ -39,8 +39,9 @@ class Main {
 
     public static void main(String[] args) {
 
-        options.addOption(inputFolder);
+        options.addOption(proto);
         options.addOption(outputFolder);
+        options.addOption(inputFolder);
         options.addOption(help);
 
         CommandLineParser parser = new DefaultParser();
@@ -55,10 +56,19 @@ class Main {
                 return;
             }
 
+            if(cmd.hasOption("proto")){
+                int port = ((Number)cmd.getParsedOptionValue("proto")).intValue();
+                GrpcServer server = new GrpcServer(port);
+                try {
+                    server.start();
+                    server.blockUntilShutdown();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             String inputFolderPath = cmd.getOptionValue("input-folder");
             String outputFolderPath = cmd.getOptionValue("output-folder");
-            String[] components = cmd.getOptionValues("comps");
-            Automaton[] machines = JSONParser.parse(inputFolderPath, false);
 
             List<String> argsList = cmd.getArgList();
             StringBuilder argStrBuilder = new StringBuilder();

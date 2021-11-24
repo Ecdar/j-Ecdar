@@ -5,13 +5,14 @@ import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.input.DOMBuilder;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,35 +22,72 @@ public class XMLParser {
         List<Automaton> automata = new ArrayList<>();
 
         try {
-            org.jdom2.Document jdomDoc = useDOMParser(fileName);
-            Element root = jdomDoc.getRootElement();
+            org.jdom2.Document jdomDoc = useDOMParserFile(fileName);
 
             // automata
-            List<Element> elements = root.getChildren("template");
+            List<Element> elements = jdomDoc.getRootElement().getChildren("template");
 
             for (Element el : elements) {
-                // automaton name
-                String name = el.getChildText("name");
-
-                // clocks
-                List<Clock> clocks = setClocks(el);
-
-                // initial location
-                String initId = el.getChild("init").getAttributeValue("ref");
-
-                // locations
-                List<Location> locations = setLocations(el, clocks, initId);
-
-                // edges
-                List<Edge> edges = setEdges(el, clocks, locations);
-
-                automata.add(new Automaton(name, locations, edges, clocks, makeInpEnabled));
+                automata.add(buildAutomaton(el, makeInpEnabled));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return automata.toArray(new Automaton[0]);
+    }
+
+    public static Automaton[] parseXmlString(String xml, boolean makeInpEnabled) {
+        List<Automaton> automata = new ArrayList<>();
+
+        try{
+            org.jdom2.Document jdomDoc = useDOMParserString(xml);
+
+            // automata
+            List<Element> elements = jdomDoc.getRootElement().getChildren("template");
+
+            for (Element el : elements) {
+                automata.add(buildAutomaton(el, makeInpEnabled));
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return automata.toArray(new Automaton[0]);
+    }
+
+    private static Automaton buildAutomaton(Element element, boolean makeInpEnabled){
+        // automaton name
+        String name = element.getChildText("name");
+
+        // clocks
+        List<Clock> clocks = setClocks(element);
+
+        // initial location
+        String initId = element.getChild("init").getAttributeValue("ref");
+
+        // locations
+        List<Location> locations = setLocations(element, clocks, initId);
+
+        // edges
+        List<Edge> edges = setEdges(element, clocks, locations);
+
+        return new Automaton(name, locations, edges, clocks, makeInpEnabled);
+    }
+
+    private static Document convertStringToDocument(String xmlStr) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        try
+        {
+            builder = factory.newDocumentBuilder();
+            Document doc = builder.parse( new InputSource( new StringReader( xmlStr ) ) );
+            return doc;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static List<Clock> setClocks(Element el) {
@@ -313,15 +351,31 @@ public class XMLParser {
     }
 
     //Get JDOM document from DOM JSONParser
-    private static org.jdom2.Document useDOMParser(String fileName)
+    private static org.jdom2.Document useDOMParserFile(String fileName)
             throws ParserConfigurationException, SAXException, IOException {
-        //creating DOM Document
+        DocumentBuilder dBuilder = getDocumentBuilder();
+
+        Document doc = dBuilder.parse(new File(fileName));
+
+        DOMBuilder domBuilder = new DOMBuilder();
+        return domBuilder.build(doc);
+    }
+
+    private static org.jdom2.Document useDOMParserString(String xml)
+            throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilder dBuilder = getDocumentBuilder();
+
+        InputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+        Document doc = dBuilder.parse(stream);
+
+        DOMBuilder domBuilder = new DOMBuilder();
+        return domBuilder.build(doc);
+    }
+
+    private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(new File(fileName));
-        DOMBuilder domBuilder = new DOMBuilder();
-        return domBuilder.build(doc);
+        return dbFactory.newDocumentBuilder();
     }
 }

@@ -5,6 +5,8 @@ import logic.GraphNode;
 import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -33,6 +35,12 @@ public class JSONParser {
         objectList = parseFiles(locations);
 
         return distrubuteObjects(objectList, makeInpEnabled);
+    }
+
+    public static Automaton parseJsonString(String json, boolean makeInpEnabled) throws ParseException {
+        JSONObject obj = (JSONObject) JSONValue.parseWithException(json);
+
+        return distrubuteObject(obj, makeInpEnabled);
     }
 
     public static Automaton[] parse(String base, String[] components, boolean makeInpEnabled) {
@@ -101,20 +109,24 @@ public class JSONParser {
         return returnList;
     }
 
+    private static Automaton distrubuteObject(JSONObject obj, boolean makeInpEnabled){
+        addDeclarations((String) obj.get("declarations"));
+        JSONArray locationList = (JSONArray) obj.get("locations");
+        List<Location> locations = addLocations(locationList);
+        JSONArray edgeList = (JSONArray) obj.get("edges");
+        List<Edge> edges = addEdges(edgeList, locations);
+        Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
+        componentClocks.clear();
+        return automaton;
+    }
+
     private static Automaton[] distrubuteObjects(ArrayList<JSONObject> objList, boolean makeInpEnabled) {
         ArrayList<Automaton> automata = new ArrayList<>();
 
         try {
             for (JSONObject obj : objList) {
                 if (!obj.get("name").toString().equals("Global Declarations")&&!obj.get("name").toString().equals("System Declarations")) {
-                    addDeclarations((String) obj.get("declarations"));
-                    JSONArray locationList = (JSONArray) obj.get("locations");
-                    List<Location> locations = addLocations(locationList);
-                    JSONArray edgeList = (JSONArray) obj.get("edges");
-                    List<Edge> edges = addEdges(edgeList, locations);
-                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
-                    automata.add(automaton);
-                    componentClocks.clear();
+                    automata.add(distrubuteObject(obj, makeInpEnabled));
                 }
             }
         } catch (Exception e) {
