@@ -24,7 +24,6 @@ class Main {
             .argName("file")
             .hasArg()
             .desc("Provided input folder")
-            .required(true)
             .build();
 
     static Option outputFolder = Option.builder("o")
@@ -69,6 +68,11 @@ class Main {
 
             String inputFolderPath = cmd.getOptionValue("input-folder");
             String outputFolderPath = cmd.getOptionValue("output-folder");
+
+            if(inputFolderPath == null){
+                printHelp(formatter,options);
+                return;
+            }
 
             List<String> argsList = cmd.getArgList();
             StringBuilder argStrBuilder = new StringBuilder();
