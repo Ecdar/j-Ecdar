@@ -89,14 +89,11 @@ class Main {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
-                System.exit(1);
             }
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             printHelp(formatter,options);
-
-            System.exit(1);
         }
 
     }
