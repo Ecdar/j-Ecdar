@@ -18,7 +18,7 @@ public class Controller {
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public static List<String> handleRequest(String location, String outputLocation, String query, boolean trace) throws Exception {
+    public static List<String> handleRequest(String location, String query, boolean trace) throws Exception {
         addQueries(query);
 
         // Separates location and Queries
@@ -28,12 +28,12 @@ public class Controller {
 
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
-        return runQueries(trace, outputLocation);
+        return runQueries(trace);
     }
 
     public static String handleRequest(String query) throws Exception {
         addQueries(query);
-        List<String> responseList = runQueries(false, null);
+        List<String> responseList = runQueries(false);
 
         return String.join(" ", responseList);
     }
@@ -63,12 +63,18 @@ public class Controller {
     }
 
 
-    private static List<String> runQueries(boolean trace, String folderLocation) throws Exception {
+    private static List<String> runQueries(boolean trace) throws Exception {
         List<String> returnlist = new ArrayList<>();
 
         for (int i = 0; i < Queries.size(); i++) {
             Queries.set(i, Queries.get(i).replaceAll("\\s+", ""));
             isQueryValid(Queries.get(i));
+            String componentName = null;
+            if(Queries.get(i).contains("save-as")){
+                String[] saveQuery = Queries.get(i).split("save-as");
+                Queries.set(i, saveQuery[0]);
+                componentName = saveQuery[1];
+            }
             if (Queries.get(i).contains("refinement")) {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
                 Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
@@ -110,7 +116,7 @@ public class Controller {
             if(Queries.get(i).contains("get-component")){
                 String query = Queries.get(i).replace("get-component:", "");
                 TransitionSystem ts = runQuery(query);
-                saveAutomaton(ts.getAutomaton(), folderLocation);
+                saveAutomaton(ts.getAutomaton(), componentName);
             }
             if(Queries.get(i).contains("bisim-minim")){
                 String impl = Queries.get(i).replace("bisim-minim:", "");
@@ -119,7 +125,7 @@ public class Controller {
 
                 aut = Bisimilarity.checkBisimilarity(aut);
 
-                saveAutomaton(aut, folderLocation);
+                saveAutomaton(aut, componentName);
             }
             if(Queries.get(i).contains("prune")){
                 String impl = Queries.get(i).replace("prune:", "");
@@ -129,7 +135,7 @@ public class Controller {
                 SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
                 aut = simp.pruneReachTimed().getAutomaton();
 
-                saveAutomaton(aut, folderLocation);
+                saveAutomaton(aut, componentName);
             }
             //add if contains specification or smth else
         }
@@ -137,11 +143,17 @@ public class Controller {
         return returnlist;
     }
 
-    private static void saveAutomaton(Automaton aut, String folderLocation){
-        if(folderLocation != null){
-            JsonFileWriter.writeToJson(aut, folderLocation);
-        }else{
-            transitionSystems.add(new SimpleTransitionSystem(aut));
+    public static void saveToDisk(String location){
+        for(TransitionSystem system : transitionSystems){
+            JsonFileWriter.writeToJson(system.getAutomaton(), location);
+        }
+    }
+
+    private static void saveAutomaton(Automaton aut, String name){
+        if(name != null){
+            aut.setName(name);
+            SimpleTransitionSystem system = new SimpleTransitionSystem(aut);
+            transitionSystems.add(system);
         }
     }
 

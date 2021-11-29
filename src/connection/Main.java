@@ -26,8 +26,8 @@ class Main {
             .desc("Provided input folder")
             .build();
 
-    static Option outputFolder = Option.builder("o")
-            .longOpt("output-folder")
+    static Option outputFolder = Option.builder("s")
+            .longOpt("save-to-disk")
             .hasArg()
             .build();
 
@@ -67,7 +67,6 @@ class Main {
             }
 
             String inputFolderPath = cmd.getOptionValue("input-folder");
-            String outputFolderPath = cmd.getOptionValue("output-folder");
 
             if(inputFolderPath == null){
                 printHelp(formatter,options);
@@ -82,13 +81,18 @@ class Main {
             try {
                 System.out.println(inputFolderPath + " " + queryString);
                 if(inputFolderPath.endsWith(".xml")){
-                    System.out.println(Controller.handleRequest("-xml " + inputFolderPath, outputFolderPath, queryString, false));
+                    System.out.println(Controller.handleRequest("-xml " + inputFolderPath, queryString, false));
                 }else{
-                    System.out.println(Controller.handleRequest("-json " + inputFolderPath, outputFolderPath, queryString, false));
+                    System.out.println(Controller.handleRequest("-json " + inputFolderPath, queryString, false));
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
+            }
+
+            if(cmd.hasOption("save-to-disk")){
+                String outputFolderPath = cmd.getOptionValue("save-to-disk");
+                Controller.saveToDisk(outputFolderPath);
             }
 
         } catch (ParseException e) {

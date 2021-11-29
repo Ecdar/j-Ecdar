@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Automaton {
-    private final String name;
+    private String name;
 
     public List<Location> getLocations() {
         return locations;
@@ -17,6 +17,10 @@ public class Automaton {
 
     public Set<Channel> getActions() {
         return actions;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     private final List<Location> locations;
