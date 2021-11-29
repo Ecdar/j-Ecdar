@@ -1,91 +1,137 @@
 package connection;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class ConnectionTest {
-    @Test
-    public void testVersion() {
-        assertEquals(Main.ENGINE_NAME + " Version: " + Main.VERSION, (Main.chooseCommand("-version")));
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+
+    @Before
+    public void setUpStreams() {
+        System.setOut(new PrintStream(outContent));
     }
 
-    @Test
-    public void testHelp() {
-        assertEquals("In order to check version type:-version\n" +
-                "In order to run query type:-rq -json/-xml folderPath query query...\n" +
-                "In order to check the validity of a query type:-vq query", (Main.chooseCommand("-help")));
+    @After
+    public void restoreStreams() {
+        System.setOut(originalOut);
+    }
+
+    public ArrayList<String> getResult(){
+        String result = outContent.toString();
+        result = result.substring(result.lastIndexOf("[") + 1);
+        result = result.substring(0, result.lastIndexOf("]"));
+        ArrayList<String> list =  new ArrayList<>(Arrays.asList(result.split(",")));
+        list.replaceAll(String::trim);
+        list.removeIf(String::isEmpty);
+        return list;
     }
 
     @Test
     public void testVerificationOfQuery() {
-        assertEquals("true", (Main.chooseCommand("-vq refinement:Spec<=Spec")));
+        String arg = "-vq refinement:Spec<=Spec";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("true"), getResult());
     }
 
     @Test
     public void testRunSingleQuery1() {
-        assertEquals("false\nDuplicate process instance: Spec.\n", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:Spec<=Spec")));
+        String arg = "-i samples/json/EcdarUniversity refinement:Spec<=Spec";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("false", "Duplicate process instance: Spec."), getResult());
     }
 
     @Test
     public void testRunSingleQuery2() {
-        assertEquals("true", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec")));
+        String arg = "-i ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("true"), getResult());
     }
 
     @Test
     public void testRunSingleQuery3() {
-        assertEquals("true", (Main.chooseCommand("-rq -json ./samples/json/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2")));
+        String arg = "-i ./samples/json/EcdarUniversity refinement:(HalfAdm1&&HalfAdm2)<=Adm2";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("true"), getResult());
     }
 
     @Test
     public void testRunMultipleQueries() {
-        String query = "-rq -json ./samples/json/EcdarUniversity refinement:spec<=spec refinement:Machine<=Machine";
-        assertEquals("false\nDuplicate process instance: Spec.\nfalse\nDuplicate process instance: Machine.\n", (Main.chooseCommand(query)));
+        String arg = "-i ./samples/json/EcdarUniversity refinement:spec <= spec; refinement:Machine<=Machine";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("false","Duplicate process instance: Spec.","false","Duplicate process instance: Machine."), getResult());
     }
 
     @Test
     public void testRunMultipleQueries2() {
-        String query = "-rq -json ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec refinement:Machine3<=Machine3";
-        assertEquals("true\nfalse\nDuplicate process instance: Machine3.\n", (Main.chooseCommand(query)));
+        String arg = "-i ./samples/json/EcdarUniversity refinement:(Administration||Machine||Researcher)<=Spec; refinement:Machine3<=Machine3";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("true","false","Duplicate process instance: Machine3."), getResult());
     }
 
     @Test
     public void testRunMultipleQueries3() {
-        String query = "-rq -json ./samples/json/EcdarUniversity refinement:Spec<=(Administration||Machine||Researcher) refinement:Machine3<=Machine3";
-        assertEquals("false\nNot all outputs of the right side are present on the left side.\nfalse\nDuplicate process instance: Machine3.\n", (Main.chooseCommand(query)));
+        String arg = "-i ./samples/json/EcdarUniversity refinement:Spec<=(Administration||Machine||Researcher); refinement:Machine3<=Machine3";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("false","Not all outputs of the right side are present on the left side.","false","Duplicate process instance: Machine3."), getResult());
     }
 
     @Test
     public void testRunMultipleQueries4() {
-        String query = "-rq -json ./samples/json/EcdarUniversity refinement:Spec<=Spec refinement:Machine<=Machine refinement:Machine3<=Machine3 refinement:Researcher<=Researcher";
-        assertEquals("false\nDuplicate process instance: Spec.\nfalse\nDuplicate process instance: Machine.\nfalse\nDuplicate process instance: Machine3.\nfalse\nDuplicate process instance: Researcher.\n", (Main.chooseCommand(query)));
+        String arg = "-i ./samples/json/EcdarUniversity refinement:Spec<=Spec; refinement:Machine<=Machine; refinement:Machine3<=Machine3; refinement:Researcher<=Researcher";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("false","Duplicate process instance: Spec.","false","Duplicate process instance: Machine.","false",
+                "Duplicate process instance: Machine3.","false","Duplicate process instance: Researcher."), getResult());
     }
 
     @Test
     public void testRunMultipleQueries5() {
-        String query = "-rq -xml ./samples/xml/ImplTests.xml refinement:G17<=G17 implementation:G14";
-        assertEquals("false\nDuplicate process instance: G17.\nfalse\nAutomaton G14 is non-deterministic.\nAutomaton G14 is not output urgent.\n", (Main.chooseCommand(query)));
+        String arg = "-i ./samples/xml/ImplTests.xml refinement:G17<=G17; implementation:G14";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("false","Duplicate process instance: G17.","false","Automaton G14 is non-deterministic.","Automaton G14 is not output urgent."), getResult());
     }
 
     @Test
     public void testRunInvalidQuery() {
-        assertEquals("Error: null", (Main.chooseCommand("-rq -json sdfsd xcv")));
+        String arg = "-i sdfsd xcv";
+        Main.main(arg.split(" "));
+        assertEquals(Arrays.asList("Error: null"), getResult());
     }
 
     @Test
     public void testRunInvalidQuery2() {
-        String expected = "Unknown command: \"-machine 1 2 3\"\nwrite -help to get list of commands";
-        String result = Main.chooseCommand("-machine 1 2 3");
-        assertEquals(result, expected);
+        String arg = "-machine 1 2 3";
+        List<String> expected = Arrays.asList("Unknown command:","-machine 1 2 3","write -help to get list of commands");
+
+        Main.main(arg.split(" "));
+        assertEquals(expected,getResult());
     }
 
     @Test
     public void testValidateInvalidQuery1() {
-        assertEquals("Error: Expected: \"refinement:\"", (Main.chooseCommand("-vq spec<=spec")));
+        String arg = "-vq spec<=spec";
+        List<String> expected = Arrays.asList("Error: Expected:","refinement:");
+
+        Main.main(arg.split(" "));
+        assertEquals(expected,getResult());
     }
 
     @Test
     public void testValidateInvalidQuery2() {
-        assertEquals("Error: Incorrect syntax, does not contain any feature", (Main.chooseCommand("-vq sdf")));
+        String arg = "-vq sdf";
+        List<String> expected = Arrays.asList("Error: Incorrect syntax, does not contain any feature");
+
+        Main.main(arg.split(" "));
+        assertEquals(expected,getResult());
     }
 }
