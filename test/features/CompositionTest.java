@@ -1,20 +1,15 @@
 package features;
 
-import logic.*;
+import logic.Composition;
+import logic.Refinement;
+import logic.SimpleTransitionSystem;
+import logic.TransitionSystem;
 import models.Automaton;
-import models.Clock;
-import models.Guard;
-import models.Zone;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 import parser.XMLParser;
-import sun.java2d.pipe.SpanShapeRenderer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CompositionTest {
