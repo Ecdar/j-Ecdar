@@ -1,7 +1,7 @@
 #include "lib_DBMLib.h"
-#include "../dbm/constraints.h"
-#include "../dbm/dbm.h"
-#include "../dbm/fed.h"
+#include "../dbm/dbm/constraints.h"
+#include "../dbm/dbm/dbm.h"
+#include "../dbm/dbm/fed.h"
 #include <string.h>
 
 namespace helper_functions
@@ -22,7 +22,7 @@ namespace helper_functions
         for (int i = 0; i < len; i++) {
             arr[i] = t[i];
         }
-        env->SetIntArrayRegion(newT, 0, len, arr);
+        env->SetIntArrayRegion(newT, 0, len, (const jint*)arr);
         return newT;
     }
 
