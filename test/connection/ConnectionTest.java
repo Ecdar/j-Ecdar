@@ -38,13 +38,6 @@ public class ConnectionTest {
     }
 
     @Test
-    public void testVerificationOfQuery() {
-        String arg = "-vq refinement:Spec<=Spec";
-        Main.main(arg.split(" "));
-        assertEquals(Arrays.asList("true"), getResult());
-    }
-
-    @Test
     public void testRunSingleQuery1() {
         String arg = "-i samples/json/EcdarUniversity refinement:Spec<=Spec";
         Main.main(arg.split(" "));
@@ -112,24 +105,6 @@ public class ConnectionTest {
     public void testRunInvalidQuery2() {
         String arg = "-machine 1 2 3";
         List<String> expected = Arrays.asList("Unknown command:","-machine 1 2 3","write -help to get list of commands");
-
-        Main.main(arg.split(" "));
-        assertEquals(expected,getResult());
-    }
-
-    @Test
-    public void testValidateInvalidQuery1() {
-        String arg = "-vq spec<=spec";
-        List<String> expected = Arrays.asList("Error: Expected:","refinement:");
-
-        Main.main(arg.split(" "));
-        assertEquals(expected,getResult());
-    }
-
-    @Test
-    public void testValidateInvalidQuery2() {
-        String arg = "-vq sdf";
-        List<String> expected = Arrays.asList("Error: Incorrect syntax, does not contain any feature");
 
         Main.main(arg.split(" "));
         assertEquals(expected,getResult());
