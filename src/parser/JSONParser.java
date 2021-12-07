@@ -5,6 +5,8 @@ import logic.GraphNode;
 import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -26,12 +28,19 @@ public class JSONParser {
     public static Automaton[] parse(String folderPath, boolean makeInpEnabled) {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
-
+        System.out.println(folderPath);
         ArrayList<String> locations = new ArrayList<>(Collections.singletonList(folderPath + "/GlobalDeclarations.json"));
         locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
 
         objectList = parseFiles(locations);
+
         return distrubuteObjects(objectList, makeInpEnabled);
+    }
+
+    public static Automaton parseJsonString(String json, boolean makeInpEnabled) throws ParseException {
+        JSONObject obj = (JSONObject) JSONValue.parseWithException(json);
+
+        return distrubuteObject(obj, makeInpEnabled);
     }
 
     public static Automaton[] parse(String base, String[] components, boolean makeInpEnabled) {
@@ -47,7 +56,7 @@ public class JSONParser {
         obj.put("initial sp id", "" + refTree.getNodeId());
         obj.put("left", "" + refTree.getStatePair().getLeft().getLocation());
         obj.put("right", "" + refTree.getStatePair().getRight().getLocation());
-        obj.put("zone", "" + refTree.getStatePair().getLeft().getInvZone());
+        obj.put("federation", "" + refTree.getStatePair().getLeft().getInvFed());
         obj.put("transitions", helper(children));
 
         System.out.println(obj.toJSONString());
@@ -64,7 +73,7 @@ public class JSONParser {
                 statePair.put("state pair id", "" + child.getTarget().getNodeId());
                 statePair.put("left", "" + child.getTarget().getStatePair().getLeft().getLocation());
                 statePair.put("right", "" + child.getTarget().getStatePair().getRight().getLocation());
-                statePair.put("zone", "" + child.getTarget().getStatePair().getLeft().getInvZone());
+                statePair.put("federation", "" + child.getTarget().getStatePair().getLeft().getInvFed());
                 transition.put("source sp id", "" + child.getSource().getNodeId());
                 transition.put("target sp id", "" + child.getTarget().getNodeId());
                 transition.put("target sp", statePair);
@@ -100,20 +109,24 @@ public class JSONParser {
         return returnList;
     }
 
+    private static Automaton distrubuteObject(JSONObject obj, boolean makeInpEnabled){
+        addDeclarations((String) obj.get("declarations"));
+        JSONArray locationList = (JSONArray) obj.get("locations");
+        List<Location> locations = addLocations(locationList);
+        JSONArray edgeList = (JSONArray) obj.get("edges");
+        List<Edge> edges = addEdges(edgeList, locations);
+        Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
+        componentClocks.clear();
+        return automaton;
+    }
+
     private static Automaton[] distrubuteObjects(ArrayList<JSONObject> objList, boolean makeInpEnabled) {
         ArrayList<Automaton> automata = new ArrayList<>();
 
         try {
             for (JSONObject obj : objList) {
-                if (!obj.get("name").toString().equals("Global Declarations")) {
-                    addDeclarations((String) obj.get("declarations"));
-                    JSONArray locationList = (JSONArray) obj.get("locations");
-                    List<Location> locations = addLocations(locationList);
-                    JSONArray edgeList = (JSONArray) obj.get("edges");
-                    List<Edge> edges = addEdges(edgeList, locations);
-                    Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
-                    automata.add(automaton);
-                    componentClocks.clear();
+                if (!obj.get("name").toString().equals("Global Declarations")&&!obj.get("name").toString().equals("System Declarations")) {
+                    automata.add(distrubuteObject(obj, makeInpEnabled));
                 }
             }
         } catch (Exception e) {
@@ -172,8 +185,8 @@ public class JSONParser {
 
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            List<Guard> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
-                    addGuards(jsonObject.get("invariant").toString()));
+            List<List<Guard>> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
+                    addInvarGuards(jsonObject.get("invariant").toString()));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
 
@@ -183,49 +196,107 @@ public class JSONParser {
         return returnLocList;
     }
 
-    private static List<Guard> addGuards(String invariant) {
-        ArrayList<Guard> guards = new ArrayList<>();
-        String[] listOfInv = invariant.split("&&");
+    private static List<List<Guard>> addGuards(String invariant) {
+        List<List<Guard>> guardList = new ArrayList<>();
+        for (String part: invariant.split("or")) {
+            ArrayList<Guard> guards = new ArrayList<>();
+            String[] listOfInv = part.split("&&");
 
-        for (String str : listOfInv) {
-            String symbol = "";
-            boolean strict, greater, isEq;
-            strict = false;
-            greater = false;
-            isEq = false;
-
-            if (str.contains("==")) {
-                symbol = "==";
+            for (String str : listOfInv) {
+                String symbol = "";
+                boolean strict, greater, isEq;
+                strict = false;
                 greater = false;
-                isEq = true;
-            } else if (str.contains("<=")) {
-                symbol = "<=";
-            } else if (str.contains(">=")) {
-                symbol = ">=";
-                greater = true;
-            } else if (str.contains("<") && !str.contains("=")) {
-                symbol = "<";
-                strict = true;
-            } else if (str.contains(">") && !str.contains("=")) {
-                symbol = ">";
-                greater = true;
-                strict = true;
+                isEq = false;
+
+                if (str.contains("==")) {
+                    symbol = "==";
+                    greater = false;
+                    isEq = true;
+                } else if (str.contains("<=")) {
+                    symbol = "<=";
+                } else if (str.contains(">=")) {
+                    symbol = ">=";
+                    greater = true;
+                } else if (str.contains("<") && !str.contains("=")) {
+                    symbol = "<";
+                    strict = true;
+                } else if (str.contains(">") && !str.contains("=")) {
+                    symbol = ">";
+                    greater = true;
+                    strict = true;
+                }
+
+                String[] s = str.split(symbol);
+                for (int x = 0; x < s.length; x++) {
+                    s[x] = s[x].replaceAll(" ", "");
+                }
+
+                if (isEq)
+                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
+                else
+                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
             }
 
-            String[] s = str.split(symbol);
-            for (int x = 0; x < s.length; x++) {
-                s[x] = s[x].replaceAll(" ", "");
-            }
+            guardList.add(guards);
+        }
+        return guardList;
+    }
+    private static List<List<Guard>> addInvarGuards(String invariant) {
 
-            if (isEq)
-                guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
-            else
-                guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
+        ArrayList<List<Guard>> guardsOuter = new ArrayList<>();
+
+
+        String[] listOfDisjc = invariant.split("or");
+
+       // System.out.println("whole: " + invariant);
+        for (String strOuter : listOfDisjc) {
+            String[] listOfInv = strOuter.split("&&");
+            ArrayList<Guard> guards = new ArrayList<>();
+            //System.out.println("discj part: " + strOuter);
+
+            for (String str : listOfInv) {
+               //System.out.println("conj. part: " + str);
+
+                String symbol = "";
+                boolean strict, greater, isEq;
+                strict = false;
+                greater = false;
+                isEq = false;
+
+                if (str.contains("==")) {
+                    symbol = "==";
+                    greater = false;
+                    isEq = true;
+                } else if (str.contains("<=")) {
+                    symbol = "<=";
+                } else if (str.contains(">=")) {
+                    symbol = ">=";
+                    greater = true;
+                } else if (str.contains("<") && !str.contains("=")) {
+                    symbol = "<";
+                    strict = true;
+                } else if (str.contains(">") && !str.contains("=")) {
+                    symbol = ">";
+                    greater = true;
+                    strict = true;
+                }
+
+                String[] s = str.split(symbol);
+                for (int x = 0; x < s.length; x++) {
+                    s[x] = s[x].replaceAll(" ", "");
+                }
+
+                if (isEq)
+                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
+                else
+                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
+            }
+            guardsOuter.add(guards);
         }
 
-        return guards;
+        return guardsOuter;
     }
-
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
             if (clock.getName().equals(clockName)) return clock;
@@ -239,7 +310,7 @@ public class JSONParser {
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            List<Guard> guards;
+            List<List<Guard>> guards;
             Update[] updates;
 
             if (!jsonObject.get("guard").toString().equals(""))

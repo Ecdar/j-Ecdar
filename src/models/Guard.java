@@ -10,6 +10,7 @@ public class Guard {
     private boolean isStrict;
 
     public Guard(Clock clock, int value, boolean greater, boolean isStrict) {
+        assert(clock!=null);
         this.clock = clock;
         this.isStrict = isStrict;
 
@@ -67,11 +68,11 @@ public class Guard {
     }
 
     public Guard negate() {
-        isStrict = !isStrict;
+        boolean isStrictTemp = !isStrict;
         int newLower = (lowerBound == 0) ? upperBound : 0;
         int newUpper = (upperBound == Integer.MAX_VALUE) ? lowerBound : Integer.MAX_VALUE;
 
-        return new Guard(clock, newUpper, newLower, isStrict);
+        return new Guard(clock, newUpper, newLower, isStrictTemp);
     }
 
     @Override

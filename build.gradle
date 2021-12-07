@@ -1,0 +1,52 @@
+plugins {
+    id 'java-library'
+    id 'com.google.protobuf' version '0.8.17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "junit:junit:4.12"
+    implementation 'io.grpc:grpc-netty-shaded:1.42.0'
+    implementation 'io.grpc:grpc-protobuf:1.42.0'
+    implementation 'io.grpc:grpc-stub:1.42.0'
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
+    implementation 'commons-cli:commons-cli:1.4'
+    implementation 'org.jdom:jdom2:2.0.6'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.17.3"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.42.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        proto{
+            srcDirs = ['src/proto']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}

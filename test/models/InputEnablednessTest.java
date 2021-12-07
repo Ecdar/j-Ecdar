@@ -1,8 +1,11 @@
 package models;
 
+import logic.SimpleTransitionSystem;
+import logic.TransitionSystem;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
+import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +16,7 @@ public class InputEnablednessTest {
 
     private static Automaton expected, actual;
     private static Update[] noUpdate = new Update[]{};
-    private static List<Guard> noguard = new ArrayList<>();
+    private static List<List<Guard>> noguard = new ArrayList<>();
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -23,7 +26,7 @@ public class InputEnablednessTest {
         Guard invL1 = new Guard(x, 10, false, false);
 
         Location l0 = new Location("L0", noguard, true, false, false, false);
-        Location l1 = new Location("L1", new ArrayList<>(Collections.singletonList(invL1)), false, false, false, false);
+        Location l1 = new Location("L1", new ArrayList<>(Collections.singletonList(Collections.singletonList(invL1))), false, false, false, false);
         Location l2 = new Location("L2", noguard, false, false, false, false);
         Location l3 = new Location("L3", noguard, false, false, false, false);
         Location l4 = new Location("L4", noguard, false, false, false, false);
@@ -35,30 +38,30 @@ public class InputEnablednessTest {
         Guard e2_g1 = new Guard(x, 3, true, false);
         Guard e2_g2 = new Guard(x, 5, false, false);
         Guard e2_g3 = new Guard(y, 4, true, false);
-        Guard e3_g1 = new Guard(x, 2, false, false);
+        Guard e3_g1 = new Guard(x, 2, false, false); // x<2
         Guard e3_g2 = new Guard(y, 3, false, false);
-        Guard e5_g1 = new Guard(x, 10, true, true);
+        Guard e5_g1 = new Guard(x, 10, true, true); // x>10
         Guard e5_g2 = new Guard(y, 10, true, true);
-        Guard e6_g1 = new Guard(x, 2, true, true);
+        Guard e6_g1 = new Guard(x, 2, true, true);  // x>2
         Guard e6_g2 = new Guard(x, 4, false, true);
         Guard e6_g3 = new Guard(y, 2, true, true);
         Guard e6_g4 = new Guard(y, 4, false, true);
         Guard e7_g1 = new Guard(x, 5, true, true);
         Guard e7_g2 = new Guard(y, 5, true, true);
-        Guard e8_g1 = new Guard(x, 10, false, false);
+        Guard e8_g1 = new Guard(x, 10, false, false); // greater: false => x<10
         Guard e8_g2 = new Guard(y, 10, false, false);
         Guard e9_g1 = new Guard(x, 10, false, false);
         Guard e9_g2 = new Guard(y, 10, false, false);
 
-        Edge e1 = new Edge(l0, l1, i1, true, new ArrayList<>(Collections.singletonList(invL1)), noUpdate);
-        Edge e2 = new Edge(l0, l2, i2, true, new ArrayList<>(Arrays.asList(e2_g1, e2_g2, e2_g3)), noUpdate);
-        Edge e3 = new Edge(l0, l3, i2, true, new ArrayList<>(Arrays.asList(e3_g1, e3_g2)), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(invL1))), noUpdate);
+        Edge e2 = new Edge(l0, l2, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e2_g1, e2_g2, e2_g3))), noUpdate);
+        Edge e3 = new Edge(l0, l3, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e3_g1, e3_g2))), noUpdate);
         Edge e4 = new Edge(l1, l4, o, false, noguard, noUpdate);
-        Edge e5 = new Edge(l0, l0, i1, true, new ArrayList<>(Arrays.asList(e5_g1, e5_g2)), noUpdate);
-        Edge e6 = new Edge(l0, l0, i2, true, new ArrayList<>(Arrays.asList(e6_g1, e6_g2, e6_g3, e6_g4)), noUpdate);
-        Edge e7 = new Edge(l0, l0, i2, true, new ArrayList<>(Arrays.asList(e7_g1, e7_g2)), noUpdate);
-        Edge e8 = new Edge(l1, l1, i1, true, new ArrayList<>(Arrays.asList(e8_g1, e8_g2)), noUpdate);
-        Edge e9 = new Edge(l1, l1, i2, true, new ArrayList<>(Arrays.asList(e9_g1, e9_g2)), noUpdate);
+        Edge e5 = new Edge(l0, l0, i1, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e5_g1, e5_g2))), noUpdate);
+        Edge e6 = new Edge(l0, l0, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e6_g1, e6_g2, e6_g3, e6_g4))), noUpdate);
+        Edge e7 = new Edge(l0, l0, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e7_g1, e7_g2))), noUpdate);
+        Edge e8 = new Edge(l1, l1, i1, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e8_g1, e8_g2))), noUpdate);
+        Edge e9 = new Edge(l1, l1, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e9_g1, e9_g2))), noUpdate);
         Edge e10 = new Edge(l2, l2, i1, true, noguard, noUpdate);
         Edge e11 = new Edge(l2, l2, i2, true, noguard, noUpdate);
         Edge e12 = new Edge(l3, l3, i1, true, noguard, noUpdate);
@@ -80,6 +83,11 @@ public class InputEnablednessTest {
 
     @Test
     public void testAutomaton() {
+        SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
+        st.toXML("wtf.xml");
+        SimpleTransitionSystem st1 = new SimpleTransitionSystem(expected);
+        st1.toXML("wtf-exp.xml");
         assert actual.equals(expected);
     }
+
 }

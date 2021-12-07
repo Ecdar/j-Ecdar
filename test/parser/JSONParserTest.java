@@ -1,6 +1,11 @@
 package parser;
 
+import logic.JsonFileWriter;
+import logic.Pruning;
+import logic.SimpleTransitionSystem;
 import models.*;
+import org.json.simple.parser.ParseException;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -12,8 +17,9 @@ import java.util.List;
 public class JSONParserTest {
     private static Automaton[] machines, machines2;
     private static Automaton A, G, Q, Imp, Ref1;
+    private static String AJsonString = "{\r\n  \"name\": \"A\",\r\n  \"declarations\": \"// comment\\nclock a;\\n// comment\\nclock b, z;\\n// comment\\nclock m;\",\r\n  \"locations\": [\r\n    {\r\n      \"id\": \"L2\",\r\n      \"nickname\": \"\",\r\n      \"invariant\": \"\",\r\n      \"type\": \"INITIAL\",\r\n      \"urgency\": \"NORMAL\",\r\n      \"x\": 240.0,\r\n      \"y\": 350.0,\r\n      \"color\": \"3\",\r\n      \"nicknameX\": 30.0,\r\n      \"nicknameY\": -10.0,\r\n      \"invariantX\": 30.0,\r\n      \"invariantY\": 10.0\r\n    }\r\n  ],\r\n  \"edges\": [\r\n    {\r\n      \"sourceLocation\": \"L2\",\r\n      \"targetLocation\": \"L2\",\r\n      \"status\": \"INPUT\",\r\n      \"select\": \"\",\r\n      \"guard\": \"\",\r\n      \"update\": \"\",\r\n      \"sync\": \"bad\",\r\n      \"isLocked\": false,\r\n      \"nails\": [\r\n        {\r\n          \"x\": 270.0,\r\n          \"y\": 290.0,\r\n          \"propertyType\": \"SYNCHRONIZATION\",\r\n          \"propertyX\": 10.0,\r\n          \"propertyY\": -10.0\r\n        },\r\n        {\r\n          \"x\": 280.0,\r\n          \"y\": 330.0,\r\n          \"propertyType\": \"NONE\",\r\n          \"propertyX\": 0.0,\r\n          \"propertyY\": 0.0\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"sourceLocation\": \"L2\",\r\n      \"targetLocation\": \"L2\",\r\n      \"status\": \"INPUT\",\r\n      \"select\": \"\",\r\n      \"guard\": \"\",\r\n      \"update\": \"\",\r\n      \"sync\": \"good\",\r\n      \"isLocked\": false,\r\n      \"nails\": [\r\n        {\r\n          \"x\": 200.0,\r\n          \"y\": 290.0,\r\n          \"propertyType\": \"SYNCHRONIZATION\",\r\n          \"propertyX\": 10.0,\r\n          \"propertyY\": -10.0\r\n        },\r\n        {\r\n          \"x\": 190.0,\r\n          \"y\": 340.0,\r\n          \"propertyType\": \"NONE\",\r\n          \"propertyX\": 0.0,\r\n          \"propertyY\": 0.0\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"sourceLocation\": \"L2\",\r\n      \"targetLocation\": \"L2\",\r\n      \"status\": \"OUTPUT\",\r\n      \"select\": \"\",\r\n      \"guard\": \"\",\r\n      \"update\": \"\",\r\n      \"sync\": \"button1\",\r\n      \"isLocked\": false,\r\n      \"nails\": [\r\n        {\r\n          \"x\": 240.0,\r\n          \"y\": 410.0,\r\n          \"propertyType\": \"SYNCHRONIZATION\",\r\n          \"propertyX\": -10.0,\r\n          \"propertyY\": 20.0\r\n        },\r\n        {\r\n          \"x\": 270.0,\r\n          \"y\": 400.0,\r\n          \"propertyType\": \"NONE\",\r\n          \"propertyX\": 0.0,\r\n          \"propertyY\": 0.0\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"description\": \"\",\r\n  \"x\": 5.0,\r\n  \"y\": 5.0,\r\n  \"width\": 450.0,\r\n  \"height\": 600.0,\r\n  \"color\": \"3\",\r\n  \"includeInPeriodicCheck\": false\r\n}";
 
-    private static final List<Guard> emptyGuards = new ArrayList<>();
+    private static final List<List<Guard>> emptyGuards = new ArrayList<>();
     private static final Update[] emptyUpdates = new Update[]{};
     private static final List<Clock> emptyClocks = new ArrayList<>();
 
@@ -89,7 +95,7 @@ public class JSONParserTest {
         Location l12 = new Location("L12", emptyGuards, true, false, false, false);
         Location l13 = new Location("L13", emptyGuards, false, false, false, false);
         Location l14 = new Location("L14", emptyGuards, false, false, false, false);
-        Location l15 = new Location("L15", new ArrayList<>(Collections.singletonList(inv_l15)), false, false, false, false);
+        Location l15 = new Location("L15", new ArrayList<>(Collections.singletonList(Collections.singletonList(inv_l15))), false, false, false, false);
         Location l16 = new Location("L16", emptyGuards, false, false, false, false);
         Location l17 = new Location("L17", emptyGuards, false, false, false, false);
         Location l18 = new Location("L18", emptyGuards, false, false, false, false);
@@ -112,27 +118,33 @@ public class JSONParserTest {
         Channel o10 = new Channel("o10");
 
 
-        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Collections.singletonList(g_l12_l14)), emptyUpdates);
-        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Collections.singletonList(g_l12_l17)), emptyUpdates);
-        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Collections.singletonList(g_l12_l15)), new Update[]{u1});
-        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Collections.singletonList(g_l12_l16)), emptyUpdates);
+        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l14))), emptyUpdates);
+        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l17))), emptyUpdates);
+        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l15))), new Update[]{u1});
+        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l16))), emptyUpdates);
         t5 = new Edge(l17, l18, o8, false, emptyGuards, new Update[]{u1});
         t6 = new Edge(l16, l18, o8, false, emptyGuards, emptyUpdates);
-        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Collections.singletonList(g_l15_l18)), emptyUpdates);
+        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l15_l18))), emptyUpdates);
         t8 = new Edge(l14, l18, o8, false, emptyGuards, emptyUpdates);
         t9 = new Edge(l13, l18, o8, false, emptyGuards, emptyUpdates);
         t10 = new Edge(l17, l17, o3, false, emptyGuards, emptyUpdates);
         t11 = new Edge(l17, l17, o5, false, emptyGuards, emptyUpdates);
         t12 = new Edge(l17, l14, i6, true, emptyGuards, emptyUpdates);
-        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(g_l12_l13)), emptyUpdates);
+        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l13))), emptyUpdates);
 
         Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)), false);
     }
 
     @Test
+    public void parseJsonStringTest() throws ParseException {
+        Automaton parsedA = JSONParser.parseJsonString(AJsonString, false);
+        Assert.assertEquals(A,parsedA);
+    }
+
+    @Test
     public void testA() {
-        assert A.equals(machines[0]);
+        Assert.assertEquals(A,machines[0]);
     }
 
     @Test
@@ -153,5 +165,25 @@ public class JSONParserTest {
     @Test
     public void testRef1() {
         assert Ref1.equals(machines2[0]);
+    }
+
+    @Test
+    public void parsingNewJson()
+    {
+        SimpleTransitionSystem selfloopZeno;
+        Automaton[] aut3 = XMLParser.parse("samples/xml/quotient/QuotientTestOutputs.xml", false);
+        selfloopZeno = new SimpleTransitionSystem(aut3[2]);
+        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopZeno);
+        pruned.toXML("selfloopNonZeno.xml");
+        JsonFileWriter.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
+
+        String base = "C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1/";
+        String[] components = new String[]{"GlobalDeclarations.json", "SystemDeclarations.json",
+                "Components/selfloopNonZeno.json"};
+        Automaton[] parsedMachines = JSONParser.parse(base, components, false);
+        SimpleTransitionSystem s = new SimpleTransitionSystem(parsedMachines[0]);
+        s.toXML("jsonToXML.xml");
+        assert(true);
+//        assert Ref1.equals(machines2[0]);
     }
 }

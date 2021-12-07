@@ -1,69 +1,108 @@
 package connection;
 
-import logic.Controller;
+import logic.*;
 
 import java.util.List;
-import java.util.Scanner;
+import org.apache.commons.cli.*;
+
 
 class Main {
     static final String VERSION = "1.0";
     static final String ENGINE_NAME = "JECDAR";
 
+    static Options options = new Options();
+
+    static Option proto = Option.builder("p")
+            .longOpt("proto")
+            .argName("port")
+            .hasArg()
+            .type(Number.class)
+            .build();
+
+    static Option inputFolder = Option.builder("i")
+            .longOpt("input-folder")
+            .argName("file")
+            .hasArg()
+            .desc("Provided input folder")
+            .build();
+
+    static Option outputFolder = Option.builder("s")
+            .longOpt("save-to-disk")
+            .hasArg()
+            .build();
+
+    static Option help = Option.builder("h")
+            .longOpt("help")
+            .build();
+
+
     public static void main(String[] args) {
-        Scanner console = new Scanner(System.in);
-        while (console.hasNextLine()) {
-            System.out.println(chooseCommand(console.nextLine()));
+
+        options.addOption(proto);
+        options.addOption(outputFolder);
+        options.addOption(inputFolder);
+        options.addOption(help);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+
+            if(cmd.hasOption("help")){
+                printHelp(formatter,options);
+                return;
+            }
+
+            if(cmd.hasOption("proto")){
+                int port = ((Number)cmd.getParsedOptionValue("proto")).intValue();
+                GrpcServer server = new GrpcServer(port);
+                try {
+                    server.start();
+                    server.blockUntilShutdown();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            String inputFolderPath = cmd.getOptionValue("input-folder");
+
+            if(inputFolderPath == null){
+                printHelp(formatter,options);
+                return;
+            }
+
+            List<String> argsList = cmd.getArgList();
+            StringBuilder argStrBuilder = new StringBuilder();
+            argsList.forEach(argStrBuilder::append);
+            String queryString = argStrBuilder.toString();
+
+            try {
+                System.out.println(inputFolderPath + " " + queryString);
+                if(inputFolderPath.endsWith(".xml")){
+                    System.out.println(Controller.handleRequest("-xml " + inputFolderPath, queryString, false));
+                }else{
+                    System.out.println(Controller.handleRequest("-json " + inputFolderPath, queryString, false));
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+            }
+
+            if(cmd.hasOption("save-to-disk")){
+                String outputFolderPath = cmd.getOptionValue("save-to-disk");
+                Controller.saveToDisk(outputFolderPath);
+            }
+
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            printHelp(formatter,options);
         }
+
     }
 
-    static String chooseCommand(String query) {
-        String indicator = query;
-        if (query.contains(" ")) {
-            indicator = query.substring(0, query.indexOf(' '));
-        }
-
-        switch (indicator.toLowerCase()) {
-            case "-version":
-                return ENGINE_NAME + " Version: " + VERSION;
-            case "-rq":
-                try {
-                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), false);
-                    if (temp.size() == 1) return temp.get(0);
-                    else {
-                        StringBuilder str = new StringBuilder();
-                        for (int i = 0; i < temp.size(); i++)
-                            str.append(temp.get(i));
-                        return str.toString();
-                    }
-                } catch (Exception e) {
-                    return "Error: " + e.getMessage();//e.printStackTrace();
-                }
-            case "-rqrrr":
-                try {
-                    List<String> temp = Controller.handleRequest(query.substring(query.indexOf(' ') + 1), true);
-                    if (temp.size() == 1) return temp.get(0);
-                    else {
-                        StringBuilder str = new StringBuilder();
-                        for (int i = 0; i < temp.size(); i++)
-                            str.append(temp.get(i));
-                        return str.toString();
-                    }
-                } catch (Exception e) {
-                    return "Error: " + e.getMessage();//e.printStackTrace();
-                }
-            case "-vq":
-                try {
-                    Controller.isQueryValid(query.substring(query.indexOf(' ') + 1));
-                    return String.valueOf(true);
-                } catch (Exception e) {
-                    return "Error: " + e.getMessage();//e.printStackTrace();
-                }
-            case "-help":
-                return "In order to check version type:-version\n"
-                        + "In order to run query type:-rq -json/-xml folderPath query query...\n"
-                        + "In order to check the validity of a query type:-vq query";
-            default:
-                return "Unknown command: \"" + query + "\"\nwrite -help to get list of commands";
-        }
+    private static void printHelp(HelpFormatter formatter, Options options){
+        formatter.printHelp("-i path/to/folder [OPTIONS] [\"QUERIES\"]", options);
     }
 }

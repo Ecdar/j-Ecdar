@@ -1,10 +1,28 @@
 package models;
 
+import java.security.URIParameter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Automaton {
-    private final String name;
+    private String name;
+
+    public List<Location> getLocations() {
+        return locations;
+    }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    public Set<Channel> getActions() {
+        return actions;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     private final List<Location> locations;
     private final List<Edge> edges;
     private final List<Clock> clocks;
@@ -20,6 +38,7 @@ public class Automaton {
         this.locations = locations;
 
         for (Location location : locations) {
+
             if (location.isInitial()) {
                 initLoc = location;
                 break;
@@ -82,50 +101,142 @@ public class Automaton {
     }
 
     private void makeInputEnabled() {
+        //System.out.println("reached makeInputEnabled: start");
         if (clocks.size() > 0) {
             for (Location loc : locations) {
                 // build the zone for this location
-                Zone zone = new Zone(clocks.size() + 1, true);
-                List<Guard> invariants = loc.getInvariant();
-                for (Guard invariant : invariants) {
-                    zone.buildConstraintsForGuard(invariant, clocks.indexOf(invariant.getClock()) + 1);
+
+ /*               List<Zone> zoneList = new ArrayList<>();
+                List<List<Guard>> invariants = loc.getInvariant();
+                //System.out.println("reached makeInputEnabled");
+                // check if done correctly
+                if (invariants.isEmpty())
+                {
+                    //System.out.println("no invar");
+                    Zone zone = new Zone(clocks.size() + 1, true);
+                    //zone.init(); // TODO: check if init was the right thing to do here
+                    zoneList.add(zone);
                 }
-                Federation fullFed = new Federation(new ArrayList<>(Collections.singletonList(zone)));
+                else {
+                    //System.out.println("yes invar" + invariants.get(0));
+                    for (List<Guard> disjunction : invariants) {
+                        Zone zone = new Zone(clocks.size() + 1, true);
+                        //zone.init(); // TODO: check if init was the right thing to do here
+                        for (Guard invariant : disjunction) {
+                            zone.buildConstraintsForGuard(invariant, clocks.indexOf(invariant.getClock()) + 1);
+                        }
+                        zoneList.add(zone);
+                    }
+                }
+                Federation fullFed = new Federation(zoneList);
+*/
+                Federation fullFed = loc.getInvariantFederation(clocks);
+
 
                 // loop through all inputs
                 for (Channel input : inputAct) {
-                    // build federation of zones from edges
+                    // build federation of zones from edges // TODO: check if federations were handled correctly here!
                     List<Edge> inputEdges = getEdgesFromLocationAndSignal(loc, input);
                     List<Zone> zones = new ArrayList<>();
-                    for (Edge edge : inputEdges) {
-                        Zone guardZone = new Zone(zone);
 
-                        for (Guard g : edge.getGuards()) {
-                            guardZone.buildConstraintsForGuard(g, clocks.indexOf(g.getClock()) + 1);
+                    Federation resFed;
+                    Federation fedOfAllInputs=null;
+                    if (!inputEdges.isEmpty()) {
+                        for (Edge edge : inputEdges) {
+                            Federation targetFedAfterReset = edge.getTarget().getInvariantFederation(clocks);
+                            for (Update u: edge.getUpdates())
+                                targetFedAfterReset= targetFedAfterReset.free(getIndexOfClock(u.getClock(),clocks));
+
+                            if (fedOfAllInputs == null) {
+                                fedOfAllInputs = edge.getGuardFederation(clocks).intersect(targetFedAfterReset);
+                            } else
+                                fedOfAllInputs = Federation.fedPlusFed(fedOfAllInputs, edge.getGuardFederation(clocks).intersect(targetFedAfterReset));
                         }
-                        zones.add(guardZone);
-                    }
-                    Federation fed = new Federation(zones);
+/*
 
-                    // subtract the federation of zones from the original zone
-                    Federation resFed = Federation.fedMinusFed(fullFed, fed);
-                    for (Zone edgeZone : resFed.getZones()) {
-                        // build guards from zone
-                        Edge newEdge = new Edge(loc, loc, input, true, edgeZone.buildGuardsFromZone(clocks), new Update[]{});
-                        edges.add(newEdge);
+//                        Federation guardFederation = new Federation(fullFed.getZones());
+                            Federation guardFederation = fullFed.getCopy();
+                            //Zone guardZone = new Zone(zone);
+                            if (!guardFederation.getZones().isEmpty()) {
+
+                                for (Zone guardZone : guardFederation.getZones()) {
+                                    if (edge.getGuards().isEmpty() || (edge.getGuards().size()==1 && edge.getGuards().get(0).isEmpty()))
+                                    {
+                                        Zone newZone = new Zone(guardZone);
+                                        zones.add(newZone);
+                                    } else
+                                    for (List<Guard> disjunction : edge.getGuards()) {
+                                        Zone newZone = new Zone(guardZone);
+                                        for (Guard g : disjunction) {
+                                            newZone.buildConstraintsForGuard(g, clocks.indexOf(g.getClock()) + 1);
+                                        }
+
+                                        zones.add(newZone);
+                                    }
+
+                                }
+                            } else {
+                                assert (false);
+                                //Zone guardZone = new Zone(); // init?
+                            }
+
+
+                        }
+*/
+
+
+
+                        //Federation fed = new Federation(zones);
+                        // subtract the federation of zones from the original fed
+                        resFed = Federation.fedMinusFed(fullFed, fedOfAllInputs);
                     }
+                    else {
+                        resFed =fullFed;
+                    }
+
+
+
+                        for (Zone edgeZone : resFed.getZones()) {
+                            // build guards from zone
+                            List<List<Guard>> guardList = new ArrayList<>();
+                            guardList.add(edgeZone.buildGuardsFromZone(clocks));
+                            Edge newEdge = new Edge(loc, loc, input, true, guardList, new Update[]{});
+                            edges.add(newEdge);
+                        }
+
                 }
             }
         }
     }
 
+
+    private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
+        for (int i = 0; i < clocks.size(); i++) {
+            if (clock.hashCode() == clocks.get(i).hashCode()) return i + 1;
+        }
+        return 0;
+    }
     private void addTargetInvariantToEdges() {
         if (clocks.size() > 0) {
             for (Edge edge : edges) {
+                Federation targetFed = edge.getTarget().getInvariantFederation(clocks);
+                for (Update u : edge.getUpdates())
+                    targetFed.free(getIndexOfClock(u.getClock(), clocks));
+                Federation intersec = targetFed.intersect(edge.getGuardFederation(clocks));
+                edge.setGuards(intersec.turnFederationToGuards(clocks));
+
+                /*
                 // if there are no resets, we should apply the invariant of the target on the guard zone
                 if (edge.getUpdates().length == 0) {
-                    edge.addGuards(edge.getTarget().getInvariant());
+                        //System.out.println("Debug: " +edge.getGuards() + edge.getTarget().getInvariant());
+                        edge.addGuards(edge.getTarget().getInvariant());
+                    //System.out.println("Out: " +edge.getGuards());
+
                 }
+                else
+                {
+                    // FIXME: 17-11-2020 make the else branch
+                }*/
             }
         }
     }
@@ -186,11 +297,14 @@ public class Automaton {
         return outputAct;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Automaton)) return false;
         Automaton automaton = (Automaton) o;
+
+
         return name.equals(automaton.name) &&
                 Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
                 Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&

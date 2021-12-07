@@ -14,3 +14,16 @@ If you want to support more methods from the DBM library you have to:
 3. From the src folder, regenerate the C++ header file "javah lib.DBMLib"
 4. Add the corresponding methods to lib_DBMLib.cpp
 5. Rebuild the library
+
+
+## Building DBMLib
+The DBM static library files should be placed in the dbm/libs/ folder.
+
+Compile from the src folder.
+
+### Windows
+`g++ -fPIC -shared -I"JAVA_HOME\include" -I"JAVA_HOME\include\win32" -I"..\dbm" lib_DBMLib.cpp ..\dbm\libs\libdbm.a ..\dbm\libs\libbase.a ..\dbm\libs\libhash.a -o DBM.dll`
+
+
+### Linux
+`g++ -fPIC -shared -I"JAVA_HOME/include" -I"JAVA_HOME/include/linux" -I"../dbm" lib_DBMLib.cpp ../dbm/libs/*.a -o libDBM.so`
