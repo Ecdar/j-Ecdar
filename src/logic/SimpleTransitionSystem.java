@@ -1,21 +1,15 @@
 package logic;
 
-import com.sun.deploy.security.SelectableSecurityManager;
-import lib.DBMLib;
 import models.*;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.DOMBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import javax.swing.*;
 import java.util.stream.Collectors;
 
 public class SimpleTransitionSystem extends TransitionSystem{
