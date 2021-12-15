@@ -19,8 +19,8 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
             List<ComponentProtos.Component> components = request.getComponentsList();
             for (ComponentProtos.Component component: components) {
                 switch (component.getRepCase()){
-                    case JSON -> Controller.parseComponentJson(component.getJson());
-                    case XML -> Controller.parseComponentXml(component.getXml());
+                    case JSON : Controller.parseComponentJson(component.getJson());
+                    case XML : Controller.parseComponentXml(component.getXml());
                 }
             }
             responseObserver.onNext(Empty.newBuilder().build());
