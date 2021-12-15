@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.cli.*;
 
 
-class Main {
+public class Main {
     static final String VERSION = "1.0";
     static final String ENGINE_NAME = "JECDAR";
 
