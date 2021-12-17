@@ -1,0 +1,70 @@
+name: Build artifacts
+
+on:
+  push:
+    branches: [ ci-build-jni ]
+
+  workflow_dispatch:
+
+jobs:
+  build-dbm-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install compiler tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential cmake make
+      - name: Clone java JDK
+        uses: actions/checkout@v2
+        with:
+          repository: openjdk/jdk
+          path: jdk
+
+      - name: Compile UDBM for Linux
+        run: |
+          cd dbm
+          cmake -B build/ -D os=linux
+          cmake --build build/
+
+      - name: Build for linux
+        run: |
+          cd src
+          g++ -fPIC -shared -I"../jdk/src/java.base/unix/native/include" -I"../jdk/src/java.base/share/native/include" -I"../dbm/include" lib_DBMLib.cpp ../dbm/libs/linux/*.a -o libDBM.so
+      - name: Upload libDBM.so 
+        uses: actions/upload-artifact@v2
+        with:
+          name: dbm-jni-linux
+          path: src/libDBM.so
+
+  build-dbm-windows:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install compiler tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential cmake make mingw-w64
+      - name: Clone java JDK
+        uses: actions/checkout@v2
+        with:
+          repository: openjdk/jdk
+          path: jdk
+
+      - name: Compile UDBM for Windows
+        run: |
+          cd dbm
+          cmake -B build/ -D os=windows -D CMAKE_TOOLCHAIN_FILE=toolchain-x86_64-w64-mingw32.cmake
+          cmake --build build/
+
+      - name: Build for windows
+        run: |
+          cd src
+          x86_64-w64-mingw32-g++ -fPIC -shared -I"../jdk/src/java.base/windows/native/include" -I"../jdk/src/java.base/share/native/include" -I"../dbm/include" lib_DBMLib.cpp ../dbm/libs/windows/*.a -o DBM.dll
+      - name: Upload DBM.dll 
+        uses: actions/upload-artifact@v2
+        with:
+          name: dbm-jni-windows
+          path: src/DBM.dll

@@ -1,7 +1,7 @@
 #include "lib_DBMLib.h"
-#include "../dbm/dbm/constraints.h"
-#include "../dbm/dbm/dbm.h"
-#include "../dbm/dbm/fed.h"
+#include "../dbm/include/dbm/constraints.h"
+#include "../dbm/include/dbm/dbm.h"
+#include "../dbm/include/dbm/fed.h"
 #include <string.h>
 
 namespace helper_functions
