@@ -2,7 +2,7 @@ name: Build artifacts
 
 on:
   push:
-    branches: [ ci-build-jni ]
+    branches: [ main ]
 
   workflow_dispatch:
 
@@ -18,7 +18,8 @@ jobs:
           java-version: '11'
       - name: Create jar file
         run: |
-          jar cf lib/DBMLib.jar dbm/jni/DBMLib.java
+          javac dbm/jni/DBMLib.java
+          jar cf lib/DBMLib.jar dbm/jni/DBMLib.class
       - name: Upload DBMLib.jar
         uses: actions/upload-artifact@v2
         with:
