@@ -7,6 +7,18 @@ on:
   workflow_dispatch:
 
 jobs:
+  build-dbm-artifacts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - name: Create jar file
+        run: |
+          jar cf lib/DBMLib.jar dbm/jni/DBMLib.java
+
   build-dbm-linux:
     runs-on: ubuntu-latest
 
