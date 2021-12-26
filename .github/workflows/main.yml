@@ -18,8 +18,8 @@ jobs:
           java-version: '11'
       - name: Create jar file
         run: |
-          javac dbm/jni/DBMLib.java
-          jar cf lib/DBMLib.jar dbm/jni/DBMLib.class
+          javac DBMLib/src/main/java/lib/DBMLib.java
+          jar cf lib/DBMLib.jar DBMLib/src/main/java/lib/DBMLib.class2
       - name: Upload DBMLib.jar
         uses: actions/upload-artifact@v2
         with:
@@ -43,19 +43,18 @@ jobs:
 
       - name: Compile UDBM for Linux
         run: |
-          cd dbm
+          cd DBMLib
           cmake -B build/ -D os=linux
           cmake --build build/
 
       - name: Build for linux
         run: |
-          cd src
-          g++ -fPIC -shared -I"../jdk/src/java.base/unix/native/include" -I"../jdk/src/java.base/share/native/include" -I"../dbm/include" lib_DBMLib.cpp ../dbm/libs/linux/*.a -o libDBM.so
+          g++ -fPIC -shared -I"jdk/src/java.base/unix/native/include" -I"jdk/src/java.base/share/native/include" -I"DBMLib/include" DBMLib/src/main/java/lib/lib_DBMLib.cpp DBMLib/libs/linux/*.a -o DBMLib/libDBM.so
       - name: Upload libDBM.so 
         uses: actions/upload-artifact@v2
         with:
           name: dbm-jni
-          path: src/libDBM.so
+          path: DBMLib/libDBM.so
 
   build-dbm-windows:
     runs-on: ubuntu-latest
@@ -74,16 +73,15 @@ jobs:
 
       - name: Compile UDBM for Windows
         run: |
-          cd dbm
+          cd DBMLib
           cmake -B build/ -D os=windows -D CMAKE_TOOLCHAIN_FILE=toolchain-x86_64-w64-mingw32.cmake
           cmake --build build/
 
       - name: Build for windows
         run: |
-          cd src
-          x86_64-w64-mingw32-g++ -fPIC -shared -I"../jdk/src/java.base/windows/native/include" -I"../jdk/src/java.base/share/native/include" -I"../dbm/include" lib_DBMLib.cpp ../dbm/libs/windows/*.a -o DBM.dll
+          x86_64-w64-mingw32-g++ -fPIC -shared -I"jdk/src/java.base/windows/native/include" -I"jdk/src/java.base/share/native/include" -I"DBMLib/include" DBMLib/src/main/java/lib/lib_DBMLib.cpp DBMLib/libs/windows/*.a -o DBMLib/DBM.dll
       - name: Upload DBM.dll 
         uses: actions/upload-artifact@v2
         with:
           name: dbm-jni
-          path: src/DBM.dll
+          path: DBMLib/DBM.dll

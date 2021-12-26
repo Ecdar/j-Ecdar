@@ -1,11 +1,21 @@
-package dbm.jni;
+package lib;
 
 import java.io.File;
 
 public class DBMLib {
 
     static {
-        String fileName = System.mapLibraryName("DBM");
+        String fileName = "DBMLib/" + System.mapLibraryName("DBM");
+        File lib = new File(fileName);
+        System.load(lib.getAbsolutePath());
+    }
+
+    public static void main(String[] args) {
+
+    }
+
+    public static void loadLibrary(){
+        String fileName = "DBMLib/" + System.mapLibraryName("DBM");
         File lib = new File(fileName);
         System.load(lib.getAbsolutePath());
     }

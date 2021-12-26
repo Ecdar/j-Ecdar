@@ -1,6 +1,5 @@
 package dbm;
 
-import global.LibLoader;
 import lib.DBMLib;
 import models.*;
 import org.junit.BeforeClass;
@@ -8,10 +7,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import static features.Helpers.printDBM;
 import static org.junit.Assert.*;
 
 public class DBMTest {
@@ -22,8 +19,6 @@ public class DBMTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        LibLoader.load();
-
         Location l1 = new Location("L0", new ArrayList<>(), false, false, false, false);
         SymbolicLocation sl1 = new SimpleLocation(l1);
 
