@@ -1,6 +1,24 @@
 package lib;
 
+import java.io.File;
+
 public class DBMLib {
+
+    static {
+        String fileName = "DBMLib/" + System.mapLibraryName("DBM");
+        File lib = new File(fileName);
+        System.load(lib.getAbsolutePath());
+    }
+
+    public static void main(String[] args) {
+
+    }
+
+    public static void loadLibrary(){
+        String fileName = "DBMLib/" + System.mapLibraryName("DBM");
+        File lib = new File(fileName);
+        System.load(lib.getAbsolutePath());
+    }
 
     // here you must define every method you want to use from the DBM library
     public static native int boundbool2raw(int bound, boolean isStrict);
