@@ -19,7 +19,7 @@ jobs:
       - name: Create jar file
         run: |
           javac DBMLib/src/main/java/lib/DBMLib.java
-          jar cf lib/DBMLib.jar DBMLib/src/main/java/lib/DBMLib.class2
+          jar cf lib/DBMLib.jar DBMLib/src/main/java/lib/DBMLib.class
       - name: Upload DBMLib.jar
         uses: actions/upload-artifact@v2
         with:
