@@ -3,27 +3,28 @@
 You can read about calling C++ code from Java here: https://www.ibm.com/developerworks/java/tutorials/j-jni/j-jni.html
 
 How to run:
-1. Build the library. You have to be in the src folder. Depends on OS, for Mac it's something like "g++ -I"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers" lib_DBMLib.cpp ../dbm/libs/*.a -o libDBM.dylib" (the .a files are static libraries generated from dbm)
+1. Build the library (see instructions below)
 
 2. Run from IntelliJ.
 
-
-If you want to support more methods from the DBM library you have to:
-1. Add them as native methods in src/lib/DBMLib.java
-2. From src/lib, run "javac DBMLib.java"
-3. From the src folder, regenerate the C++ header file "javah lib.DBMLib"
-4. Add the corresponding methods to lib_DBMLib.cpp
-5. Rebuild the library
-
-
 ## Building DBMLib
-The DBM static library files should be placed in the dbm/libs/ folder.
+The DBM static library files should be placed in the DBMLib/lib folder.
 
-Compile from the src folder.
+Compile from the root folder.
 
 ### Windows
-`g++ -fPIC -shared -I"JAVA_HOME\include" -I"JAVA_HOME\include\win32" -I"..\dbm" lib_DBMLib.cpp ..\dbm\libs\libdbm.a ..\dbm\libs\libbase.a ..\dbm\libs\libhash.a -o DBM.dll`
+`g++ -fPIC -shared -I"JAVA_HOME\include" -I"JAVA_HOME\include\win32" -I"DBMLib\include" DBMLib\src\main\java\lib\lib_DBMLib.cpp DBMLib\libs\libdbm.a DBMLib\libs\libbase.a DBMLib\libs\libhash.a -o src/DBM.dll`
 
 
 ### Linux
-`g++ -fPIC -shared -I"JAVA_HOME/include" -I"JAVA_HOME/include/linux" -I"../dbm" lib_DBMLib.cpp ../dbm/libs/*.a -o libDBM.so`
+`g++ -fPIC -shared -I"JAVA_HOME/include" -I"JAVA_HOME/include/linux" -I"DBMLib/include" DBMLib/src/main/java/lib/lib_DBMLib.cpp DBMLib/libs/*.a -o src/libDBM.so`
+
+
+## Adding more methods to the DBM library
+If you want to support more methods from the DBM library you have to:
+1. Add them as native methods in DBMLib/src/main/java/lib/DBMLib.java
+2. From the root directory, run "javac DBMLib/src/main/java/lib/DBMLib.java"
+3. To create the jar file run "jar cf lib/DBMLib.jar DBMLib/src/main/java/lib/DBMLib.class"
+4. From the DBMLib/src/main/java/lib folder, regenerate the C++ header file "javac -h . DBMLib.java"
+5. Add the corresponding methods to lib_DBMLib.cpp
+6. Rebuild the library using the instructions in the section above
