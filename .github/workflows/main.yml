@@ -50,12 +50,12 @@ jobs:
 
       - name: Build for linux
         run: |
-          g++ -fPIC -shared -I"jdk/src/java.base/unix/native/include" -I"jdk/src/java.base/share/native/include" -I"DBMLib/include" DBMLib/lib/lib_DBMLib.cpp DBMLib/libs/linux/*.a -o DBMLib/libDBM.so
+          g++ -fPIC -shared -I"jdk/src/java.base/unix/native/include" -I"jdk/src/java.base/share/native/include" -I"DBMLib/include" DBMLib/lib/lib_DBMLib.cpp DBMLib/libs/linux/*.a -o src/libDBM.so
       - name: Upload libDBM.so 
         uses: actions/upload-artifact@v2
         with:
           name: dbm-jni
-          path: DBMLib/libDBM.so
+          path: src/libDBM.so
 
   build-dbm-windows:
     runs-on: ubuntu-latest
@@ -80,9 +80,9 @@ jobs:
 
       - name: Build for windows
         run: |
-          x86_64-w64-mingw32-g++ -fPIC -shared -I"jdk/src/java.base/windows/native/include" -I"jdk/src/java.base/share/native/include" -I"DBMLib/include" DBMLib/lib/lib_DBMLib.cpp DBMLib/libs/windows/*.a -o DBMLib/DBM.dll
+          x86_64-w64-mingw32-g++ -fPIC -shared -I"jdk/src/java.base/windows/native/include" -I"jdk/src/java.base/share/native/include" -I"DBMLib/include" DBMLib/lib/lib_DBMLib.cpp DBMLib/libs/windows/*.a -o src/DBM.dll
       - name: Upload DBM.dll 
         uses: actions/upload-artifact@v2
         with:
           name: dbm-jni
-          path: DBMLib/DBM.dll
+          path: src/DBM.dll

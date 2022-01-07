@@ -5,7 +5,7 @@ import java.io.File;
 public class DBMLib {
 
     static {
-        String fileName = "DBMLib/" + System.mapLibraryName("DBM");
+        String fileName = "src/" + System.mapLibraryName("DBM");
         File lib = new File(fileName);
         System.load(lib.getAbsolutePath());
     }
