@@ -24,13 +24,13 @@ jobs:
           cmake -B build/
           cmake --build build/
 
-      - name: Compile UDBM for Windows
+      - name: Compile JDBM for Windows
         run: |
           cd JDBM && mkdir build-win
-          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-mingw.cmake
+          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
           cmake --build build-win/
 
-      - name: Upload UDBM Linux
+      - name: Upload JDBM Linux
         uses: actions/upload-artifact@v2
         with:
           name: jdbm-linux
