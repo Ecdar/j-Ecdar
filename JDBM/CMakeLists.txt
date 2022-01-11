@@ -7,6 +7,7 @@ project(${JDBM_NAME} VERSION ${JDBM_VERSION} LANGUAGES CXX C)
 find_package(Java 11 REQUIRED)
 find_package(Java COMPONENTS Development)
 
+set(JAVA_AWT_LIBRARY NotNeeded)
 set(JAVA_JVM_LIBRARY NotNeeded)
 find_package(JNI REQUIRED)
 
