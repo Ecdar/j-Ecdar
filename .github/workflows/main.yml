@@ -34,10 +34,10 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jdbm-linux
-          path: JDBM/build/lib/*
+          path: JDBM/build/jdbm/lib/*
 
       - name: Upload UDBM Windows
         uses: actions/upload-artifact@v2
         with:
           name: jdbm-windows
-          path: JDBM/build-win/lib/*
+          path: JDBM/build-win/jdbm/lib/*
