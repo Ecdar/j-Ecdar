@@ -2,15 +2,9 @@ package features;
 
 import logic.*;
 import models.Automaton;
-import models.Clock;
-import models.Guard;
-import models.Zone;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

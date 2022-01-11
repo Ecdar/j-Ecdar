@@ -1,14 +1,10 @@
 package models;
 
-import global.LibLoader;
 import lib.DBMLib;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Zone {
     private int[] dbm;
@@ -20,7 +16,6 @@ public class Zone {
         this.size = size;
         this.actualSize = size * size;
 
-        LibLoader.load();
         int[] temp = new int[actualSize];
 
         // zone for initial state is dbm_zero with delay
@@ -33,7 +28,6 @@ public class Zone {
         this.size = (int) Math.sqrt(dbm.length);
         this.actualSize = dbm.length;
 
-        LibLoader.load();
     }
 
 
@@ -44,7 +38,6 @@ public class Zone {
         this.actualSize = oldZone.actualSize;
         this.dbm = oldZone.dbm.clone();
 
-        LibLoader.load();
     }
 
     public boolean isEmpty() {return DBMLib.dbm_isEmpty(dbm, size);}
