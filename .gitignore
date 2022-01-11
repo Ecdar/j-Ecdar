@@ -1,3 +1,9 @@
+# JDBM
+lib/jdbm.jar
+lib/JDBM.dll
+lib/libJDBM.so
+lib/libJDBM.dylib
+
 # Compiled class file
 *.class
 
