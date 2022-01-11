@@ -17,7 +17,14 @@ set(JDBM_TARGETDIR "${CMAKE_BINARY_DIR}/${JDBM_NAME}" CACHE PATH "Traget directo
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${JDBM_TARGETDIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${JDBM_TARGETDIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${JDBM_TARGETDIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${JDBM_TARGETDIR}/lib) # Place dll files in lib
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+
+if(WIN32)
+    set(CMAKE_SHARED_LIBRARY_PREFIX "") # dont add lib prefix to dll files
+endif()
 
 set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external CACHE PATH "Install location for external dependencies")
 ExternalProject_Add(udbm-ext
@@ -29,9 +36,6 @@ ExternalProject_Add(udbm-ext
 )
 link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
 include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
-
-message(JAVA_JVM_LIBRARY ${JAVA_JVM_LIBRARY})
-
 
 add_jar(udbmjava
     src/DBMLib.java
