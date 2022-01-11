@@ -27,7 +27,7 @@ jobs:
       - name: Compile UDBM for Windows
         run: |
           cd JDBM && mkdir build-win
-          cmake -B build-win/
+          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-mingw.cmake
           cmake --build build-win/
 
       - name: Upload UDBM Linux
