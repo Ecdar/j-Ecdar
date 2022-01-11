@@ -18,7 +18,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
 
-      - name: Compile UDBM for Linux
+      - name: Compile JDBM for Linux
         run: |
           cd JDBM && mkdir build
           cmake -B build/
@@ -36,7 +36,7 @@ jobs:
           name: jdbm-linux
           path: JDBM/build/jdbm/lib/*
 
-      - name: Upload UDBM Windows
+      - name: Upload JDBM Windows
         uses: actions/upload-artifact@v2
         with:
           name: jdbm-windows
