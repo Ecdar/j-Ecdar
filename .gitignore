@@ -1,3 +1,9 @@
+# JDBM
+lib/jdbm.jar
+lib/JDBM.dll
+lib/libJDBM.so
+lib/libJDBM.dylib
+
 # Compiled class file
 *.class
 
@@ -46,7 +52,7 @@ Generated library files
 
 
 .gradle
-**/build/
+**/build*/
 !src/**/build/
 
 # Ignore Gradle GUI config
