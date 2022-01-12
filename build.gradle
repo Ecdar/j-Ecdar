@@ -16,6 +16,8 @@ java{
 
 mainClassName = "JECDAR"
 
+
+
 dependencies {
     testImplementation "junit:junit:4.12"
     implementation 'io.grpc:grpc-netty-shaded:1.42.0'
@@ -59,4 +61,22 @@ sourceSets {
             srcDirs = ['test']
         }
     }
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes(
+                'Main-Class': 'my.project.main',
+        )
+    }
+    classifier = 'fat'
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    with jar
 }
