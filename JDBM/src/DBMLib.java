@@ -5,13 +5,26 @@ import java.io.File;
 public class DBMLib {
 
     static {
-        File lib = new File("lib/" + System.mapLibraryName("JDBM"));
-        System.load(lib.getAbsolutePath());
+        File lib;
+        List<lib> searchPath = List.of(
+                new File("lib/" + System.mapLibraryName("JDBM")),
+                new File("../lib/" + System.mapLibraryName("JDBM"))
+                new File(System.mapLibraryName("JDBM"))
+        )
+        for (var f: searchPath) {
+            if (f.exists()) {
+                lib = f;
+                break;
+            }
+        }
+        if (lib != null) {
+            System.load(lib.getAbsolutePath());
+        } else {
+            System.load(searchPath[searchPath.size() - 1].getAbsolutePath());
+        }
     }
 
-    public static void main(String[] args) {
-
-    }
+    public static void main(String[] args) {}
 
     // here you must define every method you want to use from the DBM library
     public static native int boundbool2raw(int bound, boolean isStrict);
