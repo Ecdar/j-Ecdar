@@ -1,16 +1,17 @@
 package lib;
 
 import java.io.File;
+import java.util.List;
 
 public class DBMLib {
 
     static {
-        List<lib> searchPath = List.of(
-                new File("lib/" + System.mapLibraryName("JDBM")),
-                new File("../lib/" + System.mapLibraryName("JDBM")),
-                new File(System.mapLibraryName("JDBM"))
+        List<File> searchPath = List.of(
+            new File("lib/" + System.mapLibraryName("JDBM")),
+            new File("../lib/" + System.mapLibraryName("JDBM")),
+            new File(System.mapLibraryName("JDBM"))
         );
-        File lib;
+        File lib = null;
 
         for (var f: searchPath) {
             if (f.exists()) {
@@ -22,7 +23,7 @@ public class DBMLib {
         if (lib != null) {
             System.load(lib.getAbsolutePath());
         } else {
-            System.load(searchPath[searchPath.size() - 1].getAbsolutePath()); // Default path
+            System.load(searchPath.get(searchPath.size() - 1).getAbsolutePath()); // Default path
         }
     }
 
