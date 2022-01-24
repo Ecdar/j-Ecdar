@@ -4,6 +4,12 @@ lib/JDBM.dll
 lib/libJDBM.so
 lib/libJDBM.dylib
 
+# JCDD
+lib/jcdd.jar
+lib/JCDD.dll
+lib/libJCDD.so
+lib/libJCDD.dylib
+
 # Compiled class file
 *.class
 
