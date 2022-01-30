@@ -5,58 +5,7 @@
 #include <dbm/dbm.h>
 #include <dbm/fed.h>
 #include <string.h>
-
-namespace helper_functions
-{
-    raw_t* jintToC(JNIEnv *env, jintArray dbm, jsize len) {
-        // build array to pass to library
-        raw_t *t = new raw_t[len];
-        jint *arr = env->GetIntArrayElements(dbm, 0);
-        for (int i = 0; i < len; i++)
-            t[i] = arr[i];
-        return t;
-    }
-
-    jintArray cToJint(JNIEnv *env, const raw_t *t, jsize len) {
-        // convert updated array to jintArray
-        jintArray newT = env->NewIntArray(len);
-        int *arr = new int[len];
-        for (int i = 0; i < len; i++) {
-            arr[i] = t[i];
-        }
-        env->SetIntArrayRegion(newT, 0, len, (const jint*)arr);
-        return newT;
-    }
-
-    jobjectArray cFedtoJavaFed(JNIEnv *env, dbm::fed_t fed, jsize len) {
-        jint fedSize = fed.size();
-
-        jclass intArray1DClass = env->FindClass("[I");
-        jobjectArray zoneArray = env->NewObjectArray(fedSize, intArray1DClass, NULL);
-
-        jint y = 0;
-        for (auto i = fed.begin(); i != fed.end(); ++i) {
-            auto x = i->const_dbm();
-            env->SetObjectArrayElement(zoneArray, y, helper_functions::cToJint(env, x, len));
-            y++;
-        }
-
-        return zoneArray;
-    }
-
-    dbm::fed_t javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize size, jint dim) {
-        jsize length = env->GetArrayLength(fed);
-
-        dbm::fed_t cFed = (*new dbm::fed_t(dim));
-
-        for (int i = 0; i < length; i++) {
-            jintArray obj = (jintArray) env->GetObjectArrayElement(fed, i);
-            cFed = cFed.add(helper_functions::jintToC(env, obj, size), dim);
-        }
-
-        return cFed;
-    }
-}
+#include <helper_functions.h>
 
 JNIEXPORT jint JNICALL Java_lib_DBMLib_boundbool2raw(JNIEnv *env, jclass cls, jint bound, jboolean strict) {
     return dbm_boundbool2raw(bound, strict);

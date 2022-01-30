@@ -4,11 +4,6 @@ import java.io.File;
 
 public class DBMLib {
 
-    static {
-        File lib = new File("lib/" + System.mapLibraryName("JDBM"));
-        System.load(lib.getAbsolutePath());
-    }
-
     public static void main(String[] args) {
 
     }

@@ -36,10 +36,10 @@ ExternalProject_Add(ucdd-ext
                     ${CMAKE_COMMAND} -E copy_directory ../ucdd-ext/include/ ${EXTERNAL_INSTALL_LOCATION}/include
 )
 link_directories(${EXTERNAL_INSTALL_LOCATION}/lib)
-include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
+include_directories(${EXTERNAL_INSTALL_LOCATION}/include src)
 
 add_jar(ucddjava
-    src/CDDLib.java
+    src/CDDLib.java src/DBMLib.java
     GENERATE_NATIVE_HEADERS ucdd-native
     OUTPUT_NAME jcdd
     OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
@@ -47,6 +47,7 @@ add_jar(ucddjava
 
 add_library(JCDD SHARED
     src/lib_CDDLib.cpp
+    src/lib_DBMLib.cpp
 )
 add_dependencies(JCDD ucdd-ext ucddjava)
 target_link_libraries(JCDD PRIVATE ucdd-native libcdd.a libdbm.a libbase.a libhash.a libudebug.a )

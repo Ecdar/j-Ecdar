@@ -3,18 +3,7 @@
 #include <cdd/cdd.h>
 #include <cdd/kernel.h>
 #include <iostream>
-
-namespace helper_functions
-{
-    raw_t* jintToC(JNIEnv *env, jintArray dbm, jsize len) {
-        // build array to pass to library
-        raw_t *t = new raw_t[len];
-        jint *arr = env->GetIntArrayElements(dbm, 0);
-        for (int i = 0; i < len; i++)
-            t[i] = arr[i];
-        return t;
-    }
-}
+#include <helper_functions.h>
 
 /*
  * Class:     lib_CDDLib
