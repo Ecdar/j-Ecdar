@@ -14,7 +14,7 @@ public class Main {
 
     static Option proto = Option.builder("p")
             .longOpt("proto")
-            .argName("port")
+            .argName("address")
             .hasArg()
             .type(Number.class)
             .build();
@@ -56,8 +56,8 @@ public class Main {
             }
 
             if(cmd.hasOption("proto")){
-                int port = ((Number)cmd.getParsedOptionValue("proto")).intValue();
-                GrpcServer server = new GrpcServer(port);
+                String address = cmd.getOptionValue("proto");
+                GrpcServer server = new GrpcServer(address);
                 try {
                     server.start();
                     server.blockUntilShutdown();

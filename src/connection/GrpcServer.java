@@ -2,18 +2,39 @@ package connection;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 public class GrpcServer {
 
     private Server server;
 
-    public GrpcServer(int port) {
-        this.server = ServerBuilder.forPort(port)
+    public GrpcServer(String address) {
+        SocketAddress socketAddress = getSocketAddressFromString(address);
+        this.server = NettyServerBuilder.forAddress(socketAddress)
                 .addService(new EcdarService())
                 .build();
+    }
+
+    private SocketAddress getSocketAddressFromString(String address) {
+        int port = 80;
+        String host = null;
+        if (address.indexOf(':') != -1) {
+            String[] arr = address.split(":");
+            host = arr[0];
+            try {
+                port = Integer.parseInt(arr[1]);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        } else {
+            host = address;
+        }
+        return new InetSocketAddress(host, port);
     }
 
     public void start() throws IOException {
