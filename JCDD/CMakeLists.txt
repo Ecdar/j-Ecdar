@@ -48,6 +48,7 @@ add_jar(ucddjava
 add_library(JCDD SHARED
     src/lib_CDDLib.cpp
     src/lib_DBMLib.cpp
+    src/helper_functions.cpp
 )
 add_dependencies(JCDD ucdd-ext ucddjava)
 target_link_libraries(JCDD PRIVATE ucdd-native libcdd.a libdbm.a libbase.a libhash.a libudebug.a )

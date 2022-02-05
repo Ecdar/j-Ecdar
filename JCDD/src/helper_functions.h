@@ -1,6 +1,7 @@
 #ifndef HELPER_FUNCTIONS_H
 #define HELPER_FUNCTIONS_H
 
+#include <jni.h>
 #include <dbm/dbm.h>
 #include <dbm/fed.h>
 
