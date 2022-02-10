@@ -1,12 +1,30 @@
 package lib;
 
 import java.io.File;
+import java.util.List;
 
 public class CDDLib {
 
     static {
-        File lib = new File("lib/" + System.mapLibraryName("JCDD"));
-        System.load(lib.getAbsolutePath());
+        List<File> searchPath = List.of(
+                new File("lib/" + System.mapLibraryName("JCDD")),
+                new File("../lib/" + System.mapLibraryName("JCDD")),
+                new File(System.mapLibraryName("JCDD"))
+        );
+        File lib = null;
+
+        for (var f: searchPath) {
+            if (f.exists()) {
+                lib = f;
+                break;
+            }
+        }
+
+        if (lib != null) {
+            System.load(lib.getAbsolutePath());
+        } else {
+            System.load(searchPath.get(searchPath.size() - 1).getAbsolutePath()); // Default path
+        }
     }
 
     public static void main(String[] args) {
