@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-jdbm:
+  build-jcdd:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,26 +18,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
 
-      - name: Compile JDBM for Linux
+      - name: Compile JCDD for Linux
         run: |
-          cd JDBM && mkdir build
+          cd JCDD && mkdir build
           cmake -B build/
           cmake --build build/
 
-      - name: Compile JDBM for Windows
+      - name: Compile JCDD for Windows
         run: |
-          cd JDBM && mkdir build-win
+          cd JCDD && mkdir build-win
           cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
           cmake --build build-win/
 
-      - name: Upload JDBM Linux
+      - name: Upload JCDD Linux
         uses: actions/upload-artifact@v2
         with:
-          name: jdbm-linux
-          path: JDBM/build/jdbm/lib/*
+          name: jcdd-linux
+          path: JCDD/build/jcdd/lib/*
 
-      - name: Upload JDBM Windows
+      - name: Upload JCDD Windows
         uses: actions/upload-artifact@v2
         with:
-          name: jdbm-windows
-          path: JDBM/build-win/jdbm/lib/*
+          name: jcdd-windows
+          path: JCDD/build-win/jcdd/lib/*
