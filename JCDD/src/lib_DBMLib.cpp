@@ -293,9 +293,10 @@ JNIEXPORT jboolean JNICALL Java_lib_DBMLib_fed_1eq_1fed(JNIEnv *env, jclass cls,
 
 JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBounds(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
     jsize len = env->GetArrayLength(dbm);
+    jsize max_len = env->GetArrayLength(max);
 
     auto converted = helper_functions::jintToC(env, dbm, len);
-    auto convertedMax = helper_functions::jintToC(env, max, len);
+    auto convertedMax = helper_functions::jintToC(env, max, max_len);
     dbm_extrapolateMaxBounds(converted, dim, convertedMax);
 
     return helper_functions::cToJint(env, converted, len);
