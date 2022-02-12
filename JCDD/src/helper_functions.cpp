@@ -12,11 +12,14 @@ raw_t* helper_functions::jintToC(JNIEnv *env, jintArray dbm, jsize len) {
 jintArray helper_functions::cToJint(JNIEnv *env, const raw_t *t, jsize len) {
     // convert updated array to jintArray
     jintArray newT = env->NewIntArray(len);
-    int *arr = new int[len];
+    if(newT == NULL){
+        return NULL; // out of memory error
+    }
+    jint arr[len];
     for (int i = 0; i < len; i++) {
         arr[i] = t[i];
     }
-    env->SetIntArrayRegion(newT, 0, len, (const jint*)arr);
+    env->SetIntArrayRegion(newT, 0, len, arr);
     return newT;
 }
 
