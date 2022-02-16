@@ -7,9 +7,9 @@ public class DBMLib {
 
     static {
         List<File> searchPath = List.of(
-                new File("lib/" + System.mapLibraryName("JCDD")),
-                new File("../lib/" + System.mapLibraryName("JCDD")),
-                new File(System.mapLibraryName("JCDD"))
+            new File("lib/" + System.mapLibraryName("JCDD")),
+            new File("../lib/" + System.mapLibraryName("JCDD")),
+            new File(System.mapLibraryName("JCDD"))
         );
         File lib = null;
 
@@ -27,9 +27,7 @@ public class DBMLib {
         }
     }
 
-    public static void main(String[] args) {
-
-    }
+    public static void main(String[] args) {}
 
     // here you must define every method you want to use from the DBM library
     public static native int boundbool2raw(int bound, boolean isStrict);
