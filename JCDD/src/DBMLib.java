@@ -7,9 +7,9 @@ public class DBMLib {
 
     static {
         List<File> searchPath = List.of(
-            new File("lib/" + System.mapLibraryName("JDBM")),
-            new File("../lib/" + System.mapLibraryName("JDBM")),
-            new File(System.mapLibraryName("JDBM"))
+            new File("lib/" + System.mapLibraryName("JCDD")),
+            new File("../lib/" + System.mapLibraryName("JCDD")),
+            new File(System.mapLibraryName("JCDD"))
         );
         File lib = null;
 
