@@ -3,8 +3,12 @@
 This is a model checking engine for ECDAR (Environment for Compositional Design and Analysis of Real Time Systems) 
 written in Java, using JNI for linking with the UCDD library.
 
-In order to run you need to compile the native module. See section Building JCDD. The resulting (jar and so/dll/dylib) 
+In order to run you need to clone the protobuf submodule and compile the native module. See section Building JCDD. The resulting (jar and so/dll/dylib) 
 files should be places in the "lib/" folder. 
+
+To clone the protobuf submodule, run the following command or run the subModulesUpdate gradle task:
+
+``git submodule update --init --recursive``
 
 ## Building JCDD
 
