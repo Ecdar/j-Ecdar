@@ -6,6 +6,7 @@ raw_t* helper_functions::jintToC(JNIEnv *env, jintArray dbm, jsize len) {
     jint *arr = env->GetIntArrayElements(dbm, 0);
     for (int i = 0; i < len; i++)
         t[i] = arr[i];
+    env->ReleaseIntArrayElements(dbm, arr, JNI_ABORT);
     return t;
 }
 
