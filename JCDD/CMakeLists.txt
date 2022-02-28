@@ -30,7 +30,7 @@ endif()
 set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/external CACHE PATH "Install location for external dependencies")
 ExternalProject_Add(ucdd-ext
     GIT_REPOSITORY https://github.com/UPPAALModelChecker/UCDD
-    GIT_TAG origin/main
+    GIT_TAG v0.0.1
     CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_LOCATION} -DCMAKE_BUILD_TYPE=Release
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ocdd/lib ${EXTERNAL_INSTALL_LOCATION}/lib && 
                     ${CMAKE_COMMAND} -E copy_directory ../ucdd-ext/include/ ${EXTERNAL_INSTALL_LOCATION}/include
