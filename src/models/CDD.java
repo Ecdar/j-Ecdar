@@ -1,5 +1,7 @@
 package models;
 
+import Exceptions.CddAlreadyRunningException;
+import Exceptions.CddNotRunningException;
 import lib.CDDLib;
 
 import java.util.Objects;
@@ -7,6 +9,7 @@ import java.util.Objects;
 public class CDD {
 
     private long pointer;
+    private static boolean cddIsRunning;
 
     private CDD(){
         this.pointer = CDDLib.allocateCdd();
@@ -16,11 +19,18 @@ public class CDD {
         this.pointer = pointer;
     }
 
-    public static int init(int maxSize, int cs, int stackSize) {
+    public static int init(int maxSize, int cs, int stackSize) throws CddAlreadyRunningException {
+        if(cddIsRunning){
+            throw new CddAlreadyRunningException("Can't initialize when already running");
+        }
+        cddIsRunning = true;
         return CDDLib.cddInit(maxSize, cs, stackSize);
     }
 
-    public static void addClocks(int amount){
+    public static void addClocks(int amount) throws CddNotRunningException {
+        if(!cddIsRunning){
+            throw new CddNotRunningException("Can't add clocks without before running CDD.init");
+        }
         CDDLib.cddAddClocks(amount);
     }
 
@@ -55,45 +65,62 @@ public class CDD {
     }
 
     public static void free(CDD cdd){
+        if(cdd.pointer == 0){
+            throw new NullPointerException("CDD object is null");
+        }
         CDDLib.freeCdd(cdd.pointer);
         cdd.pointer = 0;
     }
 
     public CDD conjunction(CDD other){
+        checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);
         return new CDD(resultPointer);
     }
 
     public CDD disjunction(CDD other){
+        checkForNull();
         long resultPointer = CDDLib.disjunction(pointer, other.pointer);
         return new CDD(resultPointer);
     }
 
     public CDD negation() {
+        checkForNull();
         long resultPointer = CDDLib.negation(pointer);
         return new CDD(resultPointer);
     }
 
     public CDD reduce() {
+        checkForNull();
         long resultPointer = CDDLib.reduce(pointer);
         return new CDD(resultPointer);
     }
 
     public int getNodeCount(){
+        checkForNull();
         return CDDLib.cddNodeCount(pointer);
     }
 
     public CDDNode getRoot(){
+        checkForNull();
         long nodePointer = CDDLib.getRootNode(this.pointer);
         return new CDDNode(nodePointer);
     }
 
     public void printDot() {
+        checkForNull();
         CDDLib.cddPrintDot(pointer);
     }
 
     public void printDot(String filePath){
+        checkForNull();
         CDDLib.cddPrintDot(pointer, filePath);
+    }
+
+    private void checkForNull(){
+        if(pointer == 0){
+            throw new NullPointerException("CDD object is null");
+        }
     }
 
     @Override
