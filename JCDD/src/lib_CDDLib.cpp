@@ -12,7 +12,7 @@
  */
 jint JNICALL Java_lib_CDDLib_cddInit
   (JNIEnv *env, jclass thisObject, jint maxsize, jint cs, jint stacksize){
-    return cdd_init(1000,1000,1000);
+    return cdd_init(maxsize,cs,stacksize);
 }
 
 /*
