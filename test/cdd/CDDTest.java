@@ -1,17 +1,19 @@
 package cdd;
 
+import Exceptions.CddAlreadyRunningException;
+import Exceptions.CddNotRunningException;
 import lib.CDDLib;
 import models.CDD;
 import models.CDDNode;
 import models.Elem;
 import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CDDTest {
 
@@ -23,12 +25,12 @@ public class CDDTest {
     }
 
     @Test
-    public void testCddInit(){
+    public void testCddInit() throws CddAlreadyRunningException {
         assertEquals(0, CDD.init(0,0,0));
     }
 
     @Test
-    public void testConjunctionSameTypeWithOverlap(){
+    public void testConjunctionSameTypeWithOverlap() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(3);
         CDD cdd1 = CDD.allocateInterval(2,1,3,5);
@@ -46,7 +48,7 @@ public class CDDTest {
     }
 
     @Test
-    public void testDisjunction(){
+    public void testDisjunction() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(3);
         CDD cdd1 = CDD.allocateInterval(2,1,3,5);
@@ -64,7 +66,7 @@ public class CDDTest {
     }
 
     @Test
-    public void getCorrectBounds(){
+    public void getCorrectBounds() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(2);
         CDD cdd1 = CDD.allocateInterval(1,0,3,5);
@@ -78,21 +80,55 @@ public class CDDTest {
     }
 
     @Test
-    public void createCddFromDbm(){
+    public void createCddFromDbm() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(2);
 
         CDD cdd1 = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
         CDDNode node = cdd1.getRoot();
 
+        assertTrue(node.getElemAtIndex(0).getChild().isFalseTerminal());
+        assertTrue(node.getElemAtIndex(1).getChild().isTrueTerminal());
         assertEquals(0, node.getElemAtIndex(0).getBound());
         assertEquals(11, node.getElemAtIndex(1).getBound());
 
         CDD.free(cdd1);
     }
 
+    @Test(expected = CddNotRunningException.class)
+    public void addClocksWithoutInitializing() throws CddNotRunningException {
+        CDD.addClocks(2);
+    }
+
+    @Test(expected = CddAlreadyRunningException.class)
+    public void initializeAlreadyRunningCDD() throws CddAlreadyRunningException {
+        CDD.init(1000,1000,1000);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void cddReducingNullCDD() throws CddNotRunningException, CddAlreadyRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(2);
+
+        CDD cdd = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
+        CDD.free(cdd);
+
+        cdd.reduce();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void cddFreeingNullCDD() throws CddNotRunningException, CddAlreadyRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(2);
+
+        CDD cdd = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
+        CDD.free(cdd);
+
+        CDD.free(cdd);
+    }
+
     @Test
-    public void cddLowerBound(){
+    public void cddLowerBound() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(2);
 
@@ -107,7 +143,7 @@ public class CDDTest {
     }
 
     @Test
-    public void cddUpperBound(){
+    public void cddUpperBound() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(2);
 
@@ -121,7 +157,7 @@ public class CDDTest {
     }
 
     @Test
-    public void cddAddBddvar(){
+    public void cddAddBddvar() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(2);
 
