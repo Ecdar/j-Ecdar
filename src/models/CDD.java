@@ -27,6 +27,11 @@ public class CDD {
         return CDDLib.cddInit(maxSize, cs, stackSize);
     }
 
+    public static void done(){
+        cddIsRunning = false;
+        CDDLib.cddDone();
+    }
+
     public static void addClocks(int amount) throws CddNotRunningException {
         if(!cddIsRunning){
             throw new CddNotRunningException("Can't add clocks without before running CDD.init");

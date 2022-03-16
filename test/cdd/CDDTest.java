@@ -21,7 +21,7 @@ public class CDDTest {
 
     @After
     public void afterEachTest(){
-        CDDLib.cddDone();
+        CDD.done();
     }
 
     @Test
@@ -102,6 +102,8 @@ public class CDDTest {
 
     @Test(expected = CddAlreadyRunningException.class)
     public void initializeAlreadyRunningCDD() throws CddAlreadyRunningException {
+        CDD.init(1000,1000,1000);
+
         CDD.init(1000,1000,1000);
     }
 
