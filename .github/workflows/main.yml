@@ -20,21 +20,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
 
-      - name: Get dependencies
-        run: |
-          cd JCDD
-          ./getlibs.sh
-
       - name: Compile JCDD for Linux
         run: |
           cd JCDD && mkdir build
+          ./getlibs.sh
           cmake -B build/
           cmake --build build/
 
       - name: Compile JCDD for Windows
         run: |
           cd JCDD && mkdir build-win
-          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
+          ./getlibs-win.sh
+          cmake -B build-win/
           cmake --build build-win/
 
       - name: Upload JCDD Linux

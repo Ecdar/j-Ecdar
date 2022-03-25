@@ -28,12 +28,12 @@ if(WIN32)
     set(CMAKE_SHARED_LIBRARY_PREFIX "") # dont add lib prefix to dll files
 endif()
 
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/libs")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_BINARY_DIR}/ext-libs")
 
 find_package(xxHash 0.8.0 REQUIRED COMPONENTS xxhash)
-find_package(UUtils 1.1.1 REQUIRED PATHS ${CMAKE_CURRENT_SOURCE_DIR}/libs/UUtils)
-find_package(UDBM 2.0.11 REQUIRED PATHS ${CMAKE_CURRENT_SOURCE_DIR}/libs/UDBM)
-find_package(UCDD 0.2.1 REQUIRED PATHS ${CMAKE_CURRENT_SOURCE_DIR}/libs/UCDD)
+find_package(UUtils 1.1.1 REQUIRED PATHS ${CMAKE_BINARY_DIR}/ext-libs/UUtils)
+find_package(UDBM 2.0.11 REQUIRED PATHS ${CMAKE_BINARY_DIR}/ext-libs/UDBM)
+find_package(UCDD 0.2.1 REQUIRED PATHS ${CMAKE_BINARY_DIR}/ext-libs/UCDD)
 
 include_directories(src)
 
