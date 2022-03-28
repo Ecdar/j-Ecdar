@@ -80,6 +80,29 @@ public class CDDTest {
     }
 
     @Test
+    public void cddTrue_RootNodeIsTrueNode() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(2);
+
+        CDD trueNode = CDD.cddTrue();
+
+        assertTrue(trueNode.getRoot().isTrueTerminal());
+
+        CDD.free(trueNode);
+    }
+
+    @Test
+    public void cddFalse_RootNodeIsFalseNode() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(2);
+
+        CDD falseNode = CDD.cddFalse();
+
+        assertTrue(falseNode.getRoot().isFalseTerminal());
+
+        CDD.free(falseNode);
+    }
+    @Test
     public void createCddFromDbm() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(2);

@@ -57,4 +57,6 @@ public class CDDLib {
     public static native long cddNBddvar(int level);
     public static native boolean isTrue(long cddNodePointer);
     public static native boolean isFalse(long cddNodePointer);
+    public static native long cddTrue();
+    public static native long cddFalse();
 }

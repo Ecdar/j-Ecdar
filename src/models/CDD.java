@@ -10,13 +10,22 @@ public class CDD {
 
     private long pointer;
     private static boolean cddIsRunning;
-
     private CDD(){
         this.pointer = CDDLib.allocateCdd();
     }
 
     private CDD(long pointer){
         this.pointer = pointer;
+    }
+
+    public static CDD cddTrue()
+    {
+        return new CDD(CDDLib.cddTrue());
+    }
+
+    public static CDD cddFalse()
+    {
+        return new CDD(CDDLib.cddFalse());
     }
 
     public static int init(int maxSize, int cs, int stackSize) throws CddAlreadyRunningException {

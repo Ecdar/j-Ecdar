@@ -308,3 +308,23 @@ JNIEXPORT jboolean JNICALL Java_lib_CDDLib_isFalse
     ddNode* node = (ddNode*)cdd_node_pointer;
     return node == cddfalse;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    cddTrue
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddTrue
+  (JNIEnv *, jclass){
+    cdd* cdd_true_node = new cdd(cdd_true());
+    return (jlong)cdd_true_node;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    cddFalse
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddFalse
+  (JNIEnv *, jclass){
+    cdd* cdd_false_node = new cdd(cdd_false());
+    return (jlong)cdd_false_node;
+}
