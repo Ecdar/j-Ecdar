@@ -328,3 +328,13 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddFalse
     cdd* cdd_false_node = new cdd(cdd_false());
     return (jlong)cdd_false_node;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    isTerminal
+ */
+JNIEXPORT jboolean JNICALL Java_lib_CDDLib_isTerminal
+  (JNIEnv *, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    return cdd_isterminal(cdd_object->handle());
+}

@@ -12,8 +12,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CDDTest {
 
@@ -102,6 +101,36 @@ public class CDDTest {
 
         CDD.free(falseNode);
     }
+
+    @Test
+    public void isTerminal_trueNodeShouldBeTerminal() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(2);
+
+        CDD trueNode = CDD.cddTrue();
+
+        assertTrue(trueNode.isTerminal());
+
+        CDD.free(trueNode);
+    }
+
+    @Test
+    public void isTerminal_shouldNotBeTerminal() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(2);
+
+        CDD cdd1 = CDD.allocateInterval(2,1,3,5);
+        CDD cdd2 = CDD.allocateInterval(2,1,4,6);
+
+        CDD cdd3 = cdd1.conjunction(cdd2);
+
+        assertFalse(cdd3.isTerminal());
+
+        CDD.free(cdd1);
+        CDD.free(cdd2);
+        CDD.free(cdd3);
+    }
+
     @Test
     public void createCddFromDbm() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);

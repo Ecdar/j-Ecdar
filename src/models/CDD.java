@@ -28,6 +28,11 @@ public class CDD {
         return new CDD(CDDLib.cddFalse());
     }
 
+    public boolean isTerminal()
+    {
+        return CDDLib.isTerminal(pointer);
+    }
+
     public static int init(int maxSize, int cs, int stackSize) throws CddAlreadyRunningException {
         if(cddIsRunning){
             throw new CddAlreadyRunningException("Can't initialize when already running");
