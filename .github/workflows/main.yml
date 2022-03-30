@@ -31,7 +31,7 @@ jobs:
         run: |
           cd JCDD && mkdir build-win
           ./getlibs-win.sh
-          cmake -B build-win/
+          cmake -B build-win/ -DCMAKE_PREFIX_PATH=./build-win/ext-libs
           cmake --build build-win/
 
       - name: Upload JCDD Linux
