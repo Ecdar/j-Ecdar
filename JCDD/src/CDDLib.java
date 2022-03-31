@@ -61,4 +61,5 @@ public class CDDLib {
     public static native long cddFalse();
     public static native boolean isTerminal(long cddPointer);
     public static native long delay(long cddPointer);
+    public static native long delayInvar(long cddPonter, long cddInvarPointer);
 }

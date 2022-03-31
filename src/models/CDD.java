@@ -96,6 +96,11 @@ public class CDD {
         return new CDD(CDDLib.delay(pointer));
     }
 
+    public CDD delayInvar(CDD invariant)
+    {
+        return new CDD(CDDLib.delayInvar(pointer, invariant.pointer));
+    }
+
     public CDD conjunction(CDD other){
         checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);

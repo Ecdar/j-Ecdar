@@ -349,3 +349,15 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_delay
     cdd* cdd_result = new cdd(cdd_delay(*cdd_object));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    delayInvar
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_delayInvar
+  (JNIEnv *, jclass, jlong cdd_pointer, jlong cdd_invar_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_invar_object = (cdd*)cdd_invar_pointer;
+    cdd* cdd_result = new cdd(cdd_delay_invariant(*cdd_object, *cdd_invar_object));
+    return (jlong)cdd_result;
+}
