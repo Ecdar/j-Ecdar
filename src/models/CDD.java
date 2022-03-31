@@ -93,16 +93,24 @@ public class CDD {
 
     public CDD delay()
     {
+        checkForNull();
         return new CDD(CDDLib.delay(pointer));
     }
 
     public CDD delayInvar(CDD invariant)
     {
+        checkForNull();
         return new CDD(CDDLib.delayInvar(pointer, invariant.pointer));
     }
 
     public CDD exist(int[] levels, int[] clocks){
+        checkForNull();
         return new CDD(CDDLib.exist(pointer, levels, clocks));
+    }
+
+    public CDD past(){
+        checkForNull();
+        return new CDD(CDDLib.past(pointer));
     }
 
     public CDD conjunction(CDD other){

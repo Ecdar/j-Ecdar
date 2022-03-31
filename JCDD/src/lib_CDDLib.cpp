@@ -379,3 +379,14 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_exist
     cdd* cdd_result = new cdd(cdd_exist(*cdd_object, converted_levels, converted_clocks));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    past
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_past
+  (JNIEnv *, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_result = new cdd(cdd_past(*cdd_object));
+    return (jlong)cdd_result;
+}
