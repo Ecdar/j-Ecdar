@@ -60,4 +60,5 @@ public class CDDLib {
     public static native long cddTrue();
     public static native long cddFalse();
     public static native boolean isTerminal(long cddPointer);
+    public static native long delay(long cddPointer);
 }

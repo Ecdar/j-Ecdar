@@ -338,3 +338,14 @@ JNIEXPORT jboolean JNICALL Java_lib_CDDLib_isTerminal
     cdd* cdd_object = (cdd*)cdd_pointer;
     return cdd_isterminal(cdd_object->handle());
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    delay
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_delay
+  (JNIEnv *, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_result = new cdd(cdd_delay(*cdd_object));
+    return (jlong)cdd_result;
+}
