@@ -113,6 +113,11 @@ public class CDD {
         return new CDD(CDDLib.past(pointer));
     }
 
+    public CDD removeNegative(){
+        checkForNull();
+        return new CDD(CDDLib.removeNegative(pointer));
+    }
+
     public CDD conjunction(CDD other){
         checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);

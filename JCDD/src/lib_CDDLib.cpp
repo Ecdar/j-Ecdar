@@ -390,3 +390,14 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_past
     cdd* cdd_result = new cdd(cdd_past(*cdd_object));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    removeNegative
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_removeNegative
+  (JNIEnv *, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_result = new cdd(cdd_remove_negative(*cdd_object));
+    return (jlong)cdd_result;
+}
