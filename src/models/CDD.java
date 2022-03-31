@@ -101,6 +101,10 @@ public class CDD {
         return new CDD(CDDLib.delayInvar(pointer, invariant.pointer));
     }
 
+    public CDD exist(int[] levels, int[] clocks){
+        return new CDD(CDDLib.exist(pointer, levels, clocks));
+    }
+
     public CDD conjunction(CDD other){
         checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);

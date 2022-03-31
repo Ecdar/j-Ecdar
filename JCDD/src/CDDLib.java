@@ -61,5 +61,6 @@ public class CDDLib {
     public static native long cddFalse();
     public static native boolean isTerminal(long cddPointer);
     public static native long delay(long cddPointer);
-    public static native long delayInvar(long cddPonter, long cddInvarPointer);
+    public static native long delayInvar(long cddPointer, long cddInvarPointer);
+    public static native long exist(long cddPointer, int[] levels, int[] clocks);
 }

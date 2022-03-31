@@ -361,3 +361,21 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_delayInvar
     cdd* cdd_result = new cdd(cdd_delay_invariant(*cdd_object, *cdd_invar_object));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    exist
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_exist
+  (JNIEnv *env, jclass, jlong cdd_pointer, jintArray levels, jintArray clocks){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+
+    jsize levels_len = env->GetArrayLength(levels);
+    auto converted_levels = helper_functions::jintToC(env, levels, levels_len);
+
+    jsize clocks_len = env->GetArrayLength(clocks);
+    auto converted_clocks = helper_functions::jintToC(env, clocks, clocks_len);
+
+    cdd* cdd_result = new cdd(cdd_exist(*cdd_object, converted_levels, converted_clocks));
+    return (jlong)cdd_result;
+}
