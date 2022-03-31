@@ -235,7 +235,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddFromDbm
 JNIEXPORT void JNICALL Java_lib_CDDLib_cddPrintDot__J
   (JNIEnv *, jclass, jlong cdd_pointer){
     cdd* cdd_object = (cdd*)cdd_pointer;
-    cdd_printdot(cdd_object->handle());
+    cdd_printdot(cdd_object->handle(), true);
 }
 
 /*
@@ -249,7 +249,7 @@ JNIEXPORT void JNICALL Java_lib_CDDLib_cddPrintDot__JLjava_lang_String_2
     const char* path_name = env->GetStringUTFChars(file_path_jstring, 0);
 
     FILE* file = fopen(path_name, "w");
-    cdd_fprintdot(file, cdd_object->handle());
+    cdd_fprintdot(file, cdd_object->handle(), true);
 
     fclose(file);
     env->ReleaseStringUTFChars(file_path_jstring, path_name);
