@@ -92,6 +92,11 @@ public class CDD {
         cdd.pointer = 0;
     }
 
+    public CDD copy(){
+        checkForNull();
+        return new CDD(CDDLib.copy(pointer));
+    }
+
     public CDD delay()
     {
         checkForNull();

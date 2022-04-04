@@ -429,3 +429,14 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_minus
     cdd* cdd_result = new cdd((*cdd_l_object - *cdd_r_object));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    copy
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_copy
+  (JNIEnv *, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_copy = new cdd(*cdd_object);
+    return (jlong)cdd_copy;
+}
