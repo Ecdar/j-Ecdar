@@ -126,13 +126,19 @@ public class CDD {
 
     public CDD applyReset(int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
         checkForNull();
-        return new CDD(CDDLib.applyReset(clockResets, clockValues, boolResets, boolValues));
+        return new CDD(CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues));
     }
 
     public CDD minus(CDD other){
         checkForNull();
         other.checkForNull();
         return new CDD(CDDLib.minus(pointer, other.pointer));
+    }
+
+    public CDD transition(CDD guard, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
+        checkForNull();
+        guard.checkForNull();
+        return new CDD(CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues));
     }
 
     public CDD conjunction(CDD other){
