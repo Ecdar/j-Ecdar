@@ -124,6 +124,12 @@ public class CDD {
         return new CDD(CDDLib.applyReset(clockResets, clockValues, boolResets, boolValues));
     }
 
+    public CDD minus(CDD other){
+        checkForNull();
+        other.checkForNull();
+        return new CDD(CDDLib.minus(pointer, other.pointer));
+    }
+
     public CDD conjunction(CDD other){
         checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);

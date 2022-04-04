@@ -417,3 +417,15 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
             converted_bool_resets, converted_bool_values));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    minus
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_minus
+  (JNIEnv *, jclass, jlong cdd_l, jlong cdd_r){
+    cdd* cdd_l_object = (cdd*)cdd_l;
+    cdd* cdd_r_object = (cdd*)cdd_r;
+    cdd* cdd_result = new cdd((*cdd_l_object - *cdd_r_object));
+    return (jlong)cdd_result;
+}

@@ -66,4 +66,5 @@ public class CDDLib {
     public static native long past(long cddPointer);
     public static native long removeNegative(long cddPointer);
     public static native long applyReset(long cddPointer, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues);
+    public static native long minus(long lCdd, long rCdd);
 }
