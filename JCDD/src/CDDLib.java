@@ -65,4 +65,5 @@ public class CDDLib {
     public static native long exist(long cddPointer, int[] levels, int[] clocks);
     public static native long past(long cddPointer);
     public static native long removeNegative(long cddPointer);
+    public static native long applyReset(long cddPointer, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues);
 }

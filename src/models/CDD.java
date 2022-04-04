@@ -4,6 +4,7 @@ import Exceptions.CddAlreadyRunningException;
 import Exceptions.CddNotRunningException;
 import lib.CDDLib;
 
+import java.util.List;
 import java.util.Objects;
 
 public class CDD {
@@ -116,6 +117,11 @@ public class CDD {
     public CDD removeNegative(){
         checkForNull();
         return new CDD(CDDLib.removeNegative(pointer));
+    }
+
+    public CDD applyReset(int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
+        checkForNull();
+        return new CDD(CDDLib.applyReset(clockResets, clockValues, boolResets, boolValues));
     }
 
     public CDD conjunction(CDD other){

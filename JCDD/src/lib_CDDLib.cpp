@@ -370,11 +370,8 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_exist
   (JNIEnv *env, jclass, jlong cdd_pointer, jintArray levels, jintArray clocks){
     cdd* cdd_object = (cdd*)cdd_pointer;
 
-    jsize levels_len = env->GetArrayLength(levels);
-    auto converted_levels = helper_functions::jintToC(env, levels, levels_len);
-
-    jsize clocks_len = env->GetArrayLength(clocks);
-    auto converted_clocks = helper_functions::jintToC(env, clocks, clocks_len);
+    auto converted_levels = helper_functions::jintToC(env, levels);
+    auto converted_clocks = helper_functions::jintToC(env, clocks);
 
     cdd* cdd_result = new cdd(cdd_exist(*cdd_object, converted_levels, converted_clocks));
     return (jlong)cdd_result;
@@ -399,5 +396,24 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_removeNegative
   (JNIEnv *, jclass, jlong cdd_pointer){
     cdd* cdd_object = (cdd*)cdd_pointer;
     cdd* cdd_result = new cdd(cdd_remove_negative(*cdd_object));
+    return (jlong)cdd_result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    applyReset
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
+  (JNIEnv *env, jclass, jlong cdd_pointer, jintArray clock_resets, jintArray clock_values, jintArray bool_resets, jintArray bool_values){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+
+    auto converted_clock_resets = helper_functions::jintToC(env, clock_resets);
+    auto converted_clock_values = helper_functions::jintToC(env, clock_values);
+    auto converted_bool_resets = helper_functions::jintToC(env, bool_resets);
+    auto converted_bool_values = helper_functions::jintToC(env, bool_values);
+
+    cdd* cdd_result = new cdd(cdd_apply_reset(*cdd_object,
+            converted_clock_resets, converted_clock_values,
+            converted_bool_resets, converted_bool_values));
     return (jlong)cdd_result;
 }
