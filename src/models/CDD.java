@@ -137,12 +137,14 @@ public class CDD {
 
     public CDD conjunction(CDD other){
         checkForNull();
+        other.checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);
         return new CDD(resultPointer);
     }
 
     public CDD disjunction(CDD other){
         checkForNull();
+        other.checkForNull();
         long resultPointer = CDDLib.disjunction(pointer, other.pointer);
         return new CDD(resultPointer);
     }
