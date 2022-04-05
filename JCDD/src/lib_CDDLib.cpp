@@ -448,7 +448,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_copy
 
 /*
  * Class:     lib_CDDLib
- * Method:    applyReset
+ * Method:    transition
  */
 JNIEXPORT jlong JNICALL Java_lib_CDDLib_transition
   (JNIEnv *env, jclass, jlong cdd_pointer, jlong cdd_guard_pointer, jintArray clock_resets, jintArray clock_values, jintArray bool_resets, jintArray bool_values){
@@ -466,5 +466,49 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_transition
     cdd* cdd_result = new cdd(cdd_transition(*cdd_object, *cdd_guard_object,
             converted_clock_resets, converted_clock_values, num_clock_resets,
             converted_bool_resets, converted_bool_values, num_bool_resets));
+    return (jlong)cdd_result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    transitionBack
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_transitionBack
+  (JNIEnv *env, jclass, jlong cdd_pointer, jlong cdd_guard_pointer, jlong cdd_update_pointer, jintArray clock_resets, jintArray bool_resets){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_guard_object = (cdd*)cdd_guard_pointer;
+    cdd* cdd_update_object = (cdd*)cdd_update_pointer;
+
+    jsize num_clock_resets = env->GetArrayLength(clock_resets);
+    auto converted_clock_resets = helper_functions::jintToC(env, clock_resets, num_clock_resets);
+
+    jsize num_bool_resets = env->GetArrayLength(clock_resets);
+    auto converted_bool_resets = helper_functions::jintToC(env, bool_resets, num_bool_resets);
+
+    cdd* cdd_result = new cdd(cdd_transition_back(*cdd_object, *cdd_guard_object, *cdd_update_object,
+            converted_clock_resets, num_clock_resets,
+            converted_bool_resets, num_bool_resets));
+    return (jlong)cdd_result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    transitionBackPast
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_transitionBackPast
+  (JNIEnv *env, jclass, jlong cdd_pointer, jlong cdd_guard_pointer, jlong cdd_update_pointer, jintArray clock_resets, jintArray bool_resets){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_guard_object = (cdd*)cdd_guard_pointer;
+    cdd* cdd_update_object = (cdd*)cdd_update_pointer;
+
+    jsize num_clock_resets = env->GetArrayLength(clock_resets);
+    auto converted_clock_resets = helper_functions::jintToC(env, clock_resets, num_clock_resets);
+
+    jsize num_bool_resets = env->GetArrayLength(clock_resets);
+    auto converted_bool_resets = helper_functions::jintToC(env, bool_resets, num_bool_resets);
+
+    cdd* cdd_result = new cdd(cdd_transition_back_past(*cdd_object, *cdd_guard_object, *cdd_update_object,
+            converted_clock_resets, num_clock_resets,
+            converted_bool_resets, num_bool_resets));
     return (jlong)cdd_result;
 }

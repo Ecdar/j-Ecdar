@@ -141,6 +141,20 @@ public class CDD {
         return new CDD(CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues));
     }
 
+    public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets){
+        checkForNull();
+        guard.checkForNull();
+        update.checkForNull();
+        return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets));
+    }
+
+    public CDD transitionBackPast(CDD guard, CDD update, int[] clockResets, int[] boolResets){
+        checkForNull();
+        guard.checkForNull();
+        update.checkForNull();
+        return new CDD(CDDLib.transitionBackPast(pointer, guard.pointer, update.pointer, clockResets, boolResets));
+    }
+
     public CDD conjunction(CDD other){
         checkForNull();
         other.checkForNull();
