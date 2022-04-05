@@ -10,18 +10,6 @@ raw_t* helper_functions::jintToC(JNIEnv *env, jintArray dbm, jsize len) {
     return t;
 }
 
-raw_t* helper_functions::jintToC(JNIEnv *env, jintArray j_arr) {
-    jsize len = env->GetArrayLength(j_arr);
-
-    // build array to pass to library
-    raw_t *t = new raw_t[len];
-    jint *arr = env->GetIntArrayElements(j_arr, 0);
-    for (int i = 0; i < len; i++)
-        t[i] = arr[i];
-    env->ReleaseIntArrayElements(j_arr, arr, JNI_ABORT);
-    return t;
-}
-
 jintArray helper_functions::cToJint(JNIEnv *env, const raw_t *t, jsize len) {
     // convert updated array to jintArray
     jintArray newT = env->NewIntArray(len);
