@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class Conjunction extends TransitionSystem {
     private final TransitionSystem[] systems;
 
-    private List<Refinement.State> passed = new ArrayList<>();
-    private List<Refinement.State> waiting = new ArrayList<>();
+    private List<State> passed = new ArrayList<>();
+    private List<State> waiting = new ArrayList<>();
     private int[] maxBounds;
 
 
@@ -58,26 +58,26 @@ public class Conjunction extends TransitionSystem {
         return result;
     }
 
-    public boolean passedContains(Refinement.State s)
+    public boolean passedContains(State s)
     {
         boolean contained = false;
 
-        for (Refinement.State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
+        for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
-            if (s.getInvFed().isSubset(st.getInvFed()))
+            if (CDD.isSubset(s.getInvarCDD(), st.getInvarCDD()))
                 contained = true;
         }
         return contained;
     }
 
-    public boolean waitingContains(Refinement.State s)
+    public boolean waitingContains(State s)
     {
         boolean contained = false;
 
-        for (Refinement.State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
+        for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
 
-            if (s.getInvFed().isSubset(st.getInvFed())) {
+            if (CDD.isSubset(s.getInvarCDD(),st.getInvarCDD())) {
                 contained = true;
             }
         }
@@ -114,12 +114,12 @@ public class Conjunction extends TransitionSystem {
 
         locMap.put(initL.getName(),initL);
 
-        Refinement.State initState = getInitialState();;
+        State initState = getInitialState();;
         waiting.add(initState);
         while (!waiting.isEmpty())
         {
 
-            Refinement.State currentState = (Refinement.State)waiting.toArray()[0];
+            State currentState = (State)waiting.toArray()[0];
             waiting.remove(currentState);
             passed.add(currentState);
             //System.out.println("Processing state " + currentState.getLocation().getName()) ;
@@ -129,8 +129,8 @@ public class Conjunction extends TransitionSystem {
             for (Channel chan : all )
             {
 
-                List<Refinement.Transition> transList = getNextTransitions(currentState, chan, clocks);
-                for (Refinement.Transition trans : transList)
+                List<Transition> transList = getNextTransitions(currentState, chan, clocks);
+                for (Transition trans : transList)
                 {
                     String targetName = trans.getTarget().getLocation().getName();
 
@@ -168,7 +168,7 @@ public class Conjunction extends TransitionSystem {
                         if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(e.getUpdates(),otherE.getUpdates()))
                         {
 
-                            if (Federation.fedEqFed(e.getGuardFederation(clocks), otherE.getGuardFederation(clocks)));
+                            if (e.getGuardCDD().equiv( otherE.getGuardCDD()));
                             {
 
                                 edgeAlreadyExists = true;
@@ -199,11 +199,7 @@ public class Conjunction extends TransitionSystem {
         String name="";
         List<List<Guard>> invariant = new ArrayList<>();
 
-        List<Zone> emptyZoneList = new ArrayList<>();
-        Zone emptyZone = new Zone(clocks.size() + 1, true);
-        emptyZone.init();
-        emptyZoneList.add(emptyZone);
-        Federation invarFed = new Federation(emptyZoneList);
+        CDD invarFed = CDD.getUnrestrainedCDD();
         boolean isInitial = true;
         boolean isUrgent = false;
         boolean isUniversal = false;
@@ -216,7 +212,7 @@ public class Conjunction extends TransitionSystem {
             else
                 name += "" + l.getName();
 
-            invarFed = l.getInvariantFederation(clocks).intersect(invarFed);
+            invarFed = l.getInvariantCDD().conjunction(invarFed);
             isInitial = isInitial && l.isInitial();
             isUrgent = isUrgent || l.isUrgent();
             isUniversal = isUniversal || l.isUniversal();
@@ -225,7 +221,7 @@ public class Conjunction extends TransitionSystem {
             y += l.getY();
 
         }
-        invariant = invarFed.turnFederationToGuards(clocks);
+        invariant = CDD.toGuards(invarFed);
 
         return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
 
@@ -250,7 +246,7 @@ public class Conjunction extends TransitionSystem {
         return getInitialLocation(systems);
     }
 
-    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
         // these will store the locations of the target states and the corresponding transitions
