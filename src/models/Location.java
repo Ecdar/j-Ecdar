@@ -10,11 +10,11 @@ public class Location {
     private List<List<Guard>> invariant;
     private int x,y;
 
-    public Federation getInconsistentPart() {
+    public CDD getInconsistentPart() {
         return inconsistentPart;
     }
 
-    public void setInconsistentPart(Federation inconsistentPart) {
+    public void setInconsistentPart(CDD inconsistentPart) {
         this.inconsistentPart = inconsistentPart;
     }
 
@@ -24,7 +24,7 @@ public class Location {
         return new CDD(invariant);
     }
 
-    private Federation inconsistentPart;
+    private CDD inconsistentPart;
     private boolean isInitial;
 
     private  boolean isUrgent;

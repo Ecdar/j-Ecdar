@@ -38,6 +38,10 @@ public class Move {
         return edges;
     }
 
+
+    public CDD getGuardCDD() {
+        return (guardCDD);
+    }
     public List<List<Guard>> getGuards() {
         return CDD.toGuards(guardCDD);
     }

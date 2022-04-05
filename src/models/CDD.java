@@ -177,7 +177,7 @@ public class CDD {
         return new CDD(CDDLib.exist(pointer, levels, clocks));
     }
 
-    public CDD past(){
+    public CDD past(){ // TODO: make sure this is used at the correct spots everywhere, might have been confuces with delay
         checkForNull();
         return new CDD(CDDLib.past(pointer));
     }
@@ -259,6 +259,14 @@ public class CDD {
     }
 
 
+    public static CDD applyReset(CDD state, Update[] updates)
+    {
+        // TODO: FUN;
+        assert(false);
+        return null;
+    }
+
+
     private void checkForNull(){
         if(pointer == 0){
             throw new NullPointerException("CDD object is null");
@@ -278,6 +286,78 @@ public class CDD {
         return Objects.hash(pointer);
     }
 
+
+    public boolean isValid() {
+        if (isTerminal())
+            return false;
+        else return true;
+    }
+
+
+    public static CDD predt(CDD A, CDD B) {
+        // TODO!
+        return null;
+    }
+
+    public static  boolean canDelayIndefinitely(CDD state) {
+        CDD copy = new CDD(state.getPointer());
+        while (!copy.isTerminal())
+        {
+            /*
+            ExtractionResult res = CDD.extractDBMandCDD(copy);
+            copy = res.getCDD();
+            Zone z = res.getDBM();
+            CDD bddPart = res.getBDDPart();
+            if (z.canDelayIndefinitely())
+                return true;
+            // TODO: put in
+            */
+        }
+        assert false;
+        return false;
+    }
+
+    public static  boolean isUrgent(CDD state) {
+        CDD copy = new CDD(state.getPointer());
+        while (!copy.isTerminal())
+        {
+            /*
+            ExtractionResult res = CDD.extractDBMandCDD(copy);
+            copy = res.getCDD();
+            Zone z = res.getDBM();
+            CDD bddPart = res.getBDDPart();
+            if (z.isUrgent())
+                return true;
+            // TODO: put in
+            */
+        }
+        assert false;
+        return false;
+    }
+
+    public static boolean intersects(CDD A, CDD B) {
+        if (A.conjunction(B).isValid())
+            return true;
+        else return false;
+    }
+
+
+    public static boolean isSubset(CDD A, CDD B) { // A (= B
+        if ((A.conjunction(B).equiv(A))) // TODO: check if correct
+            return true;
+        else return false;
+    }
+
+    public boolean isUnrestrained() {
+        if (this.equiv(cddTrue().removeNegative())) // TODO: check if correct
+            return true;
+        else return false;
+    }
+
+    public static CDD getUnrestrainedCDD()
+    {
+        return CDD.cddTrue().removeNegative();
+    }
 
     public CDD transition(Edge e)
     {

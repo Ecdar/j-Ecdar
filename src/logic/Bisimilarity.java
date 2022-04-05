@@ -55,7 +55,6 @@ public class Bisimilarity {
                     }
 
                 }
-                System.out.println("split off " + splitOffPart);
                 if (!splitOffPart.isEmpty()) {
                     for (Location l : splitOffPart)
                         locationList.remove(l);
@@ -65,7 +64,6 @@ public class Bisimilarity {
 
 
             }
-            System.out.println("passed for list");
             bisimilarLocs.addAll(splitOffList);
 
 
@@ -96,18 +94,14 @@ public class Bisimilarity {
             for (Channel c : aut.getActions())
             {
                 for (Location targetLoc : locs) {
-                    Federation allFeds = null;
+                    CDD allCDDs = CDD.cddFalse();
                     boolean thereWasAnEdge= false;
                     for (Edge e : edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc)).collect(Collectors.toList())) {
                         thereWasAnEdge=true;
-                        Federation targetFedAfterReset = e.getTarget().getInvariantFederation(clocks);
-                        for (Update u: e.getUpdates())
-                            targetFedAfterReset= targetFedAfterReset.free(getIndexOfClock(u.getClock(),clocks));
+                        CDD targetFedAfterReset = e.getTarget().getInvariantCDD();
+                        targetFedAfterReset = CDD.applyReset(targetFedAfterReset,e.getUpdates());
 
-                        if (allFeds==null)
-                            allFeds= e.getGuardFederation(clocks).intersect(targetFedAfterReset);
-                        else
-                            allFeds = Federation.fedPlusFed(allFeds,e.getGuardFederation(clocks).intersect(targetFedAfterReset));
+                        allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
                     }
 
 
@@ -116,15 +110,12 @@ public class Bisimilarity {
                         Update[] updates = allEdges.get(0).getUpdates();
                         for (Edge e : allEdges)
                             assert(Arrays.equals(e.getUpdates(),(updates)));
-                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), allFeds.turnFederationToGuards(clocks), allEdges.get(0).getUpdates()));
+                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuards(allCDDs), allEdges.get(0).getUpdates()));
                     }
 
                 }
             }
         }
-
-
-
         return new Automaton(aut.getName()+"Bisimilar",locs,finalEdges,clocks);
 
     }
@@ -138,9 +129,7 @@ public class Bisimilarity {
 
     public static boolean hasDifferentZone(Location l1, Location l2, List<Clock> clocks)
     {
-        if (Federation.fedEqFed(l1.getInvariantFederation(clocks), l2.getInvariantFederation(clocks))) {
-
-
+        if (l1.getInvariantCDD().equiv(l2.getInvariantCDD())) {
             return false;
         }
         System.out.println("Feds not equal: " + l1.getName() + " "  + l2.getName());
@@ -164,8 +153,8 @@ public class Bisimilarity {
                 edgesL2.add(e);
         }
 
-        Federation s1 = l1.getInvariantFederation(clocks);
-        Federation s2 = l2.getInvariantFederation(clocks);
+        CDD s1 = l1.getInvariantCDD();
+        CDD s2 = l2.getInvariantCDD();
 
         for (Edge e1 : edgesL1)
         {
@@ -174,25 +163,25 @@ public class Bisimilarity {
                 System.out.println("chan not there 1 " + c + " " +  l1.getName() + " " + l2.getName());
                 return true;
             }
-            Federation e1Fed = s1.intersect(e1.getGuardFederation(clocks));
-            Federation e2Fed = null;
+            CDD e1CDD = s1.conjunction(e1.getGuardCDD());
+            CDD e2CDD = null;
             for (Edge e2 : edgesL2.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()))
             {
                 if (e2.getChannel().equals(c))
                 {
-                    if (e2Fed==null)
-                        e2Fed = s2.intersect(e2.getGuardFederation(clocks));
+                    if (e2CDD==null)
+                        e2CDD = s2.conjunction(e2.getGuardCDD());
                     else
-                        e2Fed = Federation.fedPlusFed(s2.intersect(e2.getGuardFederation(clocks)),e2Fed);
+                        e2CDD = s2.conjunction(e2.getGuardCDD()).disjunction(e2CDD);
                 }
-                if (e1Fed.intersects(s2.intersect(e2.getGuardFederation(clocks))) && !Arrays.equals(e1.getUpdates(),e2.getUpdates()))
+                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(e1.getUpdates(),e2.getUpdates()))
                 {
                     System.out.println("updates not eqal 1 " + l1.getName() + " " + l2.getName());
                     return true;
                 }
 
 
-               if (e1Fed.intersects(s2.intersect(e2.getGuardFederation(clocks))) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+               if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
                     if (l1.getName().equals(l2.getName())) {
                         System.out.println("same location: " + l1.getName() + " " + getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs) + "  " + getIndexInBislimlarLocs(e2.getTarget(), bisimilarLocs));
@@ -203,7 +192,7 @@ public class Bisimilarity {
                     return true;
                 }
             }
-            if (!e1Fed.isSubset(e2Fed)) {
+            if (!CDD.isSubset(e1CDD,e2CDD)) {
                 return true;
             }
         }
@@ -219,19 +208,19 @@ public class Bisimilarity {
                 System.out.println("not the same channel 2 " + l1.getName() + " " + l2.getName());
                 return true;
             }
-            Federation e2Fed = s2.intersect(e2.getGuardFederation(clocks));
-            Federation e1Fed = null;
+            CDD e2CDD = s2.conjunction(e2.getGuardCDD());
+            CDD e1CDD = null;
             for (Edge e1 : edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()))
             {
                 if (e1.getChannel().equals(c))
                 {
-                    if (e1Fed==null)
-                        e1Fed = s1.intersect(e1.getGuardFederation(clocks));
+                    if (e1CDD==null)
+                        e1CDD = s1.conjunction(e1.getGuardCDD());
                     else
-                        e1Fed = Federation.fedPlusFed(s1.intersect(e1.getGuardFederation(clocks)),e1Fed);
+                        e1CDD = s1.conjunction(e1.getGuardCDD()).disjunction(e1CDD);
                 }
 
-                if (e2Fed.intersects(s1.intersect(e1.getGuardFederation(clocks))) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+                if (CDD.intersects(e2CDD,s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
                     System.out.println("different target location lists 2");
 
@@ -240,7 +229,7 @@ public class Bisimilarity {
 
 
             }
-            if (!e2Fed.isSubset(e1Fed)) {
+            if (!CDD.isSubset(e2CDD, e1CDD)) {
                 System.out.println("outfed not subset " + l1.getName() + " " + l2.getName());
                 return true;
             }

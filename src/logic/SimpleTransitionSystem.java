@@ -17,8 +17,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
     private boolean printComments = false;
 
     private final Automaton automaton;
-    private Deque<Refinement.State> waiting;
-    private List<Refinement.State> passed;
+    private Deque<State> waiting;
+    private List<State> passed;
     private List<Integer> maxBounds;
 
     public SimpleTransitionSystem(Automaton automaton) {
@@ -79,9 +79,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
         //System.out.println("init state added " + getInitialState().getLocation());
         //getInitialState().getInvFed().getZones().get(0).printDBM(true,true);
         while (!waiting.isEmpty()) {
-            Refinement.State currState = new Refinement.State(waiting.pop());
+            State currState = new State(waiting.pop());
             //System.out.println(currState.toString());
-            Refinement.State toStore = new Refinement.State(currState);
+            State toStore = new State(currState);
             int[] maxBounds;
             List<Integer> res = new ArrayList<>();
             res.add(0);
@@ -94,7 +94,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
             for (Channel action : actions) {
 
-                List<Refinement.Transition> tempTrans = getNextTransitions(currState, action);
+                List<Transition> tempTrans = getNextTransitions(currState, action);
                 // System.out.println("reached isdetermHelp6");
                 if (checkMovesOverlap(tempTrans)) {
 
@@ -103,7 +103,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 }
 //                System.out.println("reached isdetermHelp2");
 
-                List<Refinement.State> toAdd = tempTrans.stream().map(Refinement.Transition::getTarget).
+                List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s) && !waitingContainsState(s)).collect(Collectors.toList()); // TODO I added waitingConstainsState... Okay??
 
                 //              System.out.println("reached isdetermHelp5 " + toAdd.size());
@@ -117,7 +117,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     // Check if zones of moves for the same action overlap, that is if there is non-determinism
-    public boolean checkMovesOverlap(List<Refinement.Transition> trans) {
+    public boolean checkMovesOverlap(List<Transition> trans) {
         if (trans.size() < 2) return false;
         //System.out.println("check moves overlap -------------------------------------------------------------------");
         for (int i = 0; i < trans.size(); i++) {
@@ -126,19 +126,17 @@ public class SimpleTransitionSystem extends TransitionSystem{
                         && trans.get(i).getEdges().get(0).hasEqualUpdates(trans.get(j).getEdges().get(0)))
                     continue;
 
-                Refinement.State state1 = new Refinement.State(trans.get(i).getSource());
-                Refinement.State state2 = new Refinement.State(trans.get(j).getSource());
+                State state1 = new State(trans.get(i).getSource());
+                State state2 = new State(trans.get(j).getSource());
 
 
 
 
-                state1.applyGuards(trans.get(i).getGuards(), clocks);
-                state2.applyGuards(trans.get(j).getGuards(), clocks);
+                state1.applyGuards(trans.get(i).getGuardCDD());
+                state2.applyGuards(trans.get(j).getGuardCDD());
 
-                if (state1.getInvFed().isValid() && state2.getInvFed().isValid()) {
-                    if(state1.getInvFed().intersects(state2.getInvFed())) {
-
-
+                if (state1.getInvarCDD().isValid() && state2.getInvarCDD().isValid()) {
+                    if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
                         return true;
                     }
                 }
@@ -148,22 +146,21 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     public boolean isConsistentHelper(boolean canPrune) {
-        //if (!isDeterministic())
-        //    return false;
+        if (!isDeterministic()) // TODO: this was commented out, I added it again
+            return false;
+
         passed = new ArrayList<>();
-        //System.out.println("isConsistentHelper");
         boolean result = checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
-        //System.out.println(result);
 
         return result;
     }
 
-    public boolean checkConsistency(Refinement.State currState, Set<Channel> inputs, Set<Channel> outputs, boolean canPrune) {
+    public boolean checkConsistency(State currState, Set<Channel> inputs, Set<Channel> outputs, boolean canPrune) {
 
         if (passedContainsState(currState))
             return true;
 
-        Refinement.State toStore = new Refinement.State(currState);
+        State toStore = new State(currState);
         int[] maxBounds;
         List<Integer> res = new ArrayList<>();
         res.add(0);
@@ -175,8 +172,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
-            List<Refinement.Transition> tempTrans = getNextTransitions(currState, channel);
-            for (Refinement.Transition ts : tempTrans) {
+            List<Transition> tempTrans = getNextTransitions(currState, channel);
+            for (Transition ts : tempTrans) {
                 boolean inputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                 if (!inputConsistent)
                     return false;
@@ -185,15 +182,15 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (canPrune && currState.getInvFed().canDelayIndefinitely())
+        if (canPrune && CDD.canDelayIndefinitely(currState.getInvarCDD()))
             return true;
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
         else {
             for (Channel channel : outputs) {
-                List<Refinement.Transition> tempTrans = getNextTransitions(currState, channel);
+                List<Transition> tempTrans = getNextTransitions(currState, channel);
 
-                for (Refinement.Transition ts : tempTrans) {
+                for (Transition ts : tempTrans) {
                     if(!outputExisted) outputExisted = true;
                     boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                     if (outputConsistent && canPrune)
@@ -205,7 +202,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                return currState.getInvFed().canDelayIndefinitely();
+                return CDD.canDelayIndefinitely(currState.getInvarCDD());
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
@@ -223,9 +220,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
         waiting.add(getInitialState());
 
         while (!waiting.isEmpty()) {
-            Refinement.State currState = new Refinement.State(waiting.pop());
+            State currState = new State(waiting.pop());
 
-            Refinement.State toStore = new Refinement.State(currState);
+            State toStore = new State(currState);
             int[] maxBounds;
             List<Integer> res = new ArrayList<>();
             res.add(0);
@@ -237,14 +234,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
             for (Channel action : actions){
-                List<Refinement.Transition> tempTrans = getNextTransitions(currState, action);
+                List<Transition> tempTrans = getNextTransitions(currState, action);
 
                 if(!tempTrans.isEmpty() && outputs.contains(action)){
                     if(!outputsAreUrgent(tempTrans))
                         return false;
                 }
 
-                List<Refinement.State> toAdd = tempTrans.stream().map(Refinement.Transition::getTarget).
+                List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s)).collect(Collectors.toList());
 
                 toAdd.forEach(s -> s.extrapolateMaxBounds(maxBounds));
@@ -256,12 +253,12 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return true;
     }
 
-    public boolean outputsAreUrgent(List<Refinement.Transition> trans){
-        for (Refinement.Transition ts : trans){
-            Refinement.State state = new Refinement.State(ts.getSource());
-            state.applyGuards(ts.getGuards(), clocks);
+    public boolean outputsAreUrgent(List<Transition> trans){
+        for (Transition ts : trans){
+            State state = new State(ts.getSource());
+            state.applyGuards(ts.getGuardCDD());
 
-            if(!state.getInvFed().isUrgent())
+            if(!CDD.isUrgent(state.getInvarCDD()))
                 return false;
         }
         return true;
@@ -269,8 +266,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
 
-    private boolean passedContainsState(Refinement.State state1) {
-       Refinement.State state = new Refinement.State(state1);
+    private boolean passedContainsState(State state1) {
+       State state = new State(state1);
 
         int[] maxBounds;
         List<Integer> res = new ArrayList<>();
@@ -280,38 +277,19 @@ public class SimpleTransitionSystem extends TransitionSystem{
         state.extrapolateMaxBounds(maxBounds);
 
 
-       // System.out.println("Checking state for passed " + state.getLocation());
-
-//        state.getInvFed().getZones().get(0).printDBM(true,true);
-
-
-       // System.out.println("*************************** in ");
-        for (Refinement.State passedState : passed) {
-            if ((state.getLocation().equals(passedState.getLocation()))) {
-          //      passedState.getInvFed().getZones().get(0).printDBM(true, true);
-                // check for zone inclusion
-                // System.out.println(passedState.getLocation());
-            }
-
+        for (State passedState : passed) {
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    state.getInvFed().isSubset(passedState.getInvFed())) {
+                    CDD.isSubset(state.getInvarCDD(),(passedState.getInvarCDD()))) {
 
-                      //System.out.println("included");
                 return true;
             }
         }
-        //System.out.println("***************************** out");
-
-
-
-
-        //      System.out.println("reached passedContState 2");
 
         return false;
     }
 
-    private boolean waitingContainsState(Refinement.State state1) {
-        Refinement.State state = new Refinement.State(state1);
+    private boolean waitingContainsState(State state1) {
+        State state = new State(state1);
         int[] maxBounds;
         List<Integer> res = new ArrayList<>();
         res.add(0);
@@ -320,13 +298,10 @@ public class SimpleTransitionSystem extends TransitionSystem{
         state.extrapolateMaxBounds(maxBounds);
 
 
-        for (Refinement.State passedState : waiting) {
-            //if ((state.getLocation().equals(passedState.getLocation())))
-            //passedState.getInvFed().getZones().get(0).printDBM(true,true);
+        for (State passedState : waiting) {
             // check for zone inclusion
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    state.getInvFed().isSubset(passedState.getInvFed())) {
-                // System.out.println("*************************** reached passedContState 3");
+                    CDD.isSubset(state.getInvarCDD(),passedState.getInvarCDD())) {
                 return true;
             }
         }
@@ -334,7 +309,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return false;
     }
 
-    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         //System.out.println("reached getNexttrans");
         List<Move> moves = getNextMoves(currentState.getLocation(), channel);
 
@@ -352,7 +327,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
             Move move = new Move(symLocation, target, Collections.singletonList(edge));
             moves.add(move);
         }
-        // System.out.println("reached getnextmoves  " +symLocation + channel + moves.size());
         return moves;
     }
 
@@ -882,17 +856,17 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         // explore until waiting is empty, and add all locations that ever are in waiting to metLocations
         while (!waiting.isEmpty()) {
-            Refinement.State currState = new Refinement.State(waiting.pop());
-            passed.add(new Refinement.State(currState));
+            State currState = new State(waiting.pop());
+            passed.add(new State(currState));
             metLocations.add(((SimpleLocation) currState.getLocation()).getActualLocation());
             for (Channel action : actions){
-                List<Refinement.Transition> tempTrans = getNextTransitions(currState, action);
-                for (Refinement.Transition t: tempTrans)
+                List<Transition> tempTrans = getNextTransitions(currState, action);
+                for (Transition t: tempTrans)
                 {
                     for (Edge e : t.getEdges())
                         passedEdges.add(e);
                 }
-                List<Refinement.State> toAdd = tempTrans.stream().map(Refinement.Transition::getTarget).
+                List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s)).collect(Collectors.toList());
                 waiting.addAll(toAdd);
             }

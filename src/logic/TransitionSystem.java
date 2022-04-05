@@ -20,27 +20,19 @@ public abstract class TransitionSystem {
         return clocks;
     }
 
-    public Refinement.State getInitialState() {
-        //System.out.println("clocks " + clocks);
-        Zone zone = new Zone(clocks.size() + 1, true);
-        List<Zone> zoneList = new ArrayList<>();
-        zoneList.add(zone);
-        Federation initFed = new Federation(zoneList);
-        Refinement.State state = new Refinement.State(getInitialLocation(), initFed);
-        state.applyInvariants(clocks);
-        //System.out.println("Initial Zone size first " + state.getInvFed().size() + " " + initFed.size());
+    public State getInitialState() {
+        CDD initCDD = CDD.getUnrestrainedCDD();
+        State state = new State(getInitialLocation(), initCDD);
+        state.applyInvariants();
         return state;
     }
 
-    public Refinement.State getInitialStateRef(List<Clock> allClocks, List<List<Guard>> invs) {
-        Zone zone = new Zone(allClocks.size() + 1, true);
-        List<Zone> zoneList = new ArrayList<>();
-        zoneList.add(zone);
-        Federation initFed = new Federation(zoneList);
-        Refinement.State state = new Refinement.State(getInitialLocation(), initFed);
-        state.applyInvariants(allClocks);
-        state.applyGuards(invs, allClocks);
-        //System.out.println("Initial Zone size second" + initFed.size());
+    public State getInitialStateRef( CDD invs) {
+
+        CDD initCDD = CDD.getUnrestrainedCDD();
+        State state = new State(getInitialLocation(), initCDD);
+        state.applyInvariants();
+        state.applyGuards(invs);
 
         return state;
     }
@@ -52,47 +44,34 @@ public abstract class TransitionSystem {
         return new ComplexLocation(Arrays.stream(systems).map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
     }
 
-    List<Refinement.Transition> createNewTransitions(Refinement.State currentState, List<Move> moves, List<Clock> allClocks) {
-        List<Refinement.Transition> transitions = new ArrayList<>();
-        //System.out.println(currentState + " " + moves.size());
+    List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
+        List<Transition> transitions = new ArrayList<>();
         // loop through moves
         for (Move move : moves) {
 
             // gather all the guards and resets of one move
-            List<List<Guard>> guards = move.getGuards();
+            CDD guards = move.getGuardCDD();
             List<Update> updates = move.getUpdates();
-            //System.out.println("reached createNewTransitions1");
-            // TODO: just turned zones into feds, need to check whether there is some special behaviour.
-            // need to make a copy of the zone. Arrival zone of target state is invalid right now
 
-            Refinement.State targetState = new Refinement.State(move.getTarget(), currentState.getInvFed());
-            //System.out.println("************************************************************************************************"+currentState.getInvFed().getZones().size());
-           // currentState.getInvFed().getZones().get(0).printDBM(true,true);
-            if (!guards.isEmpty()) targetState.applyGuards(guards, allClocks);
-            //System.out.println("reached createNewTransitions8");
-            //System.out.println(move.getGuards());
-            //System.out.println(move.getEdges().get(0));
-           // currentState.getInvFed().getZones().get(0).printDBM(true,true);
-            //targetState.getInvFed().getZones().get(0).printDBM(true,true);
-            if (!targetState.getInvFed().isValid()) continue;
-            //System.out.println("reached createNewTransitions9");
+            State targetState = new State(move.getTarget(), currentState.getInvarCDD());
 
-            Federation guardFed = new Federation(targetState.getInvFed().getZones());
-            //System.out.println(guardFed.getZones().size());
-            if (!updates.isEmpty()) targetState.applyResets(updates, allClocks);
-            //System.out.println("reached createNewTransitions2");
-            //System.out.println(guardFed.getZones().size());
-            targetState.getInvFed().delay();
-            //System.out.println("reached createNewTransitions5");
-            targetState.applyInvariants(allClocks);
-            //System.out.println("reached createNewTransitions3");
-            if (!targetState.getInvFed().isValid()) continue;
-            //System.out.println("reached createNewTransitions4");
+            targetState.applyGuards(guards);
 
-            assert(guardFed.getZones().size()!=0);
-            transitions.add(new Refinement.Transition(currentState, targetState, move, guardFed));
+            if (!targetState.getInvarCDD().isValid()) continue;
+
+
+            CDD guardCDD = new CDD(targetState.getInvarCDD().getPointer());
+
+            if (!updates.isEmpty()) targetState.applyResets(updates);
+
+            targetState.getInvarCDD().delay();
+
+            targetState.applyInvariants();
+
+            if (!targetState.getInvarCDD().isValid()) continue;
+
+            transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
-        //System.out.println(transitions.size());
         return transitions;
     }
 
@@ -124,13 +103,11 @@ public abstract class TransitionSystem {
 
 
     public boolean isDeterministic(){
-       // System.out.println("reached isdeterm1");
         boolean isDeterministic = true;
         List<String> nondetermTs = new ArrayList<>();
 
         List<SimpleTransitionSystem> systems = getSystems();
 
-        //System.out.println("reached isdeterm2");
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isDeterministicHelper()){
                 isDeterministic = false;
@@ -138,7 +115,6 @@ public abstract class TransitionSystem {
             }
         }
 
-        //System.out.println("reached isdeterm3");
         if(!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
 
 
@@ -146,7 +122,6 @@ public abstract class TransitionSystem {
     }
 
     public boolean isLeastConsistent(){
-        //System.out.println("reached isleastcons1");
         return isConsistent(true);
     }
 
@@ -158,9 +133,7 @@ public abstract class TransitionSystem {
         boolean isDeterm = isDeterministic();
         boolean isConsistent = true;
         List<String> inconsistentTs = new ArrayList<>();
-        //System.out.println("reached cons 0");
         List<SimpleTransitionSystem> systems = getSystems();
-        //System.out.println("reached cons 1");
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isConsistentHelper(canPrune)) {
                 isConsistent = false;
@@ -197,11 +170,11 @@ public abstract class TransitionSystem {
         return res;
     }
 
-    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel){
+    public List<Transition> getNextTransitions(State currentState, Channel channel){
         return getNextTransitions(currentState, channel, clocks);
     }
 
-    public abstract List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks);
+    public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 
