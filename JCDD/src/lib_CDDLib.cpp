@@ -526,4 +526,51 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_predt
     return (jlong)cdd_result;
 }
 
+/*
+ * Class:     lib_CDDLib
+ * Method:    extractBddAndDbm
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_extractBddAndDbm
+  (JNIEnv *env, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+
+    extraction_result* result = new extraction_result(cdd_extract_bdd_and_dbm(*cdd_object));
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getCddPartFromExtractionResult
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_getCddPartFromExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* extraction_result_object = (extraction_result*)extraction_result_pointer;
+
+    cdd* result = &(extraction_result_object->CDD_part);
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getBddPartFromExtractionResult
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_getBddPartFromExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* extraction_result_object = (extraction_result*)extraction_result_pointer;
+
+    cdd* result = &(extraction_result_object->BDD_part);
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getDbmFromExtractionResult
+ */
+JNIEXPORT jintArray JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* result_object = (extraction_result*)extraction_result_pointer;
+
+    return helper_functions::cToJint(env, result_object->dbm, result_object->CDD_part.numClocks());
+}
+
 

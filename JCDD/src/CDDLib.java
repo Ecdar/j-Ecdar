@@ -72,4 +72,8 @@ public class CDDLib {
     public static native long transitionBack(long cddPointer, long guardCddPointer, long updateCddPointer, int[] clockResets, int[] boolResets);
     public static native long transitionBackPast(long cddPointer, long guardCddPointer, long updateCddPointer, int[] clockResets, int[] boolResets);
     public static native long predt(long targetCddPointer, long safeCddPointer);
+    public static native long extractBddAndDbm(long cddPointer);
+    public static native long getCddPartFromExtractionResult(long extractionResultPointer);
+    public static native long getBddPartFromExtractionResult(long extractionResultPointer);
+    public static native int[] getDbmFromExtractionResult(long extractionResultPointer);
 }

@@ -15,7 +15,7 @@ public class CDD {
         this.pointer = CDDLib.allocateCdd();
     }
 
-    private CDD(long pointer){
+    public CDD(long pointer){
         this.pointer = pointer;
     }
 
@@ -152,6 +152,11 @@ public class CDD {
         checkForNull();
         safe.checkForNull();
         return new CDD(CDDLib.predt(pointer, safe.pointer));
+    }
+
+    public CddExtractionResult extractBddAndDbm(){
+        checkForNull();
+        return new CddExtractionResult(CDDLib.extractBddAndDbm(pointer));
     }
 
     public CDD transitionBackPast(CDD guard, CDD update, int[] clockResets, int[] boolResets){
