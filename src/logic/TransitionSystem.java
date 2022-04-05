@@ -20,24 +20,24 @@ public abstract class TransitionSystem {
         return clocks;
     }
 
-    public State getInitialState() {
+    public Refinement.State getInitialState() {
         //System.out.println("clocks " + clocks);
         Zone zone = new Zone(clocks.size() + 1, true);
         List<Zone> zoneList = new ArrayList<>();
         zoneList.add(zone);
         Federation initFed = new Federation(zoneList);
-        State state = new State(getInitialLocation(), initFed);
+        Refinement.State state = new Refinement.State(getInitialLocation(), initFed);
         state.applyInvariants(clocks);
         //System.out.println("Initial Zone size first " + state.getInvFed().size() + " " + initFed.size());
         return state;
     }
 
-    public State getInitialStateRef(List<Clock> allClocks, List<List<Guard>> invs) {
+    public Refinement.State getInitialStateRef(List<Clock> allClocks, List<List<Guard>> invs) {
         Zone zone = new Zone(allClocks.size() + 1, true);
         List<Zone> zoneList = new ArrayList<>();
         zoneList.add(zone);
         Federation initFed = new Federation(zoneList);
-        State state = new State(getInitialLocation(), initFed);
+        Refinement.State state = new Refinement.State(getInitialLocation(), initFed);
         state.applyInvariants(allClocks);
         state.applyGuards(invs, allClocks);
         //System.out.println("Initial Zone size second" + initFed.size());
@@ -52,8 +52,8 @@ public abstract class TransitionSystem {
         return new ComplexLocation(Arrays.stream(systems).map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
     }
 
-    List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
-        List<Transition> transitions = new ArrayList<>();
+    List<Refinement.Transition> createNewTransitions(Refinement.State currentState, List<Move> moves, List<Clock> allClocks) {
+        List<Refinement.Transition> transitions = new ArrayList<>();
         //System.out.println(currentState + " " + moves.size());
         // loop through moves
         for (Move move : moves) {
@@ -65,7 +65,7 @@ public abstract class TransitionSystem {
             // TODO: just turned zones into feds, need to check whether there is some special behaviour.
             // need to make a copy of the zone. Arrival zone of target state is invalid right now
 
-            State targetState = new State(move.getTarget(), currentState.getInvFed());
+            Refinement.State targetState = new Refinement.State(move.getTarget(), currentState.getInvFed());
             //System.out.println("************************************************************************************************"+currentState.getInvFed().getZones().size());
            // currentState.getInvFed().getZones().get(0).printDBM(true,true);
             if (!guards.isEmpty()) targetState.applyGuards(guards, allClocks);
@@ -90,7 +90,7 @@ public abstract class TransitionSystem {
             //System.out.println("reached createNewTransitions4");
 
             assert(guardFed.getZones().size()!=0);
-            transitions.add(new Transition(currentState, targetState, move, guardFed));
+            transitions.add(new Refinement.Transition(currentState, targetState, move, guardFed));
         }
         //System.out.println(transitions.size());
         return transitions;
@@ -197,11 +197,11 @@ public abstract class TransitionSystem {
         return res;
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel){
+    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel){
         return getNextTransitions(currentState, channel, clocks);
     }
 
-    public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
+    public abstract List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 

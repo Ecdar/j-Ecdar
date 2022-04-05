@@ -1,6 +1,7 @@
 package dbm;
 
 import lib.DBMLib;
+import logic.Refinement;
 import models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class DBMTest {
     private static final int DBM_INF = 2147483646;
-    private static State state1, state2, state3, state4, state5;
+    private static Refinement.State state1, state2, state3, state4, state5;
     private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
 
@@ -34,25 +35,25 @@ public class DBMTest {
         List<Zone> list1 = new ArrayList<>();
         list1.add(z1);
 
-        state1 = new State(sl1, new Federation(list1));
+        state1 = new Refinement.State(sl1, new Federation(list1));
 
         // From 2 to inf
         Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
         List<Zone> list2 = new ArrayList<>();
         list2.add(z2);
-        state2 = new State(sl1, new Federation(list2));
+        state2 = new Refinement.State(sl1, new Federation(list2));
 
         // From 0 to 5
         Zone z3 = new Zone(new int[]{1, 1, 11, 1});
         List<Zone> list3 = new ArrayList<>();
         list3.add(z3);
-        state3 = new State(sl1, new Federation(list3));
+        state3 = new Refinement.State(sl1, new Federation(list3));
 
         // From 3 to 12
         Zone z4 = new Zone(new int[]{1, -5, 25, 1});
         List<Zone> list4 = new ArrayList<>();
         list4.add(z4);
-        state4 = new State(sl1, new Federation(list4));
+        state4 = new Refinement.State(sl1, new Federation(list4));
 
 
         // GUARDS---------------------

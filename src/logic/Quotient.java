@@ -361,7 +361,7 @@ public class Quotient extends TransitionSystem {
         return result;
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
+    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks) {
         // get possible transitions from current state, for a given channel
         SymbolicLocation location = currentState.getLocation();
 

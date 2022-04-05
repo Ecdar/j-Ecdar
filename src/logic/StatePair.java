@@ -1,27 +1,25 @@
-package models;
-
-import logic.GraphNode;
+package logic;
 
 public class StatePair {
-    private final State left, right;
+    private final Refinement.State left, right;
     private GraphNode node;
 
-    public StatePair(State state1, State state2) {
+    public StatePair(Refinement.State state1, Refinement.State state2) {
         this.left = state1;
         this.right = state2;
     }
 
-    public StatePair(State left, State right, GraphNode node) {
+    public StatePair(Refinement.State left, Refinement.State right, GraphNode node) {
         this.left = left;
         this.right = right;
         this.node = node;
     }
 
-    public State getLeft() {
+    public Refinement.State getLeft() {
         return left;
     }
 
-    public State getRight() {
+    public Refinement.State getRight() {
         return right;
     }
 
@@ -30,7 +28,7 @@ public class StatePair {
     }
 
     public void setNode(GraphNode node) {
-       this.node = node;
+        this.node = node;
     }
 
     public String prettyPrint() {

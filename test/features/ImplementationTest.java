@@ -4,7 +4,6 @@ import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
-import models.Transition;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;

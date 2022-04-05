@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class Conjunction extends TransitionSystem {
     private final TransitionSystem[] systems;
 
-    private List<State> passed = new ArrayList<>();
-    private List<State> waiting = new ArrayList<>();
+    private List<Refinement.State> passed = new ArrayList<>();
+    private List<Refinement.State> waiting = new ArrayList<>();
     private int[] maxBounds;
 
 
@@ -58,11 +58,11 @@ public class Conjunction extends TransitionSystem {
         return result;
     }
 
-    public boolean passedContains(State s)
+    public boolean passedContains(Refinement.State s)
     {
         boolean contained = false;
 
-        for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
+        for (Refinement.State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
             if (s.getInvFed().isSubset(st.getInvFed()))
                 contained = true;
@@ -70,11 +70,11 @@ public class Conjunction extends TransitionSystem {
         return contained;
     }
 
-    public boolean waitingContains(State s)
+    public boolean waitingContains(Refinement.State s)
     {
         boolean contained = false;
 
-        for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
+        for (Refinement.State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
 
             if (s.getInvFed().isSubset(st.getInvFed())) {
@@ -114,12 +114,12 @@ public class Conjunction extends TransitionSystem {
 
         locMap.put(initL.getName(),initL);
 
-        State initState = getInitialState();;
+        Refinement.State initState = getInitialState();;
         waiting.add(initState);
         while (!waiting.isEmpty())
         {
 
-            State currentState = (State)waiting.toArray()[0];
+            Refinement.State currentState = (Refinement.State)waiting.toArray()[0];
             waiting.remove(currentState);
             passed.add(currentState);
             //System.out.println("Processing state " + currentState.getLocation().getName()) ;
@@ -129,8 +129,8 @@ public class Conjunction extends TransitionSystem {
             for (Channel chan : all )
             {
 
-                List<Transition> transList = getNextTransitions(currentState, chan, clocks);
-                for (Transition trans : transList)
+                List<Refinement.Transition> transList = getNextTransitions(currentState, chan, clocks);
+                for (Refinement.Transition trans : transList)
                 {
                     String targetName = trans.getTarget().getLocation().getName();
 
@@ -250,7 +250,7 @@ public class Conjunction extends TransitionSystem {
         return getInitialLocation(systems);
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
+    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
         // these will store the locations of the target states and the corresponding transitions

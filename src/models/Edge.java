@@ -72,32 +72,10 @@ public class Edge {
 
 
 
-    public Federation getGuardFederation(List<Clock> clocks)
+    public CDD getGuardCDD()
     {
-        List<Zone> zoneList = new ArrayList<>();
-        for (List<Guard> list: guards)
-        {
-            Zone z = new Zone(clocks.size() + 1, true);
-            z.init();
-            for (Guard g: list)
-            {
-                z.buildConstraintsForGuard(g, getIndexOfClock(g.getClock(),clocks));
-            }
-            zoneList.add(z);
-        }
-        if (guards.isEmpty()) {
-            Zone z = new Zone(clocks.size() + 1, true);
-            z.init();
-            zoneList.add(z);
-        }
-        return new Federation(zoneList);
-    }
-
-    private int getIndexOfClock(Clock clock, List<Clock> clocks) {
-        for (int i = 0; i < clocks.size(); i++){
-            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
-        }
-        return 0;
+        CDD res = new CDD(guards);
+        return res;
     }
 
 
@@ -165,29 +143,8 @@ public class Edge {
     }
 
     public void addGuards(List<List<Guard>> newGuards) {
-
-        if (newGuards.isEmpty())
-        {
-            // nothing happens
-        }
-        else {
-            List<List<Guard>> combinedGuards = new ArrayList<>();
-            if (!this.getGuards().isEmpty()) {
-                for (List<Guard> oldDisjunction : this.guards) {
-                    for (List<Guard> newDisjunction : newGuards) {
-                        List<Guard> temp = new ArrayList<>();
-                        temp.addAll(oldDisjunction);
-                        temp.addAll(newDisjunction);
-                        combinedGuards.add(temp);
-
-                    }
-                }
-
-                this.guards = combinedGuards;
-            } else {
-                this.guards = newGuards;
-            }
-        }
+        CDD res = new CDD(newGuards);
+        this.guards = CDD.toGuards(new CDD(this.guards).conjunction(res));
     }
 
     public Update[] getUpdates() {
@@ -199,47 +156,13 @@ public class Edge {
         if (this == o) return true;
         if (!(o instanceof Edge)) return false;
         Edge that = (Edge) o;
-        boolean guardsMatch = true;
-        List<List<Guard>> thisGuards = guards;
-        List<List<Guard>> thatGuards = that.guards;
-        if (thisGuards.size()!=thatGuards.size())
-            guardsMatch = false;
-        else
-        {
-            for (int i =0; i<thisGuards.size(); i++)
-            {
-                if (thisGuards.get(i).size()!= thatGuards.get(i).size())
-                    guardsMatch=false;
-                else
-                {
-                    for (int j =0; j<thisGuards.get(i).size(); j++)
-                    {
-                        if (!thisGuards.get(i).get(j).equals(thatGuards.get(i).get(j)))
-                            guardsMatch=false;
-                    }
-                }
-            }
-        }
-        boolean thisGuardsIsEmpty = true;
-        for (List<Guard> thisGuard : thisGuards)
-        {
-            if (!thisGuard.isEmpty() )
-                thisGuardsIsEmpty=false;
-        }
-        boolean thatGuardsIsEmpty = true;
-        for (List<Guard> thatGuard : thisGuards)
-        {
-            if (!thatGuard.isEmpty() )
-                thatGuardsIsEmpty=false;
-        }
-        if (thisGuardsIsEmpty && thatGuardsIsEmpty)
-            guardsMatch=true;
+
         return isInput == that.isInput &&
                 source.equals(that.source) &&
                 target.equals(that.target) &&
                 chan.equals(that.chan) &&
                 // TODO: did the stream thing work?
-                guardsMatch &&
+                that.getGuardCDD().equiv(getGuardCDD()) &&
                 //Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()) &&
                 Arrays.equals(updates, that.updates);
     }

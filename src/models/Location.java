@@ -18,33 +18,10 @@ public class Location {
         this.inconsistentPart = inconsistentPart;
     }
 
-    private int getIndexOfClock(Clock clock, List<Clock> clocks) {
-        for (int i = 0; i < clocks.size(); i++){
-            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
-        }
-        return 0;
-    }
 
-    public Federation getInvariantFederation(List<Clock> clocks)
+    public CDD getInvariantCDD()
     {
-        List<Zone> zoneList = new ArrayList<>();
-        for (List<Guard> list: invariant)
-        {
-            Zone z = new Zone(clocks.size() + 1, true);
-            z.init();
-            for (Guard g: list)
-            {
-                z.buildConstraintsForGuard(g, getIndexOfClock(g.getClock(),clocks));
-            }
-            zoneList.add(z);
-        }
-        if (invariant.isEmpty()) {
-            Zone z = new Zone(clocks.size() + 1, true);
-            z.init();
-            zoneList.add(z);
-        }
-        return new Federation(zoneList);
-
+        return new CDD(invariant);
     }
 
     private Federation inconsistentPart;

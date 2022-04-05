@@ -1,18 +1,17 @@
 package logic;
 
 import models.Edge;
-import models.StatePair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GraphNode {
-    private StatePair statePair;
+    private Refinement.StatePair statePair;
     private List<GraphEdge> successors, predecessors;
     private int nodeId;
 
 
-    public GraphNode(StatePair statePair) {
+    public GraphNode(Refinement.StatePair statePair) {
         this.statePair = statePair;
         this.successors = new ArrayList<>();
         this.predecessors = new ArrayList<>();
@@ -21,7 +20,7 @@ public class GraphNode {
         Refinement.NODE_ID ++;
     }
 
-    public GraphEdge constructSuccessor(StatePair pair, List<Edge> edgesL, List<Edge> edgesR) {
+    public GraphEdge constructSuccessor(Refinement.StatePair pair, List<Edge> edgesL, List<Edge> edgesR) {
         GraphEdge newEdge = new GraphEdge(this, new GraphNode(pair), edgesL, edgesR);
         this.successors.add(newEdge);
         newEdge.getTarget().addPredecessor(newEdge);
@@ -29,7 +28,7 @@ public class GraphNode {
         return newEdge;
     }
 
-    public StatePair getStatePair() {
+    public Refinement.StatePair getStatePair() {
         return statePair;
     }
 
