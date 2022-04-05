@@ -71,4 +71,5 @@ public class CDDLib {
     public static native long transition(long cddPointer, long guardCddPointer, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues);
     public static native long transitionBack(long cddPointer, long guardCddPointer, long updateCddPointer, int[] clockResets, int[] boolResets);
     public static native long transitionBackPast(long cddPointer, long guardCddPointer, long updateCddPointer, int[] clockResets, int[] boolResets);
+    public static native long predt(long targetCddPointer, long safeCddPointer);
 }

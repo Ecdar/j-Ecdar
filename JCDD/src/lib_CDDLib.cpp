@@ -512,3 +512,18 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_transitionBackPast
             converted_bool_resets, num_bool_resets));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    predt
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_predt
+  (JNIEnv *env, jclass, jlong cdd_target_pointer, jlong cdd_safe_pointer){
+    cdd* cdd_target_object = (cdd*)cdd_target_pointer;
+    cdd* cdd_safe_object = (cdd*)cdd_safe_pointer;
+
+    cdd* cdd_result = new cdd(cdd_predt(*cdd_target_object, *cdd_safe_object));
+    return (jlong)cdd_result;
+}
+
+

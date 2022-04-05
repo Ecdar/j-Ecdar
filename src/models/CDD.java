@@ -148,6 +148,12 @@ public class CDD {
         return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets));
     }
 
+    public CDD predt(CDD safe){
+        checkForNull();
+        safe.checkForNull();
+        return new CDD(CDDLib.predt(pointer, safe.pointer));
+    }
+
     public CDD transitionBackPast(CDD guard, CDD update, int[] clockResets, int[] boolResets){
         checkForNull();
         guard.checkForNull();
