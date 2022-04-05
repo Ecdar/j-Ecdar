@@ -138,37 +138,22 @@ public class Quotient extends TransitionSystem {
                     if (!l_spec.getInvariant().isEmpty()) {
                         // negate the spec. invariant
 
-                            List<List<Guard>> guardList = l_spec.getInvariant();
-                            List<List<Guard>> negatedInvSpec = negateGuards(guardList); //.stream().map(Guard::negate).collect(Collectors.toList());
-                            // Old: since the negation will create disjunction, we need to create a transition for each part.
-                            // New: Since we now support discjunction, we only need to add one transition
-                            //for (List<Guard> g : negatedInvSpec) {
+                            CDD invarNegated = l_spec.getInvariantCDD().negation();
                                 // merge the current part with the invariant of the component, to create each new transition
-                                List<List<List<Guard>>> big = new ArrayList<>();
-                                big.add(negatedInvSpec);
-                                big.add(l_comp.getInvariant());
-                                List<List<Guard>> res = cartesianProductBig(big);
-                                edges.add(new Edge(loc, inc, newChan, true, res, new Update[]{new Update(newClock, 0)}));
-                            //}
 
-                    }
+                                edges.add(new Edge(loc, inc, newChan, true, CDD.toGuards(l_comp.getInvariantCDD().conjunction(invarNegated)), new Update[]{new Update(newClock, 0)}));
+                       }
 
                     // Rule 1
                     if (!l_comp.getInvariant().isEmpty()) {
                         // TODO: I interpreted this rule as "for every channel". This will also create a transition for the new symbol. That is fine!
                         // negate the comp. invariant.
                         // TODO: some of the guards in the list we get here might actually be mergable
-                        //assert(l_comp.getInvariant().size()<=1);
-                        List<List<Guard>> guardList = l_comp.getInvariant();
-                        List<List<Guard>> negatedInvComp = negateGuards(guardList);
+                        CDD l_comp_invar_negated = l_comp.getInvariantCDD().negation();
                         for (Channel c : allChans) {
-                            // handle disjunction
-                            //for (Guard g : negatedInvComp) {
-                            //    List<Guard> list = new ArrayList<Guard>();
-                            //    list.add(g);
                                 boolean isInput = false;
                                 if (inputs.contains(c)) isInput = true;
-                                edges.add(new Edge(loc, univ, c, isInput, negatedInvComp, new Update[]{}));
+                                edges.add(new Edge(loc, univ, c, isInput, CDD.toGuards(l_comp_invar_negated), new Update[]{}));
 
                         }
                     }
@@ -188,16 +173,14 @@ public class Quotient extends TransitionSystem {
                                     if (e_spec.getTarget().getName().equals("univ"))
                                         target = univ;
                                     // combine both guards
-                                    List<List<List<Guard>>> big = new ArrayList<>();
-                                    big.add(e_spec.getGuards());
-                                    big.add(e_comp.getGuards());
+                                    CDD guard = e_spec.getGuardCDD().conjunction(e_comp.getGuardCDD());
 
                                     //combine both updates
                                     List<Update> updatesList = new ArrayList<Update>();
                                     updatesList.addAll(Arrays.asList(e_spec.getUpdates()));
                                     updatesList.addAll(Arrays.asList(e_comp.getUpdates()));
                                     Update[] updates = updatesList.toArray(new Update[0]); // TODO: Check whether this is really the way to initialize an array from a list
-                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), cartesianProductBig(big), updates));
+                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), CDD.toGuards(guard), updates));
                                 }
                         }
 
@@ -208,24 +191,19 @@ public class Quotient extends TransitionSystem {
                         List<Guard> collectedNegationsSpec = new ArrayList<Guard>();
                         if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                             // collect all guards from spec transitions, negated
-                            List<List<Guard>> guardsOfSpec = new ArrayList<>();
+                            CDD guardsOfSpec = CDD.cddFalse();
                             for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c))
                                 //collectedNegationsSpec.addAll(e_spec.getGuards().stream().map(Guard::negate).collect(Collectors.toList()));
-                                 guardsOfSpec.addAll(e_spec.getGuards());
-                            List<List<Guard>> negated = negateGuards(guardsOfSpec);
+                                 guardsOfSpec= guardsOfSpec.disjunction(e_spec.getGuardCDD());
+                            CDD negated = guardsOfSpec.negation();
 
 
 
                             // TODO: Currently I am creating a transition if c-transitions in spec is empty.  Correct?
                             if (!collectedNegationsSpec.isEmpty() || spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty())
                                 // for each c-transtion in comp, create a new transition with the negated guard
-                                // G_T was a disjunction, so its negation is a conjunction and can just be added.
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                    List<List<List<Guard>>> big = new ArrayList<>();
-                                    big.add(negated);
-                                    big.add(e_comp.getGuards());
-
-                                    edges.add(new Edge(loc, inc, c, true, cartesianProductBig(big), new Update[]{new Update(newClock, 0)}));
+                                    edges.add(new Edge(loc, inc, c, true,CDD.toGuards(e_comp.getGuardCDD().conjunction(negated)), new Update[]{new Update(newClock, 0)}));
                                 }
                         }
                     }
@@ -246,20 +224,19 @@ public class Quotient extends TransitionSystem {
 
                     //Rule 6
                     for (Channel c : ts_comp.getOutputs()) {
-                        List<List<Guard>> collectedGuardsComp = new ArrayList<>();
+                        CDD collectedGuardsComp = CDD.cddFalse();
                         if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
                             // collect all negated guards from c-transitions in  comp
                             for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                collectedGuardsComp.addAll(e_comp.getGuards());//.stream().map(Guard::negate).collect(Collectors.toList()));
+                                collectedGuardsComp = collectedGuardsComp.disjunction(e_comp.getGuardCDD());//.stream().map(Guard::negate).collect(Collectors.toList()));
                             }
-                            List<List<Guard>> negated = negateGuards(collectedGuardsComp);
+                            CDD negated = collectedGuardsComp.negation();
                             // if guards have been collected, or the component didn't have c-transitions, for each spec trans create a transition
-                            if (!negated.isEmpty() || comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty())
+                            if (negated.isValid() || comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty())
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
-                                    List<List<Guard>> combined = new ArrayList<>();
-                                    combined.addAll(negated);
+
                                     //combined.addAll(e_spec.getGuards()); //TODO: THIS IS IMPORTANT! Is this supposed to be in?????
-                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), combined, new Update[]{}));
+                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), CDD.toGuards(negated), new Update[]{}));
                                 }
                         }
                     }
@@ -361,7 +338,7 @@ public class Quotient extends TransitionSystem {
         return result;
     }
 
-    public List<Refinement.Transition> getNextTransitions(Refinement.State currentState, Channel channel, List<Clock> allClocks) {
+    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         // get possible transitions from current state, for a given channel
         SymbolicLocation location = currentState.getLocation();
 
@@ -383,16 +360,10 @@ public class Quotient extends TransitionSystem {
             Move newMove = new Move(location, new InconsistentLocation(), new ArrayList<>());
             // invariant is negation of invariant of ts1 and invariant of ts2
 
-            List<List<Guard>> newGuards = negateGuards(loc1.getInvariants());
-            //newGuards.addAll(loc2.getInvariants());
 
-            List<List<List<Guard>>> bigList = new ArrayList<>();
-            bigList.add(newGuards);
-            bigList.add(loc2.getInvariants());
-
-
-
-            newMove.setGuards(cartesianProductBig(bigList));
+            CDD negatedInvar = loc1.getInvariantCDD().negation();
+            CDD combined = negatedInvar.conjunction(loc2.getInvariantCDD());
+            newMove.setGuards(combined);
             newMove.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
             resultMoves.add(newMove);
 
@@ -401,7 +372,7 @@ public class Quotient extends TransitionSystem {
                 Move newMove1 = new Move(location, new UniversalLocation(), new ArrayList<>());
                 // negate invariant of ts2
                 //assert (loc2.getInvariants().size()<=1);
-                newMove1.setGuards(negateGuards(loc2.getInvariants()));
+                newMove1.setGuards(loc2.getInvariantCDD().negation());
                 newMove1.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
                 resultMoves.add(newMove1);
             }
@@ -411,14 +382,9 @@ public class Quotient extends TransitionSystem {
 
                 List<Move> movesFrom1 = ts_spec.getNextMoves(loc1, channel);
                 List<Move> movesFrom2 = ts_comp.getNextMoves(loc2, channel);
-                //System.out.println("loc1" + loc1);
-                //System.out.println("loc2" + loc2);
-                //System.out.println("movesFrom1" + movesFrom1);
-                //System.out.println("movesFrom2" + movesFrom2);
-                if (!movesFrom1.isEmpty() && !movesFrom2.isEmpty()) {
 
+                if (!movesFrom1.isEmpty() && !movesFrom2.isEmpty()) {
                     List<Move> moveProduct = moveProduct(movesFrom1, movesFrom2, true);
-                    //System.out.println("here" + moveProduct);
                     resultMoves.addAll(moveProduct);
                 }
             }
@@ -429,28 +395,32 @@ public class Quotient extends TransitionSystem {
                 List<Move> movesFrom2 = ts_comp.getNextMoves(loc2, channel);
 
                 // take all moves from ts1 in order to gather the guards and negate them
-                List<List<Guard>> newGuards2 = negateGuards(movesFrom1.stream().map(Move::getGuards).flatMap(List::stream).collect(Collectors.toList()));
+                List<CDD> moves = movesFrom1.stream().map(Move::getGuardCDD).collect(Collectors.toList());
+                CDD movesTS1 = CDD.cddFalse();
+                for (CDD cdd : moves)
+                    movesTS1 = movesTS1.disjunction(cdd);
+                CDD negated = movesTS1.negation();
+
+
 
                 for (Move move : movesFrom2) {
                     Move newMove2 = new Move(location, new InconsistentLocation(), new ArrayList<>());
-                    List<List<List<Guard>>> newGuards3 = new ArrayList<>();
-                    newGuards3.add(move.getGuards());
-                    newGuards3.add(newGuards2);
-                    List<List<Guard>> result = cartesianProductBig(newGuards3);
-                    newMove2.setGuards(result);
+                    newMove2.setGuards(move.getGuardCDD().conjunction(negated));
                     newMove2.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
                     resultMoves.add(newMove2);
                 }
 
                 // take all moves from ts2 in order to gather the guards and negate them
-                List<List<Guard>> newGuards4 = negateGuards(movesFrom2.stream().map(Move::getGuards).flatMap(List::stream).collect(Collectors.toList()));
-
-                // doesn't make sense since we don't use anything from movesFrom1
-                for (Move move : movesFrom1) {
+                List<CDD> movesT2 = movesFrom2.stream().map(Move::getGuardCDD).collect(Collectors.toList());
+                CDD movesTS2 = CDD.cddFalse();
+                for (CDD cdd : movesT2)
+                    movesTS2 = movesTS2.disjunction(cdd);
+                // for doesn't make sense since we don't use anything from movesFrom1
+                //for (Move move : movesFrom1) {
                     Move newMove4 = new Move(location, new UniversalLocation(), new ArrayList<>());
-                    newMove4.setGuards(newGuards4);
+                    newMove4.setGuards(movesTS2);
                     resultMoves.add(newMove4);
-                }
+               // }
             }
 
             // rule 5
@@ -460,7 +430,7 @@ public class Quotient extends TransitionSystem {
                 for (Move move : movesFrom1) {
                     SymbolicLocation newLoc = new ComplexLocation(new ArrayList<>(Arrays.asList(move.getTarget(), loc2)));
                     Move newMove3 = new Move(location, newLoc, new ArrayList<>());
-                    newMove3.setGuards(move.getGuards());
+                    newMove3.setGuards(move.getGuardCDD());
                     newMove3.setUpdates(move.getUpdates());
                     resultMoves.add(newMove3);
                 }
@@ -480,95 +450,6 @@ public class Quotient extends TransitionSystem {
         }
 
         return resultMoves;
-    }
-    public static List<List<Guard>> negateGuards(List<List<Guard>> origGuards)
-    {
-//        neg ((a && b) || (c && d) || (e && f && g))
-
-//        neg (a && b) && neg (c && d) && neg (e && f && g)
-
-//        (neg a || neg b) && (neg c || neg d) && (neg e || neg f || neg g)
-
-//        (neg a && neg c && neg e) || (neg a && neg c && neg f) || (neg a && neg c && neg g) || ....
-
-
-        List<List<Guard>> bigListOfNegatedConstraints = new ArrayList<>();
-        for (List<Guard> disj : origGuards)
-        {
-            List <Guard> temp = new ArrayList<>();
-            for (Guard g : disj) {
-                temp.add(g.negate());
-            }
-            bigListOfNegatedConstraints.add(temp);
-        }
-
-        return (cartesianProduct(bigListOfNegatedConstraints));
-
-    }
-
-    public static List<List<Guard>> cartesianProduct(List<List<Guard>> lists) {
-
-        List<List<Guard>> product = new ArrayList<List<Guard>>();
-
-        for (List<Guard> list : lists) {
-
-            List<List<Guard>> newProduct = new ArrayList<List<Guard>>();
-
-            for (Guard listElement : list) {
-
-                if (product.isEmpty()) {
-
-                    List<Guard> newProductList = new ArrayList<Guard>();
-
-                    newProductList.add(listElement);
-                    newProduct.add(newProductList);
-                } else {
-
-                    for (List<Guard> productList : product) {
-
-                        List<Guard> newProductList = new ArrayList<Guard>(productList);
-                        newProductList.add(listElement);
-                        newProduct.add(newProductList);
-                    }
-                }
-            }
-
-            product = newProduct;
-        }
-
-        return product;
-    }
-
-    public static List<List<Guard>> cartesianProductBig(List<List<List<Guard>>> lists) {
-
-        List<List<Guard>> product = new ArrayList<List<Guard>>();
-
-        for (List<List<Guard>> list : lists) {
-
-            List<List<Guard>> newProduct = new ArrayList<List<Guard>>();
-
-            for (List<Guard> listElement : list) {
-
-                if (product.isEmpty()) {
-
-                    List<List<Guard>> newProductList = new ArrayList<List<Guard>>();
-                    newProductList.add(listElement);
-                    newProduct.addAll(newProductList);
-                } else {
-
-                    for (List<Guard> productList : product) {
-
-                        List<Guard> newProductList = new ArrayList<Guard>(productList);
-                        newProductList.addAll(listElement);
-                        newProduct.add(newProductList);
-                    }
-                }
-            }
-
-            product = newProduct;
-        }
-
-        return product;
     }
 
 
