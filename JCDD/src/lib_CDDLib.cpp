@@ -448,7 +448,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_copy
 
 /*
  * Class:     lib_CDDLib
- * Method:    applyReset
+ * Method:    transition
  */
 JNIEXPORT jlong JNICALL Java_lib_CDDLib_transition
   (JNIEnv *env, jclass, jlong cdd_pointer, jlong cdd_guard_pointer, jintArray clock_resets, jintArray clock_values, jintArray bool_resets, jintArray bool_values){
@@ -468,3 +468,109 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_transition
             converted_bool_resets, converted_bool_values, num_bool_resets));
     return (jlong)cdd_result;
 }
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    transitionBack
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_transitionBack
+  (JNIEnv *env, jclass, jlong cdd_pointer, jlong cdd_guard_pointer, jlong cdd_update_pointer, jintArray clock_resets, jintArray bool_resets){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_guard_object = (cdd*)cdd_guard_pointer;
+    cdd* cdd_update_object = (cdd*)cdd_update_pointer;
+
+    jsize num_clock_resets = env->GetArrayLength(clock_resets);
+    auto converted_clock_resets = helper_functions::jintToC(env, clock_resets, num_clock_resets);
+
+    jsize num_bool_resets = env->GetArrayLength(clock_resets);
+    auto converted_bool_resets = helper_functions::jintToC(env, bool_resets, num_bool_resets);
+
+    cdd* cdd_result = new cdd(cdd_transition_back(*cdd_object, *cdd_guard_object, *cdd_update_object,
+            converted_clock_resets, num_clock_resets,
+            converted_bool_resets, num_bool_resets));
+    return (jlong)cdd_result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    transitionBackPast
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_transitionBackPast
+  (JNIEnv *env, jclass, jlong cdd_pointer, jlong cdd_guard_pointer, jlong cdd_update_pointer, jintArray clock_resets, jintArray bool_resets){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    cdd* cdd_guard_object = (cdd*)cdd_guard_pointer;
+    cdd* cdd_update_object = (cdd*)cdd_update_pointer;
+
+    jsize num_clock_resets = env->GetArrayLength(clock_resets);
+    auto converted_clock_resets = helper_functions::jintToC(env, clock_resets, num_clock_resets);
+
+    jsize num_bool_resets = env->GetArrayLength(clock_resets);
+    auto converted_bool_resets = helper_functions::jintToC(env, bool_resets, num_bool_resets);
+
+    cdd* cdd_result = new cdd(cdd_transition_back_past(*cdd_object, *cdd_guard_object, *cdd_update_object,
+            converted_clock_resets, num_clock_resets,
+            converted_bool_resets, num_bool_resets));
+    return (jlong)cdd_result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    predt
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_predt
+  (JNIEnv *env, jclass, jlong cdd_target_pointer, jlong cdd_safe_pointer){
+    cdd* cdd_target_object = (cdd*)cdd_target_pointer;
+    cdd* cdd_safe_object = (cdd*)cdd_safe_pointer;
+
+    cdd* cdd_result = new cdd(cdd_predt(*cdd_target_object, *cdd_safe_object));
+    return (jlong)cdd_result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    extractBddAndDbm
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_extractBddAndDbm
+  (JNIEnv *env, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+
+    extraction_result* result = new extraction_result(cdd_extract_bdd_and_dbm(*cdd_object));
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getCddPartFromExtractionResult
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_getCddPartFromExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* extraction_result_object = (extraction_result*)extraction_result_pointer;
+
+    cdd* result = &(extraction_result_object->CDD_part);
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getBddPartFromExtractionResult
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_getBddPartFromExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* extraction_result_object = (extraction_result*)extraction_result_pointer;
+
+    cdd* result = &(extraction_result_object->BDD_part);
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getDbmFromExtractionResult
+ */
+JNIEXPORT jintArray JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* result_object = (extraction_result*)extraction_result_pointer;
+
+    return helper_functions::cToJint(env, result_object->dbm, result_object->CDD_part.numClocks());
+}
+
+
