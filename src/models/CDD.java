@@ -95,7 +95,11 @@ public class CDD {
     }
 
     public boolean equiv(CDD that){
-        return CDDLib.cddEquiv(this,that);
+        if ((!this.conjunction(that.negation()).isValid())
+            && (!that.conjunction(this.negation()).isValid()))
+            return true;
+        return false;
+        //return CDDLib.cddEquiv(this,that);
     }
 
     public static void done(){

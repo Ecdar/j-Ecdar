@@ -10,8 +10,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,7 +54,7 @@ public class JSONParser {
         obj.put("initial sp id", "" + refTree.getNodeId());
         obj.put("left", "" + refTree.getStatePair().getLeft().getLocation());
         obj.put("right", "" + refTree.getStatePair().getRight().getLocation());
-        obj.put("federation", "" + refTree.getStatePair().getLeft().getInvFed());
+        obj.put("federation", "" + refTree.getStatePair().getLeft().getInvarCDD());
         obj.put("transitions", helper(children));
 
         System.out.println(obj.toJSONString());
@@ -73,7 +71,7 @@ public class JSONParser {
                 statePair.put("state pair id", "" + child.getTarget().getNodeId());
                 statePair.put("left", "" + child.getTarget().getStatePair().getLeft().getLocation());
                 statePair.put("right", "" + child.getTarget().getStatePair().getRight().getLocation());
-                statePair.put("federation", "" + child.getTarget().getStatePair().getLeft().getInvFed());
+                statePair.put("federation", "" + child.getTarget().getStatePair().getLeft().getInvarCDD());
                 transition.put("source sp id", "" + child.getSource().getNodeId());
                 transition.put("target sp id", "" + child.getTarget().getNodeId());
                 transition.put("target sp", statePair);
