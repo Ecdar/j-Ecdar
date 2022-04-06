@@ -14,7 +14,7 @@ public class CDD {
     private long pointer;
     private static int numClocks; // includes the + 1 for initial clock
     private static boolean cddIsRunning;
-    private static List<Clock> clocks = new ArrayList<>();
+    private static final List<Clock> clocks = new ArrayList<>();
 
 
     public CDD(){
@@ -27,7 +27,7 @@ public class CDD {
     }
 
 
-    private int getIndexOfClock(Clock clock, List<Clock> clocks) {
+    private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
@@ -54,14 +54,14 @@ public class CDD {
         CDD copy = new CDD(state.pointer);
         while (!copy.isTerminal())
         {
-            /*
-            ExtractionResult res = CDD.extractDBMandCDD(copy);
-            copy = res.getCDD();
-            Zone z = res.getDBM();
-            CDD bddPart = res.getBDDPart();
+
+            CddExtractionResult res = copy.extractBddAndDbm();
+            copy = res.getCddPart();
+            Zone z = new Zone(res.getDbm());
+            CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks);
             // guardList.add(bddPart.toGuards()); // TODO: once we have boolean
-            */
+            guards.add(guardList);
         }
         return guards;
     }
@@ -109,12 +109,15 @@ public class CDD {
         return CDD.allocateFromDbm(z.getDbm(),numClocks);
     }
 
-
-    public static void addClocks(int amount) throws CddNotRunningException {
+    @SafeVarargs
+    public static void addClocks(List<Clock>... clocks) throws CddNotRunningException {
         if(!cddIsRunning){
             throw new CddNotRunningException("Can't add clocks without before running CDD.init");
         }
-        CDDLib.cddAddClocks(amount);
+        for (List<Clock> list: clocks)
+            CDD.clocks.addAll(list);
+        numClocks = CDD.clocks.size()+1;
+        CDDLib.cddAddClocks(numClocks);
     }
 
     public static int addBddvar(int amount) { return CDDLib.addBddvar(amount); }
@@ -276,21 +279,26 @@ public class CDD {
         CDDLib.cddPrintDot(pointer, filePath);
     }
 
-    public static CDD applyReset(CDD state, List<Update> updates)
-    {
-        // TODO: FUN;
-        assert(false);
-        return null;
-    }
-
-
     public static CDD applyReset(CDD state, Update[] updates)
     {
-        // TODO: FUN;
-        assert(false);
-        return null;
+        int[] clockResets = new int[updates.length];
+        int[] clockValues = new int[updates.length];
+        int[] boolResets = {};
+        int[] boolValues= {};
+
+        return state.applyReset(clockResets,clockValues,boolResets,boolValues);
     }
 
+
+    public static CDD applyReset(CDD state, List<Update> list)
+    {
+        int[] clockResets = new int[list.size()];
+        int[] clockValues = new int[list.size()];
+        int[] boolResets = {};
+        int[] boolValues= {};
+
+        return state.applyReset(clockResets,clockValues,boolResets,boolValues);
+    }
 
     private void checkForNull(){
         if(pointer == 0){
@@ -328,15 +336,11 @@ public class CDD {
         CDD copy = new CDD(state.getPointer());
         while (!copy.isTerminal())
         {
-            /*
-            ExtractionResult res = CDD.extractDBMandCDD(copy);
-            copy = res.getCDD();
-            Zone z = res.getDBM();
-            CDD bddPart = res.getBDDPart();
-            if (z.canDelayIndefinitely())
+
+            CddExtractionResult res = copy.extractBddAndDbm();
+            Zone z = new Zone(res.getDbm());
+            if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
                 return true;
-            // TODO: put in
-            */
         }
         assert false;
         return false;
@@ -346,15 +350,10 @@ public class CDD {
         CDD copy = new CDD(state.getPointer());
         while (!copy.isTerminal())
         {
-            /*
-            ExtractionResult res = CDD.extractDBMandCDD(copy);
-            copy = res.getCDD();
-            Zone z = res.getDBM();
-            CDD bddPart = res.getBDDPart();
+            CddExtractionResult res = copy.extractBddAndDbm();
+            Zone z = new Zone(res.getDbm());
             if (z.isUrgent())
-                return true;
-            // TODO: put in
-            */
+                return true; // TODO: is it enough if one is urgent?
         }
         assert false;
         return false;
@@ -384,7 +383,7 @@ public class CDD {
         return CDD.cddTrue().removeNegative();
     }
 
-    public CDD transition(Edge e)
+    public  CDD transition( Edge e)
     {
         int[] clockResets = new int[e.getUpdates().length];
         int[] clockValues = new int[e.getUpdates().length];
@@ -398,29 +397,35 @@ public class CDD {
             i++;
         }
 
-        return transition(e.getGuardCDD(),clockResets,clockValues,boolResets,boolValues);
+        return this.transition(e.getGuardCDD(),clockResets,clockValues,boolResets,boolValues);
     }
 
-    public CDD transitionBack(Edge e)
+
+    public CDD transitionBack( Edge e)
     {
         int[] clockResets = new int[e.getUpdates().length];
-        int[] clockValues = new int[e.getUpdates().length];
         int[] boolResets = {};
-        int[] boolValues= {};
         int i=0;
         for (Update u : e.getUpdates())
         {
             clockResets[i]=getIndexOfClock(u.getClock(),clocks);
-            clockValues[i]=u.getValue();
+
             i++;
         }
-        assert(false); // TODO
-        //return transitionBack(e.getGuardCDD(),clockResets,clockValues,boolResets,boolValues);
-        return null;
+        return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets);
     }
 
 
+    public static CDD turnUpdatesToCDD(Update[] updates)
+    {
 
+        CDD res = cddFalse();
+        for (Update u : updates)
+        {
+            res = res.disjunction(CDD.allocateInterval(getIndexOfClock(u.getClock(),clocks),0,u.getValue(),u.getValue()));
+        }
+        return res;
+    }
 
     private static Automaton makeInputEnabled(Automaton aut) {
         Automaton copy = new Automaton(aut);
