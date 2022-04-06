@@ -2,6 +2,8 @@ package features;
 
 import logic.*;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
@@ -12,6 +14,11 @@ public class QuotientTest {
 
     private static SimpleTransitionSystem comp0,  comp1, comp2, spec01, test1Comp0, test1Comp1, test1Spec,  test2Spec, outputTest,outputTest1;
 
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
+
     @BeforeClass
     public static void setUpBeforeClass() {
         Automaton[] aut = XMLParser.parse("samples/xml/quotient/example_critical_sections_final_versions_pruned-untimed.xml", false);
@@ -20,9 +27,9 @@ public class QuotientTest {
         comp2 = new SimpleTransitionSystem(aut[2]);
         spec01 = new SimpleTransitionSystem(aut[4]);
         Automaton[] aut2 = XMLParser.parse("samples/xml/quotient/SimpleTimedQuotientTest03.xml", true);
-        test1Comp0 = new SimpleTransitionSystem(aut2[0]);
-        test1Comp1 = new SimpleTransitionSystem(aut2[1]);
-        test1Spec = new SimpleTransitionSystem(aut2[2]);
+        test1Comp0 = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[0]));
+        test1Comp1 = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[1]));
+        test1Spec = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[2]));
         Automaton[] aut3= XMLParser.parse("samples/xml/quotient/SimpleTimedQuotientTest02.xml", false);
         test2Spec = new SimpleTransitionSystem(aut3[0]);
         Automaton[] aut4= XMLParser.parse("samples/xml/quotient/QuotientTestOutputs.xml", false);

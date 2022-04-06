@@ -3,14 +3,13 @@ package features;
 import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
-import models.*;
+import models.Automaton;
+import models.CDD;
+import models.Clock;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -21,6 +20,11 @@ public class DeterminismTest {
 
     static Automaton[] automata;
     private static TransitionSystem G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11, G12, G13, G14, G15, G16, G17, G22, G23;
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {

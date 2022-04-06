@@ -1,10 +1,18 @@
 package features;
 
+import Exceptions.CddAlreadyRunningException;
+import Exceptions.CddNotRunningException;
 import logic.*;
 import models.Automaton;
+import models.CDD;
+import models.Clock;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,8 +22,13 @@ public class UniversityTest {
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
             machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy;
 
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
+
     @BeforeClass
-    public static void setUpBeforeClass() {
+    public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
         String base = "./samples/json/EcdarUniversity/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Administration.json",
@@ -27,23 +40,34 @@ public class UniversityTest {
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(machines[0].getClocks());
+        clocks.addAll(machines[1].getClocks());
+        clocks.addAll(machines[2].getClocks());
+        clocks.addAll(machines[3].getClocks());
+        clocks.addAll(machines[4].getClocks());
+        clocks.addAll(machines[5].getClocks());
+        clocks.addAll(machines[6].getClocks());
+        clocks.addAll(machines[7].getClocks());
+        CDD.addClocks(clocks);
 
-        adm = new SimpleTransitionSystem(machines[0]);
-        admCopy = new SimpleTransitionSystem(new Automaton(machines[0]));
-        machine = new SimpleTransitionSystem(machines[1]);
-        machineCopy = new SimpleTransitionSystem(new Automaton(machines[1]));
-        researcher = new SimpleTransitionSystem(machines[2]);
-        researcherCopy = new SimpleTransitionSystem(new Automaton(machines[2]));
-        spec = new SimpleTransitionSystem(machines[3]);
-        specCopy = new SimpleTransitionSystem(new Automaton(machines[3]));
-        machine3 = new SimpleTransitionSystem(machines[4]);
-        machine3Copy = new SimpleTransitionSystem(new Automaton(machines[4]));
-        adm2 = new SimpleTransitionSystem(machines[5]);
-        adm2Copy = new SimpleTransitionSystem(new Automaton(machines[5]));
-        half1 = new SimpleTransitionSystem(machines[6]);
-        half1Copy = new SimpleTransitionSystem(new Automaton(machines[6]));
-        half2 = new SimpleTransitionSystem(machines[7]);
-        half2Copy = new SimpleTransitionSystem(new Automaton(machines[7]));
+        adm = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[0]));
+        admCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[0])));
+        machine = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[1]));
+        machineCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[1])));
+        researcher = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[2]));
+        researcherCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[2])));
+        spec = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[3]));
+        specCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[3])));
+        machine3 = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[4]));
+        machine3Copy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[4])));
+        adm2 = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[5]));
+        adm2Copy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[5])));
+        half1 = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[6]));
+        half1Copy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[6])));
+        half2 = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[7]));
+        half2Copy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[7])));
     }
 
     @Test

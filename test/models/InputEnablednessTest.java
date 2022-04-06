@@ -1,11 +1,12 @@
 package models;
 
+import Exceptions.CddAlreadyRunningException;
+import Exceptions.CddNotRunningException;
 import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
-import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +19,13 @@ public class InputEnablednessTest {
     private static Update[] noUpdate = new Update[]{};
     private static List<List<Guard>> noguard = new ArrayList<>();
 
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
+
     @BeforeClass
-    public static void setUpBeforeClass() {
+    public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
         Clock x = new Clock("x");
         Clock y = new Clock("y");
 
@@ -77,8 +83,10 @@ public class InputEnablednessTest {
 
         String base = "./samples/json/InputEnabled/";
         String[] components = new String[]{"GlobalDeclarations.json", "Components/Automaton.json"};
-
+        CDD.init(100,100,100);
+        CDD.addClocks(clocks);
         actual = JSONParser.parse(base, components, true)[0];
+        actual = CDD.makeInputEnabled(actual);
     }
 
     @Test

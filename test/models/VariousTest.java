@@ -1,22 +1,28 @@
 package models;
 
+import Exceptions.CddAlreadyRunningException;
+import Exceptions.CddNotRunningException;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import parser.JSONParser;
 import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
 public class VariousTest {
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -24,8 +30,7 @@ public class VariousTest {
     }
 
     @Test
-    public void simple() {
-
+    public void simple() throws CddAlreadyRunningException, CddNotRunningException {
         Automaton[] aut2 = XMLParser.parse("samples/xml/simple.xml", true);
 
         SimpleTransitionSystem simp2 = new SimpleTransitionSystem(aut2[0]);
@@ -67,14 +72,23 @@ public class VariousTest {
     }
 
     @Test
-    public void testCompOfCompRefinesSpec() {
+    public void testCompOfCompRefinesSpec() throws CddAlreadyRunningException, CddNotRunningException {
 
         Automaton[] aut2 = XMLParser.parse("samples/xml/university-slice.xml", true);
 
-        SimpleTransitionSystem adm = new SimpleTransitionSystem(aut2[3]);
-        SimpleTransitionSystem machine = new SimpleTransitionSystem(aut2[0]);
-        SimpleTransitionSystem researcher = new SimpleTransitionSystem(aut2[1]);
-        SimpleTransitionSystem spec = new SimpleTransitionSystem(aut2[2]);
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(aut2[0].getClocks());
+        clocks.addAll(aut2[1].getClocks());
+        clocks.addAll(aut2[3].getClocks());
+        clocks.addAll(aut2[4].getClocks());
+        CDD.addClocks(clocks);
+
+
+        SimpleTransitionSystem adm = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[3]));
+        SimpleTransitionSystem machine = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[0]));
+        SimpleTransitionSystem researcher = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[1]));
+        SimpleTransitionSystem spec = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[2]));
 
         assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{adm,

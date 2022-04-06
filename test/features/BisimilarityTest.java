@@ -1,16 +1,21 @@
 package features;
 
 import logic.Bisimilarity;
-import logic.Composition;
 import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.Test;
 import parser.XMLParser;
 
 import static org.junit.Assert.assertTrue;
 
 public class BisimilarityTest {
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @Test
     public void bisimilarityTest1() {

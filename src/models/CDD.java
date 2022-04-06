@@ -427,7 +427,7 @@ public class CDD {
         return res;
     }
 
-    private static Automaton makeInputEnabled(Automaton aut) {
+    public static Automaton makeInputEnabled(Automaton aut) {
         Automaton copy = new Automaton(aut);
         if (clocks.size() > 0) {
             for (Location loc : copy.getLocations()) {
@@ -465,7 +465,7 @@ public class CDD {
         return  copy;
     }
 
-    private static Automaton addTargetInvariantToEdges(Automaton aut) {
+    public static Automaton addTargetInvariantToEdges(Automaton aut) {
 
         Automaton copy = new Automaton(aut);
         if (clocks.size() > 0) {

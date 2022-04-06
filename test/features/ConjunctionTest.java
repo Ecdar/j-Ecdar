@@ -5,6 +5,8 @@ import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
@@ -12,6 +14,12 @@ import parser.JSONParser;
 import static org.junit.Assert.assertTrue;
 
 public class ConjunctionTest {
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
+
     private static TransitionSystem t1, t1Copy, t2, t2Copy, t3, t3Copy, t4, t4Copy, t5, t5Copy, t6, t7, t8, t9, t10, t11, t12;
 
     @BeforeClass

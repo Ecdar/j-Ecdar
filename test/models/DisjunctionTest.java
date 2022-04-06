@@ -1,20 +1,17 @@
 package models;
 
-import logic.Quotient;
+import Exceptions.CddAlreadyRunningException;
+import Exceptions.CddNotRunningException;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import parser.JSONParser;
 import parser.XMLParser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
-import static org.junit.Assert.assertFalse;
 
 public class DisjunctionTest {
 
@@ -26,12 +23,21 @@ public class DisjunctionTest {
     static Automaton[] automata;
     private static TransitionSystem D1,D2;
 
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
-    public static void setUpBeforeClass() {
+    public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
         automata = XMLParser.parse("./samples/xml/DisjunctionTests.xml", true);
-        D1 = new SimpleTransitionSystem(automata[0]);
-        D2 = new SimpleTransitionSystem(automata[1]);
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(automata[0].getClocks());
+        clocks.addAll(automata[1].getClocks());
+        CDD.addClocks(clocks);
+        D1 = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[0]));
+        D2 = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[1]));
 
 
     }
@@ -71,26 +77,31 @@ public class DisjunctionTest {
         Guard g6 = new Guard(x, 8,true,true);
         Guard g7 = new Guard(x, 9,true,true);
 
-        List<List<Guard>> disjunctedGuards = new ArrayList<>();
         List<Guard> disj1 = new ArrayList<>();
         disj1.add(g1);
         disj1.add(g2);
+        List<List<Guard>> dis1 = new ArrayList<>();
+        dis1.add(disj1);
         List<Guard> disj2 = new ArrayList<>();
         disj2.add(g3);
         disj2.add(g4);
+        List<List<Guard>> dis2 = new ArrayList<>();
+        dis2.add(disj2);
         List<Guard> disj3 = new ArrayList<>();
         disj3.add(g5);
         disj3.add(g6);
         disj3.add(g7);
-        disjunctedGuards.add(disj1);
-        disjunctedGuards.add(disj2);
-        disjunctedGuards.add(disj3);
+        List<List<Guard>> dis3 = new ArrayList<>();
+        dis3.add(disj3);
+        CDD disjunctedGuards = CDD.cddFalse();
+        disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis1));
+        disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis2));
+        disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis3));
 
-        List<List<Guard>> out = Quotient.negateGuards(disjunctedGuards);
+        List<List<Guard>> out = CDD.toGuards(disjunctedGuards.negation());
 
         System.out.println(disjunctedGuards);
         System.out.println(out);
-
 
 
         assert(out.toString().equals("[[Guard{clock=Clock{name='x'}, upperBound=4, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=6, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=5, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=6, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=4, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=6, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=5, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=6, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=4, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=8, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=5, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=8, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=4, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=8, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=5, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=8, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=4, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=9, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=5, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=9, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=4, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=9, lowerBound=0, isStrict=false}], [Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=5, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=9, lowerBound=0, isStrict=false}]]"));

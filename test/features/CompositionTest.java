@@ -5,6 +5,8 @@ import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
@@ -13,6 +15,11 @@ import parser.XMLParser;
 import static org.junit.Assert.assertTrue;
 
 public class CompositionTest {
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
             machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy;

@@ -1,8 +1,9 @@
 package dbm;
 
 import lib.DBMLib;
-import logic.Refinement;
+import logic.State;
 import models.*;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -14,9 +15,15 @@ import static org.junit.Assert.*;
 
 public class DBMTest {
     private static final int DBM_INF = 2147483646;
-    private static Refinement.State state1, state2, state3, state4, state5;
+    private static State state1, state2, state3, state4, state5;
     private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
+
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -32,28 +39,23 @@ public class DBMTest {
         // STATES----------------------
         // From 0 to inf
         Zone z1 = new Zone(new int[]{1, 1, DBM_INF, 1});
-        List<Zone> list1 = new ArrayList<>();
-        list1.add(z1);
-
-        state1 = new Refinement.State(sl1, new Federation(list1));
+        CDD cdd1 = CDD.allocateFromDbm(z1.getDbm(),clockList.size()+1);
+        state1 = new State(sl1, cdd1);
 
         // From 2 to inf
         Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
-        List<Zone> list2 = new ArrayList<>();
-        list2.add(z2);
-        state2 = new Refinement.State(sl1, new Federation(list2));
+        CDD cdd2 = CDD.allocateFromDbm(z2.getDbm(),clockList.size()+1);
+        state2 = new State(sl1, cdd2);
 
         // From 0 to 5
         Zone z3 = new Zone(new int[]{1, 1, 11, 1});
-        List<Zone> list3 = new ArrayList<>();
-        list3.add(z3);
-        state3 = new Refinement.State(sl1, new Federation(list3));
+        CDD cdd3 = CDD.allocateFromDbm(z3.getDbm(),clockList.size()+1);
+        state3 = new State(sl1, cdd3);
 
         // From 3 to 12
         Zone z4 = new Zone(new int[]{1, -5, 25, 1});
-        List<Zone> list4 = new ArrayList<>();
-        list4.add(z4);
-        state4 = new Refinement.State(sl1, new Federation(list4));
+        CDD cdd4 = CDD.allocateFromDbm(z4.getDbm(),clockList.size()+1);
+        state4 = new State(sl1, cdd4);
 
 
         // GUARDS---------------------
@@ -228,9 +230,6 @@ public class DBMTest {
         int[][] arr1 = DBMLib.dbm_minus_dbm(dbm1, dbm2, dim);
         Federation fed1 = new Federation(arr1);
 
-//        for (Zone zone : fed1.getZones()) {
-//            zone.printDBM(true, true);
-//        }
 
         int[] dbm3 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
 
@@ -241,10 +240,6 @@ public class DBMTest {
 
         int[][] arr2 = DBMLib.fed_minus_dbm(arr1, dbm3, dim);
         Federation fed2 = new Federation(arr2);
-
-//        for (Zone zone : fed2.getZones()) {
-//            zone.printDBM(true, true);
-//        }
 
         assertEquals(fed1.size(), 4);
         assertEquals(fed2.size(), 5);

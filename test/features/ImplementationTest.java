@@ -4,6 +4,8 @@ import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
@@ -15,6 +17,11 @@ public class ImplementationTest {
 
     static Automaton[] automata;
     private static TransitionSystem G7, G8, G13;
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {

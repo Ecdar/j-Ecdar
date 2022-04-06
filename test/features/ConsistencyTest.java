@@ -2,6 +2,8 @@ package features;
 
 import logic.*;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
@@ -14,6 +16,11 @@ public class ConsistencyTest {
 
     static Automaton[] automata;
     private static TransitionSystem G1, G3, G4, G5, G7, G8, G9, G10, G12, G21;
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {
