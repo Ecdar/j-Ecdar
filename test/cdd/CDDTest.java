@@ -117,7 +117,7 @@ public class CDDTest {
     @Test
     public void isTerminal_shouldNotBeTerminal() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
-        CDD.addClocks(2);
+        CDD.addClocks(3);
 
         CDD cdd1 = CDD.allocateInterval(2,1,3,5);
         CDD cdd2 = CDD.allocateInterval(2,1,4,6);
