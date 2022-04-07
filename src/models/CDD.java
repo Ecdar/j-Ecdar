@@ -14,7 +14,7 @@ public class CDD {
     private long pointer;
     private static int numClocks; // includes the + 1 for initial clock
     private static boolean cddIsRunning;
-    private static final List<Clock> clocks = new ArrayList<>();
+    private static List<Clock> clocks = new ArrayList<>();
 
 
     public CDD(){
@@ -104,6 +104,8 @@ public class CDD {
 
     public static void done(){
         cddIsRunning = false;
+        numClocks = 0;
+        clocks = new ArrayList<>();
         CDDLib.cddDone();
     }
 
