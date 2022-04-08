@@ -577,7 +577,7 @@ JNIEXPORT jintArray JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
  * Class:     lib_CDDLib
  * Method:    cddEquiv
  */
-JNIEXPORT jboolean JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
+JNIEXPORT jboolean JNICALL Java_lib_CDDLib_cddEquiv
   (JNIEnv *env, jclass, jlong l_cdd, jlong r_cdd){
     cdd* l_cdd_object = (cdd*)l_cdd;
     cdd* r_cdd_object = (cdd*)r_cdd;
