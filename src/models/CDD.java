@@ -53,7 +53,6 @@ public class CDD {
         {
 
             CDD unres = getUnrestrainedCDD();
-            System.out.println("unrestrained");
             this.pointer = unres.pointer;
         }
     }
@@ -62,7 +61,8 @@ public class CDD {
 
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
-        if (copy.equiv(cddFalse())) // special case for guards
+        CDD falseC = cddFalse();
+        if (copy.reduce().isFalse()) // special case for guards
         {
             List<Guard> falseGuard = Guard.getFalseGuard(clocks.get(0));
             guards.add(falseGuard);
@@ -73,7 +73,6 @@ public class CDD {
 
             CddExtractionResult res = copy.extractBddAndDbm();
             copy = res.getCddPart();
-            System.out.println("The size is "  + res.getDbm().length);
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks);
@@ -118,15 +117,25 @@ public class CDD {
     }
 
     public boolean isNotFalse() {
-        return this.equiv(cddFalse());
+        return !isFalse();
     }
 
+    public boolean isFalse() {
+        return CDDLib.isFalse(this.reduce().pointer);
+    }
+
+    public boolean isTrue() {
+        return CDDLib.isTrue(this.reduce().pointer);
+    }
+
+
     public boolean equiv(CDD that){
-        if ((!this.conjunction(that.negation()).isNotFalse())
-            && (!that.conjunction(this.negation()).isNotFalse()))
+
+        if ((this.conjunction(that.negation()).reduce().isFalse())
+                && (that.conjunction(this.negation()).reduce().isFalse()))
             return true;
         return false;
-        //return CDDLib.cddEquiv(this,that);
+//        return CDDLib.cddEquiv(this,that);
     }
 
     public static void done(){
@@ -530,6 +539,7 @@ public class CDD {
         if (clocks.size() > 0) {
             for (Edge edge : copy.getEdges()) {
                 CDD targetCDD = edge.getTarget().getInvariantCDD();
+                targetCDD.printDot();
                 CDD past = targetCDD.transitionBack(edge);
                 past.printDot();
                 edge.setGuards(CDD.toGuards(past));

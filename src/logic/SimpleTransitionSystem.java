@@ -123,10 +123,15 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 State state2 = new State(trans.get(j).getSource());
 
 
-
+                CDD falsecdd = CDD.cddFalse();
 
                 state1.applyGuards(trans.get(i).getGuardCDD());
                 state2.applyGuards(trans.get(j).getGuardCDD());
+
+                System.out.println(trans.get(i).getEdges().get(0).getGuards());
+                System.out.println(trans.get(j).getEdges().get(0).getGuards());
+                CDD reduced1 = state1.getInvarCDD().reduce();
+                CDD reduced2 = state2.getInvarCDD().reduce();
 
                 if (state1.getInvarCDD().isNotFalse() && state2.getInvarCDD().isNotFalse()) {
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
