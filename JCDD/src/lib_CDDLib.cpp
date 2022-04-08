@@ -573,4 +573,16 @@ JNIEXPORT jintArray JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
     return helper_functions::cToJint(env, result_object->dbm, dbm_size);
 }
 
+/*
+ * Class:     lib_CDDLib
+ * Method:    cddEquiv
+ */
+JNIEXPORT jboolean JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
+  (JNIEnv *env, jclass, jlong l_cdd, jlong r_cdd){
+    cdd* l_cdd_object = (cdd*)l_cdd;
+    cdd* r_cdd_object = (cdd*)r_cdd;
+
+    return cdd_equiv(*l_cdd_object, *r_cdd_object);
+}
+
 
