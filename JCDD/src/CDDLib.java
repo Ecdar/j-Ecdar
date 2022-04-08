@@ -76,4 +76,5 @@ public class CDDLib {
     public static native long getCddPartFromExtractionResult(long extractionResultPointer);
     public static native long getBddPartFromExtractionResult(long extractionResultPointer);
     public static native int[] getDbmFromExtractionResult(long extractionResultPointer);
+    public static native boolean cddEquiv(long lCdd, long rCdd);
 }

@@ -58,7 +58,6 @@ public class CDD {
     }
 
     public static List<List<Guard>> toGuards(CDD state){
-
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
         CDD falseC = cddFalse();
@@ -130,12 +129,7 @@ public class CDD {
 
 
     public boolean equiv(CDD that){
-
-        if ((this.conjunction(that.negation()).reduce().isFalse())
-                && (that.conjunction(this.negation()).reduce().isFalse()))
-            return true;
-        return false;
-//        return CDDLib.cddEquiv(this,that);
+        return CDDLib.cddEquiv(pointer,that.pointer);
     }
 
     public static void done(){
@@ -479,6 +473,7 @@ public class CDD {
         for (Update u : e.getUpdates())
         {
             clockResets[i]=getIndexOfClock(u.getClock());
+
             i++;
         }
         return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets);
