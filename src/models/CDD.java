@@ -18,6 +18,7 @@ public class CDD {
 
 
     public CDD(){
+        checkIfRunning();
         this.pointer = CDDLib.allocateCdd();
     }
 
@@ -32,7 +33,6 @@ public class CDD {
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
-        System.out.println("Clock not found: clock: " + clock + " List: " + clocks);
         return 0;
     }
 
@@ -61,22 +61,17 @@ public class CDD {
     public static List<List<Guard>> toGuards(CDD state){
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
-
         while (!copy.isTerminal())
         {
+
             CddExtractionResult res = copy.extractBddAndDbm();
             copy = res.getCddPart();
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks);
-            //z.printDBM(false,true);
-            System.out.println(guardList);
-
-            //guardList.add(bddPart.toGuards()); // TODO: once we have boolean
+            // guardList.add(bddPart.toGuards()); // TODO: once we have boolean
             guards.add(guardList);
         }
-
-
         return guards;
     }
 
@@ -87,16 +82,20 @@ public class CDD {
 
     public static CDD cddTrue()
     {
+        checkIfRunning();
         return new CDD(CDDLib.cddTrue());
     }
 
     public static CDD cddFalse()
     {
+        checkIfRunning();
         return new CDD(CDDLib.cddFalse());
     }
 
     public boolean isTerminal()
     {
+        checkIfRunning();
+        checkForNull();
         return CDDLib.isTerminal(pointer);
     }
 
@@ -130,107 +129,120 @@ public class CDD {
     }
 
     @SafeVarargs
-    public static void addClocks(List<Clock>... clocks) throws CddNotRunningException {
-        if(!cddIsRunning){
-            throw new CddNotRunningException("Can't add clocks without before running CDD.init");
-        }
+    public static void addClocks(List<Clock>... clocks) {
+        checkIfRunning();
         for (List<Clock> list: clocks)
             CDD.clocks.addAll(list);
-
         numClocks = CDD.clocks.size()+1;
         CDDLib.cddAddClocks(numClocks);
     }
 
-    public static int addBddvar(int amount) { return CDDLib.addBddvar(amount); }
+    public static int addBddvar(int amount) {
+        checkIfRunning();
+        return CDDLib.addBddvar(amount);
+    }
 
     public static CDD allocate(){
+        checkIfRunning();
         return new CDD();
     }
 
     public static CDD allocateInterval(int i, int j, int lower, int upper){
+        checkIfRunning();
         // TODO: Dont think this works.
         assert(false);
         return new CDD(CDDLib.interval(i,j,lower,upper));
     }
 
     public static CDD allocateFromDbm(int[] dbm, int dim){
+        checkIfRunning();
         return new CDD(CDDLib.cddFromDbm(dbm, dim));
     }
 
     public static CDD allocateLower(int i, int j, int lowerBound) {
+        checkIfRunning();
         return new CDD(CDDLib.lower(i,j,lowerBound));
     }
 
     public static CDD allocateUpper(int i, int j, int upperBound) {
+        checkIfRunning();
         return new CDD(CDDLib.upper(i,j,upperBound));
     }
 
     public static CDD createBddNode(int level) {
+        checkIfRunning();
         return new CDD(CDDLib.cddBddvar(level));
     }
 
     public static CDD createNegatedBddNode(int level) {
+        checkIfRunning();
         return new CDD(CDDLib.cddNBddvar(level));
     }
 
     public static void free(CDD cdd){
-        if(cdd.pointer == 0){
-            throw new NullPointerException("CDD object is null");
-        }
+        cdd.checkForNull();
         CDDLib.freeCdd(cdd.pointer);
         cdd.pointer = 0;
     }
 
     public CDD copy(){
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.copy(pointer));
     }
 
-    public CDD delay()
-    {
+    public CDD delay() {
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.delay(pointer));
     }
 
-    public CDD delayInvar(CDD invariant)
-    {
+    public CDD delayInvar(CDD invariant) {
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.delayInvar(pointer, invariant.pointer));
     }
 
     public CDD exist(int[] levels, int[] clocks){
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.exist(pointer, levels, clocks));
     }
 
     public CDD past(){ // TODO: make sure this is used at the correct spots everywhere, might have been confuces with delay
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.past(pointer));
     }
 
     public CDD removeNegative(){
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.removeNegative(pointer));
     }
 
     public CDD applyReset(int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
+        checkIfRunning();
         checkForNull();
         return new CDD(CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues));
     }
 
     public CDD minus(CDD other){
+        checkIfRunning();
         checkForNull();
         other.checkForNull();
         return new CDD(CDDLib.minus(pointer, other.pointer));
     }
 
     public CDD transition(CDD guard, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
+        checkIfRunning();
         checkForNull();
         guard.checkForNull();
         return new CDD(CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues));
     }
 
     public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets){
+        checkIfRunning();
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
@@ -238,17 +250,20 @@ public class CDD {
     }
 
     public CDD predt(CDD safe){
+        checkIfRunning();
         checkForNull();
         safe.checkForNull();
         return new CDD(CDDLib.predt(pointer, safe.pointer));
     }
 
     public CddExtractionResult extractBddAndDbm(){
+        checkIfRunning();
         checkForNull();
         return new CddExtractionResult(CDDLib.extractBddAndDbm(pointer));
     }
 
     public CDD transitionBackPast(CDD guard, CDD update, int[] clockResets, int[] boolResets){
+        checkIfRunning();
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
@@ -256,6 +271,7 @@ public class CDD {
     }
 
     public CDD conjunction(CDD other){
+        checkIfRunning();
         checkForNull();
         other.checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);
@@ -263,6 +279,7 @@ public class CDD {
     }
 
     public CDD disjunction(CDD other){
+        checkIfRunning();
         checkForNull();
         other.checkForNull();
         long resultPointer = CDDLib.disjunction(pointer, other.pointer);
@@ -270,12 +287,14 @@ public class CDD {
     }
 
     public CDD negation() {
+        checkIfRunning();
         checkForNull();
         long resultPointer = CDDLib.negation(pointer);
         return new CDD(resultPointer);
     }
 
     public CDD reduce() {
+        checkIfRunning();
         checkForNull();
         long resultPointer = CDDLib.reduce(pointer);
         return new CDD(resultPointer);
@@ -326,6 +345,12 @@ public class CDD {
     private void checkForNull(){
         if(pointer == 0){
             throw new NullPointerException("CDD object is null");
+        }
+    }
+
+    private static void checkIfRunning() {
+        if(!cddIsRunning){
+            throw new CddNotRunningException("CDD.init() has not been called");
         }
     }
 
@@ -455,7 +480,6 @@ public class CDD {
         if (clocks.size() > 0) {
             for (Location loc : copy.getLocations()) {
                 CDD fullCDD = loc.getInvariantCDD();
-
                 // loop through all inputs
                 for (Channel input : copy.getInputAct()) {
                     // build CDD of zones from edges
@@ -466,19 +490,19 @@ public class CDD {
                     if (!inputEdges.isEmpty()) {
                         for (Edge edge : inputEdges) {
                             CDD target = edge.getTarget().getInvariantCDD();
-                            //target.printDot();
                             CDD preReset = CDD.applyReset(target, Arrays.asList(edge.getUpdates()));
                             CDD preGuard = preReset.conjunction(edge.getGuardCDD());
                             CDD preGuard1 = target.transition(edge);
                             assert (preGuard1.equiv(preGuard));
                             cddOfAllInputs = cddOfAllInputs.disjunction(preGuard);
                         }
-                        //cddOfAllInputs.printDot();
+
                         // subtract the federation of zones from the original fed
                         resCDD = fullCDD.minus(cddOfAllInputs);
                     } else {
                         resCDD = fullCDD;
                     }
+
                     Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuards(resCDD), new Update[]{});
                     copy.getEdges().add(newEdge);
 
