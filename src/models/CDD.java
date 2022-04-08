@@ -109,11 +109,7 @@ public class CDD {
     }
 
     public boolean equiv(CDD that){
-        if ((!this.conjunction(that.negation()).isValid())
-            && (!that.conjunction(this.negation()).isValid()))
-            return true;
-        return false;
-        //return CDDLib.cddEquiv(this,that);
+        return CDDLib.cddEquiv(pointer,that.pointer);
     }
 
     public static void done(){
