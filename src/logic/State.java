@@ -49,8 +49,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        // should not be used anymore, i think
-        assert(false);
+        this.invarCDD=location.getInvariantCDD();
     }
 
     public void applyResets(List<Update> resets) {
@@ -61,7 +60,7 @@ public class State {
         // TODO!
 //        for (Zone z : invFed.getZones())
 //            z.extrapolateMaxBounds(maxBounds);
-        assert(false);
+      //  assert(false);
     }
 
     @Override

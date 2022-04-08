@@ -90,7 +90,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
             toStore.extrapolateMaxBounds(maxBounds);
             passed.add(toStore);
-            //System.out.println("size " + passed.size());
 
             for (Channel action : actions) {
 

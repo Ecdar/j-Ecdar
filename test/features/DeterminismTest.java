@@ -62,7 +62,7 @@ public class DeterminismTest {
         clocks.addAll(G1.getClocks());
         clocks.addAll(G1.getClocks());
         CDD.addClocks(clocks);
-        assertEquals(new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton())), CDD.makeInputEnabled(G1.getAutomaton()));
+        assertEquals(new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton())), new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton())));
     }
 
     @Test
@@ -113,97 +113,123 @@ public class DeterminismTest {
     }
 
     @Test
-    public void G1G9IsNotDeterministic(){
-        TransitionSystem ts = new Composition(new TransitionSystem[]{G1, G9});
-
+    public void G1G9IsNotDeterministic() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G1.getClocks(), G9.getClocks());
+        TransitionSystem ts = new Composition(new TransitionSystem[]{(new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton()))), (new SimpleTransitionSystem(CDD.makeInputEnabled(G9.getAutomaton())))});
         assertFalse(ts.isDeterministic());
     }
 
     @Test
-    public void testG4(){
+    public void testG4() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G4.getClocks());
         assertTrue(G4.isDeterministic());
     }
 
     @Test
-    public void testG5(){
+    public void testG5() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G5.getClocks());
         assertTrue(G5.isDeterministic());
     }
 
     @Test
-    public void testG6(){
+    public void testG6() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G6.getClocks());
         assertTrue(G6.isDeterministic());
     }
 
     @Test
-    public void testG7(){
+    public void testG7() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G7.getClocks());
         assertTrue(G7.isDeterministic());
     }
 
     @Test
-    public void testG8(){
+    public void testG8() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G8.getClocks());
         assertTrue(G8.isDeterministic());
     }
 
     @Test
-    public void testG9(){
+    public void testG9() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G9.getClocks());
         assertFalse(G9.isDeterministic());
     }
 
     @Test
-    public void testG10(){
+    public void testG10() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G10.getClocks());
         assertTrue(G10.isDeterministic());
     }
 
     @Test
-    public void testG11(){
+    public void testG11() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G11.getClocks());
         assertTrue(G11.isDeterministic());
     }
 
     @Test
-    public void testG12(){
-
-
-
-
-
-
-
+    public void testG12() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G12.getClocks());
         assertTrue(G12.isDeterministic());
     }
 
     @Test
-    public void testG13(){
+    public void testG13() throws CddNotRunningException, CddAlreadyRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G13.getClocks());
         ((SimpleTransitionSystem) (G13)).toXML("st-ic.xml");
         assertTrue(G13.isDeterministic());
     }
 
     @Test
-    public void testG14(){
+    public void testG14() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G14.getClocks());
         assertFalse(G14.isDeterministic());
     }
 
     @Test
-    public void testG15(){
+    public void testG15() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G15.getClocks());
         assertTrue(G15.isDeterministic());
     }
 
     @Test
-    public void testG16(){
+    public void testG16() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G16.getClocks());
         assertFalse(G16.isDeterministic());
     }
 
     @Test
-    public void testG17(){
+    public void testG17() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G17.getClocks());
         assertTrue(G17.isDeterministic());
     }
 
     @Test
-    public void testG22(){
+    public void testG22() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G22.getClocks());
         assertTrue(G22.isDeterministic());
     }
 
     @Test
-    public void testG23(){
+    public void testG23() throws CddAlreadyRunningException, CddNotRunningException {
+        CDD.init(100,100,100);
+        CDD.addClocks(G23.getClocks());
         assertFalse(G23.isDeterministic());
     }
 }

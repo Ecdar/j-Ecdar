@@ -2,13 +2,11 @@ package cdd;
 
 import Exceptions.CddAlreadyRunningException;
 import Exceptions.CddNotRunningException;
-import models.CDD;
-import models.CDDNode;
-import models.Elem;
+import lib.CDDLib;
+import models.*;
 import org.junit.After;
 import org.junit.Test;
 
-import models.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +18,7 @@ public class CDDTest {
 
     @After
     public void afterEachTest(){
+
         CDD.done();
     }
 
@@ -133,6 +132,7 @@ public class CDDTest {
         CDD.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a"));
+        clocks.add(new Clock("b"));
         CDD.addClocks(clocks);
 
         CDD cdd1 = CDD.allocateInterval(2,1,3,5);
@@ -233,10 +233,43 @@ public class CDDTest {
         CDD cdd = CDD.allocateUpper(1,0,6);
         CDDNode node = cdd.getRoot();
 
+        cdd.printDot(); // --> the CDD is correct, so I guess the test is wrong
         assertEquals(0, node.getElemAtIndex(0).getBound());
         assertEquals(6, node.getElemAtIndex(1).getBound());
 
         CDD.free(cdd);
+    }
+
+    @Test
+    public void guardToCDDTest() throws CddNotRunningException, CddAlreadyRunningException {
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        Clock x = new Clock("x");
+        Clock y = new Clock("y");
+        clocks.add(x);
+        clocks.add(y);
+        CDD.addClocks(clocks);
+
+
+        Guard e2_g1 = new Guard(x, 3, true, false);
+        Guard e2_g2 = new Guard(y, 5, false, false);
+
+        List<Guard> g1 = new ArrayList<>();
+        g1.add(e2_g1);
+        List<Guard> g2 = new ArrayList<>();
+        g2.add(e2_g2);
+        List<List<Guard>> guards = new ArrayList<>();
+        guards.add(g1);
+        guards.add(g2);
+        CDD res = new CDD(guards);
+        res.printDot();
+        CDD exp = CDD.getUnrestrainedCDD();
+        exp = exp.conjunction(CDD.allocateInterval(0, 1, 1, 6));
+        exp = exp.disjunction(CDD.allocateInterval(0, 2, 10, CDD_INF));
+        exp.printDot();
+        exp = exp.removeNegative();
+        exp.printDot();
+        assertEquals(res, exp);
     }
 
     @Test
@@ -251,4 +284,6 @@ public class CDDTest {
         level = CDD.addBddvar(2);
         assertEquals(6, level);
     }
+
+
 }

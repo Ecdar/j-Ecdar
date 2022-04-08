@@ -84,8 +84,12 @@ public class InputEnablednessTest {
         String base = "./samples/json/InputEnabled/";
         String[] components = new String[]{"GlobalDeclarations.json", "Components/Automaton.json"};
         CDD.init(100,100,100);
-        CDD.addClocks(clocks);
+
         actual = JSONParser.parse(base, components, true)[0];
+        clocks.addAll(actual.getClocks());
+        CDD.addClocks(clocks);
+        //SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
+       //  st.toXML("BASE.xml");
         actual = CDD.makeInputEnabled(actual);
     }
 

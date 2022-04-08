@@ -14,7 +14,7 @@ public class CDD {
     private long pointer;
     private static int numClocks; // includes the + 1 for initial clock
     private static boolean cddIsRunning;
-    private static final List<Clock> clocks = new ArrayList<>();
+    private static List<Clock> clocks = new ArrayList<>();
 
 
     public CDD(){
@@ -27,10 +27,12 @@ public class CDD {
     }
 
 
-    private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
+    private static int getIndexOfClock(Clock clock) {
+
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
+        System.out.println("Clock not found: clock: " + clock + " List: " + clocks);
         return 0;
     }
 
@@ -42,27 +44,39 @@ public class CDD {
             Zone z = new Zone(numClocks,true);
             z.init();
             for (Guard guard: guardList) {
-                z.buildConstraintsForGuard(guard,getIndexOfClock(guard.getClock(),clocks));
+                z.buildConstraintsForGuard(guard,getIndexOfClock(guard.getClock()));
             }
             res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks));
         }
         this.pointer = res.pointer;
+        if (guards.isEmpty())
+        {
+
+            CDD unres = getUnrestrainedCDD();
+
+            this.pointer = unres.pointer;
+        }
     }
 
     public static List<List<Guard>> toGuards(CDD state){
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
+
         while (!copy.isTerminal())
         {
-
             CddExtractionResult res = copy.extractBddAndDbm();
             copy = res.getCddPart();
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks);
-            // guardList.add(bddPart.toGuards()); // TODO: once we have boolean
+            z.printDBM(false,true);
+            //System.out.println(guardList);
+
+            //guardList.add(bddPart.toGuards()); // TODO: once we have boolean
             guards.add(guardList);
         }
+
+
         return guards;
     }
 
@@ -104,6 +118,8 @@ public class CDD {
 
     public static void done(){
         cddIsRunning = false;
+        numClocks = 0;
+        clocks = new ArrayList<>();
         CDDLib.cddDone();
     }
 
@@ -120,6 +136,7 @@ public class CDD {
         }
         for (List<Clock> list: clocks)
             CDD.clocks.addAll(list);
+
         numClocks = CDD.clocks.size()+1;
         CDDLib.cddAddClocks(numClocks);
     }
@@ -131,6 +148,8 @@ public class CDD {
     }
 
     public static CDD allocateInterval(int i, int j, int lower, int upper){
+        // TODO: Dont think this works.
+        assert(false);
         return new CDD(CDDLib.interval(i,j,lower,upper));
     }
 
@@ -396,7 +415,7 @@ public class CDD {
         int i=0;
         for (Update u : e.getUpdates())
         {
-            clockResets[i]=getIndexOfClock(u.getClock(),clocks);
+            clockResets[i]=getIndexOfClock(u.getClock());
             clockValues[i]=u.getValue();
             i++;
         }
@@ -412,7 +431,7 @@ public class CDD {
         int i=0;
         for (Update u : e.getUpdates())
         {
-            clockResets[i]=getIndexOfClock(u.getClock(),clocks);
+            clockResets[i]=getIndexOfClock(u.getClock());
 
             i++;
         }
@@ -426,16 +445,17 @@ public class CDD {
         CDD res = cddFalse();
         for (Update u : updates)
         {
-            res = res.disjunction(CDD.allocateInterval(getIndexOfClock(u.getClock(),clocks),0,u.getValue(),u.getValue()));
+            res = res.disjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()),0,u.getValue(),u.getValue()));
         }
         return res;
     }
 
     public static Automaton makeInputEnabled(Automaton aut) {
-        Automaton copy = new Automaton(aut);
+        Automaton copy = aut; //new Automaton(aut);
         if (clocks.size() > 0) {
             for (Location loc : copy.getLocations()) {
                 CDD fullCDD = loc.getInvariantCDD();
+
                 // loop through all inputs
                 for (Channel input : copy.getInputAct()) {
                     // build CDD of zones from edges
@@ -446,19 +466,19 @@ public class CDD {
                     if (!inputEdges.isEmpty()) {
                         for (Edge edge : inputEdges) {
                             CDD target = edge.getTarget().getInvariantCDD();
+                            //target.printDot();
                             CDD preReset = CDD.applyReset(target, Arrays.asList(edge.getUpdates()));
                             CDD preGuard = preReset.conjunction(edge.getGuardCDD());
                             CDD preGuard1 = target.transition(edge);
                             assert (preGuard1.equiv(preGuard));
                             cddOfAllInputs = cddOfAllInputs.disjunction(preGuard);
                         }
-
+                        //cddOfAllInputs.printDot();
                         // subtract the federation of zones from the original fed
                         resCDD = fullCDD.minus(cddOfAllInputs);
                     } else {
                         resCDD = fullCDD;
                     }
-
                     Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuards(resCDD), new Update[]{});
                     copy.getEdges().add(newEdge);
 

@@ -9,6 +9,7 @@ public class Clock {
     }
 
     public Clock(Clock copy){
+        System.out.println("making a copy");
         this.name = copy.name;
     }
 
