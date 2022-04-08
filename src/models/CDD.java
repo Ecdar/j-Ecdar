@@ -66,6 +66,7 @@ public class CDD {
 
             CddExtractionResult res = copy.extractBddAndDbm();
             copy = res.getCddPart();
+            System.out.println("The size is "  + res.getDbm().length);
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks);

@@ -11,9 +11,31 @@ public class CddExtractionResult {
 
     public CddExtractionResult(long pointer) {
         this.pointer = pointer;
+        cddPart = importCddPart();
+        bddPart = importBddPart();
+        dbm = importDbm();
+
     }
 
+
+
+
     public CDD getCddPart() {
+        return cddPart;
+    }
+
+    public CDD getBddPart() {
+        return bddPart;
+    }
+
+    public int[] getDbm() {
+        return dbm;
+
+    }
+
+
+
+    public CDD importCddPart() {
         checkForNull();
 
         if(cddPart != null){
@@ -23,7 +45,7 @@ public class CddExtractionResult {
         }
     }
 
-    public CDD getBddPart() {
+    public CDD importBddPart() {
         checkForNull();
 
         if(bddPart != null){
@@ -33,7 +55,7 @@ public class CddExtractionResult {
         }
     }
 
-    public int[] getDbm() {
+    public int[] importDbm() {
         checkForNull();
 
         if(dbm != null){
