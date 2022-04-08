@@ -2,7 +2,6 @@ package cdd;
 
 import Exceptions.CddAlreadyRunningException;
 import Exceptions.CddNotRunningException;
-import lib.CDDLib;
 import models.*;
 import org.junit.After;
 import org.junit.Test;
@@ -190,7 +189,7 @@ public class CDDTest {
         CDD.free(cdd);
 
         cdd = cdd.reduce();
-        cdd.isValid();
+        cdd.isNotFalse();
     }
 
     @Test(expected = NullPointerException.class)

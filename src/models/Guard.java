@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,6 +9,7 @@ public class Guard {
     private final Clock clock;
     private int upperBound, lowerBound;
     private boolean isStrict;
+
 
     public Guard(Clock clock, int value, boolean greater, boolean isStrict) {
         assert(clock!=null);
@@ -43,6 +45,13 @@ public class Guard {
         this.isStrict = copy.isStrict;
         this.upperBound = copy.upperBound;
         this.lowerBound = copy.lowerBound;
+    }
+
+    public static List<Guard> getFalseGuard(Clock clock) {
+        List<Guard> guardList = new ArrayList<>();
+        guardList.add(new Guard(clock,707));
+        guardList.add(new Guard(clock,1337));
+        return guardList;
     }
 
     public Clock getClock() {

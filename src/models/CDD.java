@@ -12,7 +12,7 @@ import java.util.Objects;
 public class CDD {
 
     private long pointer;
-    private static int numClocks; // includes the + 1 for initial clock
+    public static int numClocks; // includes the + 1 for initial clock
     private static boolean cddIsRunning;
     private static List<Clock> clocks = new ArrayList<>();
 
@@ -59,8 +59,15 @@ public class CDD {
     }
 
     public static List<List<Guard>> toGuards(CDD state){
+
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
+        if (copy.equiv(cddFalse())) // special case for guards
+        {
+            List<Guard> falseGuard = Guard.getFalseGuard(clocks.get(0));
+            guards.add(falseGuard);
+            return guards;
+        }
         while (!copy.isTerminal())
         {
 
@@ -87,11 +94,7 @@ public class CDD {
         return new CDD(CDDLib.cddTrue());
     }
 
-    public static CDD cddFalse()
-    {
-        checkIfRunning();
-        return new CDD(CDDLib.cddFalse());
-    }
+
 
     public boolean isTerminal()
     {
@@ -108,9 +111,19 @@ public class CDD {
         return CDDLib.cddInit(maxSize, cs, stackSize);
     }
 
+    public static CDD cddFalse()
+    {
+        checkIfRunning();
+        return new CDD(CDDLib.cddFalse());
+    }
+
+    public boolean isNotFalse() {
+        return this.equiv(cddFalse());
+    }
+
     public boolean equiv(CDD that){
-        if ((!this.conjunction(that.negation()).isValid())
-            && (!that.conjunction(this.negation()).isValid()))
+        if ((!this.conjunction(that.negation()).isNotFalse())
+            && (!that.conjunction(this.negation()).isNotFalse()))
             return true;
         return false;
         //return CDDLib.cddEquiv(this,that);
@@ -369,11 +382,6 @@ public class CDD {
     }
 
 
-    public boolean isValid() {
-        if (isTerminal())
-            return false;
-        else return true;
-    }
 
 
     public static CDD predt(CDD A, CDD B) {
@@ -409,7 +417,7 @@ public class CDD {
     }
 
     public static boolean intersects(CDD A, CDD B) {
-        if (A.conjunction(B).isValid())
+        if (A.conjunction(B).isNotFalse())
             return true;
         else return false;
     }
@@ -452,13 +460,16 @@ public class CDD {
 
     public CDD transitionBack( Edge e)
     {
+        if (e.getUpdates().length==0)
+        {
+            return this.conjunction(e.getGuardCDD());
+        }
         int[] clockResets = new int[e.getUpdates().length];
         int[] boolResets = {};
         int i=0;
         for (Update u : e.getUpdates())
         {
             clockResets[i]=getIndexOfClock(u.getClock());
-
             i++;
         }
         return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets);
@@ -467,17 +478,16 @@ public class CDD {
 
     public static CDD turnUpdatesToCDD(Update[] updates)
     {
-
-        CDD res = cddFalse();
+        CDD res = cddTrue();
         for (Update u : updates)
         {
-            res = res.disjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()),0,u.getValue(),u.getValue()));
+            res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()),0,u.getValue(),u.getValue()));
         }
         return res;
     }
 
     public static Automaton makeInputEnabled(Automaton aut) {
-        Automaton copy = aut; //new Automaton(aut);
+        Automaton copy = addTargetInvariantToEdges(aut); //new Automaton(aut);
         if (clocks.size() > 0) {
             for (Location loc : copy.getLocations()) {
                 CDD fullCDD = loc.getInvariantCDD();
@@ -516,11 +526,12 @@ public class CDD {
 
     public static Automaton addTargetInvariantToEdges(Automaton aut) {
 
-        Automaton copy = new Automaton(aut);
+        Automaton copy = aut;
         if (clocks.size() > 0) {
             for (Edge edge : copy.getEdges()) {
                 CDD targetCDD = edge.getTarget().getInvariantCDD();
                 CDD past = targetCDD.transitionBack(edge);
+                past.printDot();
                 edge.setGuards(CDD.toGuards(past));
             }
         } // TODO: else part will be important once we have bool support

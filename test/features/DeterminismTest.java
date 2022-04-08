@@ -216,7 +216,9 @@ public class DeterminismTest {
     public void testG17() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G17.getClocks());
-        assertTrue(G17.isDeterministic());
+        SimpleTransitionSystem inputEnabled = new SimpleTransitionSystem(CDD.makeInputEnabled(G17.getAutomaton()));
+        inputEnabled.toXML("inputEnabledTestG17.xml");
+        assertTrue(inputEnabled.isDeterministic());
     }
 
     @Test

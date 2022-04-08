@@ -170,7 +170,7 @@ public class Refinement {
         // TODO: Does this make copies of the invariant Federations? should it?
         target1.applyGuards(t2.getGuardCDD());
 
-        if (!target1.getInvarCDD().isValid()) {
+        if (!target1.getInvarCDD().isNotFalse()) {
             return null;
         }
         target1.applyResets(t1.getUpdates());
@@ -187,7 +187,7 @@ public class Refinement {
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
         CDD cdd = invariantTest.minus(target1.getInvarCDD());
-        if (cdd.isValid()){
+        if (cdd.isNotFalse()){
 
             System.out.println("invarfed after substraction not empty");
             return null;
@@ -222,7 +222,7 @@ public class Refinement {
 
 
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
-        if (leftCDD.minus(rightCDD).isValid()) {
+        if (leftCDD.minus(rightCDD).isNotFalse()) {
             System.out.println("trans2 does not satisfy all solution of trans2");
             return false;
         }

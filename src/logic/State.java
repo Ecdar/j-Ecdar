@@ -57,10 +57,20 @@ public class State {
     }
 
     public void extrapolateMaxBounds(int[] maxBounds){
-        // TODO!
-//        for (Zone z : invFed.getZones())
-//            z.extrapolateMaxBounds(maxBounds);
-      //  assert(false);
+        CDD copy = new CDD(invarCDD.getPointer());
+        CDD resCDD = CDD.cddFalse();
+        while (!copy.isTerminal())
+        {
+            CddExtractionResult extractResult = copy.extractBddAndDbm();
+            copy = extractResult.getCddPart();
+            Zone z = new Zone(extractResult.getDbm());
+            CDD bddPart = extractResult.getBddPart();
+            z.extrapolateMaxBounds(maxBounds);
+            CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
+            CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
+            resCDD = resCDD.disjunction(extrapolatedCDD);
+        }
+        invarCDD = resCDD;
     }
 
     @Override

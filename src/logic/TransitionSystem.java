@@ -57,7 +57,7 @@ public abstract class TransitionSystem {
 
             targetState.applyGuards(guards);
 
-            if (!targetState.getInvarCDD().isValid()) continue;
+            if (!targetState.getInvarCDD().isNotFalse()) continue;
 
 
             CDD guardCDD = new CDD(targetState.getInvarCDD().getPointer());
@@ -68,7 +68,7 @@ public abstract class TransitionSystem {
 
             targetState.applyInvariants();
 
-            if (!targetState.getInvarCDD().isValid()) continue;
+            if (!targetState.getInvarCDD().isNotFalse()) continue;
 
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }

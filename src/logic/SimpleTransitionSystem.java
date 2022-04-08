@@ -70,17 +70,15 @@ public class SimpleTransitionSystem extends TransitionSystem{
     // Checks if automaton is deterministic
     public boolean isDeterministicHelper() {
 
-        //System.out.println("reached isdetermHelp1");
+
         Set<Channel> actions = getActions();
 
         waiting = new ArrayDeque<>();
         passed = new ArrayList<>();
         waiting.add(getInitialState());
-        //System.out.println("init state added " + getInitialState().getLocation());
-        //getInitialState().getInvFed().getZones().get(0).printDBM(true,true);
+
         while (!waiting.isEmpty()) {
             State currState = new State(waiting.pop());
-            //System.out.println(currState.toString());
             State toStore = new State(currState);
             int[] maxBounds;
             List<Integer> res = new ArrayList<>();
@@ -94,18 +92,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
             for (Channel action : actions) {
 
                 List<Transition> tempTrans = getNextTransitions(currState, action);
-                // System.out.println("reached isdetermHelp6");
-                if (checkMovesOverlap(tempTrans)) {
 
-                    //System.out.println("reached isdetermHelp3");
+                if (checkMovesOverlap(tempTrans)) {
                     return false;
                 }
-//                System.out.println("reached isdetermHelp2");
 
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s) && !waitingContainsState(s)).collect(Collectors.toList()); // TODO I added waitingConstainsState... Okay??
 
-                //              System.out.println("reached isdetermHelp5 " + toAdd.size());
                 toAdd.forEach(e->e.extrapolateMaxBounds(maxBounds));
                 waiting.addAll(toAdd);
             }
@@ -134,11 +128,12 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 state1.applyGuards(trans.get(i).getGuardCDD());
                 state2.applyGuards(trans.get(j).getGuardCDD());
 
-                if (state1.getInvarCDD().isValid() && state2.getInvarCDD().isValid()) {
+                if (state1.getInvarCDD().isNotFalse() && state2.getInvarCDD().isNotFalse()) {
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
                         return true;
                     }
                 }
+
             }
         }
         return false;

@@ -1,6 +1,5 @@
 package logic;
 
-import lib.DBMLib;
 import models.*;
 
 import java.util.*;
@@ -280,7 +279,7 @@ public class Pruning {
         // apply updates as guard
        incCDD = CDD.applyReset(incCDD,e.getUpdates());
 
-        if (!incCDD.isValid()) {
+        if (!incCDD.isNotFalse()) {
             // Checking for satisfiability after clocks were reset (only a problem because target invariant might now be x>4)
             // if unsatisfiable => keep edge // todo: is return the right thing here?
             if (printComments)
@@ -296,7 +295,7 @@ public class Pruning {
 
 
         // if the inconsistent part cannot be reached, we can ignore the edge e, and go on
-        if (!incCDD.isValid()) {
+        if (!incCDD.isNotFalse()) {
             if (printComments)
                 System.out.println("could not reach inconsistent part, fed is empty");
         } else {
@@ -350,7 +349,7 @@ public class Pruning {
         if (printComments)
             System.out.println("Invariants done");
 
-        if (incCDD.isValid()) {
+        if (incCDD.isNotFalse()) {
             if (printComments)
                 System.out.println("Inconsistent part is reachable with this transition. ");
         } else {
@@ -389,7 +388,7 @@ public class Pruning {
         testForSatEdgeCDD = testForSatEdgeCDD.minus(e.getSource().getInconsistentPart());
 
 
-        if (!testForSatEdgeCDD.isValid()) {
+        if (!testForSatEdgeCDD.isNotFalse()) {
             edges.remove(e);
         }
         if (printComments)
@@ -402,7 +401,7 @@ public class Pruning {
         // If that federation is unsatisfiable, we can just ignore the transition to inc, and be done,
         // so we check for that, zone by zone. Only one zone needs to be sat.
 
-        if (!incCDD.isValid())
+        if (!incCDD.isNotFalse())
         {
             if (printComments)
                 System.out.println("Did not add a new inconsistent part");
@@ -464,7 +463,7 @@ public class Pruning {
 
             }
 
-            if (goodCDD.isValid())
+            if (goodCDD.isNotFalse())
                 goodCDD= CDD.applyReset(goodCDD,otherEdge.getUpdates());
 
             CDD sourceInvFed = otherEdge.getSource().getInvariantCDD();

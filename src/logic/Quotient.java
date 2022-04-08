@@ -232,7 +232,7 @@ public class Quotient extends TransitionSystem {
                             }
                             CDD negated = collectedGuardsComp.negation();
                             // if guards have been collected, or the component didn't have c-transitions, for each spec trans create a transition
-                            if (negated.isValid() || comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty())
+                            if (negated.isNotFalse() || comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty())
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
 
                                     //combined.addAll(e_spec.getGuards()); //TODO: THIS IS IMPORTANT! Is this supposed to be in?????
