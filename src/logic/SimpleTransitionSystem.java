@@ -122,16 +122,19 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 State state1 = new State(trans.get(i).getSource());
                 State state2 = new State(trans.get(j).getSource());
 
-
-                CDD falsecdd = CDD.cddFalse();
-
                 state1.applyGuards(trans.get(i).getGuardCDD());
                 state2.applyGuards(trans.get(j).getGuardCDD());
 
+                trans.get(i).getGuardCDD().printDot();
+
+
+
                 System.out.println(trans.get(i).getEdges().get(0).getGuards());
                 System.out.println(trans.get(j).getEdges().get(0).getGuards());
-                CDD reduced1 = state1.getInvarCDD().reduce();
+                CDD reduced1 = state1.getInvarCDD().removeNegative().reduce();
                 CDD reduced2 = state2.getInvarCDD().reduce();
+
+                reduced1.printDot();
 
                 if (state1.getInvarCDD().isNotFalse() && state2.getInvarCDD().isNotFalse()) {
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
@@ -461,36 +464,40 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 i=0;
                 for (Guard g: disjunction)
                 {
-                    //System.out.println(g);
-                    String interm = "";
-                    String lower ="";
-                    String upper="";
-                    if (g.isStrict()) {
-                        lower = g.getClock().getName() + ">" + g.getLowerBound();
-                        upper = g.getClock().getName() + "<" + g.getUpperBound();
-                    }
-                    else
+                    if (g.getIsFalse())
                     {
-                        lower = g.getClock().getName() + ">=" + g.getLowerBound();
-                        upper = g.getClock().getName() + "<=" + g.getUpperBound();
+                        guardString = "false";
                     }
+                    else {
+                        //System.out.println(g);
+                        String interm = "";
+                        String lower = "";
+                        String upper = "";
+                        if (g.isStrict()) {
+                            lower = g.getClock().getName() + ">" + g.getLowerBound();
+                            upper = g.getClock().getName() + "<" + g.getUpperBound();
+                        } else {
+                            lower = g.getClock().getName() + ">=" + g.getLowerBound();
+                            upper = g.getClock().getName() + "<=" + g.getUpperBound();
+                        }
 
-                    if (g.getLowerBound()!=0)
-                        if (interm.isEmpty())
-                            interm += lower;
-                        else
-                            interm += " && " +lower;
-                    if (g.getUpperBound()!= 2147483647)
-                        if (interm.isEmpty())
-                            interm += upper;
-                        else
-                            interm += " && " +upper;
+                        if (g.getLowerBound() != 0)
+                            if (interm.isEmpty())
+                                interm += lower;
+                            else
+                                interm += " && " + lower;
+                        if (g.getUpperBound() != 2147483647)
+                            if (interm.isEmpty())
+                                interm += upper;
+                            else
+                                interm += " && " + upper;
 
-                    if (i==0)
-                        guardString+= interm;
-                    else
-                        guardString += " && " + interm;
-                    if (!guardString.isEmpty()) i++;
+                        if (i == 0)
+                            guardString += interm;
+                        else
+                            guardString += " && " + interm;
+                        if (!guardString.isEmpty()) i++;
+                    }
                 }
                 j++;
             }

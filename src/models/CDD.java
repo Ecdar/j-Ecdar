@@ -39,11 +39,16 @@ public class CDD {
     public CDD(List<List<Guard>> guards){
         CDD res = cddFalse();
 
-        for (List<Guard> guardList: guards)
+        outerloop: for (List<Guard> guardList: guards)
         {
             Zone z = new Zone(numClocks,true);
             z.init();
             for (Guard guard: guardList) {
+                if (guard.getIsFalse())
+                {
+                    res = cddFalse();
+                    break outerloop;
+                }
                 z.buildConstraintsForGuard(guard,getIndexOfClock(guard.getClock()));
             }
             res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks));
@@ -63,7 +68,8 @@ public class CDD {
         CDD falseC = cddFalse();
         if (copy.equiv(cddFalse())) // special case for guards
         {
-            List<Guard> falseGuard = Guard.getFalseGuard(clocks.get(0));
+            List<Guard> falseGuard = new ArrayList<>();
+            falseGuard.add(new Guard(true));
             guards.add(falseGuard);
             return guards;
         }
@@ -120,11 +126,11 @@ public class CDD {
     }
 
     public boolean isFalse() {
-        return CDDLib.isFalse(this.reduce().pointer);
+        return CDDLib.cddEquiv(this.pointer,cddFalse().pointer);
     }
 
     public boolean isTrue() {
-        return CDDLib.isTrue(this.reduce().pointer);
+        return CDDLib.cddEquiv(this.pointer,cddTrue().pointer);
     }
 
 
@@ -534,9 +540,7 @@ public class CDD {
         if (clocks.size() > 0) {
             for (Edge edge : copy.getEdges()) {
                 CDD targetCDD = edge.getTarget().getInvariantCDD();
-                targetCDD.printDot();
                 CDD past = targetCDD.transitionBack(edge);
-                past.printDot();
                 edge.setGuards(CDD.toGuards(past));
             }
         } // TODO: else part will be important once we have bool support

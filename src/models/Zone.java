@@ -51,6 +51,7 @@ public class Zone {
     }
 
     public void buildConstraintsForGuard(Guard g, int index) {
+        assert(!g.getIsFalse());
         boolean isStrict = g.isStrict();
 
         int lowerBoundI = g.getLowerBound();
