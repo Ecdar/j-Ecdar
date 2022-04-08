@@ -569,8 +569,8 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_getBddPartFromExtractionResult
 JNIEXPORT jintArray JNICALL Java_lib_CDDLib_getDbmFromExtractionResult
   (JNIEnv *env, jclass, jlong extraction_result_pointer){
     extraction_result* result_object = (extraction_result*)extraction_result_pointer;
-
-    return helper_functions::cToJint(env, result_object->dbm, cdd_clocknum);
+    int dbm_size = cdd_clocknum * cdd_clocknum;
+    return helper_functions::cToJint(env, result_object->dbm, dbm_size);
 }
 
 
