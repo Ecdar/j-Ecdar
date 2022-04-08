@@ -135,7 +135,7 @@ public class Zone {
 
     public List<Guard> buildGuardsFromZone(List<Clock> clocks) {
         List<Guard> guards = new ArrayList<>();
-
+        printDBM(true,true);
         for (int i = 1; i < size; i++) {
             Clock clock = clocks.get(i - 1);
 

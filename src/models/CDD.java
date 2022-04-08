@@ -53,7 +53,7 @@ public class CDD {
         {
 
             CDD unres = getUnrestrainedCDD();
-
+            System.out.println("unrestrained");
             this.pointer = unres.pointer;
         }
     }
@@ -69,8 +69,8 @@ public class CDD {
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks);
-            z.printDBM(false,true);
-            //System.out.println(guardList);
+            //z.printDBM(false,true);
+            System.out.println(guardList);
 
             //guardList.add(bddPart.toGuards()); // TODO: once we have boolean
             guards.add(guardList);
