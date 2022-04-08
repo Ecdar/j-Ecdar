@@ -61,7 +61,7 @@ public class CDD {
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
         CDD falseC = cddFalse();
-        if (copy.reduce().isFalse()) // special case for guards
+        if (copy.equiv(cddFalse())) // special case for guards
         {
             List<Guard> falseGuard = Guard.getFalseGuard(clocks.get(0));
             guards.add(falseGuard);
@@ -129,7 +129,7 @@ public class CDD {
 
 
     public boolean equiv(CDD that){
-        return CDDLib.cddEquiv(pointer,that.pointer);
+        return CDDLib.cddEquiv(this.pointer,that.pointer);
     }
 
     public static void done(){
