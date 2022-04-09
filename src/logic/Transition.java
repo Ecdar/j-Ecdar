@@ -14,7 +14,7 @@ public  class Transition {
         this.source = source;
         this.target = target;
         this.move = move;
-        this.guardCDD = move.getGuardCDD();
+        this.guardCDD = new CDD(move.getGuardCDD().getPointer());
     }
 
     public Transition(State source, State target, Move move, CDD guardCDD) {

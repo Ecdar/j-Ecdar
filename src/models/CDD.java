@@ -49,6 +49,7 @@ public class CDD {
                     res = cddFalse();
                     break outerloop;
                 }
+                System.out.println("guard,getIndexOfClock(guard.getClock())" + guard + getIndexOfClock(guard.getClock()));
                 z.buildConstraintsForGuard(guard,getIndexOfClock(guard.getClock()));
             }
             res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks));
@@ -65,7 +66,7 @@ public class CDD {
     public static List<List<Guard>> toGuards(CDD state){
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
-        CDD falseC = cddFalse();
+        int counter = 0;
         if (copy.equiv(cddFalse())) // special case for guards
         {
             List<Guard> falseGuard = new ArrayList<>();
@@ -75,7 +76,10 @@ public class CDD {
         }
         while (!copy.isTerminal())
         {
-
+            counter ++;
+            if (counter == 5)
+                return null;
+            copy=copy.reduce().removeNegative();
             CddExtractionResult res = copy.extractBddAndDbm();
             copy = res.getCddPart();
             Zone z = new Zone(res.getDbm());
@@ -173,7 +177,7 @@ public class CDD {
     public static CDD allocateInterval(int i, int j, int lower, int upper){
         checkIfRunning();
         // TODO: Dont think this works.
-        assert(false);
+        //assert(false);
         return new CDD(CDDLib.interval(i,j,lower,upper));
     }
 
@@ -350,7 +354,13 @@ public class CDD {
         int[] clockValues = new int[updates.length];
         int[] boolResets = {};
         int[] boolValues= {};
-
+        int i=0;
+        for (Update u : updates)
+        {
+            clockResets[i]=getIndexOfClock(u.getClock());
+            clockValues[i]=u.getValue();
+            i++;
+        }
         return state.applyReset(clockResets,clockValues,boolResets,boolValues);
     }
 
@@ -361,6 +371,13 @@ public class CDD {
         int[] clockValues = new int[list.size()];
         int[] boolResets = {};
         int[] boolValues= {};
+        int i=0;
+        for (Update u : list)
+        {
+            clockResets[i]=getIndexOfClock(u.getClock());
+            clockValues[i]=u.getValue();
+            i++;
+        }
 
         return state.applyReset(clockResets,clockValues,boolResets,boolValues);
     }
@@ -400,20 +417,30 @@ public class CDD {
 
     public static  boolean canDelayIndefinitely(CDD state) {
         CDD copy = new CDD(state.getPointer());
+        if (copy.isTrue())
+            return true;
+        if (copy.isFalse())
+            return false;
         while (!copy.isTerminal())
         {
-
             CddExtractionResult res = copy.extractBddAndDbm();
+            copy = res.getCddPart();
             Zone z = new Zone(res.getDbm());
             if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
                 return true;
         }
-        assert false;
         return false;
     }
 
     public static  boolean isUrgent(CDD state) {
+        System.out.println("not sure urgent works yet, aborting!");
+        assert false;
+
         CDD copy = new CDD(state.getPointer());
+        if (copy.isTrue())
+            return false;
+        if (copy.isFalse())
+            return false;
         while (!copy.isTerminal())
         {
             CddExtractionResult res = copy.extractBddAndDbm();
@@ -421,7 +448,6 @@ public class CDD {
             if (z.isUrgent())
                 return true; // TODO: is it enough if one is urgent?
         }
-        assert false;
         return false;
     }
 

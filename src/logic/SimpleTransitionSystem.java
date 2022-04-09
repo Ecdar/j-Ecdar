@@ -94,6 +94,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<Transition> tempTrans = getNextTransitions(currState, action);
 
                 if (checkMovesOverlap(tempTrans)) {
+                    System.out.println("found the culprit");
                     return false;
                 }
 
@@ -104,8 +105,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 waiting.addAll(toAdd);
             }
         }
-
-        // System.out.println("reached isdetermHelp4");
         return true;
     }
 
@@ -122,22 +121,20 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 State state1 = new State(trans.get(i).getSource());
                 State state2 = new State(trans.get(j).getSource());
 
+                System.out.println(trans.get(i).getEdges());
+                System.out.println(trans.get(j).getEdges());
                 state1.applyGuards(trans.get(i).getGuardCDD());
                 state2.applyGuards(trans.get(j).getGuardCDD());
 
-                trans.get(i).getGuardCDD().printDot();
 
-
-
-                System.out.println(trans.get(i).getEdges().get(0).getGuards());
-                System.out.println(trans.get(j).getEdges().get(0).getGuards());
-                CDD reduced1 = state1.getInvarCDD().removeNegative().reduce();
-                CDD reduced2 = state2.getInvarCDD().reduce();
-
-                reduced1.printDot();
 
                 if (state1.getInvarCDD().isNotFalse() && state2.getInvarCDD().isNotFalse()) {
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
+                        //trans.get(i).getGuardCDD().printDot();
+                       // trans.get(j).getGuardCDD().printDot();
+                        trans.get(i).getEdges().get(0).getGuardCDD().printDot();
+                        trans.get(j).getEdges().get(0).getGuardCDD().printDot();
+                        System.out.println("they intersect??!");
                         return true;
                     }
                 }
@@ -148,11 +145,12 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     public boolean isConsistentHelper(boolean canPrune) {
-        if (!isDeterministic()) // TODO: this was commented out, I added it again
-            return false;
-
+        //if (!isDeterministic()) // TODO: this was commented out, I added it again
+        //    return false;
+        System.out.println("is determinsic check passed");
         passed = new ArrayList<>();
         boolean result = checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
+        System.out.println("made it out of consistency check");
 
         return result;
     }
@@ -171,7 +169,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         toStore.extrapolateMaxBounds(maxBounds);
         passed.add(toStore);
-
+        System.out.println("somewhere mid consistentcy check");
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
             List<Transition> tempTrans = getNextTransitions(currState, channel);
@@ -182,13 +180,17 @@ public class SimpleTransitionSystem extends TransitionSystem{
             }
         }
 
+        System.out.println("somewhere after mid  consistentcy check");
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (canPrune && CDD.canDelayIndefinitely(currState.getInvarCDD()))
+        if (canPrune && CDD.canDelayIndefinitely(currState.getInvarCDD())) {
+            System.out.println("somewhere further");
             return true;
+        }
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
         else {
+            System.out.println("somewhere even further");
             for (Channel channel : outputs) {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
 
@@ -197,19 +199,27 @@ public class SimpleTransitionSystem extends TransitionSystem{
                     boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                     if (outputConsistent && canPrune)
                         return true;
-                    if(!outputConsistent && !canPrune)
+                    if(!outputConsistent && !canPrune) {
+                        System.out.println("wow");
                         return false;
+                    }
                 }
             }
             if(!canPrune) {
                 if (outputExisted)
                     return true;
+                System.out.println("finale");
                 return CDD.canDelayIndefinitely(currState.getInvarCDD());
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
             // or there are no output edges from the current location -> Independent progress does not hold
-            else return false;
+
+            else
+            {
+                System.out.println("fin finale");
+                return false;
+            }
         }
     }
 

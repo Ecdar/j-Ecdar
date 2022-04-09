@@ -156,14 +156,21 @@ public class Edge {
         if (this == o) return true;
         if (!(o instanceof Edge)) return false;
         Edge that = (Edge) o;
-
+        /*System.out.println(toString());
+        System.out.println(that.toString());
+        System.out.println(isInput == that.isInput);
+        System.out.println(source.equals(that.source));
+        System.out.println(target.equals(that.target));
+        System.out.println(chan.equals(that.chan));
+        System.out.println(Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()));
+        System.out.println(Arrays.equals(updates, that.updates));*/
         return isInput == that.isInput &&
                 source.equals(that.source) &&
                 target.equals(that.target) &&
                 chan.equals(that.chan) &&
                 // TODO: did the stream thing work?
-                that.getGuardCDD().equiv(getGuardCDD()) &&
-                //Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()) &&
+                //that.getGuardCDD().equiv(getGuardCDD()) &&
+                Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()) &&
                 Arrays.equals(updates, that.updates);
     }
 

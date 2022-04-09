@@ -165,6 +165,12 @@ public class Automaton {
         if (!(o instanceof Automaton)) return false;
         Automaton automaton = (Automaton) o;
 
+        //System.out.println( name.equals(automaton.name));
+        //System.out.println( Arrays.equals(locations.toArray(), automaton.locations.toArray()));
+        //System.out.println( Arrays.equals(edges.toArray(), automaton.edges.toArray()));
+        //System.out.println( Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) );
+        //System.out.println( Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()));
+        //System.out.println(  Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) );
 
         return name.equals(automaton.name) &&
                 Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&

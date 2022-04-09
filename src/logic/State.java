@@ -28,13 +28,6 @@ public class State {
         return invarCDD;
     }
 
-    private int getIndexOfClock(Clock clock, List<Clock> clocks) {
-        for (int i = 0; i < clocks.size(); i++){
-            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
-        }
-        return 0;
-    }
-
     public List<List<Guard>> getInvariants() {
         return CDD.toGuards(location.getInvariantCDD());
     }
@@ -76,5 +69,9 @@ public class State {
     @Override
     public String toString() {
         return "{" + location + ", " + invarCDD + '}';
+    }
+
+    public void delay() {
+        invarCDD = invarCDD.delay();
     }
 }

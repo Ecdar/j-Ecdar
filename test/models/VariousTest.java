@@ -81,7 +81,6 @@ public class VariousTest {
         clocks.addAll(aut2[0].getClocks());
         clocks.addAll(aut2[1].getClocks());
         clocks.addAll(aut2[3].getClocks());
-        clocks.addAll(aut2[4].getClocks());
         CDD.addClocks(clocks);
 
 

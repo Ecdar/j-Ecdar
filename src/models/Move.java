@@ -20,9 +20,8 @@ public class Move {
 
         for (Edge e : edges)
         {
-            guardCDD = guardCDD.conjunction(e.getGuardCDD());
+           guardCDD = guardCDD.conjunction(e.getGuardCDD());
         }
-
         this.updates = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
     }
 

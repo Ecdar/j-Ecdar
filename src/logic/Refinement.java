@@ -93,11 +93,13 @@ public class Refinement {
             precondMet = false;
             errMsg.append("Not all outputs of the right side are present on the left side.\n OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
         }
+        System.out.println("mid of preconditions");
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts1.getLastErr());
         }
 
+        System.out.println("after first least consistent");
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts2.getLastErr());
@@ -115,7 +117,7 @@ public class Refinement {
             currNode = refGraph;
             treeSize++;
         }
-        //System.out.println("reached 1");
+        System.out.println("reached 1");
         while (!waiting.isEmpty()) {
 
             StatePair curr = waiting.pop();
@@ -167,18 +169,19 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
-        // TODO: Does this make copies of the invariant Federations? should it?
+
         target1.applyGuards(t2.getGuardCDD());
 
-        if (!target1.getInvarCDD().isNotFalse()) {
+        if (target1.getInvarCDD().isFalse()) {
             return null;
         }
         target1.applyResets(t1.getUpdates());
         target1.applyResets(t2.getUpdates());
 
-        target1.getInvarCDD().delay();
+        target1.delay();// = target1.getInvarCDD().delay();
 
-        target1.applyInvariants(target1.getInvarCDD());
+        target1.applyInvariants(t1.getTarget().getInvarCDD());
+        target1.getInvarCDD().printDot();
         //System.out.println(target1.getInvariants());
         CDD invariantTest = new CDD(target1.getInvarCDD().getPointer());
         target1.applyInvariants(t2.getTarget().getInvarCDD());
@@ -186,10 +189,15 @@ public class Refinement {
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
-        CDD cdd = invariantTest.minus(target1.getInvarCDD());
-        if (cdd.isNotFalse()){
 
-            System.out.println("invarfed after substraction not empty");
+
+        CDD cdd = invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce();
+        if (cdd.isNotFalse()){
+            invariantTest.printDot();
+            target1.getInvarCDD().printDot();
+            invariantTest.minus(target1.getInvarCDD()).printDot();
+            invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
+            System.out.println("invarfed after substraction not empty!");
             return null;
          }
 
@@ -221,6 +229,11 @@ public class Refinement {
             rightCDD = rightCDD.disjunction(c);
 
 
+
+        leftCDD.printDot();
+        rightCDD.printDot();
+        leftCDD.minus(rightCDD).printDot();
+        leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
             System.out.println("trans2 does not satisfy all solution of trans2");
