@@ -1,4 +1,4 @@
-package logic;
+package parser;
 import models.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -6,15 +6,13 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class JsonFileWriter {
 
     public static void writeToJson(Automaton aut, String path)
     {
-        assert(false);
-/*        JSONArray locations= new JSONArray();
+        JSONArray locations= new JSONArray();
         JSONArray edges = new JSONArray();
         for (Location l :aut.getLocations())
         {
@@ -32,42 +30,35 @@ public class JsonFileWriter {
                 if (j!=0)
                     guardString=guardString +" or ";
                 i=0;
-                for (Guard g: disjunction)
-                {
-                    //System.out.println(g);
-                    String interm = "";
-                    String lower ="";
-                    String upper="";
-                    if (g.isStrict()) {
-                        lower = g.getClock().getName() + ">" + g.getLowerBound();
-                        upper = g.getClock().getName() + "<" + g.getUpperBound();
+                for (Guard g1: disjunction) {
+                    if (g1 instanceof ClockGuard) {
+                        ClockGuard g = (ClockGuard) g1;
+                        //System.out.println(g);
+                        String interm = g.toString();
+
+                        if (i == 0)
+                            guardString += interm;
+                        else
+                            guardString += " && " + interm;
+                        if (!guardString.isEmpty()) i++;
                     }
                     else
                     {
-                        lower = g.getClock().getName() + ">=" + g.getLowerBound();
-                        upper = g.getClock().getName() + "<=" + g.getUpperBound();
+                        if (g1 instanceof BoolGuard) {
+                            BoolGuard g = (BoolGuard) g1;
+                            //System.out.println(g);
+                            String interm = g.toString();
+                            if (i == 0)
+                                guardString += interm;
+                            else
+                                guardString += " && " + interm;
+                            if (!guardString.isEmpty()) i++;
+                        }
                     }
-
-                    if (g.getLowerBound()!=0)
-                        if (interm.isEmpty())
-                            interm += lower;
-                        else
-                            interm += " && " +lower;
-                    if (g.getUpperBound()!= 2147483647)
-                        if (interm.isEmpty())
-                            interm += upper;
-                        else
-                            interm += " && " +upper;
-
-                    if (i==0)
-                        guardString+= interm;
-                    else
-                        guardString += " && " + interm;
-                    if (!guardString.isEmpty()) i++;
                 }
                 j++;
             }
-            locationJson.put("invariant", guardString);
+            locationJson.put("invariant", guardString.replaceAll("≤","<=").replaceAll("≥",">="));
 
 
 
@@ -105,56 +96,66 @@ public class JsonFileWriter {
                 if (j!=0)
                     guardString=guardString +" or ";
                 i=0;
-                for (Guard g: disjunction)
-                {
-                    //System.out.println(g);
-                    String interm = "";
-                    String lower ="";
-                    String upper="";
-                    if (g.isStrict()) {
-                        lower = g.getClock().getName() + ">" + g.getLowerBound();
-                        upper = g.getClock().getName() + "<" + g.getUpperBound();
+                for (Guard g1: disjunction) {
+                    if (g1 instanceof ClockGuard) {
+
+                        ClockGuard g = (ClockGuard) g1;
+                        //System.out.println(g);
+                        String interm = g.toString();
+
+                        if (i == 0)
+                            guardString += interm;
+                        else
+                            guardString += " && " + interm;
+                        if (!guardString.isEmpty()) i++;
                     }
                     else
                     {
-                        lower = g.getClock().getName() + ">=" + g.getLowerBound();
-                        upper = g.getClock().getName() + "<=" + g.getUpperBound();
+                        BoolGuard g = (BoolGuard) g1;
+                        String interm = g.getVar().getName()+g.getComperator()+g.getValue();
+                        if (i == 0)
+                            guardString += interm;
+                        else
+                            guardString += " && " + interm;
+                        if (!guardString.isEmpty()) i++;
                     }
-
-                    if (g.getLowerBound()!=0)
-                        if (interm.isEmpty())
-                            interm += lower;
-                        else
-                            interm += " && " +lower;
-                    if (g.getUpperBound()!= 2147483647)
-                        if (interm.isEmpty())
-                            interm += upper;
-                        else
-                            interm += " && " +upper;
-
-                    if (i==0)
-                        guardString+= interm;
-                    else
-                        guardString += " && " + interm;
-                    if (!guardString.isEmpty()) i++;
                 }
+
                 j++;
             }
-            edgeJson.put("guard", guardString);
+
+
+            edgeJson.put("guard", guardString.replaceAll("≤","<=").replaceAll("≥",">="));
 
             String updateString = "";
             i= 0;
-            for (Update u: e.getUpdates())
+            for (Update u1: e.getUpdates())
             {
-
-                if (i==0) {
-                    updateString += u.getClock().getName();
-                    updateString += " = " + u.getValue();
+                if (u1 instanceof ClockUpdate) {
+                    ClockUpdate u = (ClockUpdate) u1;
+                    if (i == 0) {
+                        updateString += u.getClock().getName();
+                        updateString += " = " + u.getValue();
+                    } else
+                        updateString += ", " + u.getClock().getName() + " = " + u.getValue();
+                    i++;
                 }
                 else
-                    updateString += ", " + u.getClock().getName() + " = " + u.getValue();
-                i++;
+                {
+                    if (u1 instanceof BoolUpdate)
+                    {
+                        BoolUpdate u = (BoolUpdate) u1;
+                        if (i == 0) {
+                            updateString += u.getBV().getName();
+                            updateString += " = " + u.getValue();
+                        } else
+                            updateString += ", " + u.getBV().getName() + " = " + u.getValue();
+                        i++;
+                    }
+                }
+
             }
+
 
             edgeJson.put("update",updateString);
             edgeJson.put("sync", e.getChannel().getName());
@@ -225,8 +226,8 @@ public class JsonFileWriter {
         }
 
 
-*/
     }
+
 
 
 }

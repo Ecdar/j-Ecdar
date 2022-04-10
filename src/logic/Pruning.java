@@ -119,7 +119,7 @@ public class Pruning {
             locations.add(new Location("inc", new ArrayList<List<Guard>>(), true, false, false, true));
             edges = new ArrayList<>();
         }
-        Automaton resAut = new Automaton(st.getName(), locations, edges, clocks, false);
+        Automaton resAut = new Automaton(st.getName(), locations, edges, clocks, st.BVs, false);
         return new SimpleTransitionSystem(resAut);
 
     }

@@ -79,13 +79,13 @@ public class DisjunctionTest {
     @Test
     public void testGuardNegation() {
         Clock x = new Clock("x");
-        Guard g1 = new Guard(x, 4,true,true);  //x>4
-        Guard g2 = new Guard(x, 5,false,true); //x<5
-        Guard g3 = new Guard(x, 7,false,true); //x<7
-        Guard g4 = new Guard(x, 3,true,true); //x>3
-        Guard g5 = new Guard(x, 6,true,true); //x>6
-        Guard g6 = new Guard(x, 8,true,true); //x>8
-        Guard g7 = new Guard(x, 9,true,true); //x>9
+        Guard g1 = new ClockGuard(x, null, 4, Relation.GREATER_THAN );  //x>4
+        Guard g2 = new ClockGuard(x, null, 5, Relation.LESS_THAN); //x<5
+        Guard g3 = new ClockGuard(x, null, 7,Relation.LESS_THAN); //x<7
+        Guard g4 = new ClockGuard(x, null, 3,Relation.GREATER_THAN); //x>3
+        Guard g5 = new ClockGuard(x, null, 6,Relation.GREATER_THAN); //x>6
+        Guard g6 = new ClockGuard(x, null, 8,Relation.GREATER_THAN); //x>8
+        Guard g7 = new ClockGuard(x, null, 9,Relation.GREATER_EQUAL); //x>9
 
         List<Guard> disj1 = new ArrayList<>();
         disj1.add(g1);

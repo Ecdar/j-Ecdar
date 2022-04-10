@@ -188,10 +188,10 @@ public class Composition extends TransitionSystem {
                     assert(locMap.get(sourceName)!=null);
                     assert(locMap.get(targetName)!=null);
 
-                    Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList.toArray(new Update[updateList.size()]));
+                    Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList);
                     boolean edgeAlreadyExists=false;
                     for (Edge otherE : edgesSet) {
-                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(e.getUpdates(),otherE.getUpdates()))
+                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(Arrays.stream(e.getUpdates().toArray()).toArray(), Arrays.stream(otherE.getUpdates().toArray()).toArray()))
                         {
 
                             if (e.getGuardCDD().equiv(otherE.getGuardCDD()));
@@ -213,7 +213,7 @@ public class Composition extends TransitionSystem {
         }
 
 
-        Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, false);
+        Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, BVs, false);
         return resAut;
 
     }

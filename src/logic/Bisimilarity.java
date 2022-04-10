@@ -107,16 +107,16 @@ public class Bisimilarity {
 
                     if (thereWasAnEdge) {
                         List<Edge> allEdges =edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc)).collect(Collectors.toList());
-                        Update[] updates = allEdges.get(0).getUpdates();
+                        List<Update> updates = allEdges.get(0).getUpdates();
                         for (Edge e : allEdges)
-                            assert(Arrays.equals(e.getUpdates(),(updates)));
+                            assert(Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
                         finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuards(allCDDs), allEdges.get(0).getUpdates()));
                     }
 
                 }
             }
         }
-        return new Automaton(aut.getName()+"Bisimilar",locs,finalEdges,clocks);
+        return new Automaton(aut.getName()+"Bisimilar",locs,finalEdges,clocks, aut.getBVs());
 
     }
 
@@ -174,9 +174,9 @@ public class Bisimilarity {
                     else
                         e2CDD = s2.conjunction(e2.getGuardCDD()).disjunction(e2CDD);
                 }
-                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(e1.getUpdates(),e2.getUpdates()))
+                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
                 {
-                    System.out.println("updates not eqal 1 " + l1.getName() + " " + l2.getName());
+                    System.out.println("updates not equal 1 " + l1.getName() + " " + l2.getName());
                     return true;
                 }
 

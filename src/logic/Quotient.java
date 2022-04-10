@@ -141,7 +141,7 @@ public class Quotient extends TransitionSystem {
                             CDD invarNegated = l_spec.getInvariantCDD().negation();
                                 // merge the current part with the invariant of the component, to create each new transition
 
-                                edges.add(new Edge(loc, inc, newChan, true, CDD.toGuards(l_comp.getInvariantCDD().conjunction(invarNegated)), new Update[]{new Update(newClock, 0)}));
+                                edges.add(new Edge(loc, inc, newChan, true, CDD.toGuards(l_comp.getInvariantCDD().conjunction(invarNegated)), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
                        }
 
                     // Rule 1
@@ -153,7 +153,7 @@ public class Quotient extends TransitionSystem {
                         for (Channel c : allChans) {
                                 boolean isInput = false;
                                 if (inputs.contains(c)) isInput = true;
-                                edges.add(new Edge(loc, univ, c, isInput, CDD.toGuards(l_comp_invar_negated), new Update[]{}));
+                                edges.add(new Edge(loc, univ, c, isInput, CDD.toGuards(l_comp_invar_negated), new ArrayList<>()));
 
                         }
                     }
@@ -177,10 +177,10 @@ public class Quotient extends TransitionSystem {
 
                                     //combine both updates
                                     List<Update> updatesList = new ArrayList<Update>();
-                                    updatesList.addAll(Arrays.asList(e_spec.getUpdates()));
-                                    updatesList.addAll(Arrays.asList(e_comp.getUpdates()));
-                                    Update[] updates = updatesList.toArray(new Update[0]); // TODO: Check whether this is really the way to initialize an array from a list
-                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), CDD.toGuards(guard), updates));
+                                    updatesList.addAll(e_spec.getUpdates());
+                                    updatesList.addAll(e_comp.getUpdates());
+                                    //Update[] updates = updatesList.toArray(new Update[0]); // TODO: Check whether this is really the way to initialize an array from a list
+                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), CDD.toGuards(guard), updatesList));
                                 }
                         }
 
@@ -203,7 +203,7 @@ public class Quotient extends TransitionSystem {
                             if (!collectedNegationsSpec.isEmpty() || spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty())
                                 // for each c-transtion in comp, create a new transition with the negated guard
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                    edges.add(new Edge(loc, inc, c, true,CDD.toGuards(e_comp.getGuardCDD().conjunction(negated)), new Update[]{new Update(newClock, 0)}));
+                                    edges.add(new Edge(loc, inc, c, true,CDD.toGuards(e_comp.getGuardCDD().conjunction(negated)), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
                                 }
                         }
                     }
@@ -236,7 +236,7 @@ public class Quotient extends TransitionSystem {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
 
                                     //combined.addAll(e_spec.getGuards()); //TODO: THIS IS IMPORTANT! Is this supposed to be in?????
-                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), CDD.toGuards(negated), new Update[]{}));
+                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), CDD.toGuards(negated), new ArrayList<>()));
                                 }
                         }
                     }
@@ -244,24 +244,24 @@ public class Quotient extends TransitionSystem {
 
                    // for each input, create a selfloop in inc.
                    for (Channel c : getInputs()) {
-                        Guard g = new Guard(newClock, 0, true, false);
-                        Guard g1 = new Guard(newClock, 0, false, false);
+                        Guard g = new ClockGuard(newClock, null, 0, Relation.LESS_EQUAL);
+                        //Guard g1 = new ClockGuard(newClock, null, false, false);
                         List<Guard> guards = new ArrayList<Guard>();
                         guards.add(g);
-                        guards.add(g1);
+                       // guards.add(g1);
                         List<List<Guard>> res = new ArrayList<>();
                         res.add(guards);
-                        edges.add(new Edge(inc, inc, c, true, res, new Update[]{}));
+                        edges.add(new Edge(inc, inc, c, true, res, new ArrayList<>()));
                     }
 
                     // for each input or output,  create a selfloop in univ.
                     for (Channel c : getInputs()) {
                         List<List<Guard>> guards = new ArrayList<>();
-                        edges.add(new Edge(univ, univ, c, true, guards, new Update[]{}));
+                        edges.add(new Edge(univ, univ, c, true, guards, new ArrayList<>()));
                     }
                     for (Channel c : getOutputs()) {
                         List<List<Guard>> guards = new ArrayList<>();
-                        edges.add(new Edge(univ, univ, c, false, guards, new Update[]{}));
+                        edges.add(new Edge(univ, univ, c, false, guards, new ArrayList<>()));
                     }
                 }
             }
@@ -313,7 +313,7 @@ public class Quotient extends TransitionSystem {
             edges.add(e);
 
 
-        Automaton aut = new Automaton(name,  locations,  edges, clocks,false);
+        Automaton aut = new Automaton(name,  locations,  edges, clocks, BVs, false);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);
         return simp;
@@ -364,7 +364,7 @@ public class Quotient extends TransitionSystem {
             CDD negatedInvar = loc1.getInvariantCDD().negation();
             CDD combined = negatedInvar.conjunction(loc2.getInvariantCDD());
             newMove.setGuards(combined);
-            newMove.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
+            newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
             resultMoves.add(newMove);
 
             // rule 1
@@ -373,7 +373,7 @@ public class Quotient extends TransitionSystem {
                 // negate invariant of ts2
                 //assert (loc2.getInvariants().size()<=1);
                 newMove1.setGuards(loc2.getInvariantCDD().negation());
-                newMove1.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
+                newMove1.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove1);
             }
 
@@ -406,7 +406,7 @@ public class Quotient extends TransitionSystem {
                 for (Move move : movesFrom2) {
                     Move newMove2 = new Move(location, new InconsistentLocation(), new ArrayList<>());
                     newMove2.setGuards(move.getGuardCDD().conjunction(negated));
-                    newMove2.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
+                    newMove2.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                     resultMoves.add(newMove2);
                 }
 
@@ -439,7 +439,7 @@ public class Quotient extends TransitionSystem {
         } else if (location instanceof InconsistentLocation) {
             if (getInputs().contains(channel)) {
                 Move newMove = new Move(location, new InconsistentLocation(), new ArrayList<>());
-                newMove.setUpdates(new ArrayList<>(Collections.singletonList(new Update(newClock, 0))));
+                newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove);
             }
         } else if (location instanceof UniversalLocation) {

@@ -49,13 +49,13 @@ public class VariousTest {
         Zone z2 = new Zone(clocks.size()+1,true);
         z2.init();
 
-        Guard g1 = new Guard(y, 5, true, false);
-        z1.buildConstraintsForGuard(g1,1);
+        ClockGuard g1 = new ClockGuard(y, 5,  Relation.GREATER_EQUAL);
+        z1.buildConstraintsForGuard(g1,clocks);
 
         z1.printDBM(true,true);
-        Guard g2 = new Guard(y, 6, true, false);
+        ClockGuard g2 = new ClockGuard(y, 6,  Relation.GREATER_EQUAL);
         System.out.println(g2);
-        z2.buildConstraintsForGuard(g2,1);
+        z2.buildConstraintsForGuard(g2,clocks);
         z2.printDBM(true,true);
 
         List<Zone> zoneList1 = new ArrayList<>();
@@ -72,17 +72,55 @@ public class VariousTest {
     }
 
     @Test
+    public void testDiagonalConstraints() {
+        Clock x = new Clock("x");
+        Clock y = new Clock("y");
+
+        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
+        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
+        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
+        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+
+        List<List<Guard>> guards1 = new ArrayList<>();
+        List<Guard> inner = new ArrayList<>();
+        inner.add(g1);
+        inner.add(g2);
+        inner.add(g3);
+        inner.add(g4);
+        guards1.add(inner);
+
+        List<Clock> clocks = new ArrayList<>();
+        clocks.add(x);
+        clocks.add(y);
+        CDD.init(100,100,100);
+        CDD.addClocks(clocks);
+
+        CDD origin1 = new CDD(guards1);
+
+
+        origin1 = origin1.delay();
+        List<List<Guard>> origin1Guards = CDD.toGuards(origin1);
+        for (List<Guard> list : origin1Guards) {
+            System.out.println("nextOr");
+            for (Guard guard: list)
+                System.out.println(guard);
+        }
+        assert(true);
+
+    }
+
+
+    @Test
     public void testCompOfCompRefinesSpec() throws CddAlreadyRunningException, CddNotRunningException {
 
         Automaton[] aut2 = XMLParser.parse("samples/xml/university-slice.xml", true);
 
-        CDD.init(100,100,100);
+        CDD.init(1000,1000,1000);
         List<Clock> clocks = new ArrayList<>();
         clocks.addAll(aut2[0].getClocks());
         clocks.addAll(aut2[1].getClocks());
         clocks.addAll(aut2[3].getClocks());
         CDD.addClocks(clocks);
-
 
         SimpleTransitionSystem adm = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[3]));
         SimpleTransitionSystem machine = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[0]));
@@ -94,6 +132,8 @@ public class VariousTest {
                         new Composition(new TransitionSystem[]{machine, researcher})}),
                 spec).check()
         );
+
+
 
 
     }

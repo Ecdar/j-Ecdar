@@ -24,16 +24,17 @@ public class Automaton {
     }
 
     private final List<Location> locations;
+    private final List<BoolVar> BVs;
     private final List<Edge> edges;
     private final List<Clock> clocks;
     private Set<Channel> inputAct, outputAct, actions;
     private Location initLoc;
 
-    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks) {
-        this(name, locations, edges, clocks, true);
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks,List<BoolVar> BVs) {
+        this(name, locations, edges, clocks, BVs,true);
     }
 
-    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, boolean makeInpEnabled) {
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInpEnabled) {
         this.name = name;
         this.locations = locations;
 
@@ -48,7 +49,7 @@ public class Automaton {
         this.edges = edges;
         setActions(edges);
         this.clocks = clocks;
-
+        this.BVs = BVs;
         /*if (makeInpEnabled) { // TODO: Figure out how to handle this now
             addTargetInvariantToEdges();
             makeInputEnabled();
@@ -63,7 +64,10 @@ public class Automaton {
         for (Clock c : copy.clocks) {
             this.clocks.add(new Clock(c));
         }
-
+        this.BVs = new ArrayList<>();
+        for (BoolVar c : copy.BVs) {
+            this.BVs.add(new BoolVar(c.getName(), c.getInitialValue()));   // TODO: Do I need copies? Do I want copies?
+        }
         this.locations = new ArrayList<>();
         for (Location loc : copy.locations) {
             this.locations.add(new Location(loc, clocks));
@@ -75,7 +79,7 @@ public class Automaton {
             int sourceIndex = this.locations.indexOf(e.getSource());
             int targetIndex = this.locations.indexOf(e.getTarget());
 
-            this.edges.add(new Edge(e, this.clocks, locations.get(sourceIndex), locations.get(targetIndex)));
+            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex)));
         }
 
         this.inputAct = copy.inputAct;
@@ -110,7 +114,7 @@ public class Automaton {
         if (loc.isUniversal()) {
             List<Edge> resultEdges = new ArrayList<>();
             for (Channel action : actions) {
-                resultEdges.add(new Edge(loc, loc, action, inputAct.contains(action), new ArrayList<>(), new Update[]{}));
+                resultEdges.add(new Edge(loc, loc, action, inputAct.contains(action), new ArrayList<>(), new ArrayList<>()));
             }
             return resultEdges;
         }
@@ -158,6 +162,9 @@ public class Automaton {
         return outputAct;
     }
 
+    public List<BoolVar> getBVs() {
+        return BVs;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -176,6 +183,7 @@ public class Automaton {
                 Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
                 Arrays.equals(edges.toArray(), automaton.edges.toArray()) &&
                 Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) &&
+                Arrays.equals(BVs.toArray(), automaton.BVs.toArray()) &&
                 Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
                 Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) &&
                 initLoc.equals(automaton.initLoc);
@@ -188,6 +196,7 @@ public class Automaton {
                 ", locations=" + Arrays.toString(locations.toArray()) +
                 ", edges=" + Arrays.toString(edges.toArray()) +
                 ", clocks=" + Arrays.toString(clocks.toArray()) +
+                ", BVs=" + Arrays.toString(BVs.toArray()) +
                 ", inputAct=" + inputAct +
                 ", outputAct=" + outputAct +
                 ", actions=" + actions +
@@ -197,6 +206,6 @@ public class Automaton {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, locations, edges, clocks, inputAct, outputAct, initLoc);
+        return Objects.hash(name, locations, edges, clocks, BVs, inputAct, outputAct, initLoc);
     }
 }

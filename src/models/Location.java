@@ -104,7 +104,7 @@ public class Location {
         for (List<Guard> list : copy.invariant) {
             List<Guard> interm = new ArrayList<Guard>();
             for (Guard g : list) {
-                interm.add(new Guard(g, clocks));
+                interm.add(new ClockGuard((ClockGuard) g, clocks));
             }
             this.invariant.add(interm);
         }
@@ -136,8 +136,9 @@ public class Location {
 
         for (List<Guard> list : invariant) {
             for(Guard guard : list) {
-                if (clock.equals(guard.getClock())) {
-                    if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
+
+                if (guard instanceof ClockGuard && !((ClockGuard) guard).isDiagonal() && clock.equals( ((ClockGuard) guard).getClock_i())) {
+                    if (((ClockGuard)guard).getBound() > constant) constant = ((ClockGuard) guard).getBound();
                 }
             }
         }

@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
+import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +17,7 @@ import java.util.List;
 public class InputEnablednessTest {
 
     private static Automaton expected, actual;
-    private static Update[] noUpdate = new Update[]{};
+    private static List<Update> noUpdate = new ArrayList<>();
     private static List<List<Guard>> noguardG = new ArrayList<>();
     private static List<List<Guard>> noguardI = new ArrayList<>();
 
@@ -30,7 +31,9 @@ public class InputEnablednessTest {
         Clock x = new Clock("x");
         Clock y = new Clock("y");
 
-        Guard invL1 = new Guard(x, 10, false, false);
+        System.out.println("started setup");
+
+        ClockGuard invL1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
 
         Location l0 = new Location("L0", noguardI, true, false, false, false);
         Location l1 = new Location("L1", new ArrayList<>(Collections.singletonList(Collections.singletonList(invL1))), false, false, false, false);
@@ -42,23 +45,27 @@ public class InputEnablednessTest {
         Channel i2 = new Channel("i2");
         Channel o = new Channel("o");
 
-        Guard e2_g1 = new Guard(x, 3, true, false);
-        Guard e2_g2 = new Guard(x, 5, false, false);
-        Guard e2_g3 = new Guard(y, 4, true, false);
-        Guard e3_g1 = new Guard(x, 2, false, false); // x<2
-        Guard e3_g2 = new Guard(y, 3, false, false);
+
+        ClockGuard e2_g1 = new ClockGuard(x, 3,  Relation.GREATER_EQUAL);
+        ClockGuard e2_g2 = new ClockGuard(x, 5,  Relation.LESS_EQUAL);
+        ClockGuard e2_g3 = new ClockGuard(y, 4, Relation.GREATER_EQUAL);
+        ClockGuard e3_g1 = new ClockGuard(x, 2,  Relation.LESS_EQUAL); // x<=2 // TODO: was this supposed to be x<=2 or x<2? The comment originally was "x<2" and did not fit the code
+        ClockGuard e3_g2 = new ClockGuard(y, 3,  Relation.LESS_EQUAL);
+
+        ClockGuard e8_g1 = new ClockGuard(x, 10,  Relation.LESS_EQUAL); // greater: false => x<10
+        ClockGuard e9_g1 = new ClockGuard(x, 10,  Relation.LESS_EQUAL);
 
 
-        Guard e5_g1_1 = new Guard(x, 2, false, false); // x>10
-        Guard e5_g1_2 = new Guard(y, 3, true, true);
-        Guard e5_g2_1 = new Guard(x, 2, true, true);
-        Guard e5_g2_2 = new Guard(x, 3, false, true);
-        Guard e5_g3_1 = new Guard(x, 3, true, false);  // x>2
-        Guard e5_g3_2 = new Guard(x, 5, false, false);
-        Guard e5_g3_3 = new Guard(y, 4, false, true);
-        Guard e5_g4 = new Guard(x, 5, true, true);
+        Guard e5_g1_1 = new ClockGuard(x, null,2, Relation.LESS_EQUAL); // x>10
+        Guard e5_g1_2 = new ClockGuard(y, null, 3, Relation.GREATER_THAN);
+        Guard e5_g2_1 = new ClockGuard(x, null,2, Relation.GREATER_THAN);
+        Guard e5_g2_2 = new ClockGuard(x, null,3, Relation.LESS_THAN);
+        Guard e5_g3_1 = new ClockGuard(x, null,3, Relation.GREATER_EQUAL);  // x>2
+        Guard e5_g3_2 = new ClockGuard(x, null,5, Relation.LESS_EQUAL);
+        Guard e5_g3_3 = new ClockGuard(y, null,4, Relation.LESS_THAN);
+        Guard e5_g4 = new ClockGuard(x, null,5, Relation.GREATER_THAN);
 
-        Guard e6_g1 = new Guard(x, 10, true, true);
+        Guard e6_g1 = new ClockGuard(x, null,10, Relation.GREATER_THAN);
 
 
         List<List<Guard>> guards_e5= new ArrayList<>();
@@ -78,9 +85,6 @@ public class InputEnablednessTest {
         guards_e5.add(e5_2);
         guards_e5.add(e5_3);
         guards_e5.add(e5_4);
-        Guard e8_g1 = new Guard(x, 10, false, false); // greater: false => x<10
-        //Guard e8_g2 = new Guard(y, 10, false, false);
-        Guard e9_g1 = new Guard(x, 10, false, false);
         //Guard e9_g2 = new Guard(y, 10, false, false);
 
         noguardG.add(new ArrayList<Guard>());
@@ -105,8 +109,9 @@ public class InputEnablednessTest {
         List<Location> locations = new ArrayList<>(Arrays.asList(l0, l1, l2, l3, l4));
         List<Edge> edges = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e6, e5, e8, e9, e10, e11, e12, e13, e14, e15));
         List<Clock> clocks = new ArrayList<>(Arrays.asList(x, y));
+        List<BoolVar> BVs = new ArrayList<>();
 
-        expected = new Automaton("Automaton", locations, edges, clocks, false);
+        expected = new Automaton("Automaton", locations, edges, clocks, BVs, false);
 
         String base = "./samples/json/InputEnabled/";
         String[] components = new String[]{"GlobalDeclarations.json", "Components/Automaton.json"};
@@ -119,6 +124,7 @@ public class InputEnablednessTest {
         //SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
        //  st.toXML("BASE.xml");
         actual = CDD.makeInputEnabled(actual);
+        System.out.println("fnished setup");
     }
 
     @Test

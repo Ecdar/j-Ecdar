@@ -250,8 +250,8 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
 
-        Guard e2_g1 = new Guard(x, 3, true, false);
-        Guard e2_g2 = new Guard(y, 5, false, false);
+        Guard e2_g1 = new ClockGuard(x, null, 3,  Relation.GREATER_EQUAL);
+        Guard e2_g2 = new ClockGuard(y, null, 5,  Relation.LESS_EQUAL);
 
         List<Guard> g1 = new ArrayList<>();
         g1.add(e2_g1);

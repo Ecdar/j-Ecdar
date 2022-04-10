@@ -2,6 +2,7 @@ package parser;
 
 import models.*;
 import org.jdom2.Attribute;
+import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 import org.jdom2.input.DOMBuilder;
 import org.w3c.dom.Document;
@@ -64,16 +65,19 @@ public class XMLParser {
         // clocks
         List<Clock> clocks = setClocks(element);
 
+        // clocks
+        List<BoolVar> BVs = setBVs(element);
+
         // initial location
         String initId = element.getChild("init").getAttributeValue("ref");
 
         // locations
-        List<Location> locations = setLocations(element, clocks, initId);
+        List<Location> locations = setLocations(element, clocks, BVs, initId);
 
         // edges
-        List<Edge> edges = setEdges(element, clocks, locations);
+        List<Edge> edges = setEdges(element, clocks, BVs, locations);
 
-        return new Automaton(name, locations, edges, clocks, makeInpEnabled);
+        return new Automaton(name, locations, edges, clocks, BVs, makeInpEnabled);
     }
 
     private static Document convertStringToDocument(String xmlStr) {
@@ -92,28 +96,65 @@ public class XMLParser {
 
     private static List<Clock> setClocks(Element el) {
         List<Clock> clockList = new ArrayList<>();
-
         String text = el.getChildText("declaration");
 
         if (text != null) {
-            String clocks = text.replaceAll("//.*\n", "")
-                    .replaceFirst("clock", "");
 
-            clocks = clocks.replaceAll("clock", ",")
-                    .replaceAll(";", "")
-                    .replaceAll(" ", "")
-                    .replaceAll("\n", "");
+            for (String line : text.split(";")) {
+                if (line.contains("clock"))
+                {
+                    String clocks = line.replaceAll("//.*\n", "")
+                            .replaceFirst("clock", "");
 
-            String[] clockArr = clocks.split(",");
+                    clocks = clocks.replaceAll("clock", ",")
+                            .replaceAll(";", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");
 
-            for (String clk : clockArr)
-                clockList.add(new Clock(clk));
+                    String[] clockArr = clocks.split(",");
+
+                    for (String clk : clockArr)
+                        clockList.add(new Clock(clk));
+                }
+            }
         }
         //System.out.println(clockList);
         return clockList;
     }
 
-    private static List<Location> setLocations(Element el, List<Clock> clocks, String initId) {
+
+
+    private static List<BoolVar> setBVs(Element el) {
+        List<BoolVar> boolList = new ArrayList<>();
+        String text = el.getChildText("declaration");
+
+        if (text != null) {
+
+            for (String line : text.split(";")) {
+                if (line.contains("bool")) {
+                    String bools = line.replaceAll("//.*\n", "")
+                            .replaceFirst("bool", "");
+
+                    bools = bools.replaceAll("bool", ",")
+                            .replaceAll(";", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");
+
+                    String[] boolArr = bools.split(",");
+
+                    for (String bool : boolArr)
+                        if (bool.contains("="))
+                            boolList.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
+                        else boolList.add(new BoolVar(bool, false));
+                }
+            }
+        }
+        System.out.println("reached the parser " + boolList.toString());
+        return boolList;
+    }
+
+
+    private static List<Location> setLocations(Element el, List<Clock> clocks, List<BoolVar> BVs, String initId) {
         List<Location> locationList = new ArrayList<>();
 
         List<Element> locations = el.getChildren("location");
@@ -135,7 +176,7 @@ public class XMLParser {
             for (Element label : labels) {
                 if (label.getAttributeValue("kind").equals("invariant")) {
                     if (!label.getText().isEmpty())
-                        invariants = addInvariants(label.getText(), clocks);
+                        invariants = addInvariants(label.getText(), clocks, BVs);
                 }
             }
 
@@ -164,7 +205,7 @@ public class XMLParser {
         return locationList;
     }
 
-    private static List<Edge> setEdges(Element el, List<Clock> clocks, List<Location> locations) {
+    private static List<Edge> setEdges(Element el, List<Clock> clocks, List<BoolVar> BVs, List<Location> locations) {
         List<Edge> edgeList = new ArrayList<>();
 
         List<Channel> channelList = new ArrayList<>();
@@ -173,7 +214,13 @@ public class XMLParser {
         for (Element edge : edges) {
             boolean isInput = true;
             for (Attribute o : edge.getAttributes()) {
-                if (o.getName().equals("controllable")) isInput = false;
+                try {
+                    if (o.getName().equals("controllable") && o.getBooleanValue()==false) isInput = false;
+                } catch (DataConversionException e) {
+                    System.err.println("Controllable flag contains non-boolean value");
+                    e.printStackTrace();
+                }
+
             }
 
             Location source = findLocations(locations, edge.getChild("source").getAttributeValue("ref"));
@@ -190,8 +237,9 @@ public class XMLParser {
 
                 switch (kind) {
                     case "guard":
-                        if (!text.isEmpty())
-                            guards = addGuards(text, clocks);
+                        if (!text.isEmpty()) {
+                            guards = addGuards(text, clocks, BVs);
+                        }
                         break;
                     case "synchronisation":
                         String channel = text.replaceAll("\\?", "").replaceAll("!", "");
@@ -199,13 +247,14 @@ public class XMLParser {
                             chan = addChannel(channelList, channel);
                         break;
                     case "assignment":
-                        if (!text.isEmpty())
-                            updates = addUpdates(text, clocks);
+                        if (!text.isEmpty()) {
+                            updates = addUpdates(text, clocks, BVs);
+                        }
                         break;
                 }
             }
 
-            edgeList.add(new Edge(source, target, chan, isInput, guards, updates.toArray(new Update[0])));
+            edgeList.add(new Edge(source, target, chan, isInput, guards, updates));
         }
 
         return edgeList;
@@ -218,6 +267,15 @@ public class XMLParser {
 
         return null;
     }
+
+    private static BoolVar findBV(List<BoolVar> BVs, String name) {
+        for (BoolVar bv : BVs)
+            if (bv.getName().equals(name))
+                return bv;
+
+        return null;
+    }
+
 
     private static Location findLocations(List<Location> locations, String name) {
         for (Location loc : locations)
@@ -237,7 +295,7 @@ public class XMLParser {
         return chan;
     }
 
-    private static List<List<Guard>> addGuards(String text, List<Clock> clockList) {
+    private static List<List<Guard>> addGuards(String text, List<Clock> clockList, List<BoolVar> boolList) {
         List<List<Guard>> guardList = new ArrayList<>();
         for (String part : text.split("or")) {
             List<Guard> list = new ArrayList<>();
@@ -247,10 +305,85 @@ public class XMLParser {
             for (String invariant : rawInvariants) {
                 invariant = invariant.replaceAll(" ", "");
                 String symbol = "";
-                boolean isEq, isGreater, isStrict;
+                Relation rel=null;
+                boolean isEq, isGreater, isStrict, isUnequal;
                 isEq = false;
                 isGreater = false;
                 isStrict = false;
+                isUnequal = false;
+
+                if (invariant.contains("==")) {
+                    symbol = "==";
+                    rel=Relation.EQUAL;
+                    isEq = true;
+                } else if (invariant.contains(">=")) {
+                    symbol = ">=";
+                    rel= Relation.GREATER_EQUAL;
+                    isGreater = true;
+                } else if (invariant.contains("<=")) {
+                    symbol = "<=";
+                    rel = Relation.LESS_EQUAL;
+                } else if (invariant.contains(">")) {
+                    symbol = ">";
+                    rel = Relation.GREATER_THAN;
+                    isGreater = true;
+                    isStrict = true;
+                } else if (invariant.contains("<")) {
+                    rel = Relation.LESS_THAN;
+                    symbol = "<";
+                    isStrict = true;
+                }
+                else if (invariant.contains("!=")) {
+                    rel= Relation.NOT_EQUAL;
+                    symbol = "!=";
+                    isStrict = true;
+                    isUnequal=true;
+
+                }
+                else
+                {
+                    System.out.println(invariant);
+                    assert(false);
+                }
+                String[] inv = invariant.split(symbol);
+                Clock clk = findClock(clockList, inv[0]);
+                if (clk != null) {
+
+                    ClockGuard newInv;
+
+                    newInv = new ClockGuard(clk, Integer.parseInt(inv[1]), rel);
+
+                    list.add(newInv);
+                }
+                BoolVar bl = findBV(boolList, inv[0]);
+
+                if(bl!=null) {
+                    BoolGuard newInv;
+                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
+                    list.add(newInv);
+                }
+
+            }
+            guardList.add(list);
+        }
+        return guardList;
+    }
+/*
+    private static List<BoolGuard> addBoolGuards(String text, List<BoolVar> boolList) {
+        List<BoolGuard> guardList = new ArrayList<>();
+        for (String part : text.split("or")) {
+            List<BoolGuard> list = new ArrayList<>();
+
+            String[] rawInvariants = part.split("&&");
+
+            for (String invariant : rawInvariants) {
+                invariant = invariant.replaceAll(" ", "");
+                String symbol = "";
+                boolean isEq, isGreater, isStrict, isUnequal;
+                isEq = false;
+                isGreater = false;
+                isStrict = false;
+                isUnequal = false;
 
                 if (invariant.contains("==")) {
                     symbol = "==";
@@ -268,24 +401,30 @@ public class XMLParser {
                     symbol = "<";
                     isStrict = true;
                 }
+                else if (invariant.contains("!=")) {
 
+                    assert(false); // would require a disjunction of ClockGuards at this point, which needs refactoring
+                    symbol = "!=";
+                    isStrict = true;
+                    isUnequal=true;
+
+                }
                 String[] inv = invariant.split(symbol);
-                Clock clk = findClock(clockList, inv[0]);
-                //System.out.println(inv[0] + " " + clk);
+                BoolVar bl = findBV(boolList, inv[0]);
 
-                Guard newInv;
-                if (isEq)
-                    newInv = new Guard(clk, Integer.parseInt(inv[1]));
-                else
-                    newInv = new Guard(clk, Integer.parseInt(inv[1]), isGreater, isStrict);
+                if(bl!=null) {
+                    BoolGuard newInv;
+                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
+                    list.add(newInv);
+                }
 
-                list.add(newInv);
             }
-            guardList.add(list);
+            guardList.addAll(list);
         }
         return guardList;
     }
-    private static List<List<Guard>> addInvariants(String text, List<Clock> clockList) {
+*/
+    private static List<List<Guard>> addInvariants(String text, List<Clock> clockList, List<BoolVar> boolList) {
         List<List<Guard>> outerList = new ArrayList<>();
 
         String[] disj = text.split("or");
@@ -294,49 +433,75 @@ public class XMLParser {
             List<Guard> list = new ArrayList<>();
             String[] rawInvariants = outer.split("&&");
 
-        for (String invariant : rawInvariants) {
-            invariant = invariant.replaceAll(" ", "");
-            String symbol = "";
-            boolean isEq, isGreater, isStrict;
-            isEq = false;
-            isGreater = false;
-            isStrict = false;
+            for (String invariant : rawInvariants) {
+                invariant = invariant.replaceAll(" ", "");
+                String symbol = "";
+                boolean isEq, isGreater, isStrict;
+                isEq = false;
+                isGreater = false;
+                isStrict = false;
 
-            if (invariant.contains("==")) {
-                symbol = "==";
-                isEq = true;
-            } else if (invariant.contains(">=")) {
-                symbol = ">=";
-                isGreater = true;
-            } else if (invariant.contains("<=")) {
-                symbol = "<=";
-            } else if (invariant.contains(">")) {
-                symbol = ">";
-                isGreater = true;
-                isStrict = true;
-            } else if (invariant.contains("<")) {
-                symbol = "<";
-                isStrict = true;
+                Relation rel =null;
+
+                if (invariant.contains("==")) {
+                    symbol = "==";
+                    rel=Relation.EQUAL;
+                    isEq = true;
+                } else if (invariant.contains(">=")) {
+                    symbol = ">=";
+                    rel= Relation.GREATER_EQUAL;
+                    isGreater = true;
+                } else if (invariant.contains("<=")) {
+                    symbol = "<=";
+                    rel = Relation.LESS_EQUAL;
+                } else if (invariant.contains(">")) {
+                    symbol = ">";
+                    rel = Relation.GREATER_THAN;
+                    isGreater = true;
+                    isStrict = true;
+                } else if (invariant.contains("<")) {
+                    rel = Relation.LESS_THAN;
+                    symbol = "<";
+                    isStrict = true;
+                }
+                else if (invariant.contains("!=")) {
+                    assert(false); // would require a disjunction of ClockGuards at this point, which needs refactoring
+                    rel= Relation.NOT_EQUAL;
+                    symbol = "!=";
+                    isStrict = true;
+
+                }
+                else assert(false);
+                String[] inv = invariant.split(symbol);
+                Clock clk = findClock(clockList, inv[0]);
+
+
+                if (clk != null) {
+
+                    ClockGuard newInv;
+
+                    newInv = new ClockGuard(clk, Integer.parseInt(inv[1]), rel);
+
+                    list.add(newInv);
+                }
+                BoolVar bl = findBV(boolList, inv[0]);
+
+                if(bl!=null) {
+                    BoolGuard newInv;
+                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
+                    list.add(newInv);
+                }
+
+
             }
-            String[] inv = invariant.split(symbol);
-            Clock clk = findClock(clockList, inv[0]);
 
-            Guard newInv;
-            if (isEq)
-                newInv = new Guard(clk, Integer.parseInt(inv[1]));
-            else
-                newInv = new Guard(clk, Integer.parseInt(inv[1]), isGreater, isStrict);
-
-            list.add(newInv);
-        }
-
-        outerList.add(list);
+            outerList.add(list);
         }
 
         return outerList;
     }
 
-    private static List<Update> addUpdates(String text, List<Clock> clockList) {
+    private static List<Update> addUpdates(String text, List<Clock> clockList, List<BoolVar> boolList) {
         List<Update> list = new ArrayList<>();
         String[] rawUpdates = text.split(",");
         for (String rawUpdate : rawUpdates) {
@@ -344,11 +509,39 @@ public class XMLParser {
 
             String[] update = rawUpdate.split("=");
             Clock clk = findClock(clockList, update[0]);
-            Update newUpdate = new Update(clk, Integer.parseInt(update[1]));
-            list.add(newUpdate);
+            if (clk != null) {
+                ClockUpdate upd = new ClockUpdate(findClock(clockList, update[0]), Integer.parseInt(update[1]));
+                list.add(upd);
+            }
+            BoolVar bv = findBV(boolList,update[0]);
+            if (bv != null) {
+                BoolUpdate upd = new BoolUpdate(findBV(boolList,update[0]), Boolean.parseBoolean(update[1]));
+                list.add(upd);
+            }
+            // Update newUpdate = new Update(clk, Integer.parseInt(update[1]));
+            //  list.add(newUpdate);
         }
         return list;
     }
+
+    private static List<BoolUpdate> addBoolUpdates(String text, List<BoolVar> boolList) {
+        List<BoolUpdate> list = new ArrayList<>();
+        String[] rawUpdates = text.split(",");
+        for (String rawUpdate : rawUpdates) {
+            rawUpdate = rawUpdate.replaceAll(" ", "");
+
+            String[] update = rawUpdate.split("=");
+            BoolVar bv = findBV(boolList,update[0]);
+            if (bv != null) {
+                BoolUpdate upd = new BoolUpdate(findBV(boolList,update[0]), Boolean.parseBoolean(update[1]));
+                list.add(upd);
+            }
+            // Update newUpdate = new Update(clk, Integer.parseInt(update[1]));
+            //  list.add(newUpdate);
+        }
+        return list;
+    }
+
 
     //Get JDOM document from DOM JSONParser
     private static org.jdom2.Document useDOMParserFile(String fileName)

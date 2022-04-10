@@ -2,6 +2,7 @@ package models;
 
 import lib.DBMLib;
 
+import models.Relation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,14 @@ public class Zone {
 
     }
 
+    private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
+
+        for (int i = 0; i < clocks.size(); i++){
+            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
+        }
+        return 0;
+    }
+
     public boolean isEmpty() {return DBMLib.dbm_isEmpty(dbm, size);}
 
     public int getSize() {
@@ -50,29 +59,71 @@ public class Zone {
         return dbm[i];
     }
 
-    public void buildConstraintsForGuard(Guard g, int index) {
-        assert(!g.getIsFalse());
-        boolean isStrict = g.isStrict();
+    public void buildConstraintsForGuard(ClockGuard g, List<Clock> clocks) {
+        if (g.isDiagonal())
+            buildConstraintsForDiagonalConstraint(g,clocks);
+        else
+            buildConstraintsForNormalGuard(g,clocks);
+    }
 
+    public void buildConstraintsForNormalGuard(ClockGuard g, List<Clock> clocks) {
+        int index = getIndexOfClock(g.getClock_i(),clocks);
+        Relation rel = g.getRelation();
         int lowerBoundI = g.getLowerBound();
         int upperBoundI = g.getUpperBound();
-
-        // if guard is of type "clock == value"
-
-//        if (upperBoundI == Integer.MAX_VALUE && (lowerBoundI == 0)) {
-//            constrain1(index, 0, DBM_INF, isStrict);
-//        }
-        if (upperBoundI == Integer.MAX_VALUE && lowerBoundI != 0) {
-            //System.out.println("been here");
-            constrain1(0, index, (-1) * lowerBoundI, isStrict);
+        switch (rel) {
+            case EQUAL: {
+                constrain1(0, index, (-1) * lowerBoundI, false);
+                constrain1(index, 0, upperBoundI, false);
+                break;
+            }
+            case NOT_EQUAL: {
+                // TODO: Zones cannot do a non equal, we would need Federations for that
+                break;
+            }
+            case LESS_THAN: {
+                constrain1(index, 0, upperBoundI, true);
+                break;
+            }
+            case LESS_EQUAL: {
+                constrain1(index, 0, upperBoundI, false);
+                break;
+            }
+            case GREATER_THAN: {
+                constrain1(0, index, (-1) * lowerBoundI, true);
+                break;
+            }
+            case GREATER_EQUAL: {
+                constrain1(0, index, (-1) * lowerBoundI, false);
+                break;
+            }
         }
-        else
-        if (lowerBoundI == 0 && upperBoundI != Integer.MAX_VALUE)
-            constrain1(index, 0, upperBoundI, isStrict);
-        else
-        if (lowerBoundI == upperBoundI) {
-            constrain1(0, index, (-1) * lowerBoundI, isStrict);
-            constrain1(index, 0, upperBoundI, isStrict);
+    }
+
+    public void buildConstraintsForDiagonalConstraint(ClockGuard dc, List<Clock> clocks) {
+        Relation rel = dc.getRelation();
+        Clock clock_i = dc.getClock_i();
+        Clock clock_j = dc.getClock_j();
+        int val = dc.getBound();
+
+        int i= getIndexOfClock(clock_i,clocks);
+        int j= getIndexOfClock(clock_j,clocks);
+
+
+
+        switch (rel) {
+            case LESS_THAN: {
+                constrain1(i, j, val, true);
+                break;
+            }
+            case LESS_EQUAL: {
+                constrain1(i, j, val, false);
+                break;
+            }
+            default: {
+                assert(false);
+                break;
+            }
         }
     }
 
@@ -136,22 +187,82 @@ public class Zone {
 
     public List<Guard> buildGuardsFromZone(List<Clock> clocks) {
         List<Guard> guards = new ArrayList<>();
+        guards.addAll(buildNormalGuardsFromZone(clocks));
+        guards.addAll(buildDiagonalConstraintsFromZone(clocks));
+        return guards;
+    }
+
+    public List<ClockGuard> buildNormalGuardsFromZone(List<Clock> clocks) {
+        List<ClockGuard> guards = new ArrayList<>();
+
         for (int i = 1; i < size; i++) {
             Clock clock = clocks.get(i - 1);
-
             // values from first row, lower bounds
             int lb = dbm[i];
-            // lower bound must be different from 1 (==0)
-            if (lb != 1) {
-                Guard g1 = new Guard(clock, (-1) * DBMLib.raw2bound(lb), true, DBMLib.dbm_rawIsStrict(lb));
-                guards.add(g1);
-            }
+
             // values from first column, upper bounds
-            int ub = dbm[size*i];
+            int ub = dbm[size * i];
+
+            if (ub==lb && !DBMLib.dbm_rawIsStrict(lb) && !DBMLib.dbm_rawIsStrict(ub))
+            {
+                ClockGuard g1 = new ClockGuard(clock, (-1) * DBMLib.raw2bound(lb), Relation.EQUAL);
+                guards.add(g1);
+                continue;
+            }
+
+            if (lb != 1) {   // lower bound must be different from 1 (==0)
+                if (DBMLib.dbm_rawIsStrict(lb)) {
+                    ClockGuard g1 = new ClockGuard(clock, (-1) * DBMLib.raw2bound(lb), Relation.GREATER_THAN);
+                    guards.add(g1);
+                } else {
+                    ClockGuard g1 = new ClockGuard(clock, (-1) * DBMLib.raw2bound(lb), Relation.GREATER_EQUAL);
+                    guards.add(g1);
+                }
+            }
+
             // upper bound must be different from infinity
             if (ub != DBM_INF) {
-                Guard g2 = new Guard(clock, DBMLib.raw2bound(ub), false, DBMLib.dbm_rawIsStrict(ub));
-                guards.add(g2);
+                if (DBMLib.dbm_rawIsStrict(ub)) {
+                    ClockGuard g2 = new ClockGuard(clock, DBMLib.raw2bound(ub), Relation.LESS_THAN);
+                    guards.add(g2);
+                } else {
+                    ClockGuard g2 = new ClockGuard(clock, DBMLib.raw2bound(ub),Relation.LESS_EQUAL);
+                    guards.add(g2);
+                }
+
+            }
+        }
+
+        return guards;
+    }
+
+    public List<ClockGuard> buildDiagonalConstraintsFromZone(List<Clock> clocks) {
+        List<ClockGuard> guards = new ArrayList<>();
+
+        for (int i = 1; i < size; i++) {
+            for (int j = 1; j < size; j++) {
+                if (i==j)
+                    continue;
+                //if (i==1 || j==1)
+                //    continue;
+                Clock clock_i = clocks.get(i - 1);
+                Clock clock_j = clocks.get(j - 1);
+
+                // values from first row, lower bounds
+                int currentValue = dbm[i+j*size];
+                if (currentValue==DBM_INF)
+                    continue;
+
+                if (DBMLib.dbm_rawIsStrict(currentValue))
+                {
+                    ClockGuard dc = new ClockGuard(clock_j,clock_i,DBMLib.raw2bound(currentValue), Relation.LESS_THAN);
+                    guards.add(dc);
+                } else
+                {
+                    ClockGuard dc = new ClockGuard(clock_j,clock_i,DBMLib.raw2bound(currentValue),Relation.LESS_EQUAL);
+                    guards.add(dc);
+                }
+
             }
         }
 

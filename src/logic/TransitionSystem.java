@@ -8,10 +8,12 @@ import java.util.stream.Collectors;
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
     final List<Clock> clocks;
+    final List <BoolVar> BVs;
     private StringBuilder lastErr = new StringBuilder();
 
     TransitionSystem() {
         this.clocks = new ArrayList<>();
+        this.BVs = new ArrayList<>();
     }
 
     public abstract Automaton getAutomaton();
@@ -19,6 +21,11 @@ public abstract class TransitionSystem {
     public List<Clock> getClocks() {
         return clocks;
     }
+
+    public List<BoolVar> getBVs() {
+        return BVs;
+    };
+
 
     public State getInitialState() {
         CDD initCDD = CDD.getUnrestrainedCDD();
@@ -64,7 +71,7 @@ public abstract class TransitionSystem {
 
             if (!updates.isEmpty()) targetState.applyResets(updates);
 
-            targetState.getInvarCDD().delay();
+            targetState.delay();
 
             targetState.applyInvariants();
 

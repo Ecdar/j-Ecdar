@@ -3,27 +3,17 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Update {
+public class ClockUpdate extends Update{
 
-
-
-    @Override
-    public abstract boolean equals(Object o) ;
-    @Override
-    public abstract String toString() ;
-
-    @Override
-    public abstract int hashCode() ;
-    /*
     private final Clock clock;
     private final int value;
 
-    public Update(Clock clock, int value) {
+    public ClockUpdate(Clock clock, int value) {
         this.clock = clock;
         this.value = value;
     }
 
-    public Update(Update copy, List<Clock> clocks){
+    public ClockUpdate(ClockUpdate copy, List<Clock> clocks){
         this.clock = clocks.get(clocks.indexOf(copy.clock));
         this.value = copy.value;
     }
@@ -39,8 +29,8 @@ public abstract class Update {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Update)) return false;
-        Update update = (Update) o;
+        if (!(o instanceof ClockUpdate)) return false;
+        ClockUpdate update = (ClockUpdate) o;
         return value == update.value &&
                 clock.equals(update.clock);
     }
@@ -56,5 +46,5 @@ public abstract class Update {
     @Override
     public int hashCode() {
         return Objects.hash(clock, value);
-    }*/
+    }
 }

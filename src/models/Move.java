@@ -17,12 +17,13 @@ public class Move {
         this.target = target;
         this.edges = edges;
         guardCDD= CDD.cddTrue();
-
+        this.updates= new ArrayList<>();
         for (Edge e : edges)
         {
            guardCDD = guardCDD.conjunction(e.getGuardCDD());
+           updates.addAll(e.getUpdates());
         }
-        this.updates = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
+
     }
 
     public SymbolicLocation getSource() {

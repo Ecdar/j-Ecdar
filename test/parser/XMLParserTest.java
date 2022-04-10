@@ -51,35 +51,42 @@ public class XMLParserTest {
         Channel i = new Channel("i");
         Channel o = new Channel("o");
 
-        Guard inv0_0 = new Guard(y, 50, false, false);
-        Guard inv0_1 = new Guard(z, 40, false, false);
+
+        ClockGuard inv0_0 = new ClockGuard(y, 50, Relation.LESS_EQUAL);
+        ClockGuard inv0_1 = new ClockGuard(z, 40,  Relation.LESS_EQUAL);
 
         Location l0 = new Location("id0", new ArrayList<>(Collections.singletonList(Arrays.asList(inv0_0, inv0_1))), false, false, false, false);
         Location l1 = new Location("id1", noGuards, false, false, false, false);
         Location l2 = new Location("id2", noGuards, true, false, false, false);
         List<Location> locations = new ArrayList<>(Arrays.asList(l0, l1, l2));
 
-        Guard g2 = new Guard(x, 4);
-        Update u2_0 = new Update(x, 0);
-        Update u2_1 = new Update(y, 0);
-        Update u2_2 = new Update(z, 0);
-        Edge e0 = new Edge(l1, l2, i, true, noGuards, new Update[]{});
-        Edge e1 = new Edge(l2, l0, o, false, noGuards, new Update[]{});
-        Edge e2 = new Edge(l2, l1, i, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g2))), new Update[]{u2_0, u2_1, u2_2});
+        ClockGuard g2 = new ClockGuard(x, 4, Relation.EQUAL);
+        ClockUpdate u2_0 = new ClockUpdate(x, 0);
+        ClockUpdate u2_1 = new ClockUpdate(y, 0);
+        ClockUpdate u2_2 = new ClockUpdate(z, 0);
+        Edge e0 = new Edge(l1, l2, i, true, noGuards, new ArrayList<>());
+        Edge e1 = new Edge(l2, l0, o, false, noGuards, new ArrayList<>());
+        Edge e2 = new Edge(l2, l1, i, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g2))), new ArrayList<>(){{add(u2_0); add(u2_1); add(u2_2);}});
         List<Edge> edges = new ArrayList<>(Arrays.asList(e0, e1, e2));
-
-        expected = new Automaton("Test", locations, edges, clocks, false);
+        ArrayList BVs = new ArrayList<>();
+        expected = new Automaton("Test", locations, edges, clocks, BVs,  false);
     }
 
     @Test
     public void testAutomaton() {
         Automaton actual = XMLParser.parse("./samples/xml/ImplTests.xml", false)[0];
+        CDD.init(100,100,100);
+        CDD.addClocks(expected.getClocks(),actual.getClocks());
         assert expected.equals(actual);
+        CDD.done();
     }
 
     @Test
     public void testParseXmlString(){
         Automaton actual = XMLParser.parseXmlString(xmlString, false)[0];
+        CDD.init(100,100,100);
+        CDD.addClocks(expected.getClocks(),actual.getClocks());
         assertEquals(actual, expected);
+        CDD.done();
     }
 }

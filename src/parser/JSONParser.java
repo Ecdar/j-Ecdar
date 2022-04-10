@@ -1,5 +1,6 @@
 package parser;
 
+import jdk.dynalink.linker.support.Guards;
 import logic.GraphEdge;
 import logic.GraphNode;
 import models.*;
@@ -22,6 +23,7 @@ public class JSONParser {
     private static ArrayList<JSONObject> objectList = new ArrayList<>();
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
     private static final List<Clock> componentClocks = new ArrayList<>();
+    private static final List<BoolVar> BVs = new ArrayList<>();
 
     public static Automaton[] parse(String folderPath, boolean makeInpEnabled) {
         File dir = new File(folderPath + "/Components");
@@ -113,7 +115,7 @@ public class JSONParser {
         List<Location> locations = addLocations(locationList);
         JSONArray edgeList = (JSONArray) obj.get("edges");
         List<Edge> edges = addEdges(edgeList, locations);
-        Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
+        Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), BVs, makeInpEnabled);
         componentClocks.clear();
         return automaton;
     }
@@ -155,6 +157,33 @@ public class JSONParser {
 
                 for (String s : clockArr) {
                     componentClocks.add(new Clock(s));
+                }
+            }
+        }
+    }
+
+    private static void addBVs(String declarations) {//add for typedefs
+        String[] firstList = declarations.split(";");
+
+        for (String line : firstList) {
+            boolean isBV = line.contains("bool");
+
+            if (isBV) {
+                if (line.contains("bool")) {
+                    String bools = line.replaceAll("//.*\n", "")
+                            .replaceFirst("bool", "");
+
+                    bools = bools.replaceAll("bool", ",")
+                            .replaceAll(";", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");
+
+                    String[] boolArr = bools.split(",");
+
+                    for (String bool : boolArr)
+                        if (bool.contains("="))
+                            BVs.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
+                        else BVs.add(new BoolVar(bool, false));
                 }
             }
         }
@@ -206,20 +235,26 @@ public class JSONParser {
                 strict = false;
                 greater = false;
                 isEq = false;
+                Relation rel = null;
 
                 if (str.contains("==")) {
                     symbol = "==";
+                    rel=Relation.EQUAL;
                     greater = false;
                     isEq = true;
                 } else if (str.contains("<=")) {
+                    rel=Relation.LESS_EQUAL;
                     symbol = "<=";
                 } else if (str.contains(">=")) {
+                    rel=Relation.GREATER_EQUAL;
                     symbol = ">=";
                     greater = true;
                 } else if (str.contains("<") && !str.contains("=")) {
+                    rel=Relation.LESS_THAN;
                     symbol = "<";
                     strict = true;
                 } else if (str.contains(">") && !str.contains("=")) {
+                    rel=Relation.GREATER_THAN;
                     symbol = ">";
                     greater = true;
                     strict = true;
@@ -230,10 +265,18 @@ public class JSONParser {
                     s[x] = s[x].replaceAll(" ", "");
                 }
 
-                if (isEq)
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
+                Clock clk = findClock(s[0]);
+                if (clk != null) {
+
+                    guards.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
+                }
                 else
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
+                {
+                    BoolVar bl = findBV(s[0]);
+                    Guard newInv;
+                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(s[1]));
+                    guards.add(newInv);
+                } // TODO FalseGuard
             }
 
             guardList.add(guards);
@@ -247,34 +290,40 @@ public class JSONParser {
 
         String[] listOfDisjc = invariant.split("or");
 
-       // System.out.println("whole: " + invariant);
+        // System.out.println("whole: " + invariant);
         for (String strOuter : listOfDisjc) {
             String[] listOfInv = strOuter.split("&&");
             ArrayList<Guard> guards = new ArrayList<>();
             //System.out.println("discj part: " + strOuter);
 
             for (String str : listOfInv) {
-               //System.out.println("conj. part: " + str);
+                //System.out.println("conj. part: " + str);
 
                 String symbol = "";
                 boolean strict, greater, isEq;
                 strict = false;
                 greater = false;
                 isEq = false;
+                Relation rel = null;
 
                 if (str.contains("==")) {
+                    rel=Relation.EQUAL;
                     symbol = "==";
                     greater = false;
                     isEq = true;
                 } else if (str.contains("<=")) {
+                    rel=Relation.LESS_EQUAL;
                     symbol = "<=";
                 } else if (str.contains(">=")) {
+                    rel=Relation.GREATER_EQUAL;
                     symbol = ">=";
                     greater = true;
                 } else if (str.contains("<") && !str.contains("=")) {
+                    rel=Relation.LESS_THAN;
                     symbol = "<";
                     strict = true;
                 } else if (str.contains(">") && !str.contains("=")) {
+                    rel=Relation.GREATER_THAN;
                     symbol = ">";
                     greater = true;
                     strict = true;
@@ -285,10 +334,18 @@ public class JSONParser {
                     s[x] = s[x].replaceAll(" ", "");
                 }
 
-                if (isEq)
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
+                Clock clk = findClock(s[0]);
+                if (clk != null) {
+
+                    guards.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
+                }
                 else
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
+                {
+                    BoolVar bl = findBV(s[0]);
+                    Guard newInv;
+                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(s[1]));
+                    guards.add(newInv);
+                } // TODO FalseGuard
             }
             guardsOuter.add(guards);
         }
@@ -301,6 +358,13 @@ public class JSONParser {
 
         return null;
     }
+    private static BoolVar findBV(String name) {
+        for (BoolVar bv : BVs)
+            if (bv.getName().equals(name))
+                return bv;
+
+        return null;
+    }
 
     private static List<Edge> addEdges(JSONArray edgeList, List<Location> locations) {
         ArrayList<Edge> edges = new ArrayList<>();
@@ -308,7 +372,10 @@ public class JSONParser {
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            List<List<Guard>> guards;
+            List<List<Guard>> guards = new ArrayList<>();
+            List<ClockUpdate> clockUpdates = new ArrayList<>();
+            List<BoolUpdate> boolUpdates = new ArrayList<>();
+
             Update[] updates;
 
             if (!jsonObject.get("guard").toString().equals(""))
@@ -320,6 +387,29 @@ public class JSONParser {
                 updates = addUpdates((String) jsonObject.get("update"));
             else
                 updates = new Update[]{};
+/*
+            for (List<Guard> gds: guards)
+            {
+                List<Guard> list = new ArrayList<>();
+                for (Guard g : gds) {
+                    if (g instanceof ClockGuard)
+                        list.add((ClockGuard)g);
+                    else
+                        list.add((BoolGuard)g);
+                }
+                guards.add(list);
+            }
+
+ */
+            for (Update u: updates)
+                if (u instanceof  ClockUpdate)
+                    clockUpdates.add((ClockUpdate) u);
+                else
+                    boolUpdates.add((BoolUpdate) u);
+
+            List<Update> updatesList = new ArrayList<>();
+            updatesList.addAll(clockUpdates);
+            updatesList.addAll(boolUpdates);
 
             Location sourceLocation = findLoc(locations, (String) jsonObject.get("sourceLocation"));
             Location targetLocation = findLoc(locations, (String) jsonObject.get("targetLocation"));
@@ -328,7 +418,7 @@ public class JSONParser {
 
             Channel c = addChannel(jsonObject.get("sync").toString());
             if (c != null) {
-                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updates);
+                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updatesList);
                 edges.add(edge);
             }
         }
@@ -355,8 +445,20 @@ public class JSONParser {
             String[] s = str.split("=");
             for (int i = 0; i < s.length; i++)
                 s[i] = s[i].replaceAll(" ", "");
-            Update upd = new Update(findClock(s[0]), Integer.parseInt(s[1]));
-            updates.add(upd);
+
+
+            Clock clk = findClock(s[0]);
+            if (clk != null) {
+                Update upd = new ClockUpdate(findClock(s[0]), Integer.parseInt(s[1]));
+                updates.add(upd);
+            }
+            else
+            {
+                Update upd = new BoolUpdate(findBV(s[0]), Boolean.parseBoolean(s[1]));
+                updates.add(upd);
+            }
+
+
         }
 
         return updates.toArray(new Update[0]);

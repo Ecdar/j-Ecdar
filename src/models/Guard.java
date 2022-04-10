@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Guard {
+public abstract class Guard {
 
+    //public enum type {DIAGONAL, CLOCKGUARD, BOOLGUARD, FALSE}
+/*
     private final Clock clock;
     private int upperBound, lowerBound;
     private boolean isStrict;
@@ -136,5 +138,12 @@ public class Guard {
     public boolean getIsFalse() {
         return isFalse;
     }
+*/
+    @Override
+    public abstract boolean equals(Object o) ;
+    @Override
+    public abstract String toString() ;
 
+    @Override
+    public abstract int hashCode() ;
 }

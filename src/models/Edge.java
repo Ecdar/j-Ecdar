@@ -11,7 +11,7 @@ public class Edge {
     private  Channel chan;
     private  boolean isInput;
     private  List<List<Guard>> guards;
-    private  Update[] updates;
+    private  List<Update> updates;
 
     public void setSource(Location source) {
         this.source = source;
@@ -37,11 +37,8 @@ public class Edge {
         this.guards = guards;
     }
 
-    public void setUpdates(Update[] updates) {
-        this.updates = updates;
-    }
 
-    public Edge(Location source, Location target, Channel chan, boolean isInput, List<List<Guard>> guards, Update[] updates) {
+    public Edge(Location source, Location target, Channel chan, boolean isInput, List<List<Guard>> guards, List<Update> updates) {
         this.source = source;
         this.target = target;
         this.chan = chan;
@@ -50,7 +47,7 @@ public class Edge {
         this.updates = updates;
     }
 
-    public Edge(Edge copy, List<Clock> clocks, Location sourceR, Location targetR){
+    public Edge(Edge copy, List<Clock> clocks,  List<BoolVar> BVs, Location sourceR, Location targetR){
         this.source = sourceR;
         this.target = targetR;
         this.chan = copy.chan;
@@ -59,14 +56,26 @@ public class Edge {
         this.guards = new ArrayList<>();
         List<Guard> temp = new ArrayList<>();
         for (List<Guard> guardList : copy.guards) {
-            for (Guard g: guardList)
-               temp.add(new Guard(g, clocks));
+            for (Guard g: guardList) {
+                if (g instanceof ClockGuard)
+                    temp.add(new ClockGuard((ClockGuard) g, clocks));
+            }
             this.guards.add(temp);
         }
 
-        this.updates = new Update[copy.updates.length];
-        for (int i = 0; i < copy.updates.length; i++) {
-            this.updates[i] = new Update(copy.updates[i], clocks);
+        List<Update> updates = new ArrayList<>();
+        for (Update update: copy.getUpdates())
+        {
+            if (update instanceof BoolUpdate)
+            {
+                updates.add(new BoolUpdate((BoolUpdate) update, BVs));
+            }
+            else
+            {
+                updates.add(new ClockUpdate((ClockUpdate) update, clocks));
+
+            }
+
         }
     }
 
@@ -87,8 +96,8 @@ public class Edge {
 
         for(List<Guard> guardList : guards) {
             for (Guard guard : guardList) {
-                if (clock.equals(guard.getClock())) {
-                    if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
+                if (guard instanceof ClockGuard && !((ClockGuard) guard).isDiagonal() && clock.equals( ((ClockGuard) guard).getClock_i())) {
+                    if (((ClockGuard)guard).getBound() > constant) constant = ((ClockGuard) guard).getBound();
                 }
             }
         }
@@ -99,23 +108,21 @@ public class Edge {
     // Used in determinism check to verify if two edges have exactly the same updates
     public boolean hasEqualUpdates(Edge edge){
         // If the amount of updates on edges is not the same it means they cannot have equal updates
-        if(this.updates.length != edge.updates.length)
-            return false;
+        for (Update thisU : getUpdates()) {
+            boolean matched = false;
+            for (Update thatU : edge.getUpdates())
+                if (thisU.equals(thatU))
+                    matched=true;
+            if (!matched)
+                return false;
+        }
 
-        boolean result;
-
-        for(int i = 0; i < this.updates.length; i++)
-        {
-            result = false;
-            for(int j = 0; i < this.updates.length; i++)
-            {
-                if(this.updates[i].equals(edge.updates[j]))
-                {
-                    result = true;
-                    break;
-                }
-            }
-            if(!result)
+        for (Update thatU : edge.getUpdates()) {
+            boolean matched = false;
+            for (Update thisU : getUpdates())
+                if (thisU.equals(thatU))
+                    matched=true;
+            if (!matched)
                 return false;
         }
 
@@ -147,7 +154,7 @@ public class Edge {
         this.guards = CDD.toGuards(new CDD(this.guards).conjunction(res));
     }
 
-    public Update[] getUpdates() {
+    public List<Update> getUpdates() {
         return updates;
     }
 
@@ -171,19 +178,19 @@ public class Edge {
                 // TODO: did the stream thing work?
                 //that.getGuardCDD().equiv(getGuardCDD()) &&
                 Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()) &&
-                Arrays.equals(updates, that.updates);
+                Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(that.updates.toArray()).toArray());
     }
 
     @Override
     public String toString() {
-        return "Edge{" +
-                "source=" + source +
-                ", target=" + target +
-                ", chan=" + chan +
-                ", isInput=" + isInput +
-                ", guards=" + Arrays.toString(guards.toArray()) +
-                ", updates=" + Arrays.toString(updates) +
-                '}';
+        return "(" +
+                source + " - " +
+                chan.getName() +
+                (isInput? "?":"!")  +" - " +
+                guards +" - " +
+                Arrays.toString(this.guards.toArray()) +" - " +
+                Arrays.toString(this.updates.toArray()) +" - " +
+                target  + ")\n";
     }
 
     @Override

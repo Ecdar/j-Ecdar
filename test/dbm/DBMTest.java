@@ -35,7 +35,8 @@ public class DBMTest {
         Clock z = new Clock("z");
 
         clockList.addAll(Arrays.asList(x, y, z));
-
+        CDD.init(100,100,100);
+        CDD.addClocks(clockList);
         // STATES----------------------
         // From 0 to inf
         Zone z1 = new Zone(new int[]{1, 1, DBM_INF, 1});
@@ -59,13 +60,13 @@ public class DBMTest {
 
 
         // GUARDS---------------------
-        g1 = new Guard(x, 5, true, false);
-        g2 = new Guard(x, 1, true, false);
-        g3 = new Guard(x, 7, false, false);
-        g4 = new Guard(x, 14, false, false);
+        g1 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
+        g2 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
+        g3 = new ClockGuard(x, 7, Relation.LESS_EQUAL);
+        g4 = new ClockGuard(x, 14, Relation.LESS_EQUAL);
 
-        g5 = new Guard(x, 505, true, false);
-        g6 = new Guard(y, 8, true, false);
+        g5 = new ClockGuard(x, 505, Relation.GREATER_EQUAL);
+        g6 = new ClockGuard(y, 8, Relation.GREATER_EQUAL);
 
     }
 
