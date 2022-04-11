@@ -309,7 +309,7 @@ public class Refinement {
                 }
 
 //                if (isInput && )
-
+                System.out.println("is input "  + isInput);
                 if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
                     return false;
             }

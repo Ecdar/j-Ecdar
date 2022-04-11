@@ -61,6 +61,8 @@ public class ConjunctionTest {
 
     @Test
     public void T1RefinesSelf() {
+        CDD.init(100,100,100);
+        CDD.addClocks(t1.getClocks(),t1Copy.getClocks());
         assertTrue(new Refinement(t1, t1Copy).check());
     }
 

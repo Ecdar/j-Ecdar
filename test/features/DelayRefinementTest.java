@@ -9,7 +9,10 @@ import models.CDD;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import parser.XMLFileWriter;
 import parser.XMLParser;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -420,7 +423,9 @@ public class DelayRefinementTest {
                 new TransitionSystem[]{
                         new SimpleTransitionSystem(CDD.makeInputEnabled(automata[0])),
                         new SimpleTransitionSystem(CDD.makeInputEnabled(automata[1]))});
-        assertTrue(new Refinement(comp, new SimpleTransitionSystem((automata[2]))).check());
+       Automaton array[] = new Automaton[]{comp.getAutomaton()};
+        XMLFileWriter.toXML("compT1T2.xml", array);
+        assertTrue(new Refinement(comp, new SimpleTransitionSystem(CDD.makeInputEnabled(automata[2]))).check());
     }
 
     @Test

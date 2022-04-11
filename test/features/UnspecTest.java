@@ -36,12 +36,7 @@ public class UnspecTest {
                 "Components/AA.json",
                 "Components/B.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
-        CDD.init(100,100,100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(machines[0].getClocks());
-        clocks.addAll(machines[1].getClocks());
-        clocks.addAll(machines[2].getClocks());
-        CDD.addClocks(clocks);
+   ;
 
         a = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[0]));
         aCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[0])));
@@ -53,22 +48,43 @@ public class UnspecTest {
 
     @Test
     public void testARefinesSelf() {
-        assertTrue(new Refinement(a, aCopy).check());
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(a.getClocks());
+        clocks.addAll(aCopy.getClocks());
+        CDD.addClocks(clocks);
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(a.getAutomaton())), aCopy).check());
     }
 
     @Test
     public void testAaRefinesSelf() {
-        assertTrue(new Refinement(aa, aaCopy).check());
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(aa.getClocks());
+        clocks.addAll(aaCopy.getClocks());
+        CDD.addClocks(clocks);
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(aa.getAutomaton())), aaCopy).check());
     }
 
     @Test
     public void testBRefinesSelf() {
-        assertTrue(new Refinement(b, bCopy).check());
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(b.getClocks());
+        clocks.addAll(bCopy.getClocks());
+        CDD.addClocks(clocks);
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(b.getAutomaton())), bCopy).check());
     }
 
     @Test
     public void compNotRefinesB() {
         // should fail because right side has more inputs
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(aa.getClocks());
+        clocks.addAll(aaCopy.getClocks());
+        clocks.addAll(b.getClocks());
+        CDD.addClocks(clocks);
         assertFalse(new Refinement(new Composition(new TransitionSystem[]{a, aa}), b).check());
     }
 }

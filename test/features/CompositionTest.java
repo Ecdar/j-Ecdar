@@ -140,6 +140,8 @@ public class CompositionTest {
     @Test
     public void testCompRefinesSpecOld() {
 
+        CDD.init(100,100,100);
+        CDD.addClocks(adm.getClocks(),machine.getClocks(),researcher.getClocks(),spec.getClocks());
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
         comp.getAutomaton();
         assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check());
