@@ -57,12 +57,13 @@ public class DeterminismTest {
 
     @Test
     public void testG1EqualsG1() throws CddAlreadyRunningException, CddNotRunningException {
+        Automaton copy = new Automaton(G1.getAutomaton());
         CDD.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.addAll(G1.getClocks());
-        clocks.addAll(G1.getClocks());
+        clocks.addAll(copy.getClocks());
         CDD.addClocks(clocks);
-        assertEquals(new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton())), new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton())));
+        assertEquals(new SimpleTransitionSystem(CDD.makeInputEnabled(G1.getAutomaton())), new SimpleTransitionSystem(CDD.makeInputEnabled(copy)));
     }
 
     @Test
@@ -124,63 +125,63 @@ public class DeterminismTest {
     public void testG4() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G4.getClocks());
-        assertTrue(G4.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G4.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG5() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G5.getClocks());
-        assertTrue(G5.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G5.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG6() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G6.getClocks());
-        assertTrue(G6.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G6.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG7() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G7.getClocks());
-        assertTrue(G7.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G7.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG8() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G8.getClocks());
-        assertTrue(G8.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G8.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG9() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G9.getClocks());
-        assertFalse(G9.isDeterministic());
+        assertFalse(new SimpleTransitionSystem(CDD.makeInputEnabled(G9.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG10() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G10.getClocks());
-        assertTrue(G10.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G10.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG11() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G11.getClocks());
-        assertTrue(G11.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G11.getAutomaton())).isDeterministic());
     }
 
     @Test
     public void testG12() throws CddAlreadyRunningException, CddNotRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G12.getClocks());
-        assertTrue(G12.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled((G12.getAutomaton()))).isDeterministic());
     }
 
     @Test
@@ -188,7 +189,7 @@ public class DeterminismTest {
         CDD.init(100,100,100);
         CDD.addClocks(G13.getClocks());
         ((SimpleTransitionSystem) (G13)).toXML("st-ic.xml");
-        assertTrue(G13.isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(G13.getAutomaton())).isDeterministic());
     }
 
     @Test

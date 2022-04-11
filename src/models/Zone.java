@@ -185,18 +185,28 @@ public class Zone {
         return true;
     }
 
-    public List<Guard> buildGuardsFromZone(List<Clock> clocks) {
+    private static boolean relevantClocksContainsClock(Clock clock, List<Clock> relevantClocks) {
+
+        for (int i = 0; i < relevantClocks.size(); i++){
+            if(clock.hashCode() == relevantClocks.get(i).hashCode()) return true;
+        }
+        return false;
+    }
+
+    public List<Guard> buildGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<Guard> guards = new ArrayList<>();
-        guards.addAll(buildNormalGuardsFromZone(clocks));
-        guards.addAll(buildDiagonalConstraintsFromZone(clocks));
+        guards.addAll(buildNormalGuardsFromZone(clocks,relevantClocks));
+        guards.addAll(buildDiagonalConstraintsFromZone(clocks,relevantClocks));
         return guards;
     }
 
-    public List<ClockGuard> buildNormalGuardsFromZone(List<Clock> clocks) {
+    public List<ClockGuard> buildNormalGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<ClockGuard> guards = new ArrayList<>();
 
         for (int i = 1; i < size; i++) {
             Clock clock = clocks.get(i - 1);
+            if (!relevantClocksContainsClock(clock, relevantClocks))
+                continue;
             // values from first row, lower bounds
             int lb = dbm[i];
 
@@ -236,7 +246,7 @@ public class Zone {
         return guards;
     }
 
-    public List<ClockGuard> buildDiagonalConstraintsFromZone(List<Clock> clocks) {
+    public List<ClockGuard> buildDiagonalConstraintsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<ClockGuard> guards = new ArrayList<>();
 
         for (int i = 1; i < size; i++) {
@@ -247,7 +257,8 @@ public class Zone {
                 //    continue;
                 Clock clock_i = clocks.get(i - 1);
                 Clock clock_j = clocks.get(j - 1);
-
+                if (!relevantClocksContainsClock(clock_i, relevantClocks) || !relevantClocksContainsClock(clock_j, relevantClocks) )
+                    continue;
                 // values from first row, lower bounds
                 int currentValue = dbm[i+j*size];
                 if (currentValue==DBM_INF)
@@ -260,6 +271,7 @@ public class Zone {
                 } else
                 {
                     ClockGuard dc = new ClockGuard(clock_j,clock_i,DBMLib.raw2bound(currentValue),Relation.LESS_EQUAL);
+                    System.out.println("i: " + i + " j: " + j + " ci: + " + clock_i + " cj: " + clock_j + " " + dc + " clocks: " + clocks + " relevantClocks: " + relevantClocks);
                     guards.add(dc);
                 }
 

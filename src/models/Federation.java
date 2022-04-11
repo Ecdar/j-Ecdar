@@ -41,7 +41,7 @@ public class Federation {
     {
         List<List<Guard>> turnedBackIntoGuards = new ArrayList<>();  // make a function
         for (Zone z : getZones()) {
-            turnedBackIntoGuards.add(z.buildGuardsFromZone(clocks));
+            turnedBackIntoGuards.add(z.buildGuardsFromZone(clocks,clocks));
         }
         return turnedBackIntoGuards;
     }

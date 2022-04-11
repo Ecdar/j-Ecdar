@@ -77,6 +77,7 @@ public class Edge {
             }
 
         }
+        this.updates= updates;
     }
 
 
@@ -149,10 +150,10 @@ public class Edge {
         return guards;
     }
 
-    public void addGuards(List<List<Guard>> newGuards) {
+   /* public void addGuards(List<List<Guard>> newGuards) {
         CDD res = new CDD(newGuards);
-        this.guards = CDD.toGuards(new CDD(this.guards).conjunction(res));
-    }
+        this.guards = CDD.toGuards(new CDD(this.guards).conjunction(res),clocks);
+    }*/
 
     public List<Update> getUpdates() {
         return updates;

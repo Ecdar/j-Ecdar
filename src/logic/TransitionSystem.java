@@ -28,7 +28,7 @@ public abstract class TransitionSystem {
 
 
     public State getInitialState() {
-        CDD initCDD = CDD.getUnrestrainedCDD();
+        CDD initCDD = CDD.zeroCDDDelayed();
         State state = new State(getInitialLocation(), initCDD);
         state.applyInvariants();
         return state;
@@ -36,9 +36,11 @@ public abstract class TransitionSystem {
 
     public State getInitialStateRef( CDD invs) {
 
-        CDD initCDD = CDD.getUnrestrainedCDD();
+        CDD initCDD = CDD.zeroCDDDelayed();
         State state = new State(getInitialLocation(), initCDD);
+        //state.getInvarCDD().printDot();
         state.applyInvariants();
+        //state.getInvarCDD().printDot();
         state.applyGuards(invs);
 
         return state;
@@ -79,6 +81,7 @@ public abstract class TransitionSystem {
 
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
+
         return transitions;
     }
 

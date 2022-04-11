@@ -99,7 +99,7 @@ public class VariousTest {
 
 
         origin1 = origin1.delay();
-        List<List<Guard>> origin1Guards = CDD.toGuards(origin1);
+        List<List<Guard>> origin1Guards = CDD.toGuardList(origin1,clocks);
         for (List<Guard> list : origin1Guards) {
             System.out.println("nextOr");
             for (Guard guard: list)

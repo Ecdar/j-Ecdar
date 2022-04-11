@@ -28,8 +28,8 @@ public class State {
         return invarCDD;
     }
 
-    public List<List<Guard>> getInvariants() {
-        return CDD.toGuards(location.getInvariantCDD());
+    public List<List<Guard>> getInvariants(List<Clock> relevantClocks) {
+        return CDD.toGuardList(location.getInvariantCDD(),relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -42,7 +42,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        this.invarCDD=location.getInvariantCDD();
+        this.invarCDD=this.invarCDD.conjunction(location.getInvariantCDD());
     }
 
     public void applyResets(List<Update> resets) {
@@ -52,11 +52,14 @@ public class State {
     public void extrapolateMaxBounds(int[] maxBounds){
         CDD copy = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
+
         while (!copy.isTerminal())
         {
-            CddExtractionResult extractResult = copy.extractBddAndDbm();
+            CddExtractionResult extractResult = copy.reduce().removeNegative().extractBddAndDbm();
             copy = extractResult.getCddPart();
+            //copy.printDot();
             Zone z = new Zone(extractResult.getDbm());
+            //z.printDBM(true,true);
             CDD bddPart = extractResult.getBddPart();
             z.extrapolateMaxBounds(maxBounds);
             CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);

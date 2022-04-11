@@ -110,7 +110,7 @@ public class Bisimilarity {
                         List<Update> updates = allEdges.get(0).getUpdates();
                         for (Edge e : allEdges)
                             assert(Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
-                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuards(allCDDs), allEdges.get(0).getUpdates()));
+                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuardList(allCDDs, aut.getClocks()), allEdges.get(0).getUpdates()));
                     }
 
                 }

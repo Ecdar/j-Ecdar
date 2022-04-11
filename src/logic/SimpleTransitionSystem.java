@@ -79,6 +79,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         waiting.add(getInitialState());
 
         while (!waiting.isEmpty()) {
+            System.out.println("in the while");
             State currState = new State(waiting.pop());
             State toStore = new State(currState);
             int[] maxBounds;
@@ -94,18 +95,24 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 List<Transition> tempTrans = getNextTransitions(currState, action);
 
+                System.out.println("and now this");
                 if (checkMovesOverlap(tempTrans)) {
                     System.out.println("found the culprit");
                     return false;
                 }
 
+                System.out.println("and now t´hat");
+
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s) && !waitingContainsState(s)).collect(Collectors.toList()); // TODO I added waitingConstainsState... Okay??
 
+                System.out.println("and now none");
                 toAdd.forEach(e->e.extrapolateMaxBounds(maxBounds));
+
                 waiting.addAll(toAdd);
             }
         }
+        System.out.println("shinfesadasdas");
         return true;
     }
 
@@ -133,8 +140,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
                         //trans.get(i).getGuardCDD().printDot();
                        // trans.get(j).getGuardCDD().printDot();
-                        trans.get(i).getEdges().get(0).getGuardCDD().printDot();
-                        trans.get(j).getEdges().get(0).getGuardCDD().printDot();
+                        //trans.get(i).getEdges().get(0).getGuardCDD().printDot();
+                        //trans.get(j).getEdges().get(0).getGuardCDD().printDot();
                         System.out.println("they intersect??!");
                         return true;
                     }
@@ -281,15 +288,17 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     private boolean passedContainsState(State state1) {
        State state = new State(state1);
-
+        System.out.println("start of passedstate");
         int[] maxBounds;
         List<Integer> res = new ArrayList<>();
         res.add(0);
         res.addAll(this.getMaxBounds());
         maxBounds= res.stream().mapToInt(i -> i).toArray();
+        System.out.println("mid of passedstate");
         state.extrapolateMaxBounds(maxBounds);
 
 
+        System.out.println("mid of passedstate");
         for (State passedState : passed) {
             if (state.getLocation().equals(passedState.getLocation()) &&
                     CDD.isSubset(state.getInvarCDD(),(passedState.getInvarCDD()))) {
@@ -297,7 +306,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 return true;
             }
         }
-
+        System.out.println("end of passedstate");
         return false;
     }
 
@@ -323,9 +332,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
-        //System.out.println("reached getNexttrans");
+        System.out.println("reached getNexttrans");
         List<Move> moves = getNextMoves(currentState.getLocation(), channel);
-
+        System.out.println("made moves");
         return createNewTransitions(currentState, moves, allClocks);
     }
 

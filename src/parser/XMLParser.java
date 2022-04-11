@@ -149,7 +149,6 @@ public class XMLParser {
                 }
             }
         }
-        System.out.println("reached the parser " + boolList.toString());
         return boolList;
     }
 

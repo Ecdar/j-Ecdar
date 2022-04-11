@@ -175,13 +175,16 @@ public class Refinement {
         if (target1.getInvarCDD().isFalse()) {
             return null;
         }
+
+        CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
         target1.applyResets(t1.getUpdates());
         target1.applyResets(t2.getUpdates());
 
+        CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
         target1.delay();// = target1.getInvarCDD().delay();
 
         target1.applyInvariants(t1.getTarget().getInvarCDD());
-        target1.getInvarCDD().printDot();
+
         //System.out.println(target1.getInvariants());
         CDD invariantTest = new CDD(target1.getInvarCDD().getPointer());
         target1.applyInvariants(t2.getTarget().getInvarCDD());
@@ -193,10 +196,15 @@ public class Refinement {
 
         CDD cdd = invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce();
         if (cdd.isNotFalse()){
-            invariantTest.printDot();
-            target1.getInvarCDD().printDot();
-            invariantTest.minus(target1.getInvarCDD()).printDot();
-            invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
+            //System.out.println(t1.getTarget().getLocation());
+            //System.out.println(t2.getTarget().getLocation());
+            //t2.getGuardCDD().printDot();
+            //copyBeforeResets.printDot();
+           //copyAfterResets.printDot();
+            //t1.getTarget().getInvarCDD().printDot();
+            //t2.getTarget().getInvarCDD().printDot();
+            //invariantTest.minus(target1.getInvarCDD()).printDot();
+           // invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
             System.out.println("invarfed after substraction not empty!");
             return null;
          }
@@ -228,14 +236,16 @@ public class Refinement {
         for (CDD c: gzRight)
             rightCDD = rightCDD.disjunction(c);
 
+        System.out.println("create new state pair");
 
-
-        leftCDD.printDot();
-        rightCDD.printDot();
-        leftCDD.minus(rightCDD).printDot();
-        leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
+       // leftCDD.minus(rightCDD).printDot();
+       // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
+            System.out.println(trans1.get(0).getEdges().get(0));
+            System.out.println(trans2.get(0).getEdges().get(0));
+            leftCDD.printDot();
+            rightCDD.printDot();
             System.out.println("trans2 does not satisfy all solution of trans2");
             return false;
         }
@@ -281,10 +291,14 @@ public class Refinement {
                 List<Transition> transitions2;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
+                    System.out.println("action : " + action);
                     transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
                             : ts2.getNextTransitions(state2, action, allClocks);
 
                     if (transitions2.isEmpty()) {
+                        //state2.getInvarCDD().printDot();
+                        System.out.println("ts2 loc" + state2.getLocation());
+                        System.out.println("trans 2 empty");
                         return false;
                     }
                 } else {

@@ -141,7 +141,7 @@ public class Quotient extends TransitionSystem {
                             CDD invarNegated = l_spec.getInvariantCDD().negation();
                                 // merge the current part with the invariant of the component, to create each new transition
 
-                                edges.add(new Edge(loc, inc, newChan, true, CDD.toGuards(l_comp.getInvariantCDD().conjunction(invarNegated)), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
+                                edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(l_comp.getInvariantCDD().conjunction(invarNegated),clocks), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
                        }
 
                     // Rule 1
@@ -153,7 +153,7 @@ public class Quotient extends TransitionSystem {
                         for (Channel c : allChans) {
                                 boolean isInput = false;
                                 if (inputs.contains(c)) isInput = true;
-                                edges.add(new Edge(loc, univ, c, isInput, CDD.toGuards(l_comp_invar_negated), new ArrayList<>()));
+                                edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(l_comp_invar_negated,clocks), new ArrayList<>()));
 
                         }
                     }
@@ -180,7 +180,7 @@ public class Quotient extends TransitionSystem {
                                     updatesList.addAll(e_spec.getUpdates());
                                     updatesList.addAll(e_comp.getUpdates());
                                     //Update[] updates = updatesList.toArray(new Update[0]); // TODO: Check whether this is really the way to initialize an array from a list
-                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), CDD.toGuards(guard), updatesList));
+                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), CDD.toGuardList(guard,clocks), updatesList));
                                 }
                         }
 
@@ -203,7 +203,7 @@ public class Quotient extends TransitionSystem {
                             if (!collectedNegationsSpec.isEmpty() || spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty())
                                 // for each c-transtion in comp, create a new transition with the negated guard
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                    edges.add(new Edge(loc, inc, c, true,CDD.toGuards(e_comp.getGuardCDD().conjunction(negated)), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
+                                    edges.add(new Edge(loc, inc, c, true,CDD.toGuardList(e_comp.getGuardCDD().conjunction(negated),clocks), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
                                 }
                         }
                     }
@@ -236,7 +236,7 @@ public class Quotient extends TransitionSystem {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
 
                                     //combined.addAll(e_spec.getGuards()); //TODO: THIS IS IMPORTANT! Is this supposed to be in?????
-                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), CDD.toGuards(negated), new ArrayList<>()));
+                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), CDD.toGuardList(negated,clocks), new ArrayList<>()));
                                 }
                         }
                     }

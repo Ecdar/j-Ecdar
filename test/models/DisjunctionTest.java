@@ -118,15 +118,14 @@ public class DisjunctionTest {
         disjunctedGuards.printDot();
         CDD neg = disjunctedGuards.negation();
         System.out.println("too");
-        List<List<Guard>> out = CDD.toGuards(neg);
+        List<List<Guard>> out = CDD.toGuardList(neg,clocks);
 
 
         System.out.println(disjunctedGuards);
         System.out.println(out);
 
 
-        assert(out.toString().equals("[[Guard{clock=Clock{name='x'}, upperBound=3, lowerBound=0, isStrict=false}], " +
-                "[Guard{clock=Clock{name='x'}, upperBound=2147483647, lowerBound=7, isStrict=false}, Guard{clock=Clock{name='x'}, upperBound=9, lowerBound=0, isStrict=false}]]"));
+        assert(out.toString().equals("[[x<=3], [x>=7, x<9]]"));
 
 
     }

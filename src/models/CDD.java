@@ -87,7 +87,7 @@ public class CDD {
             return createBddNode(bddStartLevel + getIndexOfBV(guard.getVar())).negation();
     }
 
-    public static List<List<Guard>> toGuards(CDD state){
+    public static List<List<Guard>> toGuardList(CDD state, List<Clock> relevantClocks){
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
         copy = copy.removeNegative().reduce();
@@ -109,7 +109,7 @@ public class CDD {
             copy = res.getCddPart();
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
-            List<Guard> guardList = z.buildGuardsFromZone(clocks);
+            List<Guard> guardList = z.buildGuardsFromZone(clocks, relevantClocks);
             guardList.addAll(CDD.toBoolGuards(bddPart)); // TODO: once we have boolean
             guards.add(guardList);
         }
@@ -198,6 +198,13 @@ public class CDD {
     public static CDD zeroCDD()
     {
         Zone z = new Zone(numClocks,false);
+        return CDD.allocateFromDbm(z.getDbm(),numClocks);
+    }
+
+    public static CDD zeroCDDDelayed()
+    {
+        Zone z = new Zone(numClocks,false);
+        z.delay();
         return CDD.allocateFromDbm(z.getDbm(),numClocks);
     }
 
@@ -477,7 +484,7 @@ public class CDD {
             return false;
         while (!copy.isTerminal())
         {
-            CddExtractionResult res = copy.extractBddAndDbm();
+            CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
             copy = res.getCddPart();
             Zone z = new Zone(res.getDbm());
             if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
@@ -487,8 +494,7 @@ public class CDD {
     }
 
     public static  boolean isUrgent(CDD state) {
-        System.out.println("not sure urgent works yet, aborting!");
-        assert false;
+        System.out.println("not sure urgent works yet!");
 
         CDD copy = new CDD(state.getPointer());
         if (copy.isTrue())
@@ -497,8 +503,9 @@ public class CDD {
             return false;
         while (!copy.isTerminal())
         {
-            CddExtractionResult res = copy.extractBddAndDbm();
+            CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
             Zone z = new Zone(res.getDbm());
+            copy = res.getCddPart();
             if (z.isUrgent())
                 return true; // TODO: is it enough if one is urgent?
         }
@@ -564,6 +571,8 @@ public class CDD {
             }
         }
 
+
+
         return this.transition(e.getGuardCDD(),clockResets,clockValues,boolResets,boolValues);
     }
 
@@ -627,7 +636,7 @@ public class CDD {
         Automaton copy = addTargetInvariantToEdges(aut); //new Automaton(aut);
         if (clocks.size() > 0) {
             for (Location loc : copy.getLocations()) {
-                CDD fullCDD = loc.getInvariantCDD();
+                CDD sourceInvariantCDD = loc.getInvariantCDD();
                 // loop through all inputs
                 for (Channel input : copy.getInputAct()) {
                     // build CDD of zones from edges
@@ -637,20 +646,20 @@ public class CDD {
                     if (!inputEdges.isEmpty()) {
                         for (Edge edge : inputEdges) {
                             CDD target = edge.getTarget().getInvariantCDD();
-                            CDD preReset = CDD.applyReset(target, edge.getUpdates());
-                            CDD preGuard = preReset.conjunction(edge.getGuardCDD());
-                            CDD preGuard1 = target.transition(edge);
-                            assert (preGuard1.equiv(preGuard));
-                            cddOfAllInputs = cddOfAllInputs.disjunction(preGuard);
+                            //CDD preReset = CDD.applyReset(target, edge.getUpdates()); // Does not work for back propagation
+                            //CDD preGuard = preReset.conjunction(edge.getGuardCDD());
+                            CDD preGuard1 = target.transitionBack(edge);
+                            //assert (preGuard1.equiv(preGuard));
+                            cddOfAllInputs = cddOfAllInputs.disjunction(preGuard1);
                         }
 
                         // subtract the federation of zones from the original fed
-                        resCDD = fullCDD.minus(cddOfAllInputs);
+                        resCDD = sourceInvariantCDD.minus(cddOfAllInputs);
                     } else {
-                        resCDD = fullCDD;
+                        resCDD = sourceInvariantCDD;
                     }
 
-                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuards(resCDD), new ArrayList<>());
+                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, aut.getClocks()), new ArrayList<>());
                     copy.getEdges().add(newEdge);
 
 
@@ -667,7 +676,7 @@ public class CDD {
             for (Edge edge : copy.getEdges()) {
                 CDD targetCDD = edge.getTarget().getInvariantCDD();
                 CDD past = targetCDD.transitionBack(edge);
-                edge.setGuards(CDD.toGuards(past));
+                edge.setGuards(CDD.toGuardList(past, aut.getClocks()));
             }
         } // TODO: else part will be important once we have bool support
         return copy;

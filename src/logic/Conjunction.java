@@ -138,7 +138,7 @@ public class Conjunction extends TransitionSystem {
                     boolean isUrgent = trans.getTarget().getLocation().getIsUrgent();
                     boolean isUniversal = trans.getTarget().getLocation().getIsUniversal();
                     boolean isInconsistent = trans.getTarget().getLocation().getIsInconsistent();
-                    List<List<Guard>> invariant = trans.getTarget().getInvariants();
+                    List<List<Guard>> invariant = trans.getTarget().getInvariants(clocks);
                     String sourceName = trans.getSource().getLocation().getName();
                     int x = trans.getTarget().getLocation().getX();
                     int y = trans.getTarget().getLocation().getX();
@@ -154,7 +154,7 @@ public class Conjunction extends TransitionSystem {
                         trans.getTarget().extrapolateMaxBounds(maxBounds);
                         waiting.add(trans.getTarget());
                     }
-                    List<List<Guard>> guardList = trans.getGuards(); // TODO: Check!
+                    List<List<Guard>> guardList = trans.getGuards(clocks); // TODO: Check!
                     List<Update> updateList = trans.getUpdates();
                     boolean isInput = false;
                     if (getInputs().contains(chan))
@@ -221,7 +221,7 @@ public class Conjunction extends TransitionSystem {
             y += l.getY();
 
         }
-        invariant = CDD.toGuards(invarFed);
+        invariant = CDD.toGuardList(invarFed, getClocks());
 
         return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
 
