@@ -66,19 +66,31 @@ public abstract class TransitionSystem {
 
             targetState.applyGuards(guards);
 
-            if (!targetState.getInvarCDD().isNotFalse()) continue;
+            if (!targetState.getInvarCDD().isNotFalse())
+            {
+                System.out.println("target invar not valid");
+                continue;
+            }
 
 
             CDD guardCDD = new CDD(targetState.getInvarCDD().getPointer());
 
+
+            System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
+            System.out.println("updates: " + updates);
             if (!updates.isEmpty()) targetState.applyResets(updates);
+            System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
 
+            targetState.getInvarCDD().printDot();
             targetState.delay();
-
             targetState.applyInvariants();
 
 
-            if (targetState.getInvarCDD().isFalse()) continue;
+            if (targetState.getInvarCDD().isFalse())
+            {
+                System.out.println("no valid target state");
+                continue;
+            }
 
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
@@ -142,6 +154,7 @@ public abstract class TransitionSystem {
 
     private boolean isConsistent(boolean canPrune) {
         boolean isDeterm = isDeterministic();
+        System.out.println("is deterministic: " + isDeterm);
         boolean isConsistent = true;
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();

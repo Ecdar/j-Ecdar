@@ -377,8 +377,10 @@ public class DelayRefinementTest {
     @Test
     public void Z1RefinesSelf() {
         Automaton automata2 = new Automaton(automata[46]);
-        CDD.init(100,100,100);
+        CDD.init(1000,1000,1000);
         CDD.addClocks(automata[46].getClocks(),automata2.getClocks());
+        SimpleTransitionSystem inpuEn = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[46]));
+        XMLFileWriter.toXML("inpue.xml",inpuEn);
         assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[46])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
@@ -580,7 +582,7 @@ public class DelayRefinementTest {
     public void K3NotRefinesK4() {
         CDD.init(100,100,100);
         CDD.addClocks(automata[27].getClocks(),automata[28].getClocks());
-        assertFalse(new Refinement(new SimpleTransitionSystem(automata[27]), new SimpleTransitionSystem(automata[28])).check());
+        assertFalse(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[27])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata[28]))).check());
     }
 
     @Test

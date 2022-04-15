@@ -160,7 +160,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         if (passedContainsState(currState))
             return true;
-
+        System.out.println(((SimpleLocation)currState.getLocation()).getActualLocation() + " " +  CDD.toGuardList(currState.getInvarCDD(),clocks));
         State toStore = new State(currState);
         int[] maxBounds;
         List<Integer> res = new ArrayList<>();
@@ -179,7 +179,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                     return false;
             }
         }
-
+        System.out.println("somewhere in the check");
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
         if (canPrune && CDD.canDelayIndefinitely(currState.getInvarCDD())) {
@@ -190,7 +190,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         else {
             for (Channel channel : outputs) {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
-
+                System.out.println("temptranssize " + channel + " " + tempTrans.size());
                 for (Transition ts : tempTrans) {
                     if(!outputExisted) outputExisted = true;
                     boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
@@ -213,6 +213,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             else
             {
 
+                System.out.println(".....");
                 return false;
             }
         }
@@ -324,12 +325,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         Location location = ((SimpleLocation) symLocation).getActualLocation();
         List<Edge> edges = automaton.getEdgesFromLocationAndSignal(location, channel);
-
+        System.out.println("number of edges " + edges.size() + " " + edges);
         for (Edge edge : edges) {
             SymbolicLocation target = new SimpleLocation(edge.getTarget());
             Move move = new Move(symLocation, target, Collections.singletonList(edge));
             moves.add(move);
         }
+        System.out.println("number of moves " + moves.size() + " " + moves);
+
         return moves;
     }
 

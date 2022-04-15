@@ -93,13 +93,13 @@ public class Refinement {
             precondMet = false;
             errMsg.append("Not all outputs of the right side are present on the left side.\n OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
         }
-        System.out.println("mid of preconditions");
+        System.out.println("mid of preconditions " + precondMet);
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts1.getLastErr());
         }
 
-        System.out.println("after first least consistent");
+        System.out.println("after first least consistent " + precondMet);
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts2.getLastErr());
@@ -187,15 +187,15 @@ public class Refinement {
         CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
         System.out.println("after resets " + CDD.toGuardList(copyAfterResets,allClocks));
         target1.delay();// = target1.getInvarCDD().delay();
+        System.out.println("delayed " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         target1.applyInvariants(t1.getTarget().getInvarCDDDirectlyFromInvariants());
-        System.out.println(((SimpleLocation)t1.getTarget().getLocation()).getActualLocation().getInvariant());
+        //System.out.println(((SimpleLocation)t1.getTarget().getLocation()).getActualLocation().getInvariant());
         System.out.println("delayed + first invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         CDD invariantTest = new CDD(target1.getInvarCDD().getPointer());
         target1.applyInvariants(t2.getTarget().getInvarCDDDirectlyFromInvariants());
-        System.out.println("in the end: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
-        System.out.println(((SimpleLocation)t2.getTarget().getLocation()).getActualLocation().getInvariant());
+        //System.out.println(((SimpleLocation)t2.getTarget().getLocation()).getActualLocation().getInvariant());
         System.out.println("delayed + second invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
@@ -373,7 +373,7 @@ public class Refinement {
         //assert(ts1.getInitialLocation().getInvariants().size()<=1 && ts2.getInitialLocation().getInvariants().size()<=1); // TODO: this just holds for testing until we have tests with disjunctions as input files
         State left = ts1.getInitialStateRef( ts2.getInitialLocation().getInvariantCDD());
         State right = ts2.getInitialStateRef(ts1.getInitialLocation().getInvariantCDD());
-
+        System.out.println("left " + CDD.toGuardList(left.getInvarCDD(),allClocks) + " " + CDD.toGuardList(right.getInvarCDD(),allClocks));
         return new StatePair(left, right);
     }
 

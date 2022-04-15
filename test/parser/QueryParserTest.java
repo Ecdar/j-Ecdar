@@ -401,6 +401,7 @@ public class QueryParserTest {
             System.out.println(result);
             assertTrue(result.get(0).equals("true") && result.get(2).equals("false"));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             fail();
         }
     }

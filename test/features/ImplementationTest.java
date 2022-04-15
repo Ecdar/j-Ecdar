@@ -161,9 +161,7 @@ public class ImplementationTest {
     public void testG12(){
         CDD.init(100,100,100);
         CDD.addClocks(automata[12].getClocks() );
-        TransitionSystem ts = new SimpleTransitionSystem(automata[12]);
-
-        
+        TransitionSystem ts = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[12]));
         assertFalse(ts.isImplementation());
     }
 

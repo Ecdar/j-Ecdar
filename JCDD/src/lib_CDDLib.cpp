@@ -413,12 +413,12 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
     auto converted_clock_resets = helper_functions::jintToC(env, clock_resets, num_clock_resets);
     auto converted_clock_values = helper_functions::jintToC(env, clock_values, num_clock_resets);
 
-    jsize num_bool_resets = env->GetArrayLength(clock_resets);
+    jsize num_bool_resets = env->GetArrayLength(bool_resets);
     auto converted_bool_resets = helper_functions::jintToC(env, bool_resets, num_bool_resets);
     auto converted_bool_values = helper_functions::jintToC(env, bool_values, num_bool_resets);
 
     cdd* cdd_result = new cdd(cdd_apply_reset(*cdd_object,
-            converted_clock_resets, converted_clock_values, num_bool_resets,
+            converted_clock_resets, converted_clock_values, num_clock_resets,
             converted_bool_resets, converted_bool_values, num_bool_resets));
     return (jlong)cdd_result;
 }

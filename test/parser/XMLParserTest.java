@@ -84,8 +84,8 @@ public class XMLParserTest {
     @Test
     public void testParseXmlString(){
         Automaton actual = XMLParser.parseXmlString(xmlString, false)[0];
-        CDD.init(100,100,100);
-        CDD.addClocks(expected.getClocks(),actual.getClocks());
+//        CDD.init(100,100,100);
+//        CDD.addClocks(expected.getClocks(),actual.getClocks());
         assertEquals(actual, expected);
         CDD.done();
     }
