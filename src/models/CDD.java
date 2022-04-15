@@ -35,6 +35,7 @@ public class CDD {
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
+        assert(false);
         return 0;
     }
 
@@ -68,7 +69,7 @@ public class CDD {
                     bdd.conjunction(fromBoolGuard((BoolGuard)guard));
                 }
             }
-            res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks).conjunction(bdd));
+            res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks).conjunction(bdd)).removeNegative().reduce();
         }
         this.pointer = res.pointer;
         if (guards.isEmpty())
@@ -230,6 +231,7 @@ public class CDD {
 
     public static CDD allocateInterval(int i, int j, int lower, int upper){
         checkIfRunning();
+        System.out.println("**************************************************** Check allocate interval ***********************");
         // TODO: Dont think this works.
         //assert(false);
         return new CDD(CDDLib.interval(i,j,lower,upper));
@@ -305,21 +307,21 @@ public class CDD {
     public CDD applyReset(int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
         checkIfRunning();
         checkForNull();
-        return new CDD(CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues));
+        return new CDD(CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues)).removeNegative().reduce();
     }
 
     public CDD minus(CDD other){
         checkIfRunning();
         checkForNull();
         other.checkForNull();
-        return new CDD(CDDLib.minus(pointer, other.pointer));
+        return new CDD(CDDLib.minus(pointer, other.pointer)).removeNegative().reduce();
     }
 
     public CDD transition(CDD guard, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
         checkIfRunning();
         checkForNull();
         guard.checkForNull();
-        return new CDD(CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues));
+        return new CDD(CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues)).removeNegative().reduce();
     }
 
     public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets){
@@ -327,7 +329,7 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
-        return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets));
+        return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
     }
 
     public CDD predt(CDD safe){
@@ -440,7 +442,7 @@ public class CDD {
             }
         }
 
-        return state.applyReset(clockResets,clockValues,boolResets,boolValues);
+        return state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
     }
 
     private void checkForNull(){
@@ -477,6 +479,7 @@ public class CDD {
     }
 
     public static  boolean canDelayIndefinitely(CDD state) {
+
         CDD copy = new CDD(state.getPointer());
         if (copy.isTrue())
             return true;
@@ -490,6 +493,7 @@ public class CDD {
             if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
                 return true;
         }
+
         return false;
     }
 
@@ -573,7 +577,7 @@ public class CDD {
 
 
 
-        return this.transition(e.getGuardCDD(),clockResets,clockValues,boolResets,boolValues);
+        return this.transition(e.getGuardCDD(),clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
     }
 
 
@@ -611,7 +615,7 @@ public class CDD {
                 bl++;
             }
         }
-        return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets);
+        return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets).removeNegative().reduce();
     }
 
 
@@ -629,7 +633,7 @@ public class CDD {
                 res = res.conjunction(CDD.fromBoolGuard(bg));
             }
         }
-        return res;
+        return res.removeNegative().reduce();
     }
 
     public static Automaton makeInputEnabled(Automaton aut) {

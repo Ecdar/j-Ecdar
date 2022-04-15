@@ -156,6 +156,7 @@ public class QueryParserTest {
         try {
             assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0), "false");
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             fail();
         }
     }
@@ -397,6 +398,7 @@ public class QueryParserTest {
     public void testSeveralQueries2() {
         try {
             List<String> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec; refinement:Machine3<=Machine3", false);
+            System.out.println(result);
             assertTrue(result.get(0).equals("true") && result.get(2).equals("false"));
         } catch (Exception e) {
             fail();

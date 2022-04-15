@@ -79,7 +79,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
         waiting.add(getInitialState());
 
         while (!waiting.isEmpty()) {
-            System.out.println("in the while");
             State currState = new State(waiting.pop());
             State toStore = new State(currState);
             int[] maxBounds;
@@ -89,30 +88,28 @@ public class SimpleTransitionSystem extends TransitionSystem{
             maxBounds= res.stream().mapToInt(i -> i).toArray();
 
             toStore.extrapolateMaxBounds(maxBounds);
+
             passed.add(toStore);
 
             for (Channel action : actions) {
 
+
                 List<Transition> tempTrans = getNextTransitions(currState, action);
 
-                System.out.println("and now this");
                 if (checkMovesOverlap(tempTrans)) {
-                    System.out.println("found the culprit");
                     return false;
                 }
 
-                System.out.println("and now t´hat");
 
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s) && !waitingContainsState(s)).collect(Collectors.toList()); // TODO I added waitingConstainsState... Okay??
 
-                System.out.println("and now none");
                 toAdd.forEach(e->e.extrapolateMaxBounds(maxBounds));
 
                 waiting.addAll(toAdd);
             }
         }
-        System.out.println("shinfesadasdas");
+
         return true;
     }
 
@@ -129,8 +126,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 State state1 = new State(trans.get(i).getSource());
                 State state2 = new State(trans.get(j).getSource());
 
-                System.out.println(trans.get(i).getEdges());
-                System.out.println(trans.get(j).getEdges());
                 state1.applyGuards(trans.get(i).getGuardCDD());
                 state2.applyGuards(trans.get(j).getGuardCDD());
 
@@ -155,10 +150,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
     public boolean isConsistentHelper(boolean canPrune) {
         //if (!isDeterministic()) // TODO: this was commented out, I added it again
         //    return false;
-        System.out.println("is determinsic check passed");
         passed = new ArrayList<>();
         boolean result = checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
-        System.out.println("made it out of consistency check");
 
         return result;
     }
@@ -177,7 +170,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         toStore.extrapolateMaxBounds(maxBounds);
         passed.add(toStore);
-        System.out.println("somewhere mid consistentcy check");
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
             List<Transition> tempTrans = getNextTransitions(currState, channel);
@@ -188,17 +180,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
             }
         }
 
-        System.out.println("somewhere after mid  consistentcy check");
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
         if (canPrune && CDD.canDelayIndefinitely(currState.getInvarCDD())) {
-            System.out.println("somewhere further");
             return true;
         }
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
         else {
-            System.out.println("somewhere even further");
             for (Channel channel : outputs) {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
 
@@ -208,7 +197,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
                     if (outputConsistent && canPrune)
                         return true;
                     if(!outputConsistent && !canPrune) {
-                        System.out.println("wow");
                         return false;
                     }
                 }
@@ -216,7 +204,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                System.out.println("finale");
                 return CDD.canDelayIndefinitely(currState.getInvarCDD());
 
             }
@@ -225,7 +212,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
             else
             {
-                System.out.println("fin finale");
+
                 return false;
             }
         }
@@ -288,17 +275,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     private boolean passedContainsState(State state1) {
        State state = new State(state1);
-        System.out.println("start of passedstate");
         int[] maxBounds;
         List<Integer> res = new ArrayList<>();
         res.add(0);
         res.addAll(this.getMaxBounds());
         maxBounds= res.stream().mapToInt(i -> i).toArray();
-        System.out.println("mid of passedstate");
         state.extrapolateMaxBounds(maxBounds);
 
 
-        System.out.println("mid of passedstate");
         for (State passedState : passed) {
             if (state.getLocation().equals(passedState.getLocation()) &&
                     CDD.isSubset(state.getInvarCDD(),(passedState.getInvarCDD()))) {
@@ -306,7 +290,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 return true;
             }
         }
-        System.out.println("end of passedstate");
         return false;
     }
 
@@ -332,9 +315,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
-        System.out.println("reached getNexttrans");
         List<Move> moves = getNextMoves(currentState.getLocation(), channel);
-        System.out.println("made moves");
         return createNewTransitions(currentState, moves, allClocks);
     }
 

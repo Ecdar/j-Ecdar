@@ -77,7 +77,8 @@ public abstract class TransitionSystem {
 
             targetState.applyInvariants();
 
-            if (!targetState.getInvarCDD().isNotFalse()) continue;
+
+            if (targetState.getInvarCDD().isFalse()) continue;
 
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
@@ -120,7 +121,6 @@ public abstract class TransitionSystem {
 
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isDeterministicHelper()){
-                System.out.println("came here again");
                 isDeterministic = false;
                 nondetermTs.add(ts.getName());
             }
@@ -147,13 +147,11 @@ public abstract class TransitionSystem {
         List<SimpleTransitionSystem> systems = getSystems();
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isConsistentHelper(canPrune)) {
-                System.out.println("now in here ");
                 isConsistent = false;
                 inconsistentTs.add(ts.getName());
             }
         }
 
-        System.out.println("after first isconsistent! "+ isConsistent + isDeterm);
         if(!isConsistent) buildErrMessage(inconsistentTs, "inconsistent");
         return isConsistent && isDeterm;
     }

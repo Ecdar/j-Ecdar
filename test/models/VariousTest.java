@@ -111,6 +111,53 @@ public class VariousTest {
 
 
     @Test
+    public void testClockReset() {
+        Clock x = new Clock("x");
+        Clock y = new Clock("y");
+
+        ClockGuard g1 = new ClockGuard(x, 10, Relation.GREATER_EQUAL);
+        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
+
+        List<List<Guard>> guards1 = new ArrayList<>();
+        List<Guard> inner = new ArrayList<>();
+        inner.add(g1);
+        inner.add(g3);
+        guards1.add(inner);
+
+        List<Clock> clocks = new ArrayList<>();
+        clocks.add(x);
+        clocks.add(y);
+        CDD.init(100,100,100);
+        CDD.addClocks(clocks);
+
+        CDD origin1 = new CDD(guards1);
+
+        List<List<Guard>> origin1Guards = CDD.toGuardList(origin1,clocks);
+        for (List<Guard> list : origin1Guards) {
+            for (Guard guard: list)
+                System.out.println(guard);
+        }
+
+
+        Update clockUpdate = new ClockUpdate(x,0);
+        List<Update>  list1 = new ArrayList<>();
+        list1.add(clockUpdate);
+        origin1 = CDD.applyReset(origin1,list1);
+
+        List<List<Guard>> origin2Guards = CDD.toGuardList(origin1,clocks);
+        for (List<Guard> list : origin2Guards) {
+            for (Guard guard: list)
+                System.out.println(guard);
+        }
+        System.out.println(origin2Guards);
+        assert(origin2Guards.toString().equals("[[x==0, y<=3, y-x<=3, x-y<=0]]"));
+
+    }
+
+
+
+
+    @Test
     public void testCompOfCompRefinesSpec() throws CddAlreadyRunningException, CddNotRunningException {
 
         Automaton[] aut2 = XMLParser.parse("samples/xml/university-slice.xml", true);
@@ -119,6 +166,7 @@ public class VariousTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.addAll(aut2[0].getClocks());
         clocks.addAll(aut2[1].getClocks());
+        clocks.addAll(aut2[2].getClocks());
         clocks.addAll(aut2[3].getClocks());
         CDD.addClocks(clocks);
 

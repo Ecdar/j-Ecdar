@@ -117,7 +117,6 @@ public class Refinement {
             currNode = refGraph;
             treeSize++;
         }
-        System.out.println("reached 1");
         while (!waiting.isEmpty()) {
 
             StatePair curr = waiting.pop();
@@ -127,7 +126,7 @@ public class Refinement {
 
             State left = curr.getLeft();
             State right = curr.getRight();
-
+            System.out.println("left: " + CDD.toGuardList(left.getInvarCDD(),allClocks) + " right: " + CDD.toGuardList(right.getInvarCDD(),allClocks));
             // need to make deep copy
             State newState1 = new State(left);
             State newState2 = new State(right);
@@ -169,6 +168,8 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
+        System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
+        System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
 
         target1.applyGuards(t2.getGuardCDD());
 
@@ -176,35 +177,47 @@ public class Refinement {
             return null;
         }
 
+
         CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
+        System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
         target1.applyResets(t1.getUpdates());
         target1.applyResets(t2.getUpdates());
 
+        System.out.println(t1.getUpdates() + " " + t2.getUpdates());
         CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
+        System.out.println("after resets " + CDD.toGuardList(copyAfterResets,allClocks));
         target1.delay();// = target1.getInvarCDD().delay();
 
-        target1.applyInvariants(t1.getTarget().getInvarCDD());
+        target1.applyInvariants(t1.getTarget().getInvarCDDDirectlyFromInvariants());
+        System.out.println(((SimpleLocation)t1.getTarget().getLocation()).getActualLocation().getInvariant());
+        System.out.println("delayed + first invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
-        //System.out.println(target1.getInvariants());
         CDD invariantTest = new CDD(target1.getInvarCDD().getPointer());
-        target1.applyInvariants(t2.getTarget().getInvarCDD());
-        //System.out.println(t2.getTarget().getInvariants());
+        target1.applyInvariants(t2.getTarget().getInvarCDDDirectlyFromInvariants());
+        System.out.println("in the end: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
+        System.out.println(((SimpleLocation)t2.getTarget().getLocation()).getActualLocation().getInvariant());
+        System.out.println("delayed + second invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
 
+        System.out.println(CDD.toGuardList(invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce(),allClocks));
 
         CDD cdd = invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce();
         if (cdd.isNotFalse()){
+
             //System.out.println(t1.getTarget().getLocation());
             //System.out.println(t2.getTarget().getLocation());
             //t2.getGuardCDD().printDot();
-            //copyBeforeResets.printDot();
-           //copyAfterResets.printDot();
-            //t1.getTarget().getInvarCDD().printDot();
+//            copyBeforeResets.printDot();
+//            invariantTest.printDot();
+//            System.out.println(t1.getUpdates() + " " + t2.getUpdates());
+//            target1.getInvarCDD().printDot();
+
             //t2.getTarget().getInvarCDD().printDot();
             //invariantTest.minus(target1.getInvarCDD()).printDot();
-           // invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
+//            invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
+
             System.out.println("invarfed after substraction not empty!");
             return null;
          }
@@ -216,7 +229,6 @@ public class Refinement {
         target1.extrapolateMaxBounds(maxBounds);
 
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
-
         return new StatePair(target1, target2);
     }
 
@@ -297,14 +309,17 @@ public class Refinement {
 
                     if (transitions2.isEmpty()) {
                         //state2.getInvarCDD().printDot();
-                        System.out.println("ts2 loc" + state2.getLocation());
+
+                        System.out.println("ts2 loc" + state2.getLocation() + CDD.toGuardList(state2.getInvarCDD(),allClocks));
                         System.out.println("trans 2 empty");
                         return false;
                     }
                 } else {
+                    System.out.println("making selfloop");
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
                     Transition loop = new Transition(state2, state2.getInvarCDD());
+                    System.out.println("selfloop targetState invar" + CDD.toGuardList(loop.getTarget().getInvarCDD(),allClocks));
                     transitions2.add(loop);
                 }
 

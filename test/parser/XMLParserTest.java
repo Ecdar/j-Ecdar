@@ -75,10 +75,10 @@ public class XMLParserTest {
     @Test
     public void testAutomaton() {
         Automaton actual = XMLParser.parse("./samples/xml/ImplTests.xml", false)[0];
-        CDD.init(100,100,100);
-        CDD.addClocks(expected.getClocks(),actual.getClocks());
+//        CDD.init(100,100,100);
+//        CDD.addClocks(expected.getClocks(),actual.getClocks());
         assert expected.equals(actual);
-        CDD.done();
+//        CDD.done();
     }
 
     @Test

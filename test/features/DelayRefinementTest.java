@@ -157,16 +157,18 @@ public class DelayRefinementTest {
 
     @Test
     public void T10RefinesSelf() {
+        Automaton automata2 = new Automaton(automata[17]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[17].getClocks(),automata[17].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[17]), new SimpleTransitionSystem(new Automaton(automata[17]))).check());
+        CDD.addClocks(automata[17].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[17])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
     public void T11RefinesSelf() {
+        Automaton automata2 = new Automaton(automata[18]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[18].getClocks(),automata[18].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[18]), new SimpleTransitionSystem(new Automaton(automata[18]))).check());
+        CDD.addClocks(automata[18].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[18])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
@@ -220,16 +222,20 @@ public class DelayRefinementTest {
 
     @Test
     public void K2RefinesSelf() {
+
+        Automaton automata2 = new Automaton(automata[26]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[26].getClocks(),automata[26].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[26]), new SimpleTransitionSystem(new Automaton(automata[26]))).check());
+        CDD.addClocks(automata[26].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(automata[26]), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
     public void K3RefinesSelf() {
+
+        Automaton automata2 = new Automaton(automata[27]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[27].getClocks(),automata[27].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[27]), new SimpleTransitionSystem(new Automaton(automata[27]))).check());
+        CDD.addClocks(automata[27].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[27])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
@@ -241,9 +247,11 @@ public class DelayRefinementTest {
 
     @Test
     public void K5RefinesSelf() {
+
+        Automaton automata2 = new Automaton(automata[29]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[29].getClocks(),automata[29].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[29]), new SimpleTransitionSystem(new Automaton(automata[29]))).check());
+        CDD.addClocks(automata[29].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[29])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
@@ -337,16 +345,19 @@ public class DelayRefinementTest {
 
     @Test
     public void L4RefinesSelf() {
+        Automaton automata2 = new Automaton(automata[42]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[42].getClocks(),automata[42].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[42]), new SimpleTransitionSystem(new Automaton(automata[42]))).check());
+        CDD.addClocks(automata[42].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[42])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
     public void L5RefinesSelf() {
+
+        Automaton automata2 = new Automaton(automata[43]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[43].getClocks(),automata[43].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[43]), new SimpleTransitionSystem(new Automaton(automata[43]))).check());
+        CDD.addClocks(automata[43].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[43])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
@@ -365,9 +376,10 @@ public class DelayRefinementTest {
 
     @Test
     public void Z1RefinesSelf() {
+        Automaton automata2 = new Automaton(automata[46]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[46].getClocks(),automata[46].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[46]), new SimpleTransitionSystem(new Automaton(automata[46]))).check());
+        CDD.addClocks(automata[46].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[46])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
@@ -379,9 +391,11 @@ public class DelayRefinementTest {
 
     @Test
     public void Z3RefinesSelf() {
+
+        Automaton automata2 = new Automaton(automata[48]);
         CDD.init(100,100,100);
-        CDD.addClocks(automata[48].getClocks(),automata[48].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[48]), new SimpleTransitionSystem(new Automaton(automata[48]))).check());
+        CDD.addClocks(automata[48].getClocks(),automata2.getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[48])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata2))).check());
     }
 
     @Test
@@ -415,8 +429,19 @@ public class DelayRefinementTest {
 
     // Rest of the tests
 
+
     @Test
-    public void T1T2RefinesT3() {
+    public void T2isImplementation() {
+        CDD.init(100,100,100);
+        CDD.addClocks(automata[1].getClocks());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[1])).isDeterministic());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[1])).isFullyConsistent());
+    }
+
+
+
+    @Test
+    public void T1T2RefinesT3() { // TODO: T2 is not consistent...... see test before
         CDD.init(100,100,100);
         CDD.addClocks(automata[0].getClocks(),automata[1].getClocks(),automata[2].getClocks());
         TransitionSystem comp = new Composition(
@@ -474,17 +499,21 @@ public class DelayRefinementTest {
     }
 
     @Test
-    public void T4RefinesT3() {
+    public void T4RefinesT3() { // TODO: T4 has no independent progress
         CDD.init(100,100,100);
         CDD.addClocks(automata[10].getClocks(),automata[2].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[10]), new SimpleTransitionSystem(automata[2])).check());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[10])).isFullyConsistent());
+        assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[2])).isFullyConsistent());
+       // assertTrue(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[10])).isImplementation());
+
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[10])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata[2]))).check());
     }
 
     @Test
     public void T6RefinesT5() {
         CDD.init(100,100,100);
         CDD.addClocks(automata[13].getClocks(),automata[12].getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[13]), new SimpleTransitionSystem(automata[12])).check(true));
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[13])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata[12]))).check(true));
     }
 
     @Test

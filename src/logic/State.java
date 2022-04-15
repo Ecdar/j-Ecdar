@@ -28,6 +28,11 @@ public class State {
         return invarCDD;
     }
 
+
+    public CDD getInvarCDDDirectlyFromInvariants() {
+        return location.getInvariantCDD();
+    }
+
     public List<List<Guard>> getInvariants(List<Clock> relevantClocks) {
         return CDD.toGuardList(location.getInvariantCDD(),relevantClocks);
     }
@@ -59,13 +64,14 @@ public class State {
             copy = extractResult.getCddPart();
             //copy.printDot();
             Zone z = new Zone(extractResult.getDbm());
-            //z.printDBM(true,true);
+//            z.printDBM(true,true);
             CDD bddPart = extractResult.getBddPart();
             z.extrapolateMaxBounds(maxBounds);
             CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
             CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
             resCDD = resCDD.disjunction(extrapolatedCDD);
         }
+
         invarCDD = resCDD;
     }
 

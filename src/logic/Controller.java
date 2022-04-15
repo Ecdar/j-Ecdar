@@ -2,10 +2,12 @@ package logic;
 
 import Exceptions.InvalidQueryException;
 import models.Automaton;
+import models.CDD;
 import org.json.simple.parser.ParseException;
 import parser.JSONParser;
 import parser.XMLParser;
 
+import models.Clock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +19,7 @@ public class Controller {
     private static final int FEATURE_COMPOSITION = 1;
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
+    private static List<Clock> clocksInCurrentQuery = new ArrayList<>();
 
     public static List<String> handleRequest(String location, String query, boolean trace) throws Exception {
         addQueries(query);
@@ -77,7 +80,13 @@ public class Controller {
             }
             if (Queries.get(i).contains("refinement")) {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
-                Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
+                TransitionSystem left = runQuery(refSplit.get(0));
+                TransitionSystem right = runQuery(refSplit.get(1));
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
+
+                Refinement ref = new Refinement(left, right);
+
                 boolean refCheck;
                 if (trace) {
                     refCheck = ref.check(true);
@@ -94,33 +103,50 @@ public class Controller {
             }
             if (Queries.get(i).contains("consistency")) {
                 String cons = Queries.get(i).replace("consistency:", "");
+                clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(cons);
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
                 boolean passed = ts.isLeastConsistent();
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
             if (Queries.get(i).contains("implementation")) {
                 String impl = Queries.get(i).replace("implementation:", "");
+                clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
+
                 boolean passed = ts.isImplementation();
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
             if (Queries.get(i).contains("determinism")) {
                 String impl = Queries.get(i).replace("determinism:", "");
+                clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
                 boolean passed = ts.isDeterministic();
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
             }
             if(Queries.get(i).contains("get-component")){
                 String query = Queries.get(i).replace("get-component:", "");
+                clocksInCurrentQuery= new ArrayList<>();
                 TransitionSystem ts = runQuery(query);
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
                 saveAutomaton(ts.getAutomaton(), componentName);
             }
             if(Queries.get(i).contains("bisim-minim")){
                 String impl = Queries.get(i).replace("bisim-minim:", "");
+                clocksInCurrentQuery=new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
+
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
                 Automaton aut = ts.getAutomaton();
 
                 aut = Bisimilarity.checkBisimilarity(aut);
@@ -129,7 +155,10 @@ public class Controller {
             }
             if(Queries.get(i).contains("prune")){
                 String impl = Queries.get(i).replace("prune:", "");
+                clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
+                CDD.init(1000,1000,1000);
+                CDD.addClocks(clocksInCurrentQuery);
                 Automaton aut = ts.getAutomaton();
 
                 SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
@@ -138,6 +167,7 @@ public class Controller {
                 saveAutomaton(aut, componentName);
             }
             //add if contains specification or smth else
+            CDD.done();
         }
 
         return returnlist;
@@ -156,6 +186,49 @@ public class Controller {
             transitionSystems.add(system);
         }
     }
+/*
+    public static List<Automaton> getAutomata(List<String> parts) {
+        ArrayList<Automaton> automata = new ArrayList<>();
+        for (String part: parts) {
+            if (part.charAt(0) == '(') part = part.substring(1);
+            int feature = -1;
+
+            outerLoop:
+            for (int i = 0; i < part.length(); i++) {
+                if (part.charAt(i) == '(') {
+                    int tempPosition = checkParentheses(part);
+                    ArrayList newList = new ArrayList<>();
+                    newList.add(part.substring(i, tempPosition));
+                    automata.addAll(getAutomata(newList));
+                    part = part.substring(tempPosition);
+                    i = 0;
+                }
+
+                if (Character.isLetter(part.charAt(i)) || Character.isDigit(part.charAt(i))) {
+                    int j = 0;
+                    boolean check = true;
+                    while (check) {
+                        if (i + j < part.length()) {
+                            if (!Character.isLetter(part.charAt(i + j)) && !Character.isDigit(part.charAt(i + j))) {
+                                automata.add(findComponent(part.substring(i, j + i)).getAutomaton());
+                                j--;
+                                check = false;
+                            }
+                        } else {
+                            automata.add(findComponent(part.substring(i, j + i)).getAutomaton());
+                            break outerLoop;
+                        }
+                        j++;
+                    }
+                    i += j;
+                }
+
+                if (feature == -1) feature = setFeature(part.charAt(i));
+            }
+        }
+        return getTransitionSystem(feature, transitionSystems);
+    }*/
+
 
     public static TransitionSystem runQuery(String part) {
         ArrayList<TransitionSystem> transitionSystems = new ArrayList<>();
@@ -228,7 +301,10 @@ public class Controller {
     // Finds and returns Automaton given the name of that component
     private static TransitionSystem findComponent(String str) {
         for (SimpleTransitionSystem ts : transitionSystems)
-            if (ts.getName().equalsIgnoreCase(str)) return ts;
+            if (ts.getName().equalsIgnoreCase(str)) {
+                clocksInCurrentQuery.addAll(ts.getAutomaton().getClocks());
+                return ts;
+            }
 
         System.out.println("Automaton does not exist  " + str);
         return null;

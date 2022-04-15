@@ -271,7 +271,7 @@ public class Zone {
                 } else
                 {
                     ClockGuard dc = new ClockGuard(clock_j,clock_i,DBMLib.raw2bound(currentValue),Relation.LESS_EQUAL);
-                    System.out.println("i: " + i + " j: " + j + " ci: + " + clock_i + " cj: " + clock_j + " " + dc + " clocks: " + clocks + " relevantClocks: " + relevantClocks);
+                   // System.out.println("i: " + i + " j: " + j + " ci: + " + clock_i + " cj: " + clock_j + " " + dc + " clocks: " + clocks + " relevantClocks: " + relevantClocks);
                     guards.add(dc);
                 }
 
