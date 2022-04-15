@@ -81,7 +81,7 @@ public abstract class TransitionSystem {
             if (!updates.isEmpty()) targetState.applyResets(updates);
             System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
 
-            targetState.getInvarCDD().printDot();
+            //targetState.getInvarCDD().printDot();
             targetState.delay();
             targetState.applyInvariants();
 

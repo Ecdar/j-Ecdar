@@ -182,7 +182,6 @@ public class Refinement {
         System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
         target1.applyResets(t1.getUpdates());
         target1.applyResets(t2.getUpdates());
-
         System.out.println(t1.getUpdates() + " " + t2.getUpdates());
         CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
         System.out.println("after resets " + CDD.toGuardList(copyAfterResets,allClocks));
@@ -201,7 +200,7 @@ public class Refinement {
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
 
-        System.out.println(CDD.toGuardList(invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce(),allClocks));
+        //System.out.println(CDD.toGuardList(invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce(),allClocks));
 
         CDD cdd = invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce();
         if (cdd.isNotFalse()){
@@ -248,16 +247,14 @@ public class Refinement {
         for (CDD c: gzRight)
             rightCDD = rightCDD.disjunction(c);
 
-        System.out.println("create new state pair");
+        //System.out.println("create new state pair");
 
        // leftCDD.minus(rightCDD).printDot();
        // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
-            System.out.println(trans1.get(0).getEdges().get(0));
-            System.out.println(trans2.get(0).getEdges().get(0));
-            leftCDD.printDot();
-            rightCDD.printDot();
+            //leftCDD.printDot();
+            //rightCDD.printDot();
             System.out.println("trans2 does not satisfy all solution of trans2");
             return false;
         }
@@ -303,14 +300,13 @@ public class Refinement {
                 List<Transition> transitions2;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
-                    System.out.println("action : " + action);
+                    System.out.println("action is " + action);
                     transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
                             : ts2.getNextTransitions(state2, action, allClocks);
 
                     if (transitions2.isEmpty()) {
                         //state2.getInvarCDD().printDot();
 
-                        System.out.println("ts2 loc" + state2.getLocation() + CDD.toGuardList(state2.getInvarCDD(),allClocks));
                         System.out.println("trans 2 empty");
                         return false;
                     }
@@ -319,12 +315,10 @@ public class Refinement {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
                     Transition loop = new Transition(state2, state2.getInvarCDD());
-                    System.out.println("selfloop targetState invar" + CDD.toGuardList(loop.getTarget().getInvarCDD(),allClocks));
                     transitions2.add(loop);
                 }
 
 //                if (isInput && )
-                System.out.println("is input "  + isInput);
                 if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
                     return false;
             }
@@ -373,7 +367,6 @@ public class Refinement {
         //assert(ts1.getInitialLocation().getInvariants().size()<=1 && ts2.getInitialLocation().getInvariants().size()<=1); // TODO: this just holds for testing until we have tests with disjunctions as input files
         State left = ts1.getInitialStateRef( ts2.getInitialLocation().getInvariantCDD());
         State right = ts2.getInitialStateRef(ts1.getInitialLocation().getInvariantCDD());
-        System.out.println("left " + CDD.toGuardList(left.getInvarCDD(),allClocks) + " " + CDD.toGuardList(right.getInvarCDD(),allClocks));
         return new StatePair(left, right);
     }
 

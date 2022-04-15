@@ -327,7 +327,7 @@ public class UniversityTest {
 
     @Test
     public void testCompRefinesSelf() {
-        CDD.init(100,100,100);
+        CDD.init(1000,1000,1000);
         CDD.addClocks(adm.getClocks(),machine.getClocks(),researcher.getClocks(),machineCopy.getClocks(),researcherCopy.getClocks(),admCopy.getClocks() );
         Refinement ref = new Refinement(
                 new Composition(new TransitionSystem[]{adm, machine, researcher}),

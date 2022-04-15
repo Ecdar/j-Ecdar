@@ -441,7 +441,7 @@ public class CDD {
                 bl++;
             }
         }
-        System.out.println("resets " + clockResets[0] + " values " + clockValues[0]);
+//        System.out.println("resets " + clockResets[0] + " values " + clockValues[0]);
         return state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
     }
 
@@ -493,7 +493,7 @@ public class CDD {
             if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
                 return true;
         }
-        System.out.println(" found a state that cannot delay indefinitely");
+//        System.out.println(" found a state that cannot delay indefinitely");
         return false;
     }
 
