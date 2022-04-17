@@ -20,7 +20,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     private final Automaton automaton;
     private Deque<State> waiting;
     private List<State> passed;
-    private List<Integer> maxBounds;
+    private HashMap<Clock,Integer> maxBounds;
 
     public SimpleTransitionSystem(Automaton automaton) {
         this.automaton = automaton;
@@ -58,13 +58,13 @@ public class SimpleTransitionSystem extends TransitionSystem{
     public void setMaxBounds()
     {
        // System.out.println("Max bounds: " + automaton.getMaxBoundsForAllClocks());
-        List<Integer> res = new ArrayList<>();
+        HashMap<Clock,Integer> res = new HashMap<>();
 
-        res.addAll(automaton.getMaxBoundsForAllClocks());
-        res.replaceAll(e -> e==0 ? 1 : e);
+        res.putAll(automaton.getMaxBoundsForAllClocks());
+        //res.replaceAll(e -> e==0 ? 1 : e);
         maxBounds = res;
     }
-    public List<Integer> getMaxBounds(){
+    public HashMap<Clock,Integer> getMaxBounds(){
         return maxBounds;
     }
 
@@ -81,13 +81,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
         while (!waiting.isEmpty()) {
             State currState = new State(waiting.pop());
             State toStore = new State(currState);
-            int[] maxBounds;
-            List<Integer> res = new ArrayList<>();
-            res.add(0);
-            res.addAll(this.getMaxBounds());
-            maxBounds= res.stream().mapToInt(i -> i).toArray();
 
-            toStore.extrapolateMaxBounds(maxBounds);
+            toStore.extrapolateMaxBounds(this.getMaxBounds(),clocks);
 
             passed.add(toStore);
 
@@ -104,7 +99,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s) && !waitingContainsState(s)).collect(Collectors.toList()); // TODO I added waitingConstainsState... Okay??
 
-                toAdd.forEach(e->e.extrapolateMaxBounds(maxBounds));
+                toAdd.forEach(e->e.extrapolateMaxBounds(getMaxBounds(),clocks));
 
                 waiting.addAll(toAdd);
             }
@@ -152,7 +147,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         //    return false;
         passed = new ArrayList<>();
         boolean result = checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
-
+        System.out.println("helper result: " + result);
         return result;
     }
 
@@ -162,13 +157,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
             return true;
         System.out.println(((SimpleLocation)currState.getLocation()).getActualLocation() + " " +  CDD.toGuardList(currState.getInvarCDD(),clocks));
         State toStore = new State(currState);
-        int[] maxBounds;
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
-        res.addAll(this.getMaxBounds());
-        maxBounds= res.stream().mapToInt(i -> i).toArray();
 
-        toStore.extrapolateMaxBounds(maxBounds);
+        toStore.extrapolateMaxBounds(getMaxBounds(),clocks);
         passed.add(toStore);
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
@@ -183,14 +173,19 @@ public class SimpleTransitionSystem extends TransitionSystem{
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
         if (canPrune && CDD.canDelayIndefinitely(currState.getInvarCDD())) {
+
+            System.out.println("in the if");
+
             return true;
         }
             // Else if independent progress does not hold through delaying indefinitely,
             // we must check for being able to output and satisfy independent progress
         else {
+
+            System.out.println("in the else");
+
             for (Channel channel : outputs) {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
-                System.out.println("temptranssize " + channel + " " + tempTrans.size());
                 for (Transition ts : tempTrans) {
                     if(!outputExisted) outputExisted = true;
                     boolean outputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
@@ -212,8 +207,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
             else
             {
-
-                System.out.println(".....");
                 return false;
             }
         }
@@ -231,13 +224,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
             State currState = new State(waiting.pop());
 
             State toStore = new State(currState);
-            int[] maxBounds;
-            List<Integer> res = new ArrayList<>();
-            res.add(0);
-            res.addAll(this.getMaxBounds());
-            maxBounds= res.stream().mapToInt(i -> i).toArray();
 
-            toStore.extrapolateMaxBounds(maxBounds);
+            toStore.extrapolateMaxBounds(getMaxBounds(),clocks);
             passed.add(toStore);
 
 
@@ -252,7 +240,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s)).collect(Collectors.toList());
 
-                toAdd.forEach(s -> s.extrapolateMaxBounds(maxBounds));
+                toAdd.forEach(s -> s.extrapolateMaxBounds(getMaxBounds(),clocks));
 
                 waiting.addAll(toAdd);
             }
@@ -276,33 +264,29 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     private boolean passedContainsState(State state1) {
        State state = new State(state1);
-        int[] maxBounds;
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
-        res.addAll(this.getMaxBounds());
-        maxBounds= res.stream().mapToInt(i -> i).toArray();
-        state.extrapolateMaxBounds(maxBounds);
+        System.out.println("before extrapolation: " + CDD.toGuardList(state.getInvarCDD(), CDD.getClocks()));
+        state.extrapolateMaxBounds(maxBounds, clocks);
+        System.out.println("after extrapolation: " + CDD.toGuardList(state.getInvarCDD(), CDD.getClocks()));
 
 
         for (State passedState : passed) {
+        //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
             if (state.getLocation().equals(passedState.getLocation()) &&
                     CDD.isSubset(state.getInvarCDD(),(passedState.getInvarCDD()))) {
-
+                System.out.println("some of them are a subset: " + CDD.toGuardList(state.getInvarCDD(),clocks) + " " +   CDD.toGuardList(passedState.getInvarCDD(),clocks));
                 return true;
             }
         }
+
+//        System.out.println("!!!!!!!!some of them are not a subset: " + CDD.toGuardList(state.getInvarCDD(),clocks) + " " +  passed.size() );
+        if (passed.size()==10)
+            System.exit(0);
         return false;
     }
 
     private boolean waitingContainsState(State state1) {
         State state = new State(state1);
-        int[] maxBounds;
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
-        res.addAll(this.getMaxBounds());
-        maxBounds= res.stream().mapToInt(i -> i).toArray();
-        state.extrapolateMaxBounds(maxBounds);
-
+        state.extrapolateMaxBounds(maxBounds, clocks);
 
         for (State passedState : waiting) {
             // check for zone inclusion
@@ -325,13 +309,11 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         Location location = ((SimpleLocation) symLocation).getActualLocation();
         List<Edge> edges = automaton.getEdgesFromLocationAndSignal(location, channel);
-        System.out.println("number of edges " + edges.size() + " " + edges);
         for (Edge edge : edges) {
             SymbolicLocation target = new SimpleLocation(edge.getTarget());
             Move move = new Move(symLocation, target, Collections.singletonList(edge));
             moves.add(move);
         }
-        System.out.println("number of moves " + moves.size() + " " + moves);
 
         return moves;
     }

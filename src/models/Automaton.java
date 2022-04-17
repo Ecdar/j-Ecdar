@@ -87,19 +87,26 @@ public class Automaton {
         this.actions = copy.actions;
     }
 
-    public List<Integer> getMaxBoundsForAllClocks(){
-        List<Integer> res = new ArrayList<>(Collections.nCopies(clocks.size(), 0));
+    public HashMap<Clock,Integer> getMaxBoundsForAllClocks(){
+        HashMap<Clock,Integer> res = new HashMap<Clock,Integer>();
 
-        for(int i = 0; i < clocks.size(); i++) {
+        for(Clock clock: clocks) {
             for (Edge edge : edges) {
-                int clockMaxBound = edge.getMaxConstant(clocks.get(i));
-                if (clockMaxBound > res.get(i)) res.set(i, clockMaxBound);
+                int clockMaxBound = edge.getMaxConstant(clock);
+                if (!(res.containsKey(clock)))
+                    res.put(clock, clockMaxBound);
+                if (clockMaxBound > res.get(clock)) res.put(clock, clockMaxBound);
             }
 
             for (Location location : locations) {
-                int clockMaxBound = location.getMaxConstant(clocks.get(i));
-                if (clockMaxBound > res.get(i)) res.set(i, clockMaxBound);
+                int clockMaxBound = location.getMaxConstant(clock);
+                if (!(res.containsKey(clock)))
+                    res.put(clock, clockMaxBound);
+                if ( clockMaxBound > res.get(clock))
+                    res.put(clock, clockMaxBound);
             }
+            if (!res.containsKey(clock) | res.get(clock)==0)
+                res.put(clock,1);
         }
         return res;
     }

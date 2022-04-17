@@ -105,14 +105,13 @@ public class Composition extends TransitionSystem {
     }
 
 
-    private int[] maxBounds;
+    private HashMap<Clock,Integer> maxBounds;
     public void setMaxBounds() {
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
+        HashMap<Clock,Integer> res = new HashMap<>();
         for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
-            res.addAll(sys.getMaxBounds());
+            res.putAll(sys.getMaxBounds());
 
-        maxBounds = res.stream().mapToInt(i -> i).toArray();
+        maxBounds = res;
     }
 
     public Automaton createComposition(List<Automaton> autList)
@@ -177,7 +176,7 @@ public class Composition extends TransitionSystem {
                     }
                     locationsSet.add(target);
                     if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
-                        trans.getTarget().extrapolateMaxBounds(maxBounds);
+                        trans.getTarget().extrapolateMaxBounds(maxBounds,clocks);
                         waiting.add(trans.getTarget());
                     }
                     List<List<Guard>> guardList = trans.getGuards(clocks); // TODO: Check!

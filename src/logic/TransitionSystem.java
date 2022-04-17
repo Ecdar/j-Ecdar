@@ -76,10 +76,10 @@ public abstract class TransitionSystem {
             CDD guardCDD = new CDD(targetState.getInvarCDD().getPointer());
 
 
-            System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
-            System.out.println("updates: " + updates);
+//            System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
+
             if (!updates.isEmpty()) targetState.applyResets(updates);
-            System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
+ //           System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
 
             //targetState.getInvarCDD().printDot();
             targetState.delay();
@@ -184,12 +184,12 @@ public abstract class TransitionSystem {
         return isImpl && isCons;
     }
 
-    public List<Integer> getMaxBounds(){
+    public HashMap<Clock,Integer> getMaxBounds(){
         List<SimpleTransitionSystem> systems = getSystems();
-        List<Integer> res = new ArrayList<>();
+        HashMap<Clock,Integer> res = new HashMap<>();
 
         for (TransitionSystem ts : systems){
-            res.addAll(ts.getMaxBounds());
+            res.putAll(ts.getMaxBounds());
         }
         return res;
     }

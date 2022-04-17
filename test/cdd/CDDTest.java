@@ -261,13 +261,13 @@ public class CDDTest {
         guards.add(g1);
         guards.add(g2);
         CDD res = new CDD(guards);
-        res.printDot();
+        //res.printDot();
         CDD exp = CDD.getUnrestrainedCDD();
         exp = exp.conjunction(CDD.allocateInterval(0, 1, 1, 6));
         exp = exp.disjunction(CDD.allocateInterval(0, 2, 10, CDD_INF));
-        exp.printDot();
+        //exp.printDot();
         exp = exp.removeNegative();
-        exp.printDot();
+        //exp.printDot();
         assertEquals(res, exp);
     }
 

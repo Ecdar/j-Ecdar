@@ -290,9 +290,9 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 	</template>
 	<template>
 		<name>F2</name>
-		<declaration>clock x;</declaration>
+		<declaration>clock y;</declaration>
 		<location id="id55" x="-8" y="-80">
-			<label kind="invariant" x="-18" y="-65">x&lt;=4</label>
+			<label kind="invariant" x="-18" y="-65">y&lt;=4</label>
 		</location>
 		<location id="id56" x="56" y="32">
 		</location>
@@ -316,11 +316,11 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 	</template>
 	<template>
 		<name>F3</name>
-		<declaration>clock x;</declaration>
+		<declaration>clock z;</declaration>
 		<location id="id60" x="144" y="8">
 		</location>
 		<location id="id61" x="-24" y="8">
-			<label kind="invariant" x="-48" y="32">x&lt;=12</label>
+			<label kind="invariant" x="-48" y="32">z&lt;=12</label>
 		</location>
 		<location id="id62" x="-192" y="8">
 		</location>
@@ -334,7 +334,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 			<source ref="id62"/>
 			<target ref="id61"/>
 			<label kind="synchronisation" x="-112" y="-16">ri?</label>
-			<label kind="assignment" x="-72" y="-24">x=0</label>
+			<label kind="assignment" x="-72" y="-24">z=0</label>
 		</transition>
 	</template>
 	<template>

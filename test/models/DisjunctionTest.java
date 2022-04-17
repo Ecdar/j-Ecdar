@@ -115,7 +115,7 @@ public class DisjunctionTest {
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis1));
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis2));
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis3));
-        disjunctedGuards.printDot();
+        //disjunctedGuards.printDot();
         CDD neg = disjunctedGuards.negation();
         System.out.println("too");
         List<List<Guard>> out = CDD.toGuardList(neg,clocks);

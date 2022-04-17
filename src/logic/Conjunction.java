@@ -10,16 +10,15 @@ public class Conjunction extends TransitionSystem {
 
     private List<State> passed = new ArrayList<>();
     private List<State> waiting = new ArrayList<>();
-    private int[] maxBounds;
+    private HashMap<Clock,Integer> maxBounds;
 
 
     public void setMaxBounds() {
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
+        HashMap<Clock,Integer> res = new HashMap<>();
         for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
-            res.addAll(sys.getMaxBounds());
+            res.putAll(sys.getMaxBounds());
 
-        maxBounds = res.stream().mapToInt(i -> i).toArray();
+        maxBounds = res;
     }
 
 
@@ -151,7 +150,7 @@ public class Conjunction extends TransitionSystem {
                     }
                     locationsSet.add(target);
                     if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
-                        trans.getTarget().extrapolateMaxBounds(maxBounds);
+                        trans.getTarget().extrapolateMaxBounds(maxBounds, clocks);
                         waiting.add(trans.getTarget());
                     }
                     List<List<Guard>> guardList = trans.getGuards(clocks); // TODO: Check!

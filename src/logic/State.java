@@ -3,6 +3,7 @@ package logic;
 import models.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class State {
@@ -54,9 +55,10 @@ public class State {
         invarCDD=CDD.applyReset(invarCDD, resets);
     }
 
-    public void extrapolateMaxBounds(int[] maxBounds){
+    public void extrapolateMaxBounds(HashMap<Clock,Integer> maxBounds, List<Clock> relevantClocks){
         CDD copy = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
+        System.out.println("max bounds : "  + maxBounds);
 
         while (!copy.isTerminal())
         {
@@ -66,12 +68,30 @@ public class State {
             Zone z = new Zone(extractResult.getDbm());
 //            z.printDBM(true,true);
             CDD bddPart = extractResult.getBddPart();
-            z.extrapolateMaxBounds(maxBounds);
+            int[] bounds = new int[CDD.numClocks];
+            int counter =1;
+            bounds[0] = 0; // special clock
+            for (Clock clk :CDD.getClocks())
+            {
+                if (!maxBounds.containsKey(clk))
+                {
+                    bounds[counter]=0;
+                }
+                else if (relevantClocks.contains(clk))
+                {
+                    bounds[counter] =maxBounds.get(clk);
+                }
+                else
+                {
+                    bounds[counter] = 0;
+                }
+                counter++;
+            }
+            z.extrapolateMaxBounds(bounds);
             CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
             CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
             resCDD = resCDD.disjunction(extrapolatedCDD);
         }
-
         invarCDD = resCDD;
     }
 

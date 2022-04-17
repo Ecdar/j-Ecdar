@@ -30,7 +30,7 @@ public class CDD {
     }
 
 
-    private static int getIndexOfClock(Clock clock) {
+    public static int getIndexOfClock(Clock clock) {
 
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
@@ -135,6 +135,10 @@ public class CDD {
                 }
         );
         return guards;
+    }
+
+    public static List<Clock> getClocks() {
+        return clocks;
     }
 
 
@@ -441,7 +445,7 @@ public class CDD {
                 bl++;
             }
         }
-//        System.out.println("resets " + clockResets[0] + " values " + clockValues[0]);
+        //state.printDot();
         return state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
     }
 
@@ -524,6 +528,10 @@ public class CDD {
 
 
     public static boolean isSubset(CDD A, CDD B) { // A (= B
+//        System.out.println("A : " + CDD.toGuardList(A,clocks));
+//        System.out.println("B : " + CDD.toGuardList(B,clocks));
+//        System.out.println("A & B : " + CDD.toGuardList(A.conjunction(B),clocks));
+//        System.out.println("A & B = A: " + (A.conjunction(B).equiv(A)));
         if ((A.conjunction(B).equiv(A))) // TODO: check if correct
             return true;
         else return false;

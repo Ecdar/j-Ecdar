@@ -15,7 +15,7 @@ public class Refinement {
     private GraphNode currNode;
     private GraphNode supersetNode;
     private int treeSize;
-    private int[] maxBounds;
+    private HashMap<Clock,Integer> maxBounds;
     private static boolean RET_REF = false;
     public static int NODE_ID = 0;
     private StringBuilder errMsg = new StringBuilder();
@@ -181,6 +181,8 @@ public class Refinement {
         CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
         System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
         target1.applyResets(t1.getUpdates());
+        System.out.println("after first reset " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+
         target1.applyResets(t2.getUpdates());
         System.out.println(t1.getUpdates() + " " + t2.getUpdates());
         CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
@@ -225,7 +227,7 @@ public class Refinement {
         // The exact same check will catch it but in TransitionSystem instead
         //if (!target1.getInvZone().isValid()) return null;
 
-        target1.extrapolateMaxBounds(maxBounds);
+        target1.extrapolateMaxBounds(maxBounds,allClocks);
 
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
         return new StatePair(target1, target2);
@@ -371,12 +373,11 @@ public class Refinement {
     }
 
     public void setMaxBounds() {
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
-        res.addAll(ts1.getMaxBounds());
-        res.addAll(ts2.getMaxBounds());
+        HashMap<Clock,Integer> res = new HashMap<>();
+        res.putAll(ts1.getMaxBounds());
+        res.putAll(ts2.getMaxBounds());
 
-        maxBounds = res.stream().mapToInt(i -> i).toArray();
+        maxBounds = res;
     }
 
 
