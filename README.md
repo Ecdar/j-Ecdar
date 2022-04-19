@@ -25,7 +25,7 @@ cmake --build build/
 ```
 apt-get update && apt-get install cmake openjdk-11-jdk mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
 cd JCDD && mkdir build-win
-./getlibs.sh
+./getlibs-win.sh
 cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
 cmake --build build-win/ 
 ```
