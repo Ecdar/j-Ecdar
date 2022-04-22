@@ -114,8 +114,8 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_reduce
  */
 jlong JNICALL Java_lib_CDDLib_interval
   (JNIEnv *env, jclass cdd_class, jint i, jint j, jint lower,jboolean lower_strict, jint upper,jboolean upper_strict){
-    raw lower_raw = Java_lib_DBMLib_boundbool2raw(lower,lower_strict);
-    raw upper_raw = Java_lib_DBMLib_boundbool2raw(upper,upper_strict);
+    raw_t lower_raw = dbm_boundbool2raw(lower,lower_strict);
+    raw_t upper_raw = dbm_boundbool2raw(upper,upper_strict);
     cdd* cdd_object = new cdd(cdd_interval(i,j,lower_raw,upper_raw));
     return (jlong)cdd_object;
 }
