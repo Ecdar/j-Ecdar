@@ -92,6 +92,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<Transition> tempTrans = getNextTransitions(currState, action);
 
                 if (checkMovesOverlap(tempTrans)) {
+                    System.out.println("moves overlap");
                     return false;
                 }
 
@@ -130,7 +131,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
                         System.out.println(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
                         System.out.println(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
-
+                        System.out.println(trans.get(0).getEdges().get(0).getChannel());
+                        System.out.println(trans.get(0).getEdges().get(0));
+                        System.out.println(trans.get(1).getEdges().get(0));
                         System.out.println(CDD.toGuardList(state1.getInvarCDD(),clocks));
                         System.out.println(CDD.toGuardList(state2.getInvarCDD(),clocks));
                         // trans.get(j).getGuardCDD().printDot();

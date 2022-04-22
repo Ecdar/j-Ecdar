@@ -88,8 +88,10 @@ public class ConsistencyTest {
 
     @Test
     public void testG6(){
+
         TransitionSystem ts = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[5]));
 
+        ts.getAutomaton().getEdges().forEach(e->System.out.println(e));
         assertTrue(ts.isLeastConsistent());
     }
 

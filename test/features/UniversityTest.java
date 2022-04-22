@@ -120,7 +120,7 @@ public class UniversityTest {
     public void testResRefinesSelf() {
         CDD.init(100,100,100);
         CDD.addClocks(researcher.getClocks(),researcherCopy.getClocks() );
-        assertTrue(new Refinement(researcher, researcherCopy).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(researcher.getAutomaton())), new SimpleTransitionSystem(CDD.makeInputEnabled(researcherCopy.getAutomaton()))).check());
     }
 
     @Test

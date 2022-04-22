@@ -93,7 +93,6 @@ public class CDD {
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
         copy = copy.removeNegative().reduce();
-        int counter = 0;
         if (copy.equiv(cddFalse())) // special case for guards
         {
             List<Guard> falseGuard = new ArrayList<>();
@@ -103,9 +102,6 @@ public class CDD {
         }
         while (!copy.isTerminal())
         {
-            counter ++;
-            if (counter == 5)
-                return null;
             copy=copy.reduce().removeNegative();
             CddExtractionResult res = copy.extractBddAndDbm();
             copy = res.getCddPart().reduce().removeNegative();
@@ -237,9 +233,9 @@ public class CDD {
     public static CDD allocateInterval(int i, int j, int lower, boolean lower_strict, int upper, boolean upper_strict){
         checkIfRunning();
         System.out.println("**************************************************** Check allocate interval ***********************");
-        // TODO: Dont think this works.
-        //assert(false);
-        return new CDD(CDDLib.interval(i,j,lower, lower_strict,upper, upper_strict));
+
+        // TODO: Negation of lower strict should be moved to a new function allocate_interval function in the CDD library
+        return new CDD(CDDLib.interval(i,j,lower, !lower_strict,upper, upper_strict));
     }
 
     public static CDD allocateFromDbm(int[] dbm, int dim){
