@@ -33,8 +33,8 @@ public class CDDTest {
         clocks.add(new Clock("a"));
         clocks.add(new Clock("b"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(2,1,3,5);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,6);
+        CDD cdd1 = CDD.allocateInterval(2,1,3, false,5, false);
+        CDD cdd2 = CDD.allocateInterval(2,1,4,false,6, false);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
         CDDNode node = cdd3.getRoot();
@@ -54,8 +54,8 @@ public class CDDTest {
         clocks.add(new Clock("a"));
         clocks.add(new Clock("b"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(2,1,3,5);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,6);
+        CDD cdd1 = CDD.allocateInterval(2,1,3, false,5,false);
+        CDD cdd2 = CDD.allocateInterval(2,1,4,false,6,false);
 
         CDD cdd3 = cdd1.disjunction(cdd2);
         CDDNode node = cdd3.getRoot();
@@ -74,7 +74,7 @@ public class CDDTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(1,0,3,5);
+        CDD cdd1 = CDD.allocateInterval(1,0,3, false,5,false);
         CDDNode node = cdd1.getRoot();
         List<Elem> bounds = new ArrayList<>();
 
@@ -134,8 +134,8 @@ public class CDDTest {
         clocks.add(new Clock("b"));
         CDD.addClocks(clocks);
 
-        CDD cdd1 = CDD.allocateInterval(2,1,3,5);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,6);
+        CDD cdd1 = CDD.allocateInterval(2,1,3, false,5,false);
+        CDD cdd2 = CDD.allocateInterval(2,1,4,false,6,false);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
 
@@ -263,8 +263,8 @@ public class CDDTest {
         CDD res = new CDD(guards);
         //res.printDot();
         CDD exp = CDD.getUnrestrainedCDD();
-        exp = exp.conjunction(CDD.allocateInterval(0, 1, 1, 6));
-        exp = exp.disjunction(CDD.allocateInterval(0, 2, 10, CDD_INF));
+        exp = exp.conjunction(CDD.allocateInterval(0, 1, 1, false, 6, false));
+        exp = exp.disjunction(CDD.allocateInterval(0, 2, 10,false, CDD_INF,false));
         //exp.printDot();
         exp = exp.removeNegative();
         //exp.printDot();

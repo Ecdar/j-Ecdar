@@ -234,12 +234,12 @@ public class CDD {
         return new CDD();
     }
 
-    public static CDD allocateInterval(int i, int j, int lower, int upper){
+    public static CDD allocateInterval(int i, int j, int lower, boolean lower_strict, int upper, boolean upper_strict){
         checkIfRunning();
         System.out.println("**************************************************** Check allocate interval ***********************");
         // TODO: Dont think this works.
         //assert(false);
-        return new CDD(CDDLib.interval(i,j,lower,upper));
+        return new CDD(CDDLib.interval(i,j,lower, lower_strict,upper, upper_strict));
     }
 
     public static CDD allocateFromDbm(int[] dbm, int dim){
