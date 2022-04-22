@@ -635,7 +635,7 @@ public class CDD {
         for (Update up : updates) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), u.getValue()));
+                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), false, u.getValue(), false));
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;

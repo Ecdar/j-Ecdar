@@ -5,6 +5,16 @@
 #include <iostream>
 #include <helper_functions.h>
 
+JNIEXPORT jint JNICALL Java_lib_DBMLib_boundbool2raw(JNIEnv *env, jclass cls, jint bound, jboolean strict) {
+    return dbm_boundbool2raw(bound, strict);
+}
+
+JNIEXPORT jint JNICALL Java_lib_DBMLib_raw2bound(JNIEnv *env, jclass cls, jint raw) {
+   return dbm_raw2bound(raw);
+}
+
+
+
 /*
  * Class:     lib_CDDLib
  * Method:    cddInit
@@ -103,8 +113,10 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_reduce
  * Signature: (IIII)J
  */
 jlong JNICALL Java_lib_CDDLib_interval
-  (JNIEnv *env, jclass cdd_class, jint i, jint j, jint lower, jint upper){
-    cdd* cdd_object = new cdd(cdd_interval(i,j,lower,upper));
+  (JNIEnv *env, jclass cdd_class, jint i, jint j, jint lower,jboolean lower_strict, jint upper,jboolean upper_strict){
+    raw lower_raw = Java_lib_DBMLib_boundbool2raw(lower,!lower_strict);
+    raw upper_raw = Java_lib_DBMLib_boundbool2raw(upper,upper_strict);
+    cdd* cdd_object = new cdd(cdd_interval(i,j,lower_raw,upper_raw));
     return (jlong)cdd_object;
 }
 

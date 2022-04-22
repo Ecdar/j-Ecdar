@@ -155,7 +155,20 @@ public class VariousTest {
     }
 
 
-
+    @Test
+    public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException
+    {
+        CDD.init(100,100,100);
+        Clock x = new Clock("x");
+        Clock y = new Clock("y");
+        List<Clock> clocks = new ArrayList<>();
+        clocks.add(x);clocks.add(y);
+        CDD.addClocks(clocks);
+        CDD test = CDD.allocateInterval(1,0,2,3);
+        System.out.println(CDD.toGuardList(test,clocks));
+        test.printDot();
+        assert(true);
+    }
 
     @Test
     public void testCompOfCompRefinesSpec() throws CddAlreadyRunningException, CddNotRunningException {
