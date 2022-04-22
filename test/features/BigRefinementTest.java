@@ -6,6 +6,7 @@ import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
@@ -17,8 +18,8 @@ public class BigRefinementTest {
 
     private static TransitionSystem comp1, comp1Copy, ref1, ref1Copy;
 
-    @After
-    public void afterEachTest(){
+    @AfterClass
+    public static void afterEachTest(){
         CDD.done();
     }
 
@@ -34,6 +35,8 @@ public class BigRefinementTest {
         comp1Copy = new SimpleTransitionSystem(new Automaton(machines[0]));
         ref1 = new SimpleTransitionSystem(machines[1]);
         ref1Copy = new SimpleTransitionSystem(new Automaton(machines[1]));
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(comp1.getClocks(),comp1Copy.getClocks(), ref1.getClocks(), ref1Copy.getClocks());
 
     }
 

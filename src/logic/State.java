@@ -48,7 +48,11 @@ public class State {
     }
 
     public void applyInvariants() {
-        this.invarCDD=this.invarCDD.conjunction(location.getInvariantCDD());
+        System.out.println("THIS:" + CDD.toGuardList(this.invarCDD,CDD.getClocks()));
+        System.out.println("THAT:" + CDD.toGuardList(location.getInvariantCDD(),CDD.getClocks()));
+        CDD result = this.invarCDD.conjunction(location.getInvariantCDD());
+        System.out.println("RES:" + CDD.toGuardList(result,CDD.getClocks()));
+        this.invarCDD=result;
     }
 
     public void applyResets(List<Update> resets) {
@@ -59,11 +63,11 @@ public class State {
         CDD copy = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
         System.out.println("max bounds : "  + maxBounds);
-
+        System.out.println(CDD.toGuardList(copy,relevantClocks));
         while (!copy.isTerminal())
         {
             CddExtractionResult extractResult = copy.reduce().removeNegative().extractBddAndDbm();
-            copy = extractResult.getCddPart();
+            copy = extractResult.getCddPart().removeNegative().reduce();
             //copy.printDot();
             Zone z = new Zone(extractResult.getDbm());
 //            z.printDBM(true,true);
@@ -75,23 +79,32 @@ public class State {
             {
                 if (!maxBounds.containsKey(clk))
                 {
+                    System.out.println("Clock not restrained: " + clk);
                     bounds[counter]=0;
                 }
-                else if (relevantClocks.contains(clk))
+                else if (relevantClocks.contains(clk) )
                 {
+                    System.out.println("Clock restrained: " + clk + maxBounds.get(clk));
                     bounds[counter] =maxBounds.get(clk);
                 }
                 else
                 {
+                    System.out.println("Clock not relevant: " + clk );
                     bounds[counter] = 0;
                 }
                 counter++;
             }
+            CDD before = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
             z.extrapolateMaxBounds(bounds);
             CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
+            System.out.println(CDD.toGuardList(before,relevantClocks));
+            System.out.println(CDD.toGuardList( extrapolatedDBMCDD, relevantClocks));
             CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
+            System.out.println(CDD.toGuardList( extrapolatedCDD, relevantClocks));
             resCDD = resCDD.disjunction(extrapolatedCDD);
+            System.out.println(CDD.toGuardList( resCDD, relevantClocks));
         }
+        System.out.println(CDD.toGuardList( resCDD, relevantClocks));
         invarCDD = resCDD;
     }
 

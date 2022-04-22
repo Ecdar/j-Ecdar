@@ -58,11 +58,12 @@ public class Automaton {
 
     // Copy constructor
     public Automaton(Automaton copy){
-        this.name = copy.name;
+        this.name = copy.name+"Copy";
 
         this.clocks = new ArrayList<>();
         for (Clock c : copy.clocks) {
-            this.clocks.add(new Clock(c));
+            String[] split = c.getName().split("_");
+            this.clocks.add(new Clock(this.name + "_" + split[1]));
         }
         this.BVs = new ArrayList<>();
         for (BoolVar c : copy.BVs) {
@@ -70,16 +71,17 @@ public class Automaton {
         }
         this.locations = new ArrayList<>();
         for (Location loc : copy.locations) {
-            this.locations.add(new Location(loc, clocks));
+            this.locations.add(new Location(loc, clocks, copy.clocks));
             if(loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
         }
 
         this.edges = new ArrayList<>();
         for (Edge e : copy.edges) {
-            int sourceIndex = this.locations.indexOf(e.getSource());
-            int targetIndex = this.locations.indexOf(e.getTarget());
-
-            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex)));
+            int sourceIndex = copy.locations.indexOf(e.getSource());
+            int targetIndex = copy.locations.indexOf(e.getTarget());
+            System.out.println(targetIndex);
+            System.out.println(sourceIndex);
+            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), copy.clocks));
         }
 
         this.inputAct = copy.inputAct;

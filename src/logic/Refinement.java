@@ -2,6 +2,7 @@ package logic;
 
 import models.*;
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -126,7 +127,7 @@ public class Refinement {
 
             State left = curr.getLeft();
             State right = curr.getRight();
-            System.out.println("left: " + CDD.toGuardList(left.getInvarCDD(),allClocks) + " right: " + CDD.toGuardList(right.getInvarCDD(),allClocks));
+            System.out.println("left: " +left.getLocation()+ " "  + CDD.toGuardList(left.getInvarCDD(),allClocks) + " right: " + right.getLocation() + " " +  CDD.toGuardList(right.getInvarCDD(),allClocks));
             // need to make deep copy
             State newState1 = new State(left);
             State newState2 = new State(right);
@@ -170,7 +171,9 @@ public class Refinement {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
         System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
         System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
-
+        System.out.println(t1.getEdges().get(0).getChannel());
+        System.out.println(t1.getSource().getLocation().getName());
+        System.out.println(t2.getSource().getLocation().getName());
         target1.applyGuards(t2.getGuardCDD());
 
         if (target1.getInvarCDD().isFalse()) {
@@ -198,6 +201,7 @@ public class Refinement {
         target1.applyInvariants(t2.getTarget().getInvarCDDDirectlyFromInvariants());
         //System.out.println(((SimpleLocation)t2.getTarget().getLocation()).getActualLocation().getInvariant());
         System.out.println("delayed + second invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        System.out.println("In the end " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
@@ -226,10 +230,13 @@ public class Refinement {
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
         //if (!target1.getInvZone().isValid()) return null;
-
+        if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+            assert(false);
         target1.extrapolateMaxBounds(maxBounds,allClocks);
-
+        if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+            assert(false);
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
+
         return new StatePair(target1, target2);
     }
 
@@ -325,7 +332,7 @@ public class Refinement {
                     return false;
             }
         }
-
+        System.out.println("finale");
         return true;
     }
 
@@ -366,8 +373,8 @@ public class Refinement {
     }
 
     public StatePair getInitialStatePair() {
-        //assert(ts1.getInitialLocation().getInvariants().size()<=1 && ts2.getInitialLocation().getInvariants().size()<=1); // TODO: this just holds for testing until we have tests with disjunctions as input files
         State left = ts1.getInitialStateRef( ts2.getInitialLocation().getInvariantCDD());
+        System.out.println("REALLY" + CDD.toGuardList(left.getInvarCDD(),allClocks));
         State right = ts2.getInitialStateRef(ts1.getInitialLocation().getInvariantCDD());
         return new StatePair(left, right);
     }

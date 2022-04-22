@@ -18,6 +18,7 @@ public class ComplexLocation extends SymbolicLocation {
             CDD invarLoc = loc1.getInvariantCDD();
             invar = invar.conjunction(invarLoc);
         }
+        System.out.println("INVARIS: " + CDD.toGuardList(invar,CDD.getClocks()));
         invariants = invar;
     }
 

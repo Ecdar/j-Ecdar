@@ -7,6 +7,7 @@ import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLFileWriter;
@@ -26,9 +27,10 @@ public class DelayRefinementTest {
     public void afterEachTest(){
         CDD.done();
     }
+//Class
 
-    @BeforeClass
-    public static void setUpBeforeClass() {
+    @Before
+    public  void setUpBeforeClass() {
         automata = XMLParser.parse("./samples/xml/delayRefinement.xml", true);
     }
 
@@ -82,7 +84,7 @@ public class DelayRefinementTest {
     public void F1RefinesSelf() {
 
         Automaton automata2 = new Automaton(automata[7]);
-        assert(automata2.equals(automata[7]));
+        //assert(automata2.equals(automata[7]));
         CDD.init(100,100,100);
         CDD.addClocks(automata[7].getClocks(),automata2.getClocks());
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[7]), new SimpleTransitionSystem(automata2)).check());
@@ -318,9 +320,9 @@ public class DelayRefinementTest {
     @Test
     public void P6RefinesSelf() {
         Automaton automata2 = new Automaton(automata[37]);
-        CDD.init(100,100,100);
+        CDD.init(1000,1000,1000);
         CDD.addClocks(automata[37].getClocks(),automata2.getClocks());
-        assertTrue(new Refinement(new SimpleTransitionSystem(automata[37]), new SimpleTransitionSystem((automata2))).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[37])), new SimpleTransitionSystem((CDD.makeInputEnabled(automata2)))).check());
     }
 
     @Test
@@ -453,7 +455,7 @@ public class DelayRefinementTest {
 
     @Test
     public void T1T2RefinesT3() { // TODO: T2 is not consistent...... see test before
-        CDD.init(100,100,100);
+        CDD.init(1000,1000,1000);
         CDD.addClocks(automata[0].getClocks(),automata[1].getClocks(),automata[2].getClocks());
         TransitionSystem comp = new Composition(
                 new TransitionSystem[]{
@@ -463,6 +465,14 @@ public class DelayRefinementTest {
         XMLFileWriter.toXML("compT1T2.xml", array);
         assertTrue(new Refinement(comp, new SimpleTransitionSystem(CDD.makeInputEnabled(automata[2]))).check());
     }
+/*
+    @Test
+    public void T12RefinesT3() { // never finished the test
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(automata[55].getClocks(),automata[2].getClocks());
+        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[55])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata[2]))).check());
+    }*/
+
 
     @Test
     public void C1RefinesC2() {
@@ -539,7 +549,7 @@ public class DelayRefinementTest {
     public void T9NotRefinesT8() {
         CDD.init(100,100,100);
         CDD.addClocks(automata[15].getClocks(),automata[16].getClocks());
-        assertFalse(new Refinement(new SimpleTransitionSystem(automata[16]), new SimpleTransitionSystem(automata[15])).check());
+        assertFalse(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(automata[16])), new SimpleTransitionSystem(CDD.makeInputEnabled(automata[15]))).check());
     }
 
     @Test
@@ -635,9 +645,11 @@ public class DelayRefinementTest {
         CDD.addClocks(automata[39].getClocks(),automata[40].getClocks(),automata[41].getClocks());
         TransitionSystem comp = new Composition(
                 new TransitionSystem[]{
-                        new SimpleTransitionSystem(automata[39]),
-                        new SimpleTransitionSystem(automata[40])});
-        assertFalse(new Refinement(comp, new SimpleTransitionSystem(automata[41])).check());
+                        new SimpleTransitionSystem(CDD.makeInputEnabled(automata[39])),
+                        new SimpleTransitionSystem(CDD.makeInputEnabled(automata[40]))});
+        boolean result = new Refinement(comp, new SimpleTransitionSystem(CDD.makeInputEnabled(automata[41]))).check();
+        System.out.println(result);
+        assertFalse(result);
     }
 
     @Test

@@ -25,12 +25,12 @@ public class ClockGuard extends Guard {
         this.bound = bound;
     }
     // Copy constructor
-    public ClockGuard(ClockGuard orig, List<Clock> clocks) {
-        this.clock_i = clocks.get(clocks.indexOf(orig.clock_i));
+    public ClockGuard(ClockGuard orig, List<Clock> newClocks, List<Clock> oldClocks) {
+        this.clock_i = newClocks.get(oldClocks.indexOf(orig.clock_i));
         if (orig.clock_j==null)
             this.clock_j = null;
         else
-            this.clock_j = clocks.get(clocks.indexOf(orig.clock_j));
+            this.clock_j = newClocks.get(oldClocks.indexOf(orig.clock_j));
         this.rel = orig.rel;
         this.bound = orig.bound;
     }

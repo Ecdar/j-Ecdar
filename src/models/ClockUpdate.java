@@ -13,8 +13,8 @@ public class ClockUpdate extends Update{
         this.value = value;
     }
 
-    public ClockUpdate(ClockUpdate copy, List<Clock> clocks){
-        this.clock = clocks.get(clocks.indexOf(copy.clock));
+    public ClockUpdate(ClockUpdate copy, List<Clock> newClocks, List<Clock> oldClocks){
+        this.clock = newClocks.get(oldClocks.indexOf(copy.clock));
         this.value = copy.value;
     }
 

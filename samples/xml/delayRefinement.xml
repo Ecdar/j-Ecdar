@@ -95,7 +95,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		</location>
 		<location id="id16" x="-24" y="8">
 			<name x="-34" y="-22">id9</name>
-			<label kind="invariant" x="-40" y="24">z&lt;=12</label>
+			<label kind="invariant" x="-40" y="24">z&lt;=15</label>
 		</location>
 		<location id="id17" x="-192" y="8">
 			<name x="-202" y="-22">id10</name>
@@ -1394,6 +1394,53 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 			<source ref="id278"/>
 			<target ref="id277"/>
 			<label kind="synchronisation" x="-104" y="-16">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name>T12</name>
+		<declaration>clock x, y;</declaration>
+		<location id="id280" x="-340" y="25">
+		</location>
+		<location id="id281" x="-161" y="25">
+		</location>
+		<location id="id282" x="8" y="25">
+		</location>
+		<location id="id283" x="8" y="187">
+			<label kind="invariant" x="-2" y="204">x&lt;=3</label>
+		</location>
+		<location id="id284" x="-170" y="187">
+			<label kind="invariant" x="-180" y="204">y&lt;=3</label>
+		</location>
+		<location id="id285" x="-340" y="187">
+		</location>
+		<init ref="id280"/>
+		<transition id="id286" controllable="false">
+			<source ref="id284"/>
+			<target ref="id285"/>
+			<label kind="synchronisation" x="-255" y="153">ro!</label>
+		</transition>
+		<transition id="id287" controllable="false">
+			<source ref="id283"/>
+			<target ref="id284"/>
+			<label kind="synchronisation" x="-110" y="153">o!</label>
+			<label kind="assignment" x="-110" y="195">x=0,y=0</label>
+		</transition>
+		<transition id="id288">
+			<source ref="id281"/>
+			<target ref="id282"/>
+			<label kind="synchronisation" x="-102" y="-8">i?</label>
+			<label kind="assignment" x="-127" y="34">y=0</label>
+		</transition>
+		<transition id="id289">
+			<source ref="id280"/>
+			<target ref="id281"/>
+			<label kind="synchronisation" x="-272" y="0">i?</label>
+			<label kind="assignment" x="-263" y="34">x=0</label>
+		</transition>
+		<transition id="id290">
+			<source ref="id282"/>
+			<target ref="id283"/>
+			<label kind="synchronisation" x="8" y="89">ri?</label>
 		</transition>
 	</template>
 	<system>// List one or more processes to be composed into a system.

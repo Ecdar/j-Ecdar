@@ -38,9 +38,10 @@ public abstract class TransitionSystem {
 
         CDD initCDD = CDD.zeroCDDDelayed();
         State state = new State(getInitialLocation(), initCDD);
-        //state.getInvarCDD().printDot();
+
+        System.out.println("BEFOREINVAR: " + CDD.toGuardList(state.getInvarCDD(),clocks));
         state.applyInvariants();
-        //state.getInvarCDD().printDot();
+        System.out.println("AFTERINVAR: " + CDD.toGuardList(state.getInvarCDD(),clocks));
         state.applyGuards(invs);
 
         return state;
@@ -66,7 +67,7 @@ public abstract class TransitionSystem {
 
             targetState.applyGuards(guards);
 
-            if (!targetState.getInvarCDD().isNotFalse())
+            if (targetState.getInvarCDD().isFalse())
             {
                 System.out.println("target invar not valid");
                 continue;
@@ -94,7 +95,7 @@ public abstract class TransitionSystem {
 
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
-
+        System.out.println(transitions.size());
         return transitions;
     }
 
@@ -164,7 +165,7 @@ public abstract class TransitionSystem {
                 inconsistentTs.add(ts.getName());
             }
         }
-
+        System.out.println("Results:" + isConsistent + isDeterm);
         if(!isConsistent) buildErrMessage(inconsistentTs, "inconsistent");
         return isConsistent && isDeterm;
     }

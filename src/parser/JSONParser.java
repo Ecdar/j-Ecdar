@@ -108,8 +108,9 @@ public class JSONParser {
 
         return returnList;
     }
-
+    private static String automatonName;
     private static Automaton distrubuteObject(JSONObject obj, boolean makeInpEnabled){
+        automatonName= (String) obj.get("name");
         addDeclarations((String) obj.get("declarations"));
         JSONArray locationList = (JSONArray) obj.get("locations");
         List<Location> locations = addLocations(locationList);
@@ -117,6 +118,7 @@ public class JSONParser {
         List<Edge> edges = addEdges(edgeList, locations);
         Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), BVs, makeInpEnabled);
         componentClocks.clear();
+        BVs.clear();
         return automaton;
     }
 
@@ -156,7 +158,7 @@ public class JSONParser {
                 String[] clockArr = clocks.split(",");
 
                 for (String s : clockArr) {
-                    componentClocks.add(new Clock(s));
+                    componentClocks.add(new Clock(automatonName+"_"+s));
                 }
             }
         }
@@ -354,7 +356,7 @@ public class JSONParser {
     }
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
-            if (clock.getName().equals(clockName)) return clock;
+            if (clock.getName().equals(automatonName+"_"+clockName)) return clock;
 
         return null;
     }

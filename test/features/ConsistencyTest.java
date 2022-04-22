@@ -4,6 +4,7 @@ import logic.*;
 import models.Automaton;
 import models.CDD;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
@@ -17,8 +18,8 @@ public class ConsistencyTest {
     static Automaton[] automata;
     private static TransitionSystem G1, G3, G4, G5, G7, G8, G9, G10, G12, G21;
 
-    @After
-    public void afterEachTest(){
+    @AfterClass
+    public static void afterEachTest(){
         CDD.done();
     }
 
@@ -35,6 +36,9 @@ public class ConsistencyTest {
         G10 = new SimpleTransitionSystem(automata[9]);
         G12 = new SimpleTransitionSystem(automata[11]);
         G21 = new SimpleTransitionSystem(automata[20]);
+
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(G1.getClocks(),G3.getClocks(),G4.getClocks(),G5.getClocks(),G7.getClocks(),G8.getClocks(),G9.getClocks(),G10.getClocks(),G12.getClocks(),automata[12].getClocks(),automata[13].getClocks(),automata[14].getClocks(),automata[15].getClocks(),automata[16].getClocks(),automata[17].getClocks(),automata[18].getClocks(),automata[19].getClocks(),automata[20].getClocks());
     }
 
     @Test
@@ -84,7 +88,7 @@ public class ConsistencyTest {
 
     @Test
     public void testG6(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
+        TransitionSystem ts = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[5]));
 
         assertTrue(ts.isLeastConsistent());
     }

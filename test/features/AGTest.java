@@ -48,31 +48,44 @@ public class AGTest {
 
     @Test
     public void ARefinesSelf() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(a.getClocks(),aCopy.getClocks());
         assertTrue(new Refinement(a, aCopy).check());
     }
 
     @Test
     public void GRefinesSelf() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(g.getClocks(),gCopy.getClocks());
         assertTrue(new Refinement(g, gCopy).check());
     }
 
     @Test
     public void QRefinesSelf() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(q.getClocks(),qCopy.getClocks());
         assertTrue(new Refinement(q, qCopy).check());
     }
 
     @Test
     public void ImpRefinesSelf() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(imp.getClocks(),impCopy.getClocks());
         assertTrue(new Refinement(imp, impCopy).check());
     }
 
     @Test
     public void AaRefinesSelf() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(aa.getClocks(),aaCopy.getClocks());
         assertTrue(new Refinement(aa, aaCopy).check());
     }
 
     @Test
     public void AGNotRefinesAImp() {
+
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(a.getClocks(),g.getClocks(), imp.getClocks());
         // should fail because left side has more inputs
         assertFalse(new Refinement(
                 new Composition(new TransitionSystem[]{a, g}),
@@ -82,6 +95,8 @@ public class AGTest {
 
     @Test
     public void AImpNotRefinesAG() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(a.getClocks(),g.getClocks(), imp.getClocks());
         // should fail because the right side has more inputs
         assertFalse(new Refinement(
                 new Composition(new TransitionSystem[]{a, imp}),
@@ -91,38 +106,53 @@ public class AGTest {
 
     @Test
     public void GNotRefinesImp() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(g.getClocks(),imp.getClocks());
         // should fail because right side has more outputs
         assertFalse(new Refinement(g, imp).check());
     }
 
     @Test
     public void ImpRefinesG() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(imp.getClocks(),g.getClocks());
         assertTrue(new Refinement(imp, g).check());
     }
 
     @Test
     public void GRefinesQ() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(g.getClocks(),q.getClocks());
+
         assertTrue(new Refinement(g, q).check());
     }
 
     @Test
     public void QRefinesG() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(q.getClocks(),g.getClocks());
         assertTrue(new Refinement(q, g).check());
     }
 
     @Test
     public void QNotRefinesImp() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(q.getClocks(),imp.getClocks());
         // should fail because right side has more outputs
         assertFalse(new Refinement(q, imp).check());
     }
 
     @Test
     public void ImpRefinesQ() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(q.getClocks(),imp.getClocks());
         assertTrue(new Refinement(imp, q).check());
     }
 
     @Test
     public void ANotRefinesAA() {
+        CDD.init(1000,1000,1000);
+        CDD.addClocks(a.getClocks(),aa.getClocks());
         // should fail because right side has more inputs
         assertFalse(new Refinement(a, aa).check());
     }

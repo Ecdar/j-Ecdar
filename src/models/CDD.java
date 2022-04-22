@@ -35,6 +35,7 @@ public class CDD {
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
+        System.out.println(clock + ": " + clocks);
         assert(false);
         return 0;
     }
@@ -107,7 +108,7 @@ public class CDD {
                 return null;
             copy=copy.reduce().removeNegative();
             CddExtractionResult res = copy.extractBddAndDbm();
-            copy = res.getCddPart();
+            copy = res.getCddPart().reduce().removeNegative();
             Zone z = new Zone(res.getDbm());
             CDD bddPart = res.getBddPart();
             List<Guard> guardList = z.buildGuardsFromZone(clocks, relevantClocks);
@@ -329,6 +330,7 @@ public class CDD {
     }
 
     public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets){
+        System.out.println("klklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklk");
         checkIfRunning();
         checkForNull();
         guard.checkForNull();
@@ -363,7 +365,7 @@ public class CDD {
         checkForNull();
         other.checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);
-        return new CDD(resultPointer);
+        return new CDD(resultPointer).reduce().removeNegative();
     }
 
     public CDD disjunction(CDD other){
@@ -492,7 +494,7 @@ public class CDD {
         while (!copy.isTerminal())
         {
             CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
-            copy = res.getCddPart();
+            copy = res.getCddPart().removeNegative().reduce();
             Zone z = new Zone(res.getDbm());
             if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
                 return true;
@@ -513,7 +515,7 @@ public class CDD {
         {
             CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
             Zone z = new Zone(res.getDbm());
-            copy = res.getCddPart();
+            copy = res.getCddPart().removeNegative().reduce();
             if (z.isUrgent())
                 return true; // TODO: is it enough if one is urgent?
         }

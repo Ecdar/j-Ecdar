@@ -57,11 +57,11 @@ public class XMLParser {
 
         return automata.toArray(new Automaton[0]);
     }
-
+    private static String automatonName;
     private static Automaton buildAutomaton(Element element, boolean makeInpEnabled){
         // automaton name
         String name = element.getChildText("name");
-
+        automatonName=name;
         // clocks
         List<Clock> clocks = setClocks(element);
 
@@ -113,8 +113,9 @@ public class XMLParser {
 
                     String[] clockArr = clocks.split(",");
 
-                    for (String clk : clockArr)
-                        clockList.add(new Clock(clk));
+                    for (String clk : clockArr) {
+                        clockList.add(new Clock(automatonName + "_"+clk));
+                    }
                 }
             }
         }
@@ -261,7 +262,7 @@ public class XMLParser {
 
     private static Clock findClock(List<Clock> clocks, String name) {
         for (Clock clock : clocks)
-            if (clock.getName().equals(name))
+            if (clock.getName().equals(automatonName+"_"+name))
                 return clock;
 
         return null;

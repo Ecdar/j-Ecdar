@@ -128,10 +128,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 if (state1.getInvarCDD().isNotFalse() && state2.getInvarCDD().isNotFalse()) {
                     if(CDD.intersects(state1.getInvarCDD(),state2.getInvarCDD())) {
-                        //trans.get(i).getGuardCDD().printDot();
-                       // trans.get(j).getGuardCDD().printDot();
-                        //trans.get(i).getEdges().get(0).getGuardCDD().printDot();
-                        //trans.get(j).getEdges().get(0).getGuardCDD().printDot();
+                        System.out.println(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
+                        System.out.println(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
+
+                        System.out.println(CDD.toGuardList(state1.getInvarCDD(),clocks));
+                        System.out.println(CDD.toGuardList(state2.getInvarCDD(),clocks));
+                        // trans.get(j).getGuardCDD().printDot();
+                        System.out.println(CDD.toGuardList(trans.get(i).getEdges().get(0).getGuardCDD(),clocks));
+                        System.out.println(CDD.toGuardList(trans.get(j).getEdges().get(0).getGuardCDD(),clocks));
                         System.out.println("they intersect??!");
                         return true;
                     }
