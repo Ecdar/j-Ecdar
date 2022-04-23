@@ -61,6 +61,8 @@ public class Edge {
                     temp.add(new ClockGuard((ClockGuard) g,  clocks,oldClocks));
                 if (g instanceof BoolGuard)
                     temp.add(new BoolGuard((BoolGuard) g));
+                if (g instanceof FalseGuard)
+                    temp.add(new FalseGuard());
             }
             this.guards.add(temp);
         }

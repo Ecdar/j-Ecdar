@@ -13,6 +13,7 @@ public class Move {
     private List<Update> updates;
 
     public Move(SymbolicLocation source, SymbolicLocation target, List<Edge> edges) {
+
         this.source = source;
         this.target = target;
         this.edges = edges;
@@ -20,7 +21,8 @@ public class Move {
         this.updates= new ArrayList<>();
         for (Edge e : edges)
         {
-           guardCDD = guardCDD.conjunction(e.getGuardCDD());
+            CDD guardCDD1 = e.getGuardCDD();
+           guardCDD = guardCDD.conjunction(guardCDD1);
            updates.addAll(e.getUpdates());
         }
 

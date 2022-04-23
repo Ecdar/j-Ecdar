@@ -183,10 +183,10 @@ public class VariousTest {
         clocks.addAll(aut2[3].getClocks());
         CDD.addClocks(clocks);
 
-        SimpleTransitionSystem adm = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[3]));
-        SimpleTransitionSystem machine = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[0]));
-        SimpleTransitionSystem researcher = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[1]));
-        SimpleTransitionSystem spec = new SimpleTransitionSystem(CDD.makeInputEnabled(aut2[2]));
+        SimpleTransitionSystem adm = new SimpleTransitionSystem((aut2[3]));
+        SimpleTransitionSystem machine = new SimpleTransitionSystem((aut2[0]));
+        SimpleTransitionSystem researcher = new SimpleTransitionSystem((aut2[1]));
+        SimpleTransitionSystem spec = new SimpleTransitionSystem((aut2[2]));
 
         assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{adm,

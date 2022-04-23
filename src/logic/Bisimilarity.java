@@ -23,6 +23,9 @@ public class Bisimilarity {
         bisimilarLocs.add(locs);
 
 
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(clocks);
+        //CDD.addBddvar(allBVs); TODO!
 
 
 
@@ -116,6 +119,8 @@ public class Bisimilarity {
                 }
             }
         }
+
+        CDD.done();
         return new Automaton(aut.getName()+"Bisimilar",locs,finalEdges,clocks, aut.getBVs());
 
     }

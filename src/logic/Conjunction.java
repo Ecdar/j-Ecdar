@@ -87,6 +87,10 @@ public class Conjunction extends TransitionSystem {
 
     public Automaton createComposition(List<Automaton> autList)
     {
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
+        //CDD.addBddvar(BVs);TODO!
+
         String name="";
         Set<Edge> edgesSet = new HashSet<>();
         Set<Location> locationsSet = new HashSet<>();
@@ -113,7 +117,7 @@ public class Conjunction extends TransitionSystem {
 
         locMap.put(initL.getName(),initL);
 
-        State initState = getInitialState();;
+        State initState = getInitialState();
         waiting.add(initState);
         while (!waiting.isEmpty())
         {
@@ -121,6 +125,7 @@ public class Conjunction extends TransitionSystem {
             State currentState = (State)waiting.toArray()[0];
             waiting.remove(currentState);
             passed.add(currentState);
+            System.out.println("currentState " + currentState + " " + CDD.toGuardList(currentState.getInvarCDD(),clocks));
             //System.out.println("Processing state " + currentState.getLocation().getName()) ;
             //if (currentState.getLocation().getName().equals("L0L5L6"))
             //    currentState.getInvFed().getZones().get(0).printDBM(true,true);
@@ -128,9 +133,13 @@ public class Conjunction extends TransitionSystem {
             for (Channel chan : all )
             {
 
+                System.out.println("channel " + chan);
                 List<Transition> transList = getNextTransitions(currentState, chan, clocks);
+                System.out.println("siize " + transList.size());
                 for (Transition trans : transList)
                 {
+
+                    System.out.println("trans " + trans);
                     String targetName = trans.getTarget().getLocation().getName();
 
                     boolean isInitial = trans.getTarget().getLocation().getIsInitial();
@@ -187,6 +196,7 @@ public class Conjunction extends TransitionSystem {
 
 
         Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, BVs, false);
+        CDD.done();
         return resAut;
 
     }
@@ -198,7 +208,8 @@ public class Conjunction extends TransitionSystem {
         String name="";
         List<List<Guard>> invariant = new ArrayList<>();
 
-        CDD invarFed = CDD.getUnrestrainedCDD();
+        CDD invarFed = CDD.cddTrue(); //CDD.getUnrestrainedCDD();
+        System.out.println(CDD.toGuardList(invarFed,clocks));
         boolean isInitial = true;
         boolean isUrgent = false;
         boolean isUniversal = false;
@@ -220,8 +231,9 @@ public class Conjunction extends TransitionSystem {
             y += l.getY();
 
         }
-        invariant = CDD.toGuardList(invarFed, getClocks());
 
+        invariant = CDD.toGuardList(invarFed, getClocks());
+        System.out.println("creating a loc with invariant" + invariant);
         return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
 
     }
@@ -251,7 +263,7 @@ public class Conjunction extends TransitionSystem {
         // these will store the locations of the target states and the corresponding transitions
         List<Move> resultMoves = computeResultMoves(locations, channel);
         if (resultMoves.isEmpty()) return new ArrayList<>();
-
+        System.out.println("conjunction create new trans");
         return createNewTransitions(currentState, resultMoves, allClocks);
     }
 
@@ -263,7 +275,7 @@ public class Conjunction extends TransitionSystem {
 
     private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
         List<Move> resultMoves = systems[0].getNextMoves(locations.get(0), channel);
-
+        System.out.println("result moves size " + resultMoves.size());
         // used when there are no moves for some TS
         if (resultMoves.isEmpty())
             return new ArrayList<>();

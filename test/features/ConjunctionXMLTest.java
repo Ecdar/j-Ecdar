@@ -26,6 +26,7 @@ public class ConjunctionXMLTest {
     @Test
     public void P0ConjP1RefP2() {
         TransitionSystem ts = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(automata[1]), new SimpleTransitionSystem(automata[0])});
+        new SimpleTransitionSystem(ts.getAutomaton()).toXML("what.xml");
         assertFalse(new Refinement(ts, new SimpleTransitionSystem(automata[2])).check());
     }
     @Test

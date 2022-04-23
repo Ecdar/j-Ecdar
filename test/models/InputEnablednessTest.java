@@ -2,6 +2,7 @@ package models;
 
 import Exceptions.CddAlreadyRunningException;
 import Exceptions.CddNotRunningException;
+import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -115,15 +116,12 @@ public class InputEnablednessTest {
 
         String base = "./samples/json/InputEnabled/";
         String[] components = new String[]{"GlobalDeclarations.json", "Components/Automaton.json"};
-        CDD.init(100,100,100);
+
 
         actual = JSONParser.parse(base, components, true)[0];
-        List<Clock> cddClocks = new ArrayList<>();
-        cddClocks.addAll(actual.getClocks());
-        CDD.addClocks(clocks,cddClocks);
         //SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
        //  st.toXML("BASE.xml");
-        actual = CDD.makeInputEnabled(actual);
+        actual = (actual);
         System.out.println("fnished setup");
     }
 
@@ -133,7 +131,9 @@ public class InputEnablednessTest {
         st.toXML("wtf.xml");
         SimpleTransitionSystem st1 = new SimpleTransitionSystem(expected);
         st1.toXML("wtf-exp.xml");
-        assert actual.equals(expected);
+        assert (new Refinement(new SimpleTransitionSystem(expected),new SimpleTransitionSystem(actual)).check());
+        assert (new Refinement(new SimpleTransitionSystem(actual),new SimpleTransitionSystem(expected)).check());
+
     }
 
 }

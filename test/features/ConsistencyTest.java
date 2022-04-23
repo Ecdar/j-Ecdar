@@ -38,7 +38,7 @@ public class ConsistencyTest {
         G21 = new SimpleTransitionSystem(automata[20]);
 
         CDD.init(1000,1000,1000);
-        CDD.addClocks(G1.getClocks(),G3.getClocks(),G4.getClocks(),G5.getClocks(),G7.getClocks(),G8.getClocks(),G9.getClocks(),G10.getClocks(),G12.getClocks(),automata[12].getClocks(),automata[13].getClocks(),automata[14].getClocks(),automata[15].getClocks(),automata[16].getClocks(),automata[17].getClocks(),automata[18].getClocks(),automata[19].getClocks(),automata[20].getClocks());
+        CDD.addClocks(G1.getClocks(),G3.getClocks(),G4.getClocks(),G5.getClocks(),G7.getClocks(),G8.getClocks(),G9.getClocks(),G10.getClocks(),G12.getClocks(),automata[5].getClocks(),automata[12].getClocks(),automata[13].getClocks(),automata[14].getClocks(),automata[15].getClocks(),automata[16].getClocks(),automata[17].getClocks(),automata[18].getClocks(),automata[19].getClocks(),automata[20].getClocks());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ConsistencyTest {
     @Test
     public void testG6(){
 
-        TransitionSystem ts = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[5]));
+        TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
 
         ts.getAutomaton().getEdges().forEach(e->System.out.println(e));
         assertTrue(ts.isLeastConsistent());
@@ -204,7 +204,9 @@ public class ConsistencyTest {
         TransitionSystem comp = new Composition(new TransitionSystem[] {ts1, ts2});
 
         Refinement ref = new Refinement(comp, G21);
+
         assertFalse(ref.check());
-        assertEquals("Automaton G9 is non-deterministic.\n" + "Automata G3, G4, G5, G7, G10, G12 are inconsistent.\n", ref.getErrMsg());
+        System.out.println(ref.getErrMsg());
+        assertEquals("Automaton G9 is non-deterministic." + ", Automata G3, G4, G5, G7, G10, G12 are inconsistent.", ref.getErrMsg());
     }
 }

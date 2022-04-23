@@ -38,12 +38,12 @@ public class UnspecTest {
         Automaton[] machines = JSONParser.parse(base, components, true);
    ;
 
-        a = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[0]));
-        aCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[0])));
-        aa = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[1]));
-        aaCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[1])));
-        b = new SimpleTransitionSystem(CDD.makeInputEnabled(machines[2]));
-        bCopy = new SimpleTransitionSystem(new Automaton(CDD.makeInputEnabled(machines[2])));
+        a = new SimpleTransitionSystem((machines[0]));
+        aCopy = new SimpleTransitionSystem(new Automaton((machines[0])));
+        aa = new SimpleTransitionSystem((machines[1]));
+        aaCopy = new SimpleTransitionSystem(new Automaton((machines[1])));
+        b = new SimpleTransitionSystem((machines[2]));
+        bCopy = new SimpleTransitionSystem(new Automaton((machines[2])));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class UnspecTest {
         clocks.addAll(a.getClocks());
         clocks.addAll(aCopy.getClocks());
         CDD.addClocks(clocks);
-        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(a.getAutomaton())), aCopy).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem((a.getAutomaton())), aCopy).check());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class UnspecTest {
         clocks.addAll(aa.getClocks());
         clocks.addAll(aaCopy.getClocks());
         CDD.addClocks(clocks);
-        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(aa.getAutomaton())), aaCopy).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem((aa.getAutomaton())), aaCopy).check());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class UnspecTest {
         clocks.addAll(b.getClocks());
         clocks.addAll(bCopy.getClocks());
         CDD.addClocks(clocks);
-        assertTrue(new Refinement(new SimpleTransitionSystem(CDD.makeInputEnabled(b.getAutomaton())), bCopy).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem((b.getAutomaton())), bCopy).check());
     }
 
     @Test

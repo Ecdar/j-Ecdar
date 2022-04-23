@@ -12,7 +12,6 @@ public class Main {
         Instant x;
         String input;
 
-        System.out.println("a");
         x = Instant.now();
         try {
             input = reader.readLine();

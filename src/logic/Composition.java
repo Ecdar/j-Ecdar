@@ -69,15 +69,6 @@ public class Composition extends TransitionSystem {
             outputs.addAll(outputsOfI);
             setMaxBounds();
         }
-/*
-        String combinedName = "";
-        for (int i = 0; i < systems.length; i++) {
-            combinedName += systems[i].getSystems().get(0).getName();
-        }
-
-        Automaton resAut = new Automaton(combinedName, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, false);
-        SimpleTransitionSystem st = new SimpleTransitionSystem(resAut);
-        st.toXML("isThisAComposition"); */
     }
 
     public Set<Channel> getInputs() {
@@ -116,6 +107,9 @@ public class Composition extends TransitionSystem {
 
     public Automaton createComposition(List<Automaton> autList)
     {
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
+        //CDD.addBddvar(BVs);TODO!
         String name="";
         Set<Edge> edgesSet = new HashSet<>();
         Set<Location> locationsSet = new HashSet<>();
@@ -213,6 +207,7 @@ public class Composition extends TransitionSystem {
 
 
         Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, BVs, false);
+        CDD.done();
         return resAut;
 
     }
@@ -300,6 +295,7 @@ public class Composition extends TransitionSystem {
 
         if (checkForOutputs(channel, locations))
             resultMoves = computeResultMoves(locations, channel);
+        System.out.println("composition create new trans");
         List<Transition> transitions = createNewTransitions(currentState, resultMoves, allClocks);
         return transitions;
     }

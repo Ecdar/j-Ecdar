@@ -60,7 +60,8 @@ public class Quotient extends TransitionSystem {
 
     @Override
     public Automaton getAutomaton() {
-        return calculateQuotientAutomaton().getAutomaton();
+        Automaton res = calculateQuotientAutomaton().getAutomaton();
+        return res;
     }
 
     public SymbolicLocation getInitialLocation() {
@@ -75,6 +76,8 @@ public class Quotient extends TransitionSystem {
 
     public SimpleTransitionSystem calculateQuotientAutomaton() {
 
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(clocks);
         String name = ts_spec.getSystems().get(0).getName() + "DIV" + ts_comp.getSystems().get(0).getName() ;
 
         // Lists of edges and locations for the newly built automaton
@@ -316,6 +319,8 @@ public class Quotient extends TransitionSystem {
         Automaton aut = new Automaton(name,  locations,  edges, clocks, BVs, false);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);
+
+        CDD.done();
         return simp;
     }
 
@@ -343,6 +348,7 @@ public class Quotient extends TransitionSystem {
         SymbolicLocation location = currentState.getLocation();
 
         List<Move> moves = getNextMoves(location, channel);
+        System.out.println("quotient create new trans");
         return createNewTransitions(currentState, moves, allClocks);
     }
 

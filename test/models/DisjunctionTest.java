@@ -36,8 +36,8 @@ public class DisjunctionTest {
         clocks.addAll(automata[0].getClocks());
         clocks.addAll(automata[1].getClocks());
         CDD.addClocks(clocks);
-        D1 = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[0]));
-        D2 = new SimpleTransitionSystem(CDD.makeInputEnabled(automata[1]));
+        D1 = new SimpleTransitionSystem((automata[0]));
+        D2 = new SimpleTransitionSystem((automata[1]));
 
 
     }

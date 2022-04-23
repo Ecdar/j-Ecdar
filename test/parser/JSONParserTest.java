@@ -1,7 +1,7 @@
 package parser;
 
-import logic.JsonFileWriter;
 import logic.Pruning;
+import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import models.*;
 import org.json.simple.parser.ParseException;
@@ -141,12 +141,18 @@ public class JSONParserTest {
     @Test
     public void parseJsonStringTest() throws ParseException {
         Automaton parsedA = JSONParser.parseJsonString(AJsonString, false);
-        Assert.assertEquals(A,parsedA);
+
+        assert (new Refinement(new SimpleTransitionSystem(A), new SimpleTransitionSystem(parsedA)).check());
+        assert (new Refinement(new SimpleTransitionSystem(parsedA), new SimpleTransitionSystem(A)).check());
+        //Assert.assertEquals(A,parsedA);
     }
 
     @Test
     public void testA() {
-        Assert.assertEquals(A,machines[0]);
+
+        assert (new Refinement(new SimpleTransitionSystem(A), new SimpleTransitionSystem(machines[0])).check());
+        assert (new Refinement(new SimpleTransitionSystem(machines[0]), new SimpleTransitionSystem(A)).check());
+        //Assert.assertEquals(A,machines[0]);
     }
 
     @Test
@@ -166,7 +172,9 @@ public class JSONParserTest {
 
     @Test
     public void testRef1() {
-        assert Ref1.equals(machines2[0]);
+        assert (new Refinement(new SimpleTransitionSystem(Ref1), new SimpleTransitionSystem(machines2[0])).check());
+        assert (new Refinement(new SimpleTransitionSystem(machines2[0]), new SimpleTransitionSystem(Ref1)).check());
+        //assert Ref1.equals(machines2[0]);
     }
 
     @Test

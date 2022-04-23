@@ -41,7 +41,9 @@ public class Pruning {
     }
 
     public SimpleTransitionSystem prune(SimpleTransitionSystem st) {
-
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(clocks);
+        //CDD.addBddvar(BVs); TODO!
 
         // Creating the sets of locations and transitions that will form the new automaton.
         for (Location l : aut.getLocations()) {
@@ -120,6 +122,7 @@ public class Pruning {
             edges = new ArrayList<>();
         }
         Automaton resAut = new Automaton(st.getName(), locations, edges, clocks, st.BVs, false);
+        CDD.done();
         return new SimpleTransitionSystem(resAut);
 
     }

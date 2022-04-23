@@ -50,10 +50,17 @@ public class Automaton {
         setActions(edges);
         this.clocks = clocks;
         this.BVs = BVs;
-        /*if (makeInpEnabled) { // TODO: Figure out how to handle this now
+
+
+
+        if (makeInpEnabled) {
+            CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+            CDD.addClocks(clocks);
+            //CDD.addBddvar(BVs); TODO!
             addTargetInvariantToEdges();
             makeInputEnabled();
-        }*/
+            CDD.done();
+        }
     }
 
     // Copy constructor
@@ -79,8 +86,6 @@ public class Automaton {
         for (Edge e : copy.edges) {
             int sourceIndex = copy.locations.indexOf(e.getSource());
             int targetIndex = copy.locations.indexOf(e.getTarget());
-            System.out.println(targetIndex);
-            System.out.println(sourceIndex);
             this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), copy.clocks));
         }
 
@@ -217,4 +222,52 @@ public class Automaton {
     public int hashCode() {
         return Objects.hash(name, locations, edges, clocks, BVs, inputAct, outputAct, initLoc);
     }
+
+
+    public void makeInputEnabled() {
+
+        if (clocks.size() > 0) {
+            for (Location loc : getLocations()) {
+                CDD sourceInvariantCDD = loc.getInvariantCDD();
+                // loop through all inputs
+                for (Channel input : getInputAct()) {
+                    // build CDD of zones from edges
+                    List<Edge> inputEdges = getEdgesFromLocationAndSignal(loc, input);
+                    CDD resCDD;
+                    CDD cddOfAllInputs = CDD.cddFalse();
+                    if (!inputEdges.isEmpty()) {
+                        for (Edge edge : inputEdges) {
+                            CDD target = edge.getTarget().getInvariantCDD();
+                            //CDD preReset = CDD.applyReset(target, edge.getUpdates()); // Does not work for back propagation
+                            //CDD preGuard = preReset.conjunction(edge.getGuardCDD());
+                            CDD preGuard1 = target.transitionBack(edge);
+                            //assert (preGuard1.equiv(preGuard));
+                            cddOfAllInputs = cddOfAllInputs.disjunction(preGuard1);
+                        }
+
+                        // subtract the federation of zones from the original fed
+                        resCDD = sourceInvariantCDD.minus(cddOfAllInputs);
+                    } else {
+                        resCDD = sourceInvariantCDD;
+                    }
+                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
+                    getEdges().add(newEdge);
+
+
+                }
+            }
+        }
+    }
+
+    public void addTargetInvariantToEdges() {
+        if ( clocks.size() > 0) {
+            for (Edge edge : getEdges()) {
+                CDD targetCDD = edge.getTarget().getInvariantCDD();
+                CDD past = targetCDD.transitionBack(edge);
+
+                edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
+            }
+        } // TODO: else part will be important once we have bool support
+    }
+
 }

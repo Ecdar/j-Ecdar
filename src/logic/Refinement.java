@@ -30,8 +30,7 @@ public class Refinement {
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
 
-        // the first states we look at are the initial ones
-        waiting.push(getInitialStatePair());
+
 
         inputs1 = ts1.getInputs();
         inputs2 = ts2.getInputs();
@@ -50,12 +49,14 @@ public class Refinement {
     }
 
     public boolean check(boolean ret_ref) {
+
         Refinement.NODE_ID = 0;
         Refinement.RET_REF = ret_ref;
         return checkRef();
     }
 
     public boolean check() {
+        System.out.println("check");
         Refinement.RET_REF = false;
         return checkRef();
     }
@@ -65,6 +66,7 @@ public class Refinement {
     }
 
     public boolean checkPreconditions() {
+        System.out.println("Check precond");
         boolean precondMet = true;
 
         // check for duplicate automata
@@ -89,18 +91,21 @@ public class Refinement {
             precondMet = false;
             errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
         }
+
         // the left side must contain all outputs from the right side
         if (!outputs1.containsAll(outputs2)) {
             precondMet = false;
-            errMsg.append("Not all outputs of the right side are present on the left side.\n OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
+            errMsg.append("Not all outputs of the right side are present on the left side.\n");// OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
         }
-        System.out.println("mid of preconditions " + precondMet);
+
+        System.out.println("before least consistent checks");
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts1.getLastErr());
         }
 
-        System.out.println("after first least consistent " + precondMet);
+        System.out.println("before second consistent check");
+
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts2.getLastErr());
@@ -112,6 +117,14 @@ public class Refinement {
         // one or more of the preconditions failed, so fail refinement
         if (!checkPreconditions())
             return false;
+        System.out.println("preconditions checked");
+
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(allClocks);
+        //CDD.addBddvar(allBVs); TODO!
+
+        // the first states we look at are the initial ones
+        waiting.push(getInitialStatePair());
 
         if (RET_REF) {
             refGraph = new GraphNode(waiting.getFirst());
@@ -121,13 +134,12 @@ public class Refinement {
         while (!waiting.isEmpty()) {
 
             StatePair curr = waiting.pop();
-            //System.out.println("curr: " + curr.prettyPrint());
+            System.out.println("curr: " + curr.prettyPrint());
             if (RET_REF)
                 currNode = curr.getNode();
 
             State left = curr.getLeft();
             State right = curr.getRight();
-            System.out.println("left: " +left.getLocation()+ " "  + CDD.toGuardList(left.getInvarCDD(),allClocks) + " right: " + right.getLocation() + " " +  CDD.toGuardList(right.getInvarCDD(),allClocks));
             // need to make deep copy
             State newState1 = new State(left);
             State newState2 = new State(right);
@@ -143,17 +155,20 @@ public class Refinement {
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
                 System.out.println("output error "  );
+                CDD.done();
                 return false;
             }
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
                 System.out.println("input error "  );
+                CDD.done();
                 return false;
             }
         }
 
         // if we got here it means refinement property holds
+        CDD.done();
         return true;
     }
 
@@ -169,11 +184,11 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
-        System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
-        System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
-        System.out.println(t1.getEdges().get(0).getChannel());
-        System.out.println(t1.getSource().getLocation().getName());
-        System.out.println(t2.getSource().getLocation().getName());
+        //System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
+        //System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
+        //System.out.println(t1.getEdges().get(0).getChannel());
+        //System.out.println(t1.getSource().getLocation().getName());
+        //System.out.println(t2.getSource().getLocation().getName());
         target1.applyGuards(t2.getGuardCDD());
 
         if (target1.getInvarCDD().isFalse()) {
@@ -182,26 +197,26 @@ public class Refinement {
 
 
         CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
-        System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
+        //System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
         target1.applyResets(t1.getUpdates());
-        System.out.println("after first reset " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        //System.out.println("after first reset " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         target1.applyResets(t2.getUpdates());
-        System.out.println(t1.getUpdates() + " " + t2.getUpdates());
+        //System.out.println(t1.getUpdates() + " " + t2.getUpdates());
         CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
-        System.out.println("after resets " + CDD.toGuardList(copyAfterResets,allClocks));
+        //System.out.println("after resets " + CDD.toGuardList(copyAfterResets,allClocks));
         target1.delay();// = target1.getInvarCDD().delay();
-        System.out.println("delayed " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        //System.out.println("delayed " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         target1.applyInvariants(t1.getTarget().getInvarCDDDirectlyFromInvariants());
         //System.out.println(((SimpleLocation)t1.getTarget().getLocation()).getActualLocation().getInvariant());
-        System.out.println("delayed + first invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        //System.out.println("delayed + first invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         CDD invariantTest = new CDD(target1.getInvarCDD().getPointer());
         target1.applyInvariants(t2.getTarget().getInvarCDDDirectlyFromInvariants());
         //System.out.println(((SimpleLocation)t2.getTarget().getLocation()).getActualLocation().getInvariant());
-        System.out.println("delayed + second invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
-        System.out.println("In the end " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        //System.out.println("delayed + second invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        //System.out.println("In the end " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
@@ -230,11 +245,11 @@ public class Refinement {
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
         //if (!target1.getInvZone().isValid()) return null;
-        if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
-            assert(false);
+        //if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+       //     assert(false);
         target1.extrapolateMaxBounds(maxBounds,allClocks);
-        if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
-            assert(false);
+       // if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+       //     assert(false);
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
 
         return new StatePair(target1, target2);
@@ -243,7 +258,7 @@ public class Refinement {
     private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
         boolean pairFound = false;
 
-
+        trans2.forEach(t -> System.out.println(t.getEdges().get(0)));
 
         List<CDD> gzLeft = trans1.stream().map(Transition::getGuardCDD).collect(Collectors.toList());
         List<CDD> gzRight = trans2.stream().map(Transition::getGuardCDD).collect(Collectors.toList());
@@ -262,8 +277,8 @@ public class Refinement {
        // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
-            //leftCDD.printDot();
-            //rightCDD.printDot();
+            System.out.println("left: " + CDD.toGuardList(leftCDD,allClocks));
+            System.out.println("right: " + CDD.toGuardList(rightCDD,allClocks));
             System.out.println("trans2 does not satisfy all solution of trans2");
             return false;
         }
@@ -300,7 +315,9 @@ public class Refinement {
     }
 
     private boolean checkActions(State state1, State state2, boolean isInput) {
+        System.out.println("check action reached: isInput: " + isInput);
         for (Channel action : (isInput ? inputs2 : outputs1)) {
+            System.out.println("action is " + action);
             List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action, allClocks)
                     : ts1.getNextTransitions(state1, action, allClocks);
 
@@ -309,7 +326,7 @@ public class Refinement {
                 List<Transition> transitions2;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
-                    System.out.println("action is " + action);
+                    System.out.println("Creating transition 2");
                     transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
                             : ts2.getNextTransitions(state2, action, allClocks);
 
@@ -327,7 +344,11 @@ public class Refinement {
                     transitions2.add(loop);
                 }
 
-//                if (isInput && )
+                System.out.println("trans1edge1: " + transitions1.get(0).getEdges().get(0));
+                System.out.println("trans2edge1: " + transitions2.get(0).getEdges().get(0));
+                System.out.println(transitions2.get(0).getGuards(allClocks));
+                System.out.println(transitions2.get(0).getGuardCDD());
+
                 if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
                     return false;
             }
@@ -374,7 +395,6 @@ public class Refinement {
 
     public StatePair getInitialStatePair() {
         State left = ts1.getInitialStateRef( ts2.getInitialLocation().getInvariantCDD());
-        System.out.println("REALLY" + CDD.toGuardList(left.getInvarCDD(),allClocks));
         State right = ts2.getInitialStateRef(ts1.getInitialLocation().getInvariantCDD());
         return new StatePair(left, right);
     }

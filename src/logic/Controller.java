@@ -2,9 +2,9 @@ package logic;
 
 import Exceptions.InvalidQueryException;
 import models.Automaton;
-import models.CDD;
 import org.json.simple.parser.ParseException;
 import parser.JSONParser;
+import parser.JsonFileWriter;
 import parser.XMLParser;
 
 import models.Clock;
@@ -82,8 +82,6 @@ public class Controller {
                 List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
                 TransitionSystem left = runQuery(refSplit.get(0));
                 TransitionSystem right = runQuery(refSplit.get(1));
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
 
                 Refinement ref = new Refinement(left, right);
 
@@ -105,8 +103,6 @@ public class Controller {
                 String cons = Queries.get(i).replace("consistency:", "");
                 clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(cons);
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
                 boolean passed = ts.isLeastConsistent();
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
@@ -115,8 +111,6 @@ public class Controller {
                 String impl = Queries.get(i).replace("implementation:", "");
                 clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
 
                 boolean passed = ts.isImplementation();
                 returnlist.add(String.valueOf(passed));
@@ -126,8 +120,6 @@ public class Controller {
                 String impl = Queries.get(i).replace("determinism:", "");
                 clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
                 boolean passed = ts.isDeterministic();
                 returnlist.add(String.valueOf(passed));
                 if(!passed) returnlist.add("\n" + ts.getLastErr());
@@ -136,8 +128,6 @@ public class Controller {
                 String query = Queries.get(i).replace("get-component:", "");
                 clocksInCurrentQuery= new ArrayList<>();
                 TransitionSystem ts = runQuery(query);
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
                 saveAutomaton(ts.getAutomaton(), componentName);
             }
             if(Queries.get(i).contains("bisim-minim")){
@@ -145,8 +135,6 @@ public class Controller {
                 clocksInCurrentQuery=new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
 
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
                 Automaton aut = ts.getAutomaton();
 
                 aut = Bisimilarity.checkBisimilarity(aut);
@@ -157,8 +145,6 @@ public class Controller {
                 String impl = Queries.get(i).replace("prune:", "");
                 clocksInCurrentQuery = new ArrayList<>();
                 TransitionSystem ts = runQuery(impl);
-                CDD.init(1000,1000,1000);
-                CDD.addClocks(clocksInCurrentQuery);
                 Automaton aut = ts.getAutomaton();
 
                 SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
@@ -167,7 +153,6 @@ public class Controller {
                 saveAutomaton(aut, componentName);
             }
             //add if contains specification or smth else
-            CDD.done();
         }
 
         return returnlist;

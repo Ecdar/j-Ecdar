@@ -1,5 +1,7 @@
 package parser;
 
+import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,18 +77,15 @@ public class XMLParserTest {
     @Test
     public void testAutomaton() {
         Automaton actual = XMLParser.parse("./samples/xml/ImplTests.xml", false)[0];
-//        CDD.init(100,100,100);
-//        CDD.addClocks(expected.getClocks(),actual.getClocks());
-        assert expected.equals(actual);
-//        CDD.done();
+        assert(new Refinement(new SimpleTransitionSystem(expected),new SimpleTransitionSystem(actual)).check());
+        assert(new Refinement(new SimpleTransitionSystem(actual),new SimpleTransitionSystem(expected)).check());
     }
 
     @Test
     public void testParseXmlString(){
         Automaton actual = XMLParser.parseXmlString(xmlString, false)[0];
-//        CDD.init(100,100,100);
-//        CDD.addClocks(expected.getClocks(),actual.getClocks());
-        assertEquals(actual, expected);
-        CDD.done();
+
+        assert(new Refinement(new SimpleTransitionSystem(expected),new SimpleTransitionSystem(actual)).check());
+        assert(new Refinement(new SimpleTransitionSystem(actual),new SimpleTransitionSystem(expected)).check());
     }
 }

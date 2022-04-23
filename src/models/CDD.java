@@ -4,6 +4,7 @@ import Exceptions.CddAlreadyRunningException;
 import Exceptions.CddNotRunningException;
 import lib.CDDLib;
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,10 +12,18 @@ import java.util.Objects;
 
 public class CDD {
 
+    public static int maxSize = 1000;
+    public static int cs = 1000;
+    public static int stackSize = 1000;
     private long pointer;
     public static int numClocks; // includes the + 1 for initial clock
     public static int bddStartLevel;
-    private static boolean cddIsRunning;
+
+    public static boolean isCddIsRunning() {
+        return cddIsRunning;
+    }
+
+    static boolean cddIsRunning;
     private static List<Clock> clocks = new ArrayList<>();
     private static List<BoolVar> BVs = new ArrayList<>();
 
@@ -50,7 +59,6 @@ public class CDD {
 
     public CDD(List<List<Guard>> guards){
         CDD res = cddFalse();
-
         outerloop: for (List<Guard> guardList: guards)
         {
             Zone z = new Zone(numClocks,true);
@@ -67,15 +75,17 @@ public class CDD {
                 }
                 if (guard instanceof BoolGuard)
                 {
+                    System.out.println("bool guard");
                     bdd.conjunction(fromBoolGuard((BoolGuard)guard));
                 }
             }
+
             res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks).conjunction(bdd)).removeNegative().reduce();
+
         }
         this.pointer = res.pointer;
         if (guards.isEmpty())
         {
-
             CDD unres = getUnrestrainedCDD();
             this.pointer = unres.pointer;
         }
@@ -136,6 +146,12 @@ public class CDD {
 
     public static List<Clock> getClocks() {
         return clocks;
+    }
+
+    @Override
+    public String toString()
+    {
+        return CDD.toGuardList(this,clocks).toString();
     }
 
 
@@ -232,8 +248,6 @@ public class CDD {
 
     public static CDD allocateInterval(int i, int j, int lower, boolean lower_strict, int upper, boolean upper_strict){
         checkIfRunning();
-        System.out.println("**************************************************** Check allocate interval ***********************");
-
         // TODO: Negation of lower strict should be moved to a new function allocate_interval function in the CDD library
         return new CDD(CDDLib.interval(i,j,lower, !lower_strict,upper, upper_strict));
     }
@@ -326,7 +340,6 @@ public class CDD {
     }
 
     public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets){
-        System.out.println("klklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklklk");
         checkIfRunning();
         checkForNull();
         guard.checkForNull();
@@ -476,8 +489,10 @@ public class CDD {
 
 
     public static CDD predt(CDD A, CDD B) {
-        // TODO!
-        return null;
+        checkIfRunning();
+        A.checkForNull();
+        B.checkForNull();
+        return new CDD(CDDLib.predt(A.pointer,B.pointer));
     }
 
     public static  boolean canDelayIndefinitely(CDD state) {
@@ -642,56 +657,41 @@ public class CDD {
         return res.removeNegative().reduce();
     }
 
-    public static Automaton makeInputEnabled(Automaton aut) {
-        Automaton copy = addTargetInvariantToEdges(aut); //new Automaton(aut);
-        if (clocks.size() > 0) {
-            for (Location loc : copy.getLocations()) {
-                CDD sourceInvariantCDD = loc.getInvariantCDD();
-                // loop through all inputs
-                for (Channel input : copy.getInputAct()) {
-                    // build CDD of zones from edges
-                    List<Edge> inputEdges = copy.getEdgesFromLocationAndSignal(loc, input);
-                    CDD resCDD;
-                    CDD cddOfAllInputs = cddFalse();
-                    if (!inputEdges.isEmpty()) {
-                        for (Edge edge : inputEdges) {
-                            CDD target = edge.getTarget().getInvariantCDD();
-                            //CDD preReset = CDD.applyReset(target, edge.getUpdates()); // Does not work for back propagation
-                            //CDD preGuard = preReset.conjunction(edge.getGuardCDD());
-                            CDD preGuard1 = target.transitionBack(edge);
-                            //assert (preGuard1.equiv(preGuard));
-                            cddOfAllInputs = cddOfAllInputs.disjunction(preGuard1);
-                        }
 
-                        // subtract the federation of zones from the original fed
-                        resCDD = sourceInvariantCDD.minus(cddOfAllInputs);
-                    } else {
-                        resCDD = sourceInvariantCDD;
-                    }
-
-                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, aut.getClocks()), new ArrayList<>());
-                    copy.getEdges().add(newEdge);
-
-
-                }
+    public CDD transitionBack(Move e) {
+        if (e.getUpdates().size()==0)
+        {
+            return this.conjunction(e.getGuardCDD());
+        }
+        int numBools = 0;
+        int numClocks = 0;
+        for (Update up : e.getUpdates())
+        {
+            if (up instanceof ClockUpdate) numClocks ++;
+            if (up instanceof BoolUpdate) numBools ++;
+        }
+        int[] clockResets = new int[numClocks];
+        int[] clockValues = new int[numClocks];
+        int[] boolResets = new int[numBools];
+        int[] boolValues= new int[numBools];
+        int cl=0;
+        int bl=0;
+        for (Update up : e.getUpdates())
+        {
+            if (up instanceof ClockUpdate) {
+                ClockUpdate u = (ClockUpdate) up;
+                clockResets[cl] = getIndexOfClock(u.getClock());
+                clockValues[cl] = u.getValue();
+                cl++;
+            }
+            if (up instanceof BoolUpdate) {
+                BoolUpdate u = (BoolUpdate) up;
+                boolResets[bl] = getIndexOfBV(u.getBV());
+                boolValues[bl] = u.getValue() ? 1 : 0;
+                bl++;
             }
         }
-        return  copy;
+        return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets).removeNegative().reduce();
     }
-
-    public static Automaton addTargetInvariantToEdges(Automaton aut) {
-
-        Automaton copy = aut;
-        if (clocks.size() > 0) {
-            for (Edge edge : copy.getEdges()) {
-                CDD targetCDD = edge.getTarget().getInvariantCDD();
-                CDD past = targetCDD.transitionBack(edge);
-                edge.setGuards(CDD.toGuardList(past, aut.getClocks()));
-            }
-        } // TODO: else part will be important once we have bool support
-        return copy;
-    }
-
-
 
 }

@@ -35,8 +35,6 @@ public class BigRefinementTest {
         comp1Copy = new SimpleTransitionSystem(new Automaton(machines[0]));
         ref1 = new SimpleTransitionSystem(machines[1]);
         ref1Copy = new SimpleTransitionSystem(new Automaton(machines[1]));
-        CDD.init(1000,1000,1000);
-        CDD.addClocks(comp1.getClocks(),comp1Copy.getClocks(), ref1.getClocks(), ref1Copy.getClocks());
 
     }
 

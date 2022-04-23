@@ -2,6 +2,7 @@ package logic;
 
 import models.*;
 
+import javax.annotation.processing.SupportedSourceVersion;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,9 +40,7 @@ public abstract class TransitionSystem {
         CDD initCDD = CDD.zeroCDDDelayed();
         State state = new State(getInitialLocation(), initCDD);
 
-        System.out.println("BEFOREINVAR: " + CDD.toGuardList(state.getInvarCDD(),clocks));
         state.applyInvariants();
-        System.out.println("AFTERINVAR: " + CDD.toGuardList(state.getInvarCDD(),clocks));
         state.applyGuards(invs);
 
         return state;
@@ -57,15 +56,11 @@ public abstract class TransitionSystem {
     List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
         List<Transition> transitions = new ArrayList<>();
         // loop through moves
+        System.out.println("create new trans");
         for (Move move : moves) {
-
-            // gather all the guards and resets of one move
-            CDD guards = move.getGuardCDD();
-            List<Update> updates = move.getUpdates();
-
+            System.out.println("current state : " + currentState.getInvarCDD());
             State targetState = new State(move.getTarget(), currentState.getInvarCDD());
-
-            targetState.applyGuards(guards);
+            targetState.applyGuards(move.getGuardCDD());
 
             if (targetState.getInvarCDD().isFalse())
             {
@@ -73,29 +68,20 @@ public abstract class TransitionSystem {
                 continue;
             }
 
-
             CDD guardCDD = new CDD(targetState.getInvarCDD().getPointer());
 
-
-//            System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
-
-            if (!updates.isEmpty()) targetState.applyResets(updates);
- //           System.out.println(CDD.toGuardList(targetState.getInvarCDD(),clocks));
-
-            //targetState.getInvarCDD().printDot();
+            targetState.applyResets(move.getUpdates());
             targetState.delay();
             targetState.applyInvariants();
-
 
             if (targetState.getInvarCDD().isFalse())
             {
                 System.out.println("no valid target state");
                 continue;
             }
-
+            System.out.println("Transition with " + CDD.toGuardList(targetState.getInvarCDD(),clocks) + " and guardCDD " + CDD.toGuardList(guardCDD,CDD.getClocks()));
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
-        System.out.println(transitions.size());
         return transitions;
     }
 
@@ -127,6 +113,13 @@ public abstract class TransitionSystem {
 
 
     public boolean isDeterministic(){
+        if (!CDD.isCddIsRunning())
+        {
+            CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+            CDD.addClocks(clocks);
+            //CDD.addBddvar(allBVs); TODO!
+        }
+
         boolean isDeterministic = true;
         List<String> nondetermTs = new ArrayList<>();
 
@@ -141,12 +134,15 @@ public abstract class TransitionSystem {
 
         if(!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
 
-
+        CDD.done();
         return isDeterministic;
     }
 
     public boolean isLeastConsistent(){
-        return isConsistent(true);
+
+        //CDD.addBddvar(getBVs()); TODO!
+        boolean result = isConsistent(true);
+        return result;
     }
 
     public boolean isFullyConsistent(){
@@ -157,6 +153,9 @@ public abstract class TransitionSystem {
         boolean isDeterm = isDeterministic();
         System.out.println("is deterministic: " + isDeterm);
         boolean isConsistent = true;
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
+        //CDD.addBddvar( ) TODO!
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
         for (SimpleTransitionSystem ts : systems){
@@ -165,13 +164,18 @@ public abstract class TransitionSystem {
                 inconsistentTs.add(ts.getName());
             }
         }
-        System.out.println("Results:" + isConsistent + isDeterm);
         if(!isConsistent) buildErrMessage(inconsistentTs, "inconsistent");
+
+        CDD.done();
         return isConsistent && isDeterm;
     }
 
     public boolean isImplementation(){
+
+        //CDD.addBddvar() TODO!
         boolean isCons = isFullyConsistent();
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
@@ -181,7 +185,11 @@ public abstract class TransitionSystem {
                 isImpl = false;
             nonImpl.add(ts.getName());
         }
-        if(!isImpl) buildErrMessage(nonImpl, "not output urgent");
+        if(!isImpl) {
+            System.out.println("OUTPUT URGENT");
+            buildErrMessage(nonImpl, "not output urgent");
+        }
+        CDD.done();
         return isImpl && isCons;
     }
 
@@ -205,7 +213,7 @@ public abstract class TransitionSystem {
 
     List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
         List<Move> moves = new ArrayList<>();
-        //System.out.println("reached moveProduct");
+        System.out.println("reached moveProduct");
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
 
@@ -235,10 +243,12 @@ public abstract class TransitionSystem {
     }
 
     public void buildErrMessage(List<String> inc, String checkType) {
+        if (! (lastErr.length()==0))
+            lastErr.append(", ");
         if (inc.size() == 1) {
             lastErr.append("Automaton ");
             lastErr.append(inc.get(0));
-            lastErr.append(" is ").append(checkType).append(".\n");
+            lastErr.append(" is ").append(checkType).append(".");
         } else {
             lastErr.append("Automata ");
             for (int i = 0; i < inc.size(); i++) {
@@ -249,7 +259,7 @@ public abstract class TransitionSystem {
                     lastErr.append(", ");
                 }
             }
-            lastErr.append(" are ").append(checkType).append(".\n");
+            lastErr.append(" are ").append(checkType).append(".");
         }
     }
 

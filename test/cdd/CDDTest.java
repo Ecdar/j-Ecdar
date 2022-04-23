@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 public class CDDTest {
 
     static final int CDD_INF = 2147483646;
+    private static final int DBM_INF = Integer.MAX_VALUE - 1;
 
     @After
     public void afterEachTest(){
@@ -38,7 +39,7 @@ public class CDDTest {
 
         CDD cdd3 = cdd1.conjunction(cdd2);
         CDDNode node = cdd3.getRoot();
-
+        System.out.println(CDD.toGuardList(cdd2,clocks));
         assertEquals(4, node.getElemAtIndex(0).getBound());
         assertEquals(5, node.getElemAtIndex(1).getBound());
 
@@ -60,8 +61,8 @@ public class CDDTest {
         CDD cdd3 = cdd1.disjunction(cdd2);
         CDDNode node = cdd3.getRoot();
 
-        assertEquals(3, node.getElemAtIndex(0).getBound());
-        assertEquals(6, node.getElemAtIndex(1).getBound());
+        assertEquals(6, node.getElemAtIndex(0).getBound());
+        assertEquals(13, node.getElemAtIndex(1).getBound());
 
         CDD.free(cdd1);
         CDD.free(cdd2);
@@ -80,8 +81,8 @@ public class CDDTest {
 
         node.getElemIterable().forEach(bounds::add);
 
-        assertEquals(3, bounds.get(0).getBound());
-        assertEquals(5, bounds.get(1).getBound());
+        assertEquals(6, bounds.get(0).getBound());
+        assertEquals(11, bounds.get(1).getBound());
     }
 
     @Test
@@ -262,9 +263,11 @@ public class CDDTest {
         guards.add(g2);
         CDD res = new CDD(guards);
         //res.printDot();
-        CDD exp = CDD.getUnrestrainedCDD();
-        exp = exp.conjunction(CDD.allocateInterval(0, 1, 1, false, 6, false));
-        exp = exp.disjunction(CDD.allocateInterval(0, 2, 10,false, CDD_INF,false));
+        CDD exp = CDD.cddTrue();
+        exp = exp.conjunction(CDD.allocateInterval(1, 0, 3, false, DBM_INF/2-1, false));
+        exp = exp.disjunction(CDD.allocateInterval(2, 0, 0,true, 5,false));
+         System.out.println(CDD.toGuardList(exp.removeNegative().reduce(),clocks));
+        System.out.println(CDD.toGuardList(res.removeNegative().reduce(),clocks));
         //exp.printDot();
         exp = exp.removeNegative();
         //exp.printDot();

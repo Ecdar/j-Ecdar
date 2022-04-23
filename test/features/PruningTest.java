@@ -1,6 +1,6 @@
 package features;
 
-import logic.JsonFileWriter;
+
 import logic.Pruning;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
@@ -9,6 +9,7 @@ import models.CDD;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import parser.JsonFileWriter;
 import parser.XMLParser;
 
 import static org.junit.Assert.assertTrue;

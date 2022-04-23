@@ -12,7 +12,6 @@ public class Clock {
 
     public Clock(Clock copy){
         assert(false);
-        System.out.println("making a copy");
         String s = copy.name;
 //        while (allClockNames.contains(s))
 //            s+="_";

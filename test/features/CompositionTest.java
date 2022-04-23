@@ -18,7 +18,6 @@ public class CompositionTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
     }
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
@@ -59,8 +58,6 @@ public class CompositionTest {
 
     @Test
     public void testCompposition() {
-        CDD.init(100,100,100);
-        CDD.addClocks(machine.getClocks(), researcher.getClocks());
         Composition comp = new Composition(new TransitionSystem[]{ machine, researcher});
         Automaton aut = comp.getAutomaton();
         SimpleTransitionSystem s = new SimpleTransitionSystem(aut);
@@ -70,22 +67,18 @@ public class CompositionTest {
 
     @Test
     public void testCompposition1() {
-        CDD.init(100,100,100);
-        CDD.addClocks(adm.getClocks(), machine.getClocks(), researcher.getClocks());
         Composition comp = new Composition(new TransitionSystem[]{ adm, machine, researcher });
         Automaton aut = comp.getAutomaton();
         SimpleTransitionSystem s = new SimpleTransitionSystem(aut);
         s.toXML("compositionTest1.xml");
         assertTrue(true);
     }
-
+/*
     @Test
     public void selfloopTest() {
 
         Automaton[] aut1 = XMLParser.parse("selfloopNonZeno.xml", false);
         Automaton copy = new Automaton(aut1[0]);
-        CDD.init(100,100,100);
-        CDD.addClocks(aut1[0].getClocks(), copy.getClocks());
         SimpleTransitionSystem selfloop = new SimpleTransitionSystem(aut1[0]);
         SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(copy);
         Refinement ref = new Refinement(selfloop,selfloop1);
@@ -93,12 +86,10 @@ public class CompositionTest {
         System.out.println(ref.getErrMsg());
         assert (res==true);
     }
-
+*/
     @Test
     public void testCompRefinesSpecWeird() {
 
-        CDD.init(100,100,100);
-        CDD.addClocks(adm.getClocks(), machine.getClocks(), researcher.getClocks());
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
         comp.getAutomaton();
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
@@ -111,8 +102,6 @@ public class CompositionTest {
     @Test
     public void testCompRefinesSpec() {
 
-        CDD.init(100,100,100);
-        CDD.addClocks(adm.getClocks(), machine.getClocks(), researcher.getClocks());
 
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
         SimpleTransitionSystem st = new SimpleTransitionSystem(comp.getAutomaton());
@@ -129,8 +118,6 @@ public class CompositionTest {
     @Test
     public void testCompOfCompRefinesSpec() {
 
-        CDD.init(100,100,100);
-        CDD.addClocks(adm.getClocks(),machine.getClocks(),researcher.getClocks(),spec.getClocks());
 
         assertTrue(new Refinement(
                 new Composition(new TransitionSystem[]{adm,new SimpleTransitionSystem(new Composition(new TransitionSystem[]{machine, researcher}).getAutomaton())
@@ -142,8 +129,6 @@ public class CompositionTest {
     @Test
     public void testCompRefinesSpecOld() {
 
-        CDD.init(100,100,100);
-        CDD.addClocks(adm.getClocks(),machine.getClocks(),researcher.getClocks(),spec.getClocks());
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
         comp.getAutomaton();
         assertTrue(new Refinement(new Composition(new TransitionSystem[]{adm, machine, researcher}), spec).check());
