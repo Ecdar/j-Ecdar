@@ -402,6 +402,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_past
     return (jlong)cdd_result;
 }
 
+
 /*
  * Class:     lib_CDDLib
  * Method:    isBDD
@@ -409,7 +410,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_past
 JNIEXPORT jboolean JNICALL Java_lib_CDDLib_isBDD
   (JNIEnv *, jclass, jlong cdd_pointer){
     cdd* cdd_object = (cdd*)cdd_pointer;
-    return cdd_isBDD(*cdd_object));
+    return cdd_isBDD(*cdd_object);
 }
 
 /*
