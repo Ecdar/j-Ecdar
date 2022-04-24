@@ -47,7 +47,7 @@ public class Edge {
         this.updates = updates;
     }
 
-    public Edge(Edge copy, List<Clock> clocks,  List<BoolVar> BVs, Location sourceR, Location targetR, List<Clock> oldClocks){
+    public Edge(Edge copy, List<Clock> clocks,  List<BoolVar> BVs, Location sourceR, Location targetR, List<Clock> oldClocks, List<BoolVar> oldBVs){
         this.source = sourceR;
         this.target = targetR;
         this.chan = copy.chan;
@@ -60,7 +60,7 @@ public class Edge {
                 if (g instanceof ClockGuard)
                     temp.add(new ClockGuard((ClockGuard) g,  clocks,oldClocks));
                 if (g instanceof BoolGuard)
-                    temp.add(new BoolGuard((BoolGuard) g));
+                    temp.add(new BoolGuard((BoolGuard) g, BVs, oldBVs));
                 if (g instanceof FalseGuard)
                     temp.add(new FalseGuard());
             }
@@ -72,7 +72,7 @@ public class Edge {
         {
             if (update instanceof BoolUpdate)
             {
-                updates.add(new BoolUpdate((BoolUpdate) update, BVs));
+                updates.add(new BoolUpdate((BoolUpdate) update, BVs, oldBVs));
             }
             else
             {

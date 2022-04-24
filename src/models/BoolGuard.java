@@ -30,8 +30,8 @@ public class BoolGuard extends Guard {
     }
 
     // Copy constructor
-    public BoolGuard(BoolGuard copy) {
-        var = copy.var;
+    public BoolGuard(BoolGuard copy, List<BoolVar> oldBVs, List<BoolVar> newBVs) {
+        var = newBVs.get(oldBVs.indexOf(copy.getVar()));
         comperator = copy.comperator;
         value = copy.value;
     }

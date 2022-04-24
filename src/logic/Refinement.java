@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public class Refinement {
     private final TransitionSystem ts1, ts2;
     private final List<Clock> allClocks;
+    private final List<BoolVar> allBVs;
     private final Map<LocationPair, List<StatePair>> passed;
     private final Deque<StatePair> waiting;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
@@ -29,7 +30,8 @@ public class Refinement {
 
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
-
+        allBVs= new ArrayList<>(ts1.getBVs());
+        allBVs.addAll(ts2.getBVs());
 
 
         inputs1 = ts1.getInputs();
@@ -121,7 +123,7 @@ public class Refinement {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(allClocks);
-        //CDD.addBddvar(allBVs); TODO!
+        CDD.addBddvar(allBVs);
 
         // the first states we look at are the initial ones
         waiting.push(getInitialStatePair());

@@ -97,7 +97,7 @@ public class Location {
         this.y=y;
     }
 
-    public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks){
+    public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs){
         this.name = copy.name;
 
         this.invariant = new ArrayList<>();
@@ -105,9 +105,9 @@ public class Location {
             List<Guard> interm = new ArrayList<Guard>();
             for (Guard g : list) {
                 if (g instanceof  ClockGuard)
-                interm.add(new ClockGuard((ClockGuard) g, newClocks,oldClocks));
+                    interm.add(new ClockGuard((ClockGuard) g, newClocks,oldClocks));
                 if (g instanceof  BoolGuard)
-                    assert(false);
+                    interm.add(new BoolGuard((BoolGuard) g, newBVs,oldBVs));
             }
             this.invariant.add(interm);
         }

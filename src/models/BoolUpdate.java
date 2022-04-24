@@ -14,8 +14,8 @@ public class BoolUpdate extends Update{
         this.value = value;
     }
 
-    public BoolUpdate(BoolUpdate copy, List<BoolVar> bvs){
-        this.bv = bvs.get(bvs.indexOf(copy.bv));
+    public BoolUpdate(BoolUpdate copy, List<BoolVar> bvs, List<BoolVar> oldBVs){
+        this.bv =bvs.get(oldBVs.indexOf(copy.getBV()));
         this.value = copy.value;
     }
 

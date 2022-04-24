@@ -74,11 +74,12 @@ public class Automaton {
         }
         this.BVs = new ArrayList<>();
         for (BoolVar c : copy.BVs) {
-            this.BVs.add(new BoolVar(c.getName(), c.getInitialValue()));   // TODO: Do I need copies? Do I want copies?
+            String[] split = c.getName().split("_");
+            this.BVs.add(new BoolVar(this.name + "_" + split[1], c.getInitialValue()));   // TODO: Do I need copies? Do I want copies?
         }
         this.locations = new ArrayList<>();
         for (Location loc : copy.locations) {
-            this.locations.add(new Location(loc, clocks, copy.clocks));
+            this.locations.add(new Location(loc, clocks, copy.clocks, BVs, copy.BVs));
             if(loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
         }
 
@@ -86,7 +87,7 @@ public class Automaton {
         for (Edge e : copy.edges) {
             int sourceIndex = copy.locations.indexOf(e.getSource());
             int targetIndex = copy.locations.indexOf(e.getTarget());
-            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), copy.clocks));
+            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), copy.clocks, copy.BVs));
         }
 
         this.inputAct = copy.inputAct;

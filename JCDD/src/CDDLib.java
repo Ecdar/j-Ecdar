@@ -64,6 +64,7 @@ public class CDDLib {
     public static native long delayInvar(long cddPointer, long cddInvarPointer);
     public static native long exist(long cddPointer, int[] levels, int[] clocks);
     public static native long past(long cddPointer);
+    public static native boolean isBDD(long cddPointer);
     public static native long removeNegative(long cddPointer);
     public static native long applyReset(long cddPointer, int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues);
     public static native long minus(long lCdd, long rCdd);

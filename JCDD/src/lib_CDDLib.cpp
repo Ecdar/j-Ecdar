@@ -404,6 +404,16 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_past
 
 /*
  * Class:     lib_CDDLib
+ * Method:    isBDD
+ */
+JNIEXPORT jboolean JNICALL Java_lib_CDDLib_isBDD
+  (JNIEnv *, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    return cdd_isBDD(*cdd_object));
+}
+
+/*
+ * Class:     lib_CDDLib
  * Method:    removeNegative
  */
 JNIEXPORT jlong JNICALL Java_lib_CDDLib_removeNegative

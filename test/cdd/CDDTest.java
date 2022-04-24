@@ -297,9 +297,18 @@ public class CDDTest {
         clocks.add(new Clock("a"));
         CDD.addClocks(clocks);
 
-        int level = CDD.addBddvar(5);
+        List<BoolVar> BVs = new ArrayList<>();
+        BVs.add(new BoolVar("a",true));
+        BVs.add(new BoolVar("b",true));
+        BVs.add(new BoolVar("d",true));
+        BVs.add(new BoolVar("c",true));
+        BVs.add(new BoolVar("e",true));
+        int level = CDD.addBddvar(BVs);
         assertEquals(1, level);
-        level = CDD.addBddvar(2);
+        BVs.clear();
+        BVs.add(new BoolVar("f",true));
+        BVs.add(new BoolVar("g",true));
+        level = CDD.addBddvar(BVs);
         assertEquals(6, level);
     }
 

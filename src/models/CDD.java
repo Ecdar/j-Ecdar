@@ -17,6 +17,7 @@ public class CDD {
     public static int stackSize = 1000;
     private long pointer;
     public static int numClocks; // includes the + 1 for initial clock
+    public static int numBools;
     public static int bddStartLevel;
 
     public static boolean isCddIsRunning() {
@@ -52,8 +53,11 @@ public class CDD {
     private static int getIndexOfBV(BoolVar bv) {
 
         for (int i = 0; i < BVs.size(); i++){
-            if(bv.hashCode() == BVs.get(i).hashCode()) return i+1;
+            System.out.println(bv.hashCode() + " " + BVs.get(i).hashCode());
+            if(bv.hashCode() == BVs.get(i).hashCode()) return i;
         }
+        System.out.println(bv + ": " + BVs);
+        assert(false);
         return 0;
     }
 
@@ -61,26 +65,57 @@ public class CDD {
         CDD res = cddFalse();
         outerloop: for (List<Guard> guardList: guards)
         {
-            Zone z = new Zone(numClocks,true);
-            z.init();
             CDD bdd = cddTrue();
-            for (Guard guard: guardList) {
-                if (guard instanceof FalseGuard)
-                {
-                    res = cddFalse();
-                    break outerloop;
+            if (numClocks==0)
+            {
+                for (Guard guard: guardList) {
+                    if (guard instanceof FalseGuard)
+                    {
+                        res = cddFalse();
+                        break outerloop;
+                    }
+                    if (guard instanceof ClockGuard) {
+                        assert(false);
+                    }
+                    if (guard instanceof BoolGuard)
+                    {
+                        System.out.println("bool guard");
+                        CDD cdd = fromBoolGuard((BoolGuard)guard);
+
+                        System.out.println("done: from bool guard");
+                        bdd=bdd.conjunction(cdd);
+
+                        System.out.println("done: bool guard");
+                    }
                 }
-                if (guard instanceof ClockGuard) {
-                    z.buildConstraintsForGuard((ClockGuard) guard, clocks);
+                res = res.disjunction(bdd);
+            }
+            else
+            {
+                Zone z = new Zone(numClocks,true);
+                z.init();
+                for (Guard guard: guardList) {
+                    if (guard instanceof FalseGuard) {
+                        res = cddFalse();
+                        break outerloop;
+                    }
+                    if (guard instanceof ClockGuard) {
+                        z.buildConstraintsForGuard((ClockGuard) guard, clocks);
+                    }
+                    if (guard instanceof BoolGuard) {
+                        System.out.println("bool guard");
+                        CDD cdd = fromBoolGuard((BoolGuard) guard);
+
+                        System.out.println("done: from bool guard");
+                        bdd=bdd.conjunction(cdd);
+
+                        System.out.println("done: bool guard");
+                    }
                 }
-                if (guard instanceof BoolGuard)
-                {
-                    System.out.println("bool guard");
-                    bdd.conjunction(fromBoolGuard((BoolGuard)guard));
-                }
+                res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks).conjunction(bdd)).removeNegative().reduce();
             }
 
-            res = res.disjunction(CDD.allocateFromDbm(z.getDbm(), numClocks).conjunction(bdd)).removeNegative().reduce();
+
 
         }
         this.pointer = res.pointer;
@@ -93,6 +128,7 @@ public class CDD {
 
     public static CDD fromBoolGuard(BoolGuard guard)
     {
+        System.out.println(getIndexOfBV(guard.getVar() ) + " " + guard.getValue());
         if (guard.getValue())
             return createBddNode(bddStartLevel + getIndexOfBV(guard.getVar()));
         else
@@ -100,6 +136,7 @@ public class CDD {
     }
 
     public static List<List<Guard>> toGuardList(CDD state, List<Clock> relevantClocks){
+
         List<List<Guard>> guards = new ArrayList<>();
         CDD copy = new CDD(state.pointer);
         copy = copy.removeNegative().reduce();
@@ -110,6 +147,7 @@ public class CDD {
             guards.add(falseGuard);
             return guards;
         }
+        //if (copy.getRoot().)
         while (!copy.isTerminal())
         {
             copy=copy.reduce().removeNegative();
@@ -209,6 +247,7 @@ public class CDD {
     public static void done(){
         cddIsRunning = false;
         numClocks = 0;
+        numBools= 0;
         clocks = new ArrayList<>();
         CDDLib.cddDone();
     }
@@ -235,9 +274,12 @@ public class CDD {
         CDDLib.cddAddClocks(numClocks);
     }
 
-    public static int addBddvar(int amount) {
+    public static int addBddvar(List<BoolVar>... BVs) {
         checkIfRunning();
-        bddStartLevel =  CDDLib.addBddvar(amount);
+        for (List<BoolVar> list: BVs)
+            CDD.BVs.addAll(list);
+        numBools = CDD.BVs.size()+1;
+        bddStartLevel =  CDDLib.addBddvar(numBools);
         return bddStartLevel;
     }
 
