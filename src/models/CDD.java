@@ -162,7 +162,10 @@ public class CDD {
         return guards;
     }
 
-
+    public boolean isBDD()
+    {
+        return CDDLib.isBDD(this);
+    }
 
     public static List<Guard> toBoolGuards(CDD bdd){
         if (bdd.isFalse())
