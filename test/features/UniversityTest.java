@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
+import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -280,6 +281,17 @@ public class UniversityTest {
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp1), new SimpleTransitionSystem(comp2));
 
         assertTrue(ref.check());
+    }
+
+    @Test
+    public void testStored() {
+        Automaton[] aut = XMLParser.parse("samples/xml/test.xml", false);
+        Automaton[] aut1 = XMLParser.parse("samples/xml/test1.xml", false);
+        SimpleTransitionSystem comp0 = new SimpleTransitionSystem(aut[0]);
+        SimpleTransitionSystem comp1 = new SimpleTransitionSystem(aut1[0]);
+
+        assertTrue(new Refinement(comp1,comp0).check());
+        assertTrue(new Refinement(comp0,comp1).check());
     }
 
     @Test

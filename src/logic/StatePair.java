@@ -32,7 +32,7 @@ public class StatePair {
     }
 
     public String prettyPrint() {
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvarCDD();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvarCDD() + " " + right.getInvarCDD();
     }
 
     @Override

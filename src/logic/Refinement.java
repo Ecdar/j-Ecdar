@@ -184,8 +184,8 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
-        //System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
-        //System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
+        System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
+        System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
         //System.out.println(t1.getEdges().get(0).getChannel());
         //System.out.println(t1.getSource().getLocation().getName());
         //System.out.println(t2.getSource().getLocation().getName());
@@ -197,14 +197,14 @@ public class Refinement {
 
 
         CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
-        //System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
+        System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
         target1.applyResets(t1.getUpdates());
         //System.out.println("after first reset " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         target1.applyResets(t2.getUpdates());
-        //System.out.println(t1.getUpdates() + " " + t2.getUpdates());
-        CDD copyAfterResets = new CDD(target1.getInvarCDD().getPointer());
-        //System.out.println("after resets " + CDD.toGuardList(copyAfterResets,allClocks));
+        System.out.println(t1.getUpdates() + " " + t2.getUpdates());
+
+        System.out.println("after resets " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
         target1.delay();// = target1.getInvarCDD().delay();
         //System.out.println("delayed " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
@@ -258,7 +258,6 @@ public class Refinement {
     private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
         boolean pairFound = false;
 
-        trans2.forEach(t -> System.out.println(t.getEdges().get(0)));
 
         List<CDD> gzLeft = trans1.stream().map(Transition::getGuardCDD).collect(Collectors.toList());
         List<CDD> gzRight = trans2.stream().map(Transition::getGuardCDD).collect(Collectors.toList());
@@ -288,6 +287,7 @@ public class Refinement {
                 if (pair != null) {
                     pairFound = true;
                     if (!passedContainsStatePair(pair) && !waitingContainsStatePair(pair)) {
+
                         waiting.add(pair);
                         if (RET_REF) {
                             currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
@@ -344,10 +344,7 @@ public class Refinement {
                     transitions2.add(loop);
                 }
 
-                System.out.println("trans1edge1: " + transitions1.get(0).getEdges().get(0));
-                System.out.println("trans2edge1: " + transitions2.get(0).getEdges().get(0));
-                System.out.println(transitions2.get(0).getGuards(allClocks));
-                System.out.println(transitions2.get(0).getGuardCDD());
+
 
                 if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
                     return false;

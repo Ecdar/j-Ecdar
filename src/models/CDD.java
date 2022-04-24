@@ -258,11 +258,15 @@ public class CDD {
     }
 
     public static CDD allocateLower(int i, int j, int lowerBound) {
+        System.out.println("Allocate upper and lower have not been fixed yet. The values are not correctly translated to the C backend");
+        assert(false);
         checkIfRunning();
         return new CDD(CDDLib.lower(i,j,lowerBound));
     }
 
     public static CDD allocateUpper(int i, int j, int upperBound) {
+        System.out.println("Allocate upper and lower have not been fixed yet. The values are not correctly translated to the C backend");
+        assert(false);
         checkIfRunning();
         return new CDD(CDDLib.upper(i,j,upperBound));
     }
@@ -456,7 +460,9 @@ public class CDD {
                 bl++;
             }
         }
-        //state.printDot();
+        System.out.println(list);
+        System.out.println(Arrays.toString(clockResets) + " " + Arrays.toString(clockValues) + " "  + Arrays.toString(boolResets) + " " + Arrays.toString(boolValues) + " " + numClocks + " " + numBools);
+        System.out.println("wtf");
         return state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
     }
 

@@ -12,17 +12,17 @@ public class Pruning {
     List<Clock> clocks;
     List<Edge> edges;
     List<Location> locations;
-    Map<Location, Location> locMap;
+    //Map<Location, Location> locMap;
     Set<Location> inc;
     Map<Location, CDD> passedPairs;
 
 
     public Pruning(SimpleTransitionSystem st) {
-        aut = st.getAutomaton();
+        aut = new Automaton(st.getAutomaton());
         clocks = aut.getClocks();
-        edges = new ArrayList<Edge>();
-        locations = new ArrayList<Location>();
-        locMap = new HashMap<>();
+        edges = aut.getEdges();
+        locations = aut.getLocations();
+        //locMap = new HashMap<>();
 
 
     }
@@ -37,14 +37,19 @@ public class Pruning {
 
     public static SimpleTransitionSystem pruneIncTimed(SimpleTransitionSystem st) {
         Pruning pr = new Pruning(st);
-        return pr.prune(st);
+        return pr.prune();
     }
 
-    public SimpleTransitionSystem prune(SimpleTransitionSystem st) {
+    public SimpleTransitionSystem prune() {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
         //CDD.addBddvar(BVs); TODO!
 
+
+        for (Location l : locations)
+            l.setInconsistentPart(CDD.cddFalse());
+
+/*
         // Creating the sets of locations and transitions that will form the new automaton.
         for (Location l : aut.getLocations()) {
 
@@ -57,7 +62,7 @@ public class Pruning {
             // TODO: Move this to a seperate function for deepcopying an automaton
             edges.add(new Edge(locMap.get(e.getSource()), locMap.get(e.getTarget()), e.getChannel(), e.isInput(), e.getGuards(), e.getUpdates()));
         }
-
+*/
         // Create a list of inconsistent locations, that we can loop through
         inc = new HashSet<>(locations.stream().filter(l -> l.isInconsistent()).collect(Collectors.toList()));
 
@@ -81,15 +86,12 @@ public class Pruning {
                 CDD initial = CDD.zeroCDD();
                 if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
                 {
-                    System.out.println("Inital location is inconsistent");
+                    System.out.println(targetLoc.getInconsistentPart());
+                    System.out.println("Inital location is fully inconsistent");
                     initIsInconsistent=true;
                     break;
-
                 }
-
             }
-
-
 
             if (printComments)
                 System.out.println("Handling the new location " + targetLoc);
@@ -121,7 +123,7 @@ public class Pruning {
             locations.add(new Location("inc", new ArrayList<List<Guard>>(), true, false, false, true));
             edges = new ArrayList<>();
         }
-        Automaton resAut = new Automaton(st.getName(), locations, edges, clocks, st.BVs, false);
+        Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), false);
         CDD.done();
         return new SimpleTransitionSystem(resAut);
 
@@ -132,20 +134,15 @@ public class Pruning {
         for (Location l : locations) {
             if (l.isInconsistent()) {
                 CDD incCDD = l.getInconsistentPart();
-                if (incCDD.isUnrestrained())
-                    continue;                     // TODO: 04.02.21 how to treat a completely inconsistent location here?
+                if (incCDD.isUnrestrained()) {
+                    List<List<Guard>> list = new ArrayList<>();
+                    List<Guard> guardList = new ArrayList<>();
+                    guardList.add(new FalseGuard());
+                    list.add(guardList);
+                    l.setInvariant(list);                     // TODO: 04.02.21 how to treat a completely inconsistent location here?
+                }
                 else {
-                    CDD invarMinusIncCDD;
-                    if (l.getInvariant().isEmpty()) {
-                        if (printComments)
-                            System.out.println("There is no invariant yet, adding the negation of the inconsistent part");
-                        CDD unrestrictedCDD = CDD.getUnrestrainedCDD();
-                        invarMinusIncCDD = unrestrictedCDD.minus(l.getInconsistentPart());
-                    } else {
-                        if (printComments)
-                            System.out.println("There is an invariant, so we subtract the inconsistent part");
-                        invarMinusIncCDD = l.getInvariantCDD().minus(l.getInconsistentPart());
-                    }
+                    CDD invarMinusIncCDD = l.getInvariantCDD().minus(l.getInconsistentPart());
                     l.setInvariant(CDD.toGuardList(invarMinusIncCDD,clocks));
                 }
             }
@@ -157,7 +154,6 @@ public class Pruning {
             if (!e.getTarget().getInvariant().isEmpty()) {
                 CDD target = e.getTarget().getInvariantCDD();
                 CDD cddBeforeEdge = target.transitionBack(e);
-
                 e.setGuards(CDD.toGuardList(cddBeforeEdge,clocks));
             }
         }
@@ -185,10 +181,12 @@ public class Pruning {
 
             // take the inconsistent federation and free the clocks of the output transition
             CDD target = new CDD(targetLoc.getInconsistentPart().getPointer());
-            CDD afterReset = CDD.applyReset(target,e.getUpdates());
-
+            System.out.println("interesting: ");
+            System.out.println(target);
+            target = target.transitionBack(e);
+            System.out.println(target);
             CDD guardCDD = e.getGuardCDD();
-            CDD fedAfterRemovingInconsistentPart =guardCDD.minus(afterReset);
+            CDD fedAfterRemovingInconsistentPart =guardCDD.minus(target);
 
             e.setGuards(CDD.toGuardList(fedAfterRemovingInconsistentPart,clocks));
         }
@@ -270,17 +268,17 @@ public class Pruning {
 
         // first we need to get the Fed that leads to the inconsistent part of the target location.
         // This means making a Fed of the inconsistent part of the target, apply its invariant, then free the clocks that are updated, and finally we include the zones of the guard
-
         CDD incCDD = e.getTarget().getInconsistentPart();
 
         // apply target invariant
         CDD invarCDD = e.getTarget().getInvariantCDD();
-
         incCDD = invarCDD.conjunction(incCDD);
+
+        incCDD = incCDD.transitionBack(e);
 
 
         // apply updates as guard
-       incCDD = CDD.applyReset(incCDD,e.getUpdates());
+       //incCDD = CDD.applyReset(incCDD,e.getUpdates());
 
         if (!incCDD.isNotFalse()) {
             // Checking for satisfiability after clocks were reset (only a problem because target invariant might now be x>4)
@@ -293,12 +291,12 @@ public class Pruning {
         if (printComments)
             System.out.println("Updates as guards done");
 
-        incCDD=backExplorationOnTransition(e,incCDD);
+        //incCDD=backExplorationOnTransition(e,incCDD);
 
 
 
         // if the inconsistent part cannot be reached, we can ignore the edge e, and go on
-        if (!incCDD.isNotFalse()) {
+        if (incCDD.isFalse()) {
             if (printComments)
                 System.out.println("could not reach inconsistent part, fed is empty");
         } else {
@@ -404,7 +402,7 @@ public class Pruning {
         // If that federation is unsatisfiable, we can just ignore the transition to inc, and be done,
         // so we check for that, zone by zone. Only one zone needs to be sat.
 
-        if (!incCDD.isNotFalse())
+        if (incCDD.isFalse())
         {
             if (printComments)
                 System.out.println("Did not add a new inconsistent part");
@@ -418,6 +416,7 @@ public class Pruning {
                 if (printComments)
                     System.out.println("merged the previous and new inconsistent part of source");
             } else {
+                System.out.println("INCCDD: " + incCDD);
                 e.getSource().setInconsistent(true);
                 e.getSource().setInconsistentPart(incCDD);
             }
@@ -450,45 +449,26 @@ public class Pruning {
 
             // Ged invariant Federation
             CDD goodCDD = otherEdge.getTarget().getInvariantCDD();
+            goodCDD = goodCDD.minus(otherEdge.getTarget().getInconsistentPart());
 
             // constrain it by the guards and invariants  of the "good transition". TODO: IMPORTANT: Check if the order of doing the target invariant first, freeing, etc. is the correct one
 
+            if (goodCDD.isNotFalse()) {
+                goodCDD = goodCDD.transitionBack(otherEdge);
+                //goodCDD = CDD.applyReset(goodCDD, otherEdge.getUpdates());
 
-            // remove the parts of the target transition that are inconsistent.
-            if (otherEdge.getTarget().isInconsistent()) // TODO: added 7.1.2021, check if works
-            {
-                if (printComments)
-                    System.out.println("the target of the saving edge is at least partially inconsistent");
-                if (otherEdge.getTarget().getInconsistentPart().isUnrestrained()) // if its completely inconsistent, this transition cannot save us
-                    goodCDD = CDD.cddFalse();
-                else
-                    goodCDD = goodCDD.minus(otherEdge.getTarget().getInconsistentPart());
+                CDD sourceInvFed = otherEdge.getSource().getInvariantCDD();
+                goodCDD = sourceInvFed.conjunction(goodCDD);
 
+                // do predt.
+                CDD predtFed = CDD.predt(incCDD, goodCDD);
+                System.out.println("predtFed" + predtFed + " " + incCDD + " " + goodCDD);
+
+                // add the inconsistent Federation to it, so in case both the transition to bad and the transition to good
+                // have the guard x>4, we still get the bad zone in the result // TODO: Check if this still holds if we dont mind including zeno behaviour to save us (according to group discussion on 6.1.2021)
+                incCDD = predtFed.disjunction(incCDD);
+                //System.out.println(incFederation.getZones().get(0).buildGuardsFromZone(clocks));
             }
-
-            if (goodCDD.isNotFalse())
-                goodCDD= CDD.applyReset(goodCDD,otherEdge.getUpdates());
-
-            CDD sourceInvFed = otherEdge.getSource().getInvariantCDD();
-            goodCDD = sourceInvFed.conjunction(goodCDD);
-
-
-
-
-            CDD otherGuardFed = otherEdge.getGuardCDD();
-
-            goodCDD = otherGuardFed.conjunction(goodCDD);
-
-            // do predt.
-            CDD predtFed = CDD.predt(incCDD, goodCDD);
-            //System.out.println(predtFed.getZones().get(0).buildGuardsFromZone(clocks));
-
-
-            // add the inconsistent Federation to it, so in case both the transition to bad and the transition to good
-            // have the guard x>4, we still get the bad zone in the result // TODO: Check if this still holds if we dont mind including zeno behaviour to save us (according to group discussion on 6.1.2021)
-            incCDD = predtFed.disjunction(incCDD);
-            //System.out.println(incFederation.getZones().get(0).buildGuardsFromZone(clocks));
-
         }
         return incCDD;
 

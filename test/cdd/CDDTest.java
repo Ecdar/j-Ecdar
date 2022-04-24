@@ -31,17 +31,33 @@ public class CDDTest {
     public void testConjunctionSameTypeWithOverlap() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
-        clocks.add(new Clock("a"));
-        clocks.add(new Clock("b"));
+        Clock a = new Clock("a");
+        Clock b = new Clock("b");
+        clocks.add(a);
+        clocks.add(b);
         CDD.addClocks(clocks);
         CDD cdd1 = CDD.allocateInterval(2,1,3, false,5, false);
         CDD cdd2 = CDD.allocateInterval(2,1,4,false,6, false);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
-        CDDNode node = cdd3.getRoot();
         System.out.println(CDD.toGuardList(cdd2,clocks));
-        assertEquals(4, node.getElemAtIndex(0).getBound());
-        assertEquals(5, node.getElemAtIndex(1).getBound());
+
+        Guard g1 = new ClockGuard(b,a,3,Relation.LESS_EQUAL );
+        Guard g2 = new ClockGuard(a,b,5,Relation.LESS_EQUAL );
+
+        Guard g3 = new ClockGuard(b,a,4,Relation.LESS_EQUAL );
+        Guard g4 = new ClockGuard(a,b,6,Relation.LESS_EQUAL );
+
+        List<Guard> guardList = new ArrayList<>();
+        guardList.add(g1);
+        guardList.add(g2);
+        guardList.add(g3);
+        guardList.add(g4);
+
+        List<List<Guard>> doubleList = new ArrayList<>();
+        doubleList.add(guardList);
+        System.out.println(CDD.toGuardList(new CDD(doubleList),clocks));
+        // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         CDD.free(cdd1);
         CDD.free(cdd2);

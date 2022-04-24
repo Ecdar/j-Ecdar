@@ -1,5 +1,6 @@
 package parser;
 
+import com.google.protobuf.BoolValueOrBuilder;
 import logic.SimpleTransitionSystem;
 import models.*;
 import org.jdom2.Document;
@@ -157,7 +158,7 @@ public class XMLFileWriter {
                         inner += " && " + interm;
                     if (!inner.isEmpty()) i++;
                 }
-                    else
+                    else if (g1 instanceof BoolGuard)
                     {
                         BoolGuard g = (BoolGuard) g1;
                         String interm = g.getVar().getName()+g.getComperator()+g.getValue();
@@ -167,6 +168,17 @@ public class XMLFileWriter {
                             inner += " && " + interm;
                         if (!guardString.isEmpty()) i++;
                     }
+                    else if (g1 instanceof FalseGuard)
+                    {
+
+                        String interm = "false";
+                        if (i == 0)
+                            inner += interm;
+                        else
+                            inner += " && " + interm;
+                        if (!guardString.isEmpty()) i++;
+                    }
+
             }
                 if (j == 0)
                     guardString += inner;

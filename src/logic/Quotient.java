@@ -29,7 +29,7 @@ public class Quotient extends TransitionSystem {
         this.ts_comp = ts_comp;
 
         //clocks should contain the clocks of ts1, ts2 and a new clock
-        newClock = new Clock("new");
+        newClock = new Clock("quo_new");
         clocks.add(newClock);
         clocks.addAll(ts_spec.getClocks());
         clocks.addAll(ts_comp.getClocks());

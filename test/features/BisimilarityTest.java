@@ -14,7 +14,6 @@ public class BisimilarityTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
     }
 
     @Test
@@ -47,12 +46,13 @@ public class BisimilarityTest {
     @Test
     public void bisimilarityUntimedTestNotBisim() {
 
-
+        CDD.done();
 
         Automaton[] auts = XMLParser.parse("./samples/xml/quotient/example_critical_sections_final_versions_pruned.xml", false);
         Automaton aut = Bisimilarity.checkBisimilarity(auts[10]);
         SimpleTransitionSystem sys = new SimpleTransitionSystem(aut);
 //        sys.toXML("bisim3.xml");
+        System.out.println(aut.getLocations().size());
         assertTrue(aut.getLocations().size()==3);
     }
 

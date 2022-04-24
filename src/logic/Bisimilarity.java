@@ -26,7 +26,7 @@ public class Bisimilarity {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
         //CDD.addBddvar(allBVs); TODO!
-
+        thereWasAChange= true;
 
 
         while (thereWasAChange) {
@@ -63,13 +63,8 @@ public class Bisimilarity {
                         locationList.remove(l);
                     splitOffList.add(splitOffPart);
                 }
-
-
-
             }
             bisimilarLocs.addAll(splitOffList);
-
-
             System.out.println(bisimilarLocs);
         }
 
@@ -143,10 +138,6 @@ public class Bisimilarity {
 
     public static boolean hasDifferentOutgoings(Location l1, Location l2, List<Clock> clocks, List<Edge> edges, List<List<Location>> bisimilarLocs)
     {
-
-
-
-
         List<Edge> edgesL1 = new ArrayList<>();
         List<Edge> edgesL2 = new ArrayList<>();
 
