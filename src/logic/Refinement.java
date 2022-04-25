@@ -133,9 +133,11 @@ public class Refinement {
             currNode = refGraph;
             treeSize++;
         }
+
         while (!waiting.isEmpty()) {
 
             StatePair curr = waiting.pop();
+
             System.out.println("curr: " + curr.prettyPrint());
             if (RET_REF)
                 currNode = curr.getNode();

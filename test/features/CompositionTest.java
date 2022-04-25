@@ -73,7 +73,7 @@ public class CompositionTest {
         s.toXML("compositionTest1.xml");
         assertTrue(true);
     }
-/*
+
     @Test
     public void selfloopTest() {
 
@@ -86,7 +86,7 @@ public class CompositionTest {
         System.out.println(ref.getErrMsg());
         assert (res==true);
     }
-*/
+
     @Test
     public void testCompRefinesSpecWeird() {
 

@@ -63,6 +63,11 @@ public class State {
         CDD resCDD = CDD.cddFalse();
         //System.out.println("max bounds : "  + maxBounds);
         //System.out.println(CDD.toGuardList(copy,relevantClocks));
+        if (copy.isBDD())
+        {
+            return;
+        }
+        else
         while (!copy.isTerminal())
         {
             CddExtractionResult extractResult = copy.reduce().removeNegative().extractBddAndDbm();

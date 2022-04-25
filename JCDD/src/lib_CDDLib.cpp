@@ -609,3 +609,38 @@ JNIEXPORT jboolean JNICALL Java_lib_CDDLib_cddEquiv
 }
 
 
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    bddToArray
+ */
+JNIEXPORT jlong JNICALL Java_lib_CDDLib_bddToArray
+  (JNIEnv *env, jclass, jlong cdd_pointer){
+    cdd* cdd_object = (cdd*)cdd_pointer;
+
+    bdd_arrays* result = new bdd_arrays(cdd_bdd_to_array(*cdd_object));
+    return (jlong)result;
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getVarsFromBDDArray
+ */
+JNIEXPORT jobjectArray JNICALL Java_lib_CDDLib_getVarsFromBDDArray
+  (JNIEnv *env, jclass, jlong bdd_arrays_pointer){
+    bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
+
+    return helper_functions::cToJint(env, bdd_arrays_object->vars, bdd_arrays_object->numTraces,bdd_arrays_object->numBools);
+}
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    getValuesFromBDDArray
+ */
+JNIEXPORT jobjectArray JNICALL getValuesFromBDDArray
+  (JNIEnv *env, jclass, jlong bdd_arrays_pointer){
+    bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
+
+    return helper_functions::cToJint(env, bdd_arrays_object->values, bdd_arrays_object->numTraces,bdd_arrays_object->numBools);
+}
+

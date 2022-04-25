@@ -147,24 +147,30 @@ public class CDD {
             guards.add(falseGuard);
             return guards;
         }
-        //if (copy.getRoot().)
-        while (!copy.isTerminal())
+        if (copy.isBDD())
         {
-            copy=copy.reduce().removeNegative();
-            CddExtractionResult res = copy.extractBddAndDbm();
-            copy = res.getCddPart().reduce().removeNegative();
-            Zone z = new Zone(res.getDbm());
-            CDD bddPart = res.getBddPart();
-            List<Guard> guardList = z.buildGuardsFromZone(clocks, relevantClocks);
-            guardList.addAll(CDD.toBoolGuards(bddPart)); // TODO: once we have boolean
+            List<Guard> guardList = CDD.toBoolGuards(copy);
             guards.add(guardList);
         }
+        else {
+            while (!copy.isTerminal()) {
+                copy = copy.reduce().removeNegative();
+                CddExtractionResult res = copy.extractBddAndDbm();
+                copy = res.getCddPart().reduce().removeNegative();
+                Zone z = new Zone(res.getDbm());
+                CDD bddPart = res.getBddPart();
+                List<Guard> guardList = z.buildGuardsFromZone(clocks, relevantClocks);
+                guardList.addAll(CDD.toBoolGuards(bddPart)); // TODO: once we have boolean
+                guards.add(guardList);
+            }
+        }
+
         return guards;
     }
 
     public boolean isBDD()
     {
-        return true; //CDDLib.isBDD(this);
+        return CDDLib.isBDD(this.pointer);
     }
 
     public static List<Guard> toBoolGuards(CDD bdd){
@@ -174,7 +180,6 @@ public class CDD {
             return new ArrayList<>();
         CDDNode node = bdd.getRoot();
         List<Guard> guards = new ArrayList<>();
-
         node.getElemIterable().forEach(
                 n -> {BoolVar var = BVs.get(n.getChild().getLevel()-bddStartLevel);
                     String bits = Long.toString(n.getChild().getPointer(), 2);   //TODO: hate going for bit magic here, if anyone has a good idea, let me know!!! also, test this!
@@ -553,6 +558,8 @@ public class CDD {
             return true;
         if (copy.isFalse())
             return false;
+        if (copy.isBDD())
+            return true;
         while (!copy.isTerminal())
         {
             CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
@@ -572,6 +579,8 @@ public class CDD {
         if (copy.isTrue())
             return false;
         if (copy.isFalse())
+            return false;
+        if (copy.isBDD())
             return false;
         while (!copy.isTerminal())
         {
