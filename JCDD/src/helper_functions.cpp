@@ -55,7 +55,7 @@ dbm::fed_t helper_functions::javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize 
 
 jobjectArray helper_functions::cPointerToJavaArray(
         JNIEnv *env,
-        const int **arrayPointer, int numArrays, int lengthArrays) {
+         int** arrayPointer, int numArrays, int lengthArrays) {
 
     // Get the int array class
     jclass cls = env->FindClass("[I");
