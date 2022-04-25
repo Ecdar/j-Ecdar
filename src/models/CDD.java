@@ -53,7 +53,6 @@ public class CDD {
     private static int getIndexOfBV(BoolVar bv) {
 
         for (int i = 0; i < BVs.size(); i++){
-            System.out.println(bv.hashCode() + " " + BVs.get(i).hashCode());
             if(bv.hashCode() == BVs.get(i).hashCode()) return i;
         }
         System.out.println(bv + ": " + BVs);
@@ -128,7 +127,7 @@ public class CDD {
 
     public static CDD fromBoolGuard(BoolGuard guard)
     {
-        System.out.println(getIndexOfBV(guard.getVar() ) + " " + guard.getValue());
+        //System.out.println(getIndexOfBV(guard.getVar() ) + " " + guard.getValue());
         if (guard.getValue())
             return createBddNode(bddStartLevel + getIndexOfBV(guard.getVar()));
         else

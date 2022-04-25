@@ -1,5 +1,6 @@
 package features;
 
+import lib.CDDLib;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import models.*;
@@ -14,6 +15,39 @@ import java.util.stream.Collectors;
 public class BoolTest {
 
 
+
+    @Test
+    public void testBoolArray() {
+
+        BoolVar a = new BoolVar("a",false);
+        BoolVar b = new BoolVar("b",true);
+        BoolVar c = new BoolVar("c",true);
+        List<BoolVar> BVs = new ArrayList<>();
+        BVs.add(a); BVs.add(b); BVs.add(c);
+        BoolGuard bg_a_false = new BoolGuard(a, "==",false);
+        BoolGuard bg_b_false = new BoolGuard(b, "==",false);
+        BoolGuard bg_a_true = new BoolGuard(a, "==",true);
+        BoolGuard bg_b_true = new BoolGuard(b, "==",true);
+        BoolGuard bg_c_true = new BoolGuard(c, "==",true);
+        BoolGuard bg_c_false = new BoolGuard(c, "==",false);
+        List<Guard> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
+        //  List<Guard> l2 = new ArrayList<>(List.of(bg_a_true,bg_b_true,bg_c_false));
+        //  List<Guard> l3 = new ArrayList<>(List.of(bg_a_false,bg_b_true,bg_c_false));
+        List<List<Guard>> list = new ArrayList();
+        list.add(l1); //list.add(l2); list.add(l3);
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addBddvar(BVs);
+        System.out.println("here!");
+        CDD cdd =new CDD(list);
+        BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
+        System.out.println(bddArr.getValues());
+
+
+
+//        System.out.println("here too! " + cdd);
+  //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
+        CDD.done();
+    }
 
 
     @Test
