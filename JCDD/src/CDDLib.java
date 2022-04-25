@@ -76,7 +76,7 @@ public class CDDLib {
     public static native long extractBddAndDbm(long cddPointer);
     public static native long getCddPartFromExtractionResult(long extractionResultPointer);
     public static native long getBddPartFromExtractionResult(long extractionResultPointer);
-    public static native long bddToArray(long cddPointer);
+    public static native long bddToArray(long cddPointer, int numBools);
     public static native int[][] getVarsFromBDDArray(long bddArrayPointer);
     public static native int[][] getValuesFromBDDArray(long bddArrayPointer);
     public static native int[] getDbmFromExtractionResult(long extractionResultPointer);
