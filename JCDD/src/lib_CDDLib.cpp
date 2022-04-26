@@ -632,10 +632,7 @@ JNIEXPORT jintArray JNICALL getVarsFromBDDArray
 
     //int size = bdd_arrays_object->numTraces * bdd_arrays_object->numBools;
    // return helper_functions::cPointerToJavaArray(env, bdd_arrays_object->vars, size);
-   int test[2];
-   test[0] =1;
-   test[1] =2;
-    return helper_functions::cPointerToJavaArray(env, test, 2);
+   return null;
 }
 
 /*
