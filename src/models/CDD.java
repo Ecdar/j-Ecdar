@@ -183,15 +183,20 @@ public class CDD {
         BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(bdd.getPointer(),numBools));
 
         List<List<Guard>> result = new ArrayList<>();
+        System.out.println(arrays.numTraces + " " + arrays.numBools + " " + BVs.size() + " " + numBools);
         for (int i=0; i<= arrays.numTraces; i++)
         {
+            System.out.println("here now");
             List<Guard> guards = new ArrayList<>();
             for (int j=0; j<= arrays.numBools; j++)
             {
-                BoolVar var = BVs.get(arrays.getVars().get(i).get(j));
-                boolean val = (arrays.getValues().get(i).get(j)==1) ? true : false;
-                BoolGuard bg = new BoolGuard(var, "==",  val);
-                guards.add(bg);
+                int index = arrays.getVars().get(i).get(j);
+                if (index>=0) {
+                    BoolVar var = BVs.get(index);
+                    boolean val = (arrays.getValues().get(i).get(j) == 1) ? true : false;
+                    BoolGuard bg = new BoolGuard(var, "==", val);
+                    guards.add(bg);
+                }
             }
             result.add(guards);
         }
@@ -294,7 +299,7 @@ public class CDD {
         checkIfRunning();
         for (List<BoolVar> list: BVs)
             CDD.BVs.addAll(list);
-        numBools = CDD.BVs.size()+1;
+        numBools = CDD.BVs.size();
         bddStartLevel =  CDDLib.addBddvar(numBools);
         return bddStartLevel;
     }

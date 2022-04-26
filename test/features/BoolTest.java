@@ -15,6 +15,29 @@ import java.util.stream.Collectors;
 public class BoolTest {
 
 
+    @Test
+    public void testBoolArraySimple() {
+
+        BoolVar a = new BoolVar("a",false);
+        BoolVar b = new BoolVar("b",true);
+        BoolVar c = new BoolVar("c",true);
+        List<BoolVar> BVs = new ArrayList<>();
+        BVs.add(a); BVs.add(b); BVs.add(c);
+
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addBddvar(BVs);
+        CDD ba = CDD.createBddNode(0);
+        CDD bb = CDD.createBddNode(1);
+        CDD bc = CDD.createBddNode(2);
+        CDD cdd =ba.conjunction(bb.disjunction(bc));
+
+        BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
+        System.out.println("bdd values " + bddArr.getValues());
+        System.out.println("bdd vars " + bddArr.getVars());
+        System.out.println(cdd);
+        //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
+        CDD.done();
+    }
 
     @Test
     public void testBoolArray() {
