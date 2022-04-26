@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class BoolTest {
 
-
+/*
     @Test
     public void testBoolArraySimple() {
 
@@ -29,8 +29,8 @@ public class BoolTest {
         CDD ba = CDD.createBddNode(0);
         CDD bb = CDD.createBddNode(1);
         CDD bc = CDD.createBddNode(2);
-        CDD cdd =ba.conjunction(bb.disjunction(bc));
-
+        CDD cdd =ba.disjunction(bb.conjunction(bc));
+        System.out.println("size " + BVs.size());
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
         System.out.println("bdd values " + bddArr.getValues());
         System.out.println("bdd vars " + bddArr.getVars());
@@ -396,5 +396,5 @@ public class BoolTest {
 
 
 //here: [cg: (x<1 && y≥2 && y≤7) || (x≤10 && y<2) || (x≤10 && y>7) || (x>10) - bg:()]
-    }
+    }*/
 }

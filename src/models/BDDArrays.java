@@ -45,9 +45,10 @@ public class BDDArrays {
         }else{
             List<List<Integer>> result = new ArrayList<>();
             int[] vars=CDDLib.getVarsFromBDDArray(pointer);
-            for (int i=0; i<=numTraces; i++) {
+            System.out.println(vars.length);
+            for (int i=0; i<numTraces; i++) {
                 List<Integer> trace = new ArrayList<>();
-                for (int j = 0; j <= numBools; j++) {
+                for (int j = 0; j < numBools; j++) {
                     trace.add(vars[i * numBools + j]);
                 }
                 result.add(trace);
@@ -63,9 +64,9 @@ public class BDDArrays {
         }else{
             List<List<Integer>> result = new ArrayList<>();
             int[] vals=CDDLib.getValuesFromBDDArray(pointer);
-            for (int i=0; i<=numTraces; i++) {
+            for (int i=0; i<numTraces; i++) {
                 List<Integer> trace = new ArrayList<>();
-                for (int j = 0; j <= numBools; j++) {
+                for (int j = 0; j < numBools; j++) {
                     System.out.println("vars" + vals[i * numBools + j]);
                     trace.add(vals[i * numBools + j]);
                 }

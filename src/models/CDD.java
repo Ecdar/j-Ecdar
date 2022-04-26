@@ -184,11 +184,11 @@ public class CDD {
 
         List<List<Guard>> result = new ArrayList<>();
         System.out.println(arrays.numTraces + " " + arrays.numBools + " " + BVs.size() + " " + numBools);
-        for (int i=0; i<= arrays.numTraces; i++)
+        for (int i=0; i< arrays.numTraces; i++)
         {
             System.out.println("here now");
             List<Guard> guards = new ArrayList<>();
-            for (int j=0; j<= arrays.numBools; j++)
+            for (int j=0; j< arrays.numBools; j++)
             {
                 int index = arrays.getVars().get(i).get(j);
                 if (index>=0) {

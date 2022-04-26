@@ -108,6 +108,10 @@ public class Location {
                     interm.add(new ClockGuard((ClockGuard) g, newClocks,oldClocks));
                 if (g instanceof  BoolGuard)
                     interm.add(new BoolGuard((BoolGuard) g, newBVs,oldBVs));
+                if (g instanceof AndGuard)
+                    interm.add(new AndGuard( (AndGuard) g, newClocks, oldClocks, newBVs, oldBVs));
+                if (g instanceof OrGuard)
+                    interm.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
             }
             this.invariant.add(interm);
         }

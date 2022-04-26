@@ -63,6 +63,10 @@ public class Edge {
                     temp.add(new BoolGuard((BoolGuard) g, BVs, oldBVs));
                 if (g instanceof FalseGuard)
                     temp.add(new FalseGuard());
+                if (g instanceof AndGuard)
+                    temp.add(new AndGuard( (AndGuard) g, clocks, oldClocks, BVs, oldBVs));
+                if (g instanceof OrGuard)
+                    temp.add(new OrGuard( (OrGuard) g, clocks, oldClocks, BVs, oldBVs));
             }
             this.guards.add(temp);
         }
