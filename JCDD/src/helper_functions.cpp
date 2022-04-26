@@ -54,7 +54,7 @@ dbm::fed_t helper_functions::javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize 
 }
 
 jintArray helper_functions::cPointerToJavaArray(
-        JNIEnv *env, const uint32_t *arrayPointer, jsize len) {
+        JNIEnv *env, const int32_t *arrayPointer, jsize len) {
 
         // convert updated array to jintArray
         jintArray newT = env->NewIntArray(len);
