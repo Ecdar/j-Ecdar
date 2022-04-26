@@ -39,7 +39,7 @@ public class BDDArrays {
         if(values != null){
             return values;
         }else{
-            CDDLib.getValuesFromBDDArray(pointer);
+            //CDDLib.getValuesFromBDDArray(pointer);
             return null;//(CDDLib.getValuesFromBDDArray(pointer));
         }
     }
