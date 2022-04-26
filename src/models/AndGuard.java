@@ -12,6 +12,18 @@ public class AndGuard extends Guard{
     {
         this.guards=guards;
     }
+    public AndGuard(List<Guard>... guards)
+    {
+        this.guards= new ArrayList<>();
+        for (List<Guard> g: guards)
+            this.guards.addAll(g);
+    }
+    public AndGuard(Guard... guards)
+    {
+        this.guards= new ArrayList<>();
+        for (Guard g: guards)
+            this.guards.add(g);
+    }
 
     public AndGuard(AndGuard copy, List<Clock> newClocks,List<Clock> oldClocks,   List<BoolVar> newBVs, List<BoolVar> oldBVs)
     {
@@ -24,6 +36,8 @@ public class AndGuard extends Guard{
                 this.guards.add(new BoolGuard((BoolGuard) g, newBVs, oldBVs));
             if (g instanceof FalseGuard)
                 this.guards.add(new FalseGuard());
+            if (g instanceof TrueGuard)
+                this.guards.add(new TrueGuard());
             if (g instanceof AndGuard)
                 this.guards.add(new AndGuard( (AndGuard) g, newClocks, oldClocks, newBVs, oldBVs));
             if (g instanceof OrGuard)
@@ -31,6 +45,17 @@ public class AndGuard extends Guard{
         }
     }
 
+
+    @Override
+    int getMaxConstant() {
+        int max = 0;
+        for (Guard g: guards)
+        {
+            if (g.getMaxConstant()>max)
+                max = g.getMaxConstant();
+        }
+        return max;
+    }
 
     @Override
     public boolean equals(Object o) { // TODO: AND(G1,G2) != AND(G2,G1) => is that okay?
@@ -58,5 +83,9 @@ public class AndGuard extends Guard{
     @Override
     public int hashCode() {
         return Objects.hash(false);
+    }
+
+    public List<Guard> getGuards() {
+        return guards;
     }
 }

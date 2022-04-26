@@ -214,7 +214,7 @@ public class JSONParser {
 
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            List<List<Guard>> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
+            Guard invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueGuard() :
                     addInvarGuards(jsonObject.get("invariant").toString()));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
@@ -225,134 +225,137 @@ public class JSONParser {
         return returnLocList;
     }
 
-    private static List<List<Guard>> addGuards(String invariant) {
-        List<List<Guard>> guardList = new ArrayList<>();
+    private static Guard addGuards(String invariant) {
+        List<Guard> orParts = new ArrayList<>();
         for (String part: invariant.split("or")) {
-            ArrayList<Guard> guards = new ArrayList<>();
+            ArrayList<Guard> andParts = new ArrayList<>();
             String[] listOfInv = part.split("&&");
 
             for (String str : listOfInv) {
-                String symbol = "";
-                boolean strict, greater, isEq;
-                strict = false;
-                greater = false;
-                isEq = false;
-                Relation rel = null;
-
-                if (str.contains("==")) {
-                    symbol = "==";
-                    rel=Relation.EQUAL;
+                if (str.equals("false"))
+                    andParts.add(new FalseGuard());
+                else if (str.equals("true"))
+                    andParts.add(new TrueGuard());
+                else {
+                    String symbol = "";
+                    boolean strict, greater, isEq;
+                    strict = false;
                     greater = false;
-                    isEq = true;
-                } else if (str.contains("<=")) {
-                    rel=Relation.LESS_EQUAL;
-                    symbol = "<=";
-                } else if (str.contains(">=")) {
-                    rel=Relation.GREATER_EQUAL;
-                    symbol = ">=";
-                    greater = true;
-                } else if (str.contains("<") && !str.contains("=")) {
-                    rel=Relation.LESS_THAN;
-                    symbol = "<";
-                    strict = true;
-                } else if (str.contains(">") && !str.contains("=")) {
-                    rel=Relation.GREATER_THAN;
-                    symbol = ">";
-                    greater = true;
-                    strict = true;
-                }
+                    isEq = false;
+                    Relation rel = null;
 
-                String[] s = str.split(symbol);
-                for (int x = 0; x < s.length; x++) {
-                    s[x] = s[x].replaceAll(" ", "");
-                }
+                    if (str.contains("==")) {
+                        symbol = "==";
+                        rel = Relation.EQUAL;
+                        greater = false;
+                        isEq = true;
+                    } else if (str.contains("<=")) {
+                        rel = Relation.LESS_EQUAL;
+                        symbol = "<=";
+                    } else if (str.contains(">=")) {
+                        rel = Relation.GREATER_EQUAL;
+                        symbol = ">=";
+                        greater = true;
+                    } else if (str.contains("<") && !str.contains("=")) {
+                        rel = Relation.LESS_THAN;
+                        symbol = "<";
+                        strict = true;
+                    } else if (str.contains(">") && !str.contains("=")) {
+                        rel = Relation.GREATER_THAN;
+                        symbol = ">";
+                        greater = true;
+                        strict = true;
+                    }
 
-                Clock clk = findClock(s[0]);
-                if (clk != null) {
+                    String[] s = str.split(symbol);
+                    for (int x = 0; x < s.length; x++) {
+                        s[x] = s[x].replaceAll(" ", "");
+                    }
 
-                    guards.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
+                    Clock clk = findClock(s[0]);
+                    if (clk != null) {
+
+                        andParts.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
+                    } else {
+                        BoolVar bl = findBV(s[0]);
+                        Guard newInv;
+                        newInv = new BoolGuard(bl, symbol, Boolean.valueOf(s[1]));
+                        andParts.add(newInv);
+                    }
                 }
-                else
-                {
-                    BoolVar bl = findBV(s[0]);
-                    Guard newInv;
-                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(s[1]));
-                    guards.add(newInv);
-                } // TODO FalseGuard
             }
-
-            guardList.add(guards);
+            orParts.add(new AndGuard(andParts));
         }
-        return guardList;
+        return new OrGuard(orParts);
     }
-    private static List<List<Guard>> addInvarGuards(String invariant) {
+    private static Guard addInvarGuards(String invariant) {
 
-        ArrayList<List<Guard>> guardsOuter = new ArrayList<>();
-
-
+        List<Guard> orParts = new ArrayList<>();
         String[] listOfDisjc = invariant.split("or");
 
-        // System.out.println("whole: " + invariant);
         for (String strOuter : listOfDisjc) {
             String[] listOfInv = strOuter.split("&&");
-            ArrayList<Guard> guards = new ArrayList<>();
+            ArrayList<Guard> andParts = new ArrayList<>();
             //System.out.println("discj part: " + strOuter);
 
             for (String str : listOfInv) {
-                //System.out.println("conj. part: " + str);
+                if (str.equals("false"))
+                    andParts.add(new FalseGuard());
+                else if (str.equals("true"))
+                    andParts.add(new TrueGuard());
+                else {
+                    //System.out.println("conj. part: " + str);
 
-                String symbol = "";
-                boolean strict, greater, isEq;
-                strict = false;
-                greater = false;
-                isEq = false;
-                Relation rel = null;
-
-                if (str.contains("==")) {
-                    rel=Relation.EQUAL;
-                    symbol = "==";
+                    String symbol = "";
+                    boolean strict, greater, isEq;
+                    strict = false;
                     greater = false;
-                    isEq = true;
-                } else if (str.contains("<=")) {
-                    rel=Relation.LESS_EQUAL;
-                    symbol = "<=";
-                } else if (str.contains(">=")) {
-                    rel=Relation.GREATER_EQUAL;
-                    symbol = ">=";
-                    greater = true;
-                } else if (str.contains("<") && !str.contains("=")) {
-                    rel=Relation.LESS_THAN;
-                    symbol = "<";
-                    strict = true;
-                } else if (str.contains(">") && !str.contains("=")) {
-                    rel=Relation.GREATER_THAN;
-                    symbol = ">";
-                    greater = true;
-                    strict = true;
-                }
+                    isEq = false;
+                    Relation rel = null;
 
-                String[] s = str.split(symbol);
-                for (int x = 0; x < s.length; x++) {
-                    s[x] = s[x].replaceAll(" ", "");
-                }
+                    if (str.contains("==")) {
+                        rel = Relation.EQUAL;
+                        symbol = "==";
+                        greater = false;
+                        isEq = true;
+                    } else if (str.contains("<=")) {
+                        rel = Relation.LESS_EQUAL;
+                        symbol = "<=";
+                    } else if (str.contains(">=")) {
+                        rel = Relation.GREATER_EQUAL;
+                        symbol = ">=";
+                        greater = true;
+                    } else if (str.contains("<") && !str.contains("=")) {
+                        rel = Relation.LESS_THAN;
+                        symbol = "<";
+                        strict = true;
+                    } else if (str.contains(">") && !str.contains("=")) {
+                        rel = Relation.GREATER_THAN;
+                        symbol = ">";
+                        greater = true;
+                        strict = true;
+                    }
 
-                Clock clk = findClock(s[0]);
-                if (clk != null) {
+                    String[] s = str.split(symbol);
+                    for (int x = 0; x < s.length; x++) {
+                        s[x] = s[x].replaceAll(" ", "");
+                    }
 
-                    guards.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
+                    Clock clk = findClock(s[0]);
+                    if (clk != null) {
+
+                        andParts.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
+                    } else {
+                        BoolVar bl = findBV(s[0]);
+                        Guard newInv;
+                        newInv = new BoolGuard(bl, symbol, Boolean.valueOf(s[1]));
+                        andParts.add(newInv);
+                    }
                 }
-                else
-                {
-                    BoolVar bl = findBV(s[0]);
-                    Guard newInv;
-                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(s[1]));
-                    guards.add(newInv);
-                } // TODO FalseGuard
             }
-            guardsOuter.add(guards);
+            orParts.add(new AndGuard(andParts));
         }
-
-        return guardsOuter;
+        return new OrGuard(orParts);
     }
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
@@ -374,7 +377,7 @@ public class JSONParser {
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            List<List<Guard>> guards = new ArrayList<>();
+            Guard guards;
             List<ClockUpdate> clockUpdates = new ArrayList<>();
             List<BoolUpdate> boolUpdates = new ArrayList<>();
 
@@ -383,7 +386,7 @@ public class JSONParser {
             if (!jsonObject.get("guard").toString().equals(""))
                 guards = addGuards((String) jsonObject.get("guard"));
             else
-                guards = new ArrayList<>();
+                guards = new TrueGuard();
 
             if (!jsonObject.get("update").toString().equals(""))
                 updates = addUpdates((String) jsonObject.get("update"));

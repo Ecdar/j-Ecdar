@@ -37,13 +37,13 @@ public class Federation {
         return new Federation(emptyZoneList);
     }
 
-    public List<List<Guard>> turnFederationToGuards(List<Clock> clocks)
+    public Guard turnFederationToGuards(List<Clock> clocks)
     {
-        List<List<Guard>> turnedBackIntoGuards = new ArrayList<>();  // make a function
+        List<Guard> turnedBackIntoGuards = new ArrayList<>();  // make a function
         for (Zone z : getZones()) {
             turnedBackIntoGuards.add(z.buildGuardsFromZone(clocks,clocks));
         }
-        return turnedBackIntoGuards;
+        return new OrGuard(turnedBackIntoGuards);
     }
 
     public boolean isUnrestrained(List<Clock> clocks)

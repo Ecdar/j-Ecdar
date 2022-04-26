@@ -54,9 +54,7 @@ public class CDDTest {
         guardList.add(g3);
         guardList.add(g4);
 
-        List<List<Guard>> doubleList = new ArrayList<>();
-        doubleList.add(guardList);
-        System.out.println(CDD.toGuardList(new CDD(doubleList),clocks));
+        System.out.println(CDD.toGuardList(new CDD(new AndGuard(guardList)),clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         CDD.free(cdd1);
@@ -272,12 +270,8 @@ public class CDDTest {
 
         List<Guard> g1 = new ArrayList<>();
         g1.add(e2_g1);
-        List<Guard> g2 = new ArrayList<>();
-        g2.add(e2_g2);
-        List<List<Guard>> guards = new ArrayList<>();
-        guards.add(g1);
-        guards.add(g2);
-        CDD res = new CDD(guards);
+        g1.add(e2_g2);
+        CDD res = new CDD(new OrGuard(g1));
         //res.printDot();
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.allocateInterval(1, 0, 3, false, DBM_INF/2-1, false));

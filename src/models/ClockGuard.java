@@ -106,6 +106,14 @@ public class ClockGuard extends Guard {
     }
 
     @Override
+    int getMaxConstant() {
+        if (isDiagonal())
+            return 0;
+        else
+            return bound;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ClockGuard)) return false;

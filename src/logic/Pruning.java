@@ -120,7 +120,7 @@ public class Pruning {
 
         if (initIsInconsistent) {
             locations = new ArrayList<>();
-            locations.add(new Location("inc", new ArrayList<List<Guard>>(), true, false, false, true));
+            locations.add(new Location("inc", new TrueGuard(), true, false, false, true));
             edges = new ArrayList<>();
         }
         Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), false);
@@ -135,11 +135,7 @@ public class Pruning {
             if (l.isInconsistent()) {
                 CDD incCDD = l.getInconsistentPart();
                 if (incCDD.isUnrestrained()) {
-                    List<List<Guard>> list = new ArrayList<>();
-                    List<Guard> guardList = new ArrayList<>();
-                    guardList.add(new FalseGuard());
-                    list.add(guardList);
-                    l.setInvariant(list);                     // TODO: 04.02.21 how to treat a completely inconsistent location here?
+                    l.setInvariant(new FalseGuard());                     // TODO: 04.02.21 how to treat a completely inconsistent location here?
                 }
                 else {
                     CDD invarMinusIncCDD = l.getInvariantCDD().minus(l.getInconsistentPart());
@@ -151,7 +147,7 @@ public class Pruning {
 
     public void addInvariantsToGuards() {
         for (Edge e : edges) {
-            if (!e.getTarget().getInvariant().isEmpty()) {
+            if (!(e.getTarget().getInvariant() instanceof TrueGuard)) {
                 CDD target = e.getTarget().getInvariantCDD();
                 CDD cddBeforeEdge = target.transitionBack(e);
                 e.setGuards(CDD.toGuardList(cddBeforeEdge,clocks));
@@ -195,7 +191,7 @@ public class Pruning {
         // This happens if there is an invariant, and part of the invariant cannot delay to enable an output anymore
 
         // if there is no invariant, there cannot be a deadlock, and we do not care about whether there is any input or outputs leaving
-        if (e.getSource().getInvariant().isEmpty()) {
+        if (e.getSource().getInvariant() instanceof TrueGuard) {
             if (printComments)
                 System.out.println("Source has no invariant, nothing more to do");
         } else {

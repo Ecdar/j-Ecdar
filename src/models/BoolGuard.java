@@ -52,6 +52,11 @@ public class BoolGuard extends Guard {
     }
 
     @Override
+    int getMaxConstant() {
+        return 0;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BoolGuard)) return false;

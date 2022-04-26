@@ -2,7 +2,7 @@ package models;
 
 import java.util.Objects;
 
-public class FalseGuard extends Guard{
+public class TrueGuard extends Guard{
 
     @Override
     int getMaxConstant() {
@@ -11,14 +11,14 @@ public class FalseGuard extends Guard{
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof FalseGuard)
+        if (o instanceof TrueGuard)
             return true;
         return false;
     }
 
     @Override
     public String toString() {
-        return "false";
+        return "true";
     }
 
     @Override

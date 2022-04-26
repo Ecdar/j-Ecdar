@@ -23,8 +23,8 @@ public class JsonFileWriter {
             locationJson.put("y", l.getY());
 
 
-            String guardString ="";
-            int i= 0; int j=0;
+            String guardString =l.getInvariant().toString();
+            /*int i= 0; int j=0;
             for (List<Guard> disjunction: l.getInvariant())
             {
                 if (j!=0)
@@ -58,6 +58,7 @@ public class JsonFileWriter {
                 }
                 j++;
             }
+            */
             locationJson.put("invariant", guardString.replaceAll("≤","<=").replaceAll("≥",">="));
 
 
@@ -89,8 +90,8 @@ public class JsonFileWriter {
                 edgeJson.put("status", "OUTPUT");
             edgeJson.put("select", "");
 
-            String guardString ="";
-            int i= 0; int j=0;
+            String guardString = e.getGuards().toString();
+            /*int i= 0; int j=0;
             for (List<Guard> disjunction: e.getGuards())
             {
                 if (j!=0)
@@ -123,12 +124,12 @@ public class JsonFileWriter {
 
                 j++;
             }
-
+*/
 
             edgeJson.put("guard", guardString.replaceAll("≤","<=").replaceAll("≥",">="));
 
             String updateString = "";
-            i= 0;
+            int i= 0;
             for (Update u1: e.getUpdates())
             {
                 if (u1 instanceof ClockUpdate) {

@@ -81,13 +81,13 @@ public class VariousTest {
         ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
         ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
 
-        List<List<Guard>> guards1 = new ArrayList<>();
+
         List<Guard> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
         inner.add(g4);
-        guards1.add(inner);
+
 
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);
@@ -95,16 +95,12 @@ public class VariousTest {
         CDD.init(100,100,100);
         CDD.addClocks(clocks);
 
-        CDD origin1 = new CDD(guards1);
+        CDD origin1 = new CDD(new AndGuard(inner));
 
 
         origin1 = origin1.delay();
-        List<List<Guard>> origin1Guards = CDD.toGuardList(origin1,clocks);
-        for (List<Guard> list : origin1Guards) {
-            System.out.println("nextOr");
-            for (Guard guard: list)
-                System.out.println(guard);
-        }
+        Guard origin1Guards = CDD.toGuardList(origin1,clocks);
+        System.out.println(origin1Guards);
         assert(true);
 
     }
@@ -130,13 +126,11 @@ public class VariousTest {
         CDD.init(100,100,100);
         CDD.addClocks(clocks);
 
-        CDD origin1 = new CDD(guards1);
+        CDD origin1 = new CDD(new AndGuard(inner));
 
-        List<List<Guard>> origin1Guards = CDD.toGuardList(origin1,clocks);
-        for (List<Guard> list : origin1Guards) {
-            for (Guard guard: list)
-                System.out.println(guard);
-        }
+        Guard origin1Guards = CDD.toGuardList(origin1,clocks);
+        System.out.println(origin1Guards);
+
 
 
         Update clockUpdate = new ClockUpdate(x,0);
@@ -144,12 +138,9 @@ public class VariousTest {
         list1.add(clockUpdate);
         origin1 = CDD.applyReset(origin1,list1);
 
-        List<List<Guard>> origin2Guards = CDD.toGuardList(origin1,clocks);
-        for (List<Guard> list : origin2Guards) {
-            for (Guard guard: list)
-                System.out.println(guard);
-        }
+        Guard origin2Guards = CDD.toGuardList(origin1,clocks);
         System.out.println(origin2Guards);
+
         assert(origin2Guards.toString().equals("[[x==0, y<=3, y-x<=3, x-y<=0]]"));
 
     }

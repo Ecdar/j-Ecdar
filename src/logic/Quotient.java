@@ -88,7 +88,7 @@ public class Quotient extends TransitionSystem {
         Map<String,Location> locationMap = new HashMap<String,Location>();
 
         // TODO: currently I assume the init location to not be urgent
-        Location init = new Location(ts_spec.getSystems().get(0).getAutomaton().getInitLoc().getName() + "DIV" + ts_comp.getSystems().get(0).getAutomaton().getInitLoc().getName() , new ArrayList<List<Guard>>() , true, ts_spec.getSystems().get(0).getAutomaton().getInitLoc().isUrgent() || ts_comp.getSystems().get(0).getAutomaton().getInitLoc().isUrgent() , false, false);
+        Location init = new Location(ts_spec.getSystems().get(0).getAutomaton().getInitLoc().getName() + "DIV" + ts_comp.getSystems().get(0).getAutomaton().getInitLoc().getName() , new TrueGuard() , true, ts_spec.getSystems().get(0).getAutomaton().getInitLoc().isUrgent() || ts_comp.getSystems().get(0).getAutomaton().getInitLoc().isUrgent() , false, false);
 
         // just an easy way to access spec and comp from here on
         // TODO: check that there is only one automaton in each, maybe implement so that several automata can be explored at once
@@ -103,7 +103,7 @@ public class Quotient extends TransitionSystem {
                     boolean isInitial = l_spec.isInitial() && l_comp.isInitial();
                     boolean isUrgent = l_spec.isUrgent() || l_comp.isUrgent();
                     String locName = l_spec.getName() + "DIV" + l_comp.getName();
-                    Location loc = new Location(locName, new ArrayList<List<Guard>>(), isInitial, isUrgent, false, false);
+                    Location loc = new Location(locName, new TrueGuard(), isInitial, isUrgent, false, false);
                     locationMap.put(locName, loc);
                     locations.add(loc);
                 }
@@ -111,8 +111,8 @@ public class Quotient extends TransitionSystem {
         }
 
         // Create univ. and inc. location
-        Location univ =   new Location("univ", new ArrayList<List<Guard>>(), false, false, true, false);
-        Location inc = new Location("inc", new ArrayList<List<Guard>>(), false, true, false, true);
+        Location univ =   new Location("univ", new TrueGuard(), false, false, true, false);
+        Location inc = new Location("inc", new TrueGuard(), false, true, false, true);
 
         locationMap.put("univ",univ);
         locationMap.put("inc",inc);
@@ -138,7 +138,7 @@ public class Quotient extends TransitionSystem {
                 if (!l_spec.getName().equals("inc") && !l_spec.getName().equals("univ") && !l_comp.getName().equals("inc") && !l_comp.getName().equals("univ")) {
 
                     // Rule 2 (First transition in Figure)
-                    if (!l_spec.getInvariant().isEmpty()) {
+                    if (!(l_spec.getInvariant() instanceof TrueGuard)) {
                         // negate the spec. invariant
 
                             CDD invarNegated = l_spec.getInvariantCDD().negation();
@@ -148,7 +148,7 @@ public class Quotient extends TransitionSystem {
                        }
 
                     // Rule 1
-                    if (!l_comp.getInvariant().isEmpty()) {
+                    if (!(l_spec.getInvariant() instanceof TrueGuard)) {
                         // TODO: I interpreted this rule as "for every channel". This will also create a transition for the new symbol. That is fine!
                         // negate the comp. invariant.
                         // TODO: some of the guards in the list we get here might actually be mergable
@@ -248,23 +248,16 @@ public class Quotient extends TransitionSystem {
                    // for each input, create a selfloop in inc.
                    for (Channel c : getInputs()) {
                         Guard g = new ClockGuard(newClock, null, 0, Relation.LESS_EQUAL);
-                        //Guard g1 = new ClockGuard(newClock, null, false, false);
-                        List<Guard> guards = new ArrayList<Guard>();
-                        guards.add(g);
-                       // guards.add(g1);
-                        List<List<Guard>> res = new ArrayList<>();
-                        res.add(guards);
-                        edges.add(new Edge(inc, inc, c, true, res, new ArrayList<>()));
+
+                        edges.add(new Edge(inc, inc, c, true, g, new ArrayList<>()));
                     }
 
                     // for each input or output,  create a selfloop in univ.
                     for (Channel c : getInputs()) {
-                        List<List<Guard>> guards = new ArrayList<>();
-                        edges.add(new Edge(univ, univ, c, true, guards, new ArrayList<>()));
+                        edges.add(new Edge(univ, univ, c, true, new TrueGuard(), new ArrayList<>()));
                     }
                     for (Channel c : getOutputs()) {
-                        List<List<Guard>> guards = new ArrayList<>();
-                        edges.add(new Edge(univ, univ, c, false, guards, new ArrayList<>()));
+                        edges.add(new Edge(univ, univ, c, false, new TrueGuard(), new ArrayList<>()));
                     }
                 }
             }

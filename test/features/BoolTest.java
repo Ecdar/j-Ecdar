@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class BoolTest {
 
-/*
+
     @Test
     public void testBoolArraySimple() {
 
@@ -60,12 +60,12 @@ public class BoolTest {
         list.add(l1); //list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBddvar(BVs);
-        CDD cdd =new CDD(list);
+        CDD cdd =new CDD(new AndGuard(l1));
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
         System.out.println(bddArr.getValues());
         System.out.println(bddArr.getVars());
 
-
+        // A & !B & !C
         System.out.println("here too! " + cdd);
   //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
         CDD.done();
@@ -87,14 +87,14 @@ public class BoolTest {
         BoolGuard bg_c_true = new BoolGuard(c, "==",true);
         BoolGuard bg_c_false = new BoolGuard(c, "==",false);
         List<Guard> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
-      //  List<Guard> l2 = new ArrayList<>(List.of(bg_a_true,bg_b_true,bg_c_false));
-      //  List<Guard> l3 = new ArrayList<>(List.of(bg_a_false,bg_b_true,bg_c_false));
+        List<Guard> l2 = new ArrayList<>(List.of(bg_a_true,bg_b_true,bg_c_false));
+        List<Guard> l3 = new ArrayList<>(List.of(bg_a_false,bg_b_true,bg_c_false));
         List<List<Guard>> list = new ArrayList();
-        list.add(l1); //list.add(l2); list.add(l3);
+        list.add(l1); list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBddvar(BVs);
         System.out.println("here!");
-        CDD cdd =new CDD(list);
+        CDD cdd =new CDD(new OrGuard(l1,l2,l3));
         System.out.println("here too! " + cdd);
         assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
         CDD.done();
@@ -150,13 +150,13 @@ public class BoolTest {
         inner1.addAll(boolGuards2);
         guards2.add(inner1);
 
-        Location l0 = new Location("L0", noguard, true, false, false, false);
-        Location l1 = new Location("L1", noguard, false, false, false, false);
+        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, guards1, noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, guards2, noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
@@ -177,8 +177,8 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
         CDD.addBddvar(BVs);
-        CDD origin1 = new CDD(guards1);
-        CDD origin2 = new CDD(guards2);
+        CDD origin1 = new CDD(new AndGuard(inner));
+        CDD origin2 = new CDD(new AndGuard(inner1));
         CDD bothOrigins = origin1.disjunction(origin2);
 
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
@@ -260,16 +260,16 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
         CDD.addBddvar(BVs);
-        CDD compl = (new CDD(guards1).disjunction(new CDD(guards2))).negation();
+        CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
 
 
-        Location l0 = new Location("L0", noguard, true, false, false, false);
-        Location l1 = new Location("L1", noguard, false, false, false, false);
+        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, guards1, noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, guards2, noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
         Edge e2 = new Edge(l0, l1, i1, true, CDD.toGuardList(compl,clocks), noUpdate);
 
         List<Location> locations = new ArrayList<>();
@@ -353,13 +353,13 @@ public class BoolTest {
         inner1.addAll(boolGuards2);
         guards2.add(inner1);
 
-        Location l0 = new Location("L0", noguard, true, false, false, false);
-        Location l1 = new Location("L1", noguard, false, false, false, false);
+        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, guards1, noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, guards2, noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
@@ -396,5 +396,5 @@ public class BoolTest {
 
 
 //here: [cg: (x<1 && y≥2 && y≤7) || (x≤10 && y<2) || (x≤10 && y>7) || (x>10) - bg:()]
-    }*/
+    }
 }

@@ -34,7 +34,7 @@ public class State {
         return location.getInvariantCDD();
     }
 
-    public List<List<Guard>> getInvariants(List<Clock> relevantClocks) {
+    public Guard getInvariants(List<Clock> relevantClocks) {
         return CDD.toGuardList(location.getInvariantCDD(),relevantClocks);
     }
 

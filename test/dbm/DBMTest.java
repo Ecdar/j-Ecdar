@@ -27,7 +27,7 @@ public class DBMTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        Location l1 = new Location("L0", new ArrayList<>(), false, false, false, false);
+        Location l1 = new Location("L0", new TrueGuard(), false, false, false, false);
         SymbolicLocation sl1 = new SimpleLocation(l1);
 
         Clock x = new Clock("x");

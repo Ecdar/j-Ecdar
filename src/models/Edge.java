@@ -10,7 +10,7 @@ public class Edge {
     private  Location source, target;
     private  Channel chan;
     private  boolean isInput;
-    private  List<List<Guard>> guards;
+    private  Guard guards;
     private  List<Update> updates;
 
     public void setSource(Location source) {
@@ -33,12 +33,12 @@ public class Edge {
         isInput = input;
     }
 
-    public void setGuards(List<List<Guard>> guards) {
+    public void setGuards(Guard guards) {
         this.guards = guards;
     }
 
 
-    public Edge(Location source, Location target, Channel chan, boolean isInput, List<List<Guard>> guards, List<Update> updates) {
+    public Edge(Location source, Location target, Channel chan, boolean isInput, Guard guards, List<Update> updates) {
         this.source = source;
         this.target = target;
         this.chan = chan;
@@ -53,23 +53,18 @@ public class Edge {
         this.chan = copy.chan;
         this.isInput = copy.isInput;
 
-        this.guards = new ArrayList<>();
-        List<Guard> temp = new ArrayList<>();
-        for (List<Guard> guardList : copy.guards) {
-            for (Guard g: guardList) {
-                if (g instanceof ClockGuard)
-                    temp.add(new ClockGuard((ClockGuard) g,  clocks,oldClocks));
-                if (g instanceof BoolGuard)
-                    temp.add(new BoolGuard((BoolGuard) g, BVs, oldBVs));
-                if (g instanceof FalseGuard)
-                    temp.add(new FalseGuard());
-                if (g instanceof AndGuard)
-                    temp.add(new AndGuard( (AndGuard) g, clocks, oldClocks, BVs, oldBVs));
-                if (g instanceof OrGuard)
-                    temp.add(new OrGuard( (OrGuard) g, clocks, oldClocks, BVs, oldBVs));
-            }
-            this.guards.add(temp);
-        }
+        if (copy.guards instanceof ClockGuard)
+            this.guards =new ClockGuard((ClockGuard) copy.guards,  clocks,oldClocks);
+        if (copy.guards instanceof BoolGuard)
+            this.guards =new BoolGuard((BoolGuard) copy.guards, BVs, oldBVs);
+        if (copy.guards instanceof FalseGuard)
+            this.guards =new FalseGuard();
+        if (copy.guards instanceof TrueGuard)
+            this.guards =new TrueGuard();
+        if (copy.guards instanceof AndGuard)
+            this.guards =new AndGuard( (AndGuard) copy.guards, clocks, oldClocks, BVs, oldBVs);
+        if (copy.guards instanceof OrGuard)
+            this.guards =new OrGuard( (OrGuard) copy.guards, clocks, oldClocks, BVs, oldBVs);
 
         List<Update> updates = new ArrayList<>();
         for (Update update: copy.getUpdates())
@@ -102,15 +97,7 @@ public class Edge {
 
     public int getMaxConstant(Clock clock){
         int constant = 0;
-
-        for(List<Guard> guardList : guards) {
-            for (Guard guard : guardList) {
-                if (guard instanceof ClockGuard && !((ClockGuard) guard).isDiagonal() && clock.equals( ((ClockGuard) guard).getClock_i())) {
-                    if (((ClockGuard)guard).getBound() > constant) constant = ((ClockGuard) guard).getBound();
-                }
-            }
-        }
-
+        constant = guards.getMaxConstant();
         return constant;
     }
 
@@ -154,7 +141,7 @@ public class Edge {
         return isInput;
     }
 
-    public List<List<Guard>> getGuards() {
+    public Guard getGuards() {
         return guards;
     }
 
@@ -186,7 +173,7 @@ public class Edge {
                 chan.equals(that.chan) &&
                 // TODO: did the stream thing work?
                 //that.getGuardCDD().equiv(getGuardCDD()) &&
-                Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()) &&
+                guards.equals(that.guards) &&
                 Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(that.updates.toArray()).toArray());
     }
 
@@ -197,7 +184,6 @@ public class Edge {
                 chan.getName() +
                 (isInput? "?":"!")  +" - " +
                 guards +" - " +
-                Arrays.toString(this.guards.toArray()) +" - " +
                 Arrays.toString(this.updates.toArray()) +" - " +
                 target  + ")\n";
     }

@@ -139,8 +139,8 @@ public class XMLFileWriter {
 
             Element invarLabel = new Element("label");
             invarLabel.setAttribute("kind", "invariant");
-            String guardString ="";
-            int j=0;
+            String guardString = l.getInvariant().toString();
+/*            int j=0;
             for (List<Guard> list: l.getInvariant()) {
                 int i = 0;
                 String inner = "";
@@ -186,6 +186,8 @@ public class XMLFileWriter {
                     guardString += " || " + inner;
                 if (!guardString.isEmpty()) j++;
             }
+
+ */
             invarLabel.addContent(guardString.replaceAll("≤","<=").replaceAll("≥",">="));
             if (l.isInconsistent())
                 loc.setAttribute("color","#A66C0F");
@@ -232,9 +234,9 @@ public class XMLFileWriter {
 
             Element guardlabel = new Element("label");
             guardlabel.setAttribute("kind", "guard");
-            String guardString ="";
+            String guardString = e.getGuards().toString();
 
-
+/*
             int i= 0; int j=0;
             for (List<Guard> disjunction: e.getGuards()) {
                 if (j != 0)
@@ -277,13 +279,15 @@ public class XMLFileWriter {
                 j++;
 
             }
+
+ */
             guardlabel.addContent(guardString.replaceAll("≤","<=").replaceAll("≥",">="));
             edge.addContent(guardlabel);
 
             Element updatelabel = new Element("label");
             updatelabel.setAttribute("kind", "assignment");
             String updateString = "";
-            i= 0;
+            int i= 0;
             for (Update u: e.getUpdates()) {
 
                 if (u instanceof BoolUpdate)

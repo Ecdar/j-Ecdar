@@ -193,11 +193,11 @@ public class Zone {
         return false;
     }
 
-    public List<Guard> buildGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+    public Guard buildGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<Guard> guards = new ArrayList<>();
         guards.addAll(buildNormalGuardsFromZone(clocks,relevantClocks));
         guards.addAll(buildDiagonalConstraintsFromZone(clocks,relevantClocks));
-        return guards;
+        return new AndGuard(guards);
     }
 
     public List<ClockGuard> buildNormalGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {

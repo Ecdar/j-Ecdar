@@ -44,7 +44,8 @@ public class Move {
     public CDD getGuardCDD() {
         return (guardCDD);
     }
-    public List<List<Guard>> getGuards(List <Clock> relevantClocks) {
+
+    public Guard getGuards(List <Clock> relevantClocks) {
         return CDD.toGuardList(guardCDD, relevantClocks);
     }
 

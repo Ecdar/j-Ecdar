@@ -90,19 +90,18 @@ public class DisjunctionTest {
         List<Guard> disj1 = new ArrayList<>();
         disj1.add(g1);
         disj1.add(g2);
-        List<List<Guard>> dis1 = new ArrayList<>();
-        dis1.add(disj1);
+        Guard dis1 = new AndGuard(disj1);
         List<Guard> disj2 = new ArrayList<>();
         disj2.add(g3);
         disj2.add(g4);
-        List<List<Guard>> dis2 = new ArrayList<>();
-        dis2.add(disj2);
+        Guard dis2 = new AndGuard(disj2);
         List<Guard> disj3 = new ArrayList<>();
         disj3.add(g5);
         disj3.add(g6);
         disj3.add(g7);
-        List<List<Guard>> dis3 = new ArrayList<>();
-        dis3.add(disj3);
+        Guard dis3 = new AndGuard(disj3);
+
+
 
         CDD.done();
         CDD.init(1000,1000,1000);
@@ -118,7 +117,7 @@ public class DisjunctionTest {
         //disjunctedGuards.printDot();
         CDD neg = disjunctedGuards.negation();
         System.out.println("too");
-        List<List<Guard>> out = CDD.toGuardList(neg,clocks);
+        Guard out = CDD.toGuardList(neg,clocks);
 
 
         System.out.println(disjunctedGuards);

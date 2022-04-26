@@ -19,7 +19,6 @@ public class JSONParserTest {
     private static Automaton A, G, Q, Imp, Ref1;
     private static String AJsonString = "{\r\n  \"name\": \"A\",\r\n  \"declarations\": \"// comment\\nclock a;\\n// comment\\nclock b, z;\\n// comment\\nclock m;\",\r\n  \"locations\": [\r\n    {\r\n      \"id\": \"L2\",\r\n      \"nickname\": \"\",\r\n      \"invariant\": \"\",\r\n      \"type\": \"INITIAL\",\r\n      \"urgency\": \"NORMAL\",\r\n      \"x\": 240.0,\r\n      \"y\": 350.0,\r\n      \"color\": \"3\",\r\n      \"nicknameX\": 30.0,\r\n      \"nicknameY\": -10.0,\r\n      \"invariantX\": 30.0,\r\n      \"invariantY\": 10.0\r\n    }\r\n  ],\r\n  \"edges\": [\r\n    {\r\n      \"sourceLocation\": \"L2\",\r\n      \"targetLocation\": \"L2\",\r\n      \"status\": \"INPUT\",\r\n      \"select\": \"\",\r\n      \"guard\": \"\",\r\n      \"update\": \"\",\r\n      \"sync\": \"bad\",\r\n      \"isLocked\": false,\r\n      \"nails\": [\r\n        {\r\n          \"x\": 270.0,\r\n          \"y\": 290.0,\r\n          \"propertyType\": \"SYNCHRONIZATION\",\r\n          \"propertyX\": 10.0,\r\n          \"propertyY\": -10.0\r\n        },\r\n        {\r\n          \"x\": 280.0,\r\n          \"y\": 330.0,\r\n          \"propertyType\": \"NONE\",\r\n          \"propertyX\": 0.0,\r\n          \"propertyY\": 0.0\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"sourceLocation\": \"L2\",\r\n      \"targetLocation\": \"L2\",\r\n      \"status\": \"INPUT\",\r\n      \"select\": \"\",\r\n      \"guard\": \"\",\r\n      \"update\": \"\",\r\n      \"sync\": \"good\",\r\n      \"isLocked\": false,\r\n      \"nails\": [\r\n        {\r\n          \"x\": 200.0,\r\n          \"y\": 290.0,\r\n          \"propertyType\": \"SYNCHRONIZATION\",\r\n          \"propertyX\": 10.0,\r\n          \"propertyY\": -10.0\r\n        },\r\n        {\r\n          \"x\": 190.0,\r\n          \"y\": 340.0,\r\n          \"propertyType\": \"NONE\",\r\n          \"propertyX\": 0.0,\r\n          \"propertyY\": 0.0\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"sourceLocation\": \"L2\",\r\n      \"targetLocation\": \"L2\",\r\n      \"status\": \"OUTPUT\",\r\n      \"select\": \"\",\r\n      \"guard\": \"\",\r\n      \"update\": \"\",\r\n      \"sync\": \"button1\",\r\n      \"isLocked\": false,\r\n      \"nails\": [\r\n        {\r\n          \"x\": 240.0,\r\n          \"y\": 410.0,\r\n          \"propertyType\": \"SYNCHRONIZATION\",\r\n          \"propertyX\": -10.0,\r\n          \"propertyY\": 20.0\r\n        },\r\n        {\r\n          \"x\": 270.0,\r\n          \"y\": 400.0,\r\n          \"propertyType\": \"NONE\",\r\n          \"propertyX\": 0.0,\r\n          \"propertyY\": 0.0\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"description\": \"\",\r\n  \"x\": 5.0,\r\n  \"y\": 5.0,\r\n  \"width\": 450.0,\r\n  \"height\": 600.0,\r\n  \"color\": \"3\",\r\n  \"includeInPeriodicCheck\": false\r\n}";
 
-    private static final List<List<Guard>> emptyGuards = new ArrayList<>();
     private static final List<Update> emptyUpdates = new ArrayList<>();
     private static final List<Clock> emptyClocks = new ArrayList<>();
 
@@ -33,34 +32,34 @@ public class JSONParserTest {
                 "Components/Imp.json"};
         machines = JSONParser.parse(base, components, false);
 
-        Location l0 = new Location("L0", emptyGuards, true, false, false, false);
-        Location l1 = new Location("L1", emptyGuards, false, false, false, false);
-        Location l2 = new Location("L2", emptyGuards, true, false, false, false);
-        Location l3 = new Location("L3", emptyGuards, true, false, false, false);
-        Location l5 = new Location("L5", emptyGuards, true, false, false, false);
-        Location u0 = new Location("U0", emptyGuards, false, false, true, false);
+        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
+        Location l2 = new Location("L2", new TrueGuard(), true, false, false, false);
+        Location l3 = new Location("L3", new TrueGuard(), true, false, false, false);
+        Location l5 = new Location("L5", new TrueGuard(), true, false, false, false);
+        Location u0 = new Location("U0", new TrueGuard(), false, false, true, false);
 
         Channel button1 = new Channel("button1");
         Channel button2 = new Channel("button2");
         Channel good = new Channel("good");
         Channel bad = new Channel("bad");
 
-        Edge t1 = new Edge(l2, l2, bad, true, emptyGuards, emptyUpdates);
-        Edge t2 = new Edge(l2, l2, good, true, emptyGuards, emptyUpdates);
-        Edge t3 = new Edge(l2, l2, button1, false, emptyGuards, emptyUpdates);
-        Edge t4 = new Edge(l3, l3, button1, true, emptyGuards, emptyUpdates);
-        Edge t5 = new Edge(l3, l3, button2, true, emptyGuards, emptyUpdates);
-        Edge t6 = new Edge(l3, l3, good, false, emptyGuards, emptyUpdates);
-        Edge t7 = new Edge(l5, u0, button2, true, emptyGuards, emptyUpdates);
-        Edge t8 = new Edge(l5, l5, good, false, emptyGuards, emptyUpdates);
-        Edge t9 = new Edge(l5, l5, button1, true, emptyGuards, emptyUpdates);
-        Edge t10 = new Edge(l0, l0, button1, true, emptyGuards, emptyUpdates);
-        Edge t11 = new Edge(l0, l0, good, false, emptyGuards, emptyUpdates);
-        Edge t12 = new Edge(l1, l1, button1, true, emptyGuards, emptyUpdates);
-        Edge t13 = new Edge(l1, l1, button2, true, emptyGuards, emptyUpdates);
-        Edge t14 = new Edge(l1, l1, good, false, emptyGuards, emptyUpdates);
-        Edge t15 = new Edge(l1, l1, bad, false, emptyGuards, emptyUpdates);
-        Edge t16 = new Edge(l0, l1, button2, true, emptyGuards, emptyUpdates);
+        Edge t1 = new Edge(l2, l2, bad, true, new TrueGuard(), emptyUpdates);
+        Edge t2 = new Edge(l2, l2, good, true, new TrueGuard(), emptyUpdates);
+        Edge t3 = new Edge(l2, l2, button1, false, new TrueGuard(), emptyUpdates);
+        Edge t4 = new Edge(l3, l3, button1, true, new TrueGuard(), emptyUpdates);
+        Edge t5 = new Edge(l3, l3, button2, true, new TrueGuard(), emptyUpdates);
+        Edge t6 = new Edge(l3, l3, good, false, new TrueGuard(), emptyUpdates);
+        Edge t7 = new Edge(l5, u0, button2, true, new TrueGuard(), emptyUpdates);
+        Edge t8 = new Edge(l5, l5, good, false, new TrueGuard(), emptyUpdates);
+        Edge t9 = new Edge(l5, l5, button1, true, new TrueGuard(), emptyUpdates);
+        Edge t10 = new Edge(l0, l0, button1, true, new TrueGuard(), emptyUpdates);
+        Edge t11 = new Edge(l0, l0, good, false, new TrueGuard(), emptyUpdates);
+        Edge t12 = new Edge(l1, l1, button1, true, new TrueGuard(), emptyUpdates);
+        Edge t13 = new Edge(l1, l1, button2, true, new TrueGuard(), emptyUpdates);
+        Edge t14 = new Edge(l1, l1, good, false, new TrueGuard(), emptyUpdates);
+        Edge t15 = new Edge(l1, l1, bad, false, new TrueGuard(), emptyUpdates);
+        Edge t16 = new Edge(l0, l1, button2, true, new TrueGuard(), emptyUpdates);
 
         Clock a = new Clock("a");
         Clock b = new Clock("b");
@@ -94,13 +93,13 @@ public class JSONParserTest {
 
         ClockUpdate u1 = new ClockUpdate(x, 0);
 
-        Location l12 = new Location("L12", emptyGuards, true, false, false, false);
-        Location l13 = new Location("L13", emptyGuards, false, false, false, false);
-        Location l14 = new Location("L14", emptyGuards, false, false, false, false);
-        Location l15 = new Location("L15", new ArrayList<>(Collections.singletonList(Collections.singletonList(inv_l15))), false, false, false, false);
-        Location l16 = new Location("L16", emptyGuards, false, false, false, false);
-        Location l17 = new Location("L17", emptyGuards, false, false, false, false);
-        Location l18 = new Location("L18", emptyGuards, false, false, false, false);
+        Location l12 = new Location("L12", new TrueGuard(), true, false, false, false);
+        Location l13 = new Location("L13", new TrueGuard(), false, false, false, false);
+        Location l14 = new Location("L14", new TrueGuard(), false, false, false, false);
+        Location l15 = new Location("L15", inv_l15, false, false, false, false);
+        Location l16 = new Location("L16", new TrueGuard(), false, false, false, false);
+        Location l17 = new Location("L17", new TrueGuard(), false, false, false, false);
+        Location l18 = new Location("L18", new TrueGuard(), false, false, false, false);
 
         Channel i1 = new Channel("i1");
         Channel i2 = new Channel("i2");
@@ -120,19 +119,19 @@ public class JSONParserTest {
         Channel o10 = new Channel("o10");
 
 
-        t1 = new Edge(l12, l14, i2, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l14))), emptyUpdates);
-        t2 = new Edge(l12, l17, i3, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l17))), emptyUpdates);
-        t3 = new Edge(l12, l15, i4, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l15))), new ArrayList<>(){{add(u1);}});
-        t4 = new Edge(l12, l16, i5, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l16))), emptyUpdates);
-        t5 = new Edge(l17, l18, o8, false, emptyGuards, new ArrayList<>(){{add(u1);}});
-        t6 = new Edge(l16, l18, o8, false, emptyGuards, emptyUpdates);
-        t7 = new Edge(l15, l18, o8, false, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l15_l18))), emptyUpdates);
-        t8 = new Edge(l14, l18, o8, false, emptyGuards, emptyUpdates);
-        t9 = new Edge(l13, l18, o8, false, emptyGuards, emptyUpdates);
-        t10 = new Edge(l17, l17, o3, false, emptyGuards, emptyUpdates);
-        t11 = new Edge(l17, l17, o5, false, emptyGuards, emptyUpdates);
-        t12 = new Edge(l17, l14, i6, true, emptyGuards, emptyUpdates);
-        t13 = new Edge(l12, l13, i1, true, new ArrayList<>(Collections.singletonList(Collections.singletonList(g_l12_l13))), emptyUpdates);
+        t1 = new Edge(l12, l14, i2, true, g_l12_l14, emptyUpdates);
+        t2 = new Edge(l12, l17, i3, true, g_l12_l17, emptyUpdates);
+        t3 = new Edge(l12, l15, i4, true, g_l12_l15, new ArrayList<>(){{add(u1);}});
+        t4 = new Edge(l12, l16, i5, true, g_l12_l16, emptyUpdates);
+        t5 = new Edge(l17, l18, o8, false, new TrueGuard(), new ArrayList<>(){{add(u1);}});
+        t6 = new Edge(l16, l18, o8, false, new TrueGuard(), emptyUpdates);
+        t7 = new Edge(l15, l18, o8, false, g_l15_l18, emptyUpdates);
+        t8 = new Edge(l14, l18, o8, false, new TrueGuard(), emptyUpdates);
+        t9 = new Edge(l13, l18, o8, false, new TrueGuard(), emptyUpdates);
+        t10 = new Edge(l17, l17, o3, false, new TrueGuard(), emptyUpdates);
+        t11 = new Edge(l17, l17, o5, false, new TrueGuard(), emptyUpdates);
+        t12 = new Edge(l17, l14, i6, true, new TrueGuard(), emptyUpdates);
+        t13 = new Edge(l12, l13, i1, true, g_l12_l13, emptyUpdates);
 
         Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),
                 new ArrayList<>(Arrays.asList(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)), new ArrayList<>(Arrays.asList(x, y)), BVs, false);

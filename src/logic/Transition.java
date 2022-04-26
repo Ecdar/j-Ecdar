@@ -60,7 +60,7 @@ public  class Transition {
         return move.getEdges();
     }
 
-    public List<List<Guard>> getGuards(List <Clock> relevantClocks ) {
+    public Guard getGuards(List <Clock> relevantClocks ) {
         return move.getGuards( relevantClocks);
     }
 

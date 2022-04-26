@@ -7,7 +7,7 @@ import java.util.List;
 public class Location {
 
     private final String name;
-    private List<List<Guard>> invariant;
+    private Guard invariant;
     private int x,y;
 
     public CDD getInconsistentPart() {
@@ -39,7 +39,7 @@ public class Location {
         return isInconsistent;
     }
 
-    public void setInvariant(List<List<Guard>> invariant) {
+    public void setInvariant(Guard invariant) {
         this.invariant = invariant;
     }
 
@@ -76,7 +76,7 @@ public class Location {
 
 
 
-    public Location(String name, List<List<Guard>> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
+    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
         this.name = name;
         this.invariant = invariant;
         this.isInitial = isInitial;
@@ -85,7 +85,7 @@ public class Location {
         this.isInconsistent = isInconsistent || this.getName().equals("inc");
         this.inconsistentPart = null;
     }
-    public Location(String name, List<List<Guard>> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
+    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
         this.name = name;
         this.invariant = invariant;
         this.isInitial = isInitial;
@@ -100,21 +100,19 @@ public class Location {
     public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs){
         this.name = copy.name;
 
-        this.invariant = new ArrayList<>();
-        for (List<Guard> list : copy.invariant) {
-            List<Guard> interm = new ArrayList<Guard>();
-            for (Guard g : list) {
-                if (g instanceof  ClockGuard)
-                    interm.add(new ClockGuard((ClockGuard) g, newClocks,oldClocks));
-                if (g instanceof  BoolGuard)
-                    interm.add(new BoolGuard((BoolGuard) g, newBVs,oldBVs));
-                if (g instanceof AndGuard)
-                    interm.add(new AndGuard( (AndGuard) g, newClocks, oldClocks, newBVs, oldBVs));
-                if (g instanceof OrGuard)
-                    interm.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
-            }
-            this.invariant.add(interm);
-        }
+
+        if (copy.getInvariant() instanceof  ClockGuard)
+            invariant = (new ClockGuard((ClockGuard) copy.getInvariant(), newClocks,oldClocks));
+        if (copy.getInvariant() instanceof  BoolGuard)
+            invariant = (new BoolGuard((BoolGuard) copy.getInvariant(), newBVs,oldBVs));
+        if (copy.getInvariant() instanceof AndGuard)
+            invariant = (new AndGuard( (AndGuard) copy.getInvariant(), newClocks, oldClocks, newBVs, oldBVs));
+        if (copy.getInvariant() instanceof OrGuard)
+            invariant = (new OrGuard( (OrGuard) copy.getInvariant(), newClocks, oldClocks, newBVs, oldBVs));
+        if (copy.getInvariant() instanceof FalseGuard)
+            invariant = (new FalseGuard());
+        if (copy.getInvariant() instanceof TrueGuard)
+            invariant = (new TrueGuard());
 
         this.isInitial = copy.isInitial;
         this.isUrgent = copy.isUrgent;
@@ -126,7 +124,7 @@ public class Location {
         return name;
     }
 
-    public List<List<Guard>> getInvariant() {
+    public Guard getInvariant() {
         return invariant;
     }
 
@@ -140,16 +138,7 @@ public class Location {
 
     public int getMaxConstant(Clock clock){
         int constant = 0;
-
-        for (List<Guard> list : invariant) {
-            for(Guard guard : list) {
-
-                if (guard instanceof ClockGuard && !((ClockGuard) guard).isDiagonal() && clock.equals( ((ClockGuard) guard).getClock_i())) {
-                    if (((ClockGuard)guard).getBound() > constant) constant = ((ClockGuard) guard).getBound();
-                }
-            }
-        }
-
+        constant = invariant.getMaxConstant();
         return constant;
     }
 
@@ -158,23 +147,14 @@ public class Location {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Location location = (Location) o;
-        boolean invarsMatch = true;
-        if (invariant.size()!=location.invariant.size())
-            invarsMatch = false;
-        else
-            for (int i=0; i<invariant.size();i++)
-            {
-                invarsMatch = invarsMatch && Arrays.equals(invariant.get(i).toArray(), location.invariant.get(i).toArray());
-            }
-        assert(invarsMatch ==
-                Arrays.equals(invariant.toArray(), location.invariant.toArray()) );
+
 
         return isInitial == location.isInitial &&
                 isUrgent == location.isUrgent &&
                 isUniversal == location.isUniversal &&
                 isInconsistent == location.isInconsistent &&
                 name.equals(location.name) &&
-                invarsMatch;
+                invariant.equals(location.invariant);
     }
 
     @Override

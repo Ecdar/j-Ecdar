@@ -162,7 +162,7 @@ public class XMLParser {
             String locName = loc.getAttributeValue("id");
             boolean isInitial = locName.equals(initId);
             List<Element> labels = loc.getChildren("label");
-            List<List<Guard>> invariants = new ArrayList<>();
+            Guard invariants = new TrueGuard();
             int x=0,y=0;
             boolean xyDefined = false;
 
@@ -177,6 +177,8 @@ public class XMLParser {
                 if (label.getAttributeValue("kind").equals("invariant")) {
                     if (!label.getText().isEmpty())
                         invariants = addInvariants(label.getText(), clocks, BVs);
+                    else
+                        invariants = new TrueGuard();
                 }
             }
 
@@ -227,7 +229,7 @@ public class XMLParser {
             Location target = findLocations(locations, edge.getChild("target").getAttributeValue("ref"));
 
             List<Element> labels = edge.getChildren("label");
-            List<List<Guard>> guards = new ArrayList<>();
+            Guard guards = new TrueGuard();
             List<Update> updates = new ArrayList<>();
             Channel chan = null;
 
@@ -295,78 +297,80 @@ public class XMLParser {
         return chan;
     }
 
-    private static List<List<Guard>> addGuards(String text, List<Clock> clockList, List<BoolVar> boolList) {
-        List<List<Guard>> guardList = new ArrayList<>();
+    private static Guard addGuards(String text, List<Clock> clockList, List<BoolVar> boolList) {
+        List<Guard> orParts = new ArrayList<>();
         for (String part : text.split("or")) {
-            List<Guard> list = new ArrayList<>();
+            List<Guard> andParts = new ArrayList<>();
 
             String[] rawInvariants = part.split("&&");
 
             for (String invariant : rawInvariants) {
-                invariant = invariant.replaceAll(" ", "");
-                String symbol = "";
-                Relation rel=null;
-                boolean isEq, isGreater, isStrict, isUnequal;
-                isEq = false;
-                isGreater = false;
-                isStrict = false;
-                isUnequal = false;
+                if (invariant.equals("false"))
+                    andParts.add(new FalseGuard());
+                else if (invariant.equals("true"))
+                    andParts.add(new TrueGuard());
+                else {
+                    invariant = invariant.replaceAll(" ", "");
+                    String symbol = "";
+                    Relation rel = null;
+                    boolean isEq, isGreater, isStrict, isUnequal;
+                    isEq = false;
+                    isGreater = false;
+                    isStrict = false;
+                    isUnequal = false;
 
-                if (invariant.contains("==")) {
-                    symbol = "==";
-                    rel=Relation.EQUAL;
-                    isEq = true;
-                } else if (invariant.contains(">=")) {
-                    symbol = ">=";
-                    rel= Relation.GREATER_EQUAL;
-                    isGreater = true;
-                } else if (invariant.contains("<=")) {
-                    symbol = "<=";
-                    rel = Relation.LESS_EQUAL;
-                } else if (invariant.contains(">")) {
-                    symbol = ">";
-                    rel = Relation.GREATER_THAN;
-                    isGreater = true;
-                    isStrict = true;
-                } else if (invariant.contains("<")) {
-                    rel = Relation.LESS_THAN;
-                    symbol = "<";
-                    isStrict = true;
+                    if (invariant.contains("==")) {
+                        symbol = "==";
+                        rel = Relation.EQUAL;
+                        isEq = true;
+                    } else if (invariant.contains(">=")) {
+                        symbol = ">=";
+                        rel = Relation.GREATER_EQUAL;
+                        isGreater = true;
+                    } else if (invariant.contains("<=")) {
+                        symbol = "<=";
+                        rel = Relation.LESS_EQUAL;
+                    } else if (invariant.contains(">")) {
+                        symbol = ">";
+                        rel = Relation.GREATER_THAN;
+                        isGreater = true;
+                        isStrict = true;
+                    } else if (invariant.contains("<")) {
+                        rel = Relation.LESS_THAN;
+                        symbol = "<";
+                        isStrict = true;
+                    } else if (invariant.contains("!=")) {
+                        rel = Relation.NOT_EQUAL;
+                        symbol = "!=";
+                        isStrict = true;
+                        isUnequal = true;
+
+                    } else {
+                        System.out.println(invariant);
+                        assert (false);
+                    }
+                    String[] inv = invariant.split(symbol);
+                    Clock clk = findClock(clockList, inv[0]);
+                    if (clk != null) {
+
+                        ClockGuard newInv;
+
+                        newInv = new ClockGuard(clk, Integer.parseInt(inv[1]), rel);
+
+                        andParts.add(newInv);
+                    }
+                    BoolVar bl = findBV(boolList, inv[0]);
+
+                    if (bl != null) {
+                        BoolGuard newInv;
+                        newInv = new BoolGuard(bl, symbol, Boolean.valueOf(inv[1]));
+                        andParts.add(newInv);
+                    }
                 }
-                else if (invariant.contains("!=")) {
-                    rel= Relation.NOT_EQUAL;
-                    symbol = "!=";
-                    isStrict = true;
-                    isUnequal=true;
-
-                }
-                else
-                {
-                    System.out.println(invariant);
-                    assert(false);
-                }
-                String[] inv = invariant.split(symbol);
-                Clock clk = findClock(clockList, inv[0]);
-                if (clk != null) {
-
-                    ClockGuard newInv;
-
-                    newInv = new ClockGuard(clk, Integer.parseInt(inv[1]), rel);
-
-                    list.add(newInv);
-                }
-                BoolVar bl = findBV(boolList, inv[0]);
-
-                if(bl!=null) {
-                    BoolGuard newInv;
-                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
-                    list.add(newInv);
-                }
-
             }
-            guardList.add(list);
+            orParts.add(new AndGuard(andParts));
         }
-        return guardList;
+        return new OrGuard(orParts);
     }
 /*
     private static List<BoolGuard> addBoolGuards(String text, List<BoolVar> boolList) {
@@ -424,81 +428,84 @@ public class XMLParser {
         return guardList;
     }
 */
-    private static List<List<Guard>> addInvariants(String text, List<Clock> clockList, List<BoolVar> boolList) {
-        List<List<Guard>> outerList = new ArrayList<>();
+    private static Guard addInvariants(String text, List<Clock> clockList, List<BoolVar> boolList) {
+        List<Guard> orParts = new ArrayList<>();
 
         String[] disj = text.split("or");
 
         for (String outer : disj) {
-            List<Guard> list = new ArrayList<>();
+            List<Guard> andParts = new ArrayList<>();
             String[] rawInvariants = outer.split("&&");
 
             for (String invariant : rawInvariants) {
-                invariant = invariant.replaceAll(" ", "");
-                String symbol = "";
-                boolean isEq, isGreater, isStrict;
-                isEq = false;
-                isGreater = false;
-                isStrict = false;
+                if (invariant.equals("false"))
+                    andParts.add(new FalseGuard());
+                else if (invariant.equals("true"))
+                    andParts.add(new TrueGuard());
+                else {
+                    invariant = invariant.replaceAll(" ", "");
+                    String symbol = "";
+                    boolean isEq, isGreater, isStrict;
+                    isEq = false;
+                    isGreater = false;
+                    isStrict = false;
 
-                Relation rel =null;
+                    Relation rel = null;
 
-                if (invariant.contains("==")) {
-                    symbol = "==";
-                    rel=Relation.EQUAL;
-                    isEq = true;
-                } else if (invariant.contains(">=")) {
-                    symbol = ">=";
-                    rel= Relation.GREATER_EQUAL;
-                    isGreater = true;
-                } else if (invariant.contains("<=")) {
-                    symbol = "<=";
-                    rel = Relation.LESS_EQUAL;
-                } else if (invariant.contains(">")) {
-                    symbol = ">";
-                    rel = Relation.GREATER_THAN;
-                    isGreater = true;
-                    isStrict = true;
-                } else if (invariant.contains("<")) {
-                    rel = Relation.LESS_THAN;
-                    symbol = "<";
-                    isStrict = true;
+                    if (invariant.contains("==")) {
+                        symbol = "==";
+                        rel = Relation.EQUAL;
+                        isEq = true;
+                    } else if (invariant.contains(">=")) {
+                        symbol = ">=";
+                        rel = Relation.GREATER_EQUAL;
+                        isGreater = true;
+                    } else if (invariant.contains("<=")) {
+                        symbol = "<=";
+                        rel = Relation.LESS_EQUAL;
+                    } else if (invariant.contains(">")) {
+                        symbol = ">";
+                        rel = Relation.GREATER_THAN;
+                        isGreater = true;
+                        isStrict = true;
+                    } else if (invariant.contains("<")) {
+                        rel = Relation.LESS_THAN;
+                        symbol = "<";
+                        isStrict = true;
+                    } else if (invariant.contains("!=")) {
+                        assert (false); // would require a disjunction of ClockGuards at this point, which needs refactoring
+                        rel = Relation.NOT_EQUAL;
+                        symbol = "!=";
+                        isStrict = true;
+
+                    } else assert (false);
+                    String[] inv = invariant.split(symbol);
+                    Clock clk = findClock(clockList, inv[0]);
+
+
+                    if (clk != null) {
+
+                        ClockGuard newInv;
+
+                        newInv = new ClockGuard(clk, Integer.parseInt(inv[1]), rel);
+
+                        andParts.add(newInv);
+                    }
+                    BoolVar bl = findBV(boolList, inv[0]);
+
+                    if (bl != null) {
+                        BoolGuard newInv;
+                        newInv = new BoolGuard(bl, symbol, Boolean.valueOf(inv[1]));
+                        andParts.add(newInv);
+                    }
                 }
-                else if (invariant.contains("!=")) {
-                    assert(false); // would require a disjunction of ClockGuards at this point, which needs refactoring
-                    rel= Relation.NOT_EQUAL;
-                    symbol = "!=";
-                    isStrict = true;
-
-                }
-                else assert(false);
-                String[] inv = invariant.split(symbol);
-                Clock clk = findClock(clockList, inv[0]);
-
-
-                if (clk != null) {
-
-                    ClockGuard newInv;
-
-                    newInv = new ClockGuard(clk, Integer.parseInt(inv[1]), rel);
-
-                    list.add(newInv);
-                }
-                BoolVar bl = findBV(boolList, inv[0]);
-
-                if(bl!=null) {
-                    BoolGuard newInv;
-                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
-                    list.add(newInv);
-                }
-
 
             }
 
-            outerList.add(list);
+            orParts.add(new AndGuard(andParts));
         }
 
-        return outerList;
+        return new OrGuard(orParts);
     }
 
     private static List<Update> addUpdates(String text, List<Clock> clockList, List<BoolVar> boolList) {

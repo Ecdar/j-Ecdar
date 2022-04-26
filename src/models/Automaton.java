@@ -129,7 +129,7 @@ public class Automaton {
         if (loc.isUniversal()) {
             List<Edge> resultEdges = new ArrayList<>();
             for (Channel action : actions) {
-                resultEdges.add(new Edge(loc, loc, action, inputAct.contains(action), new ArrayList<>(), new ArrayList<>()));
+                resultEdges.add(new Edge(loc, loc, action, inputAct.contains(action), new TrueGuard(), new ArrayList<>()));
             }
             return resultEdges;
         }
