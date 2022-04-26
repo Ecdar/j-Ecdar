@@ -289,12 +289,115 @@ public class BoolTest {
 
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
         XMLFileWriter.toXML("booltest2.xml",new SimpleTransitionSystem(aut));
+        assert(new SimpleTransitionSystem(aut).isDeterministic()); // no idea if it is...
         CDD.done();
         assert(true);
 //here: [cg: (x<1 && y≥2 && y≤7) || (x≤10 && y<2) || (x≤10 && y>7) || (x>10) - bg:()]
     }
 
 
+    @Test
+    public void sameButNowMakeInputEnabled() {
+        Clock x = new Clock("x");
+        Clock y = new Clock("y");
+        BoolVar a = new BoolVar("a",false);
+        BoolVar b = new BoolVar("b",true);
+        List<BoolVar> BVs = new ArrayList<>();
+        BVs.add(a); BVs.add(b);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.add(x);
+        clocks.add(y);
+        List<BoolVar> bools = new ArrayList<>();
+        bools.add(a);
+        bools.add(b);
+
+        List<Update> noUpdate = new ArrayList<>();
+        List<List<Guard>> noguard = new ArrayList<>();
+
+        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
+        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
+        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
+        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+
+        ClockGuard g5= new ClockGuard(x, 6, Relation.LESS_EQUAL);
+        ClockGuard g6 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
+        ClockGuard g7 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
+        ClockGuard g8 = new ClockGuard(y, 6, Relation.GREATER_EQUAL);
+
+
+        BoolGuard bg_a_false = new BoolGuard(a, "==",false);
+        BoolGuard bg_b_false = new BoolGuard(b, "==",false);
+        BoolGuard bg_a_true = new BoolGuard(a, "==",true);
+        BoolGuard bg_b_true = new BoolGuard(b, "==",true);
+
+        List<Guard> boolGuards1 = new ArrayList<>();
+        List<Guard> boolGuards2 = new ArrayList<>();
+        List<Guard> boolGuards3 = new ArrayList<>();
+        boolGuards1.add(bg_a_false);
+        boolGuards1.add(bg_b_false);
+
+        boolGuards2.add(bg_a_false);
+        boolGuards2.add(bg_a_true);
+
+        boolGuards3.add(bg_a_true);
+        boolGuards3.add(bg_a_true);
+
+
+        List<List<Guard>> guards1 = new ArrayList<>();
+        List<Guard> inner = new ArrayList<>();
+        inner.add(g1);
+        inner.add(g2);
+        inner.add(g3);
+        inner.add(g4);
+        inner.addAll(boolGuards1);
+        guards1.add(inner);
+
+        List<List<Guard>> guards2 = new ArrayList<>();
+        List<Guard> inner1 = new ArrayList<>();
+        inner1.add(g5);
+        inner1.add(g6);
+        inner1.add(g7);
+        inner1.add(g8);
+        inner1.addAll(boolGuards2);
+        guards2.add(inner1);
+
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks();
+        CDD.addBddvar(BVs);
+        CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
+
+
+        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
+
+        Channel i1 = new Channel("i1");
+
+        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
+        Edge e2 = new Edge(l0, l1, i1, true, CDD.toGuardList(compl,clocks), noUpdate);
+
+        List<Location> locations = new ArrayList<>();
+        locations.add(l0);
+        locations.add(l1);
+
+        List<Edge> edges = new ArrayList<>();
+        edges.add(e0);
+        edges.add(e1);
+        edges.add(e2);
+        System.out.println(e0);
+        System.out.println(e1);
+
+
+
+        CDD.done();
+
+        Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,true);
+        XMLFileWriter.toXML("booltest2.xml",new SimpleTransitionSystem(aut));
+        assert(new SimpleTransitionSystem(aut).isDeterministic()); // no idea if it is...
+
+        assert(true);
+//here: [cg: (x<1 && y≥2 && y≤7) || (x≤10 && y<2) || (x≤10 && y>7) || (x>10) - bg:()]
+    }
 
 
 
@@ -381,7 +484,7 @@ public class BoolTest {
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
         XMLFileWriter.toXML("BoolAutomaton.xml",new Automaton[]{aut});
         Automaton newAut = XMLParser.parse("boolAutomaton.xml",false)[0];
-
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());
         assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(newAut)).check());

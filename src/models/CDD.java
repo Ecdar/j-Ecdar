@@ -115,6 +115,7 @@ public class CDD {
     }
 
     public static Guard toGuardList(CDD state, List<Clock> relevantClocks){
+        System.out.println("turning to guard");
         CDD copy = new CDD(state.pointer);
         copy = copy.removeNegative().reduce();
         if (copy.equiv(cddFalse())) // special case for guards
@@ -148,18 +149,31 @@ public class CDD {
     }
 
     public static Guard toBoolGuards(CDD bdd){
+
+        System.out.println("a");
         if (bdd.isFalse()) {
+
+            System.out.println("b");
             return new FalseGuard();
         }
         if (bdd.isTrue())
             return new TrueGuard();
+
+        System.out.println("c");
         assert(bdd.isBDD());
-        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(bdd.getPointer(),numBools));
+
+        System.out.println("d + numBools" + numBools);
+        bdd.printDot("testCDD.txt");
+
+        long ptr = bdd.getPointer();
+        System.out.println("e");
+        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr,numBools));
 
         List<Guard> orParts = new ArrayList<>();
         System.out.println(arrays.numTraces + " " + arrays.numBools + " " + BVs.size() + " " + numBools + " " + bddStartLevel);
         for (int i=0; i< arrays.numTraces; i++)
         {
+            System.out.println("f");
             List<Guard> andParts = new ArrayList<>();
             for (int j=0; j< arrays.numBools; j++)
             {

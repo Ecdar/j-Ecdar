@@ -56,9 +56,11 @@ public class Automaton {
         if (makeInpEnabled) {
             CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
             CDD.addClocks(clocks);
-            //CDD.addBddvar(BVs); TODO!
+            CDD.addBddvar(BVs);
             addTargetInvariantToEdges();
+            System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
             makeInputEnabled();
+            System.out.println("PFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
             CDD.done();
         }
     }

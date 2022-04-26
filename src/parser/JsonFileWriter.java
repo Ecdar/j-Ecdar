@@ -168,7 +168,10 @@ public class JsonFileWriter {
         {
             localDecString+= "clock " + c.getName() + "; ";
         }
-
+        for (BoolVar bv : aut.getBVs())
+        {
+            localDecString+= "bool " + bv.getName() + "; ";
+        }
 
 
         JSONObject finalJSON = new JSONObject();

@@ -122,7 +122,6 @@ public class XMLFileWriter {
 
         for (BoolVar bv : automaton.getBVs())
         {
-            System.out.println("reached bvs");
             localDecString+= "bool " + bv.getName() + "=" + bv.getInitialValue()+ "; ";
         }
         localDeclaration.addContent(localDecString);
