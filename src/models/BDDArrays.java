@@ -27,7 +27,9 @@ public class BDDArrays {
         if(vars != null){
             return vars;
         }else{
-            return(CDDLib.getVarsFromBDDArray(pointer));
+
+            CDDLib.getVarsFromBDDArray(pointer);
+            return null;//new CDD(CDDLib.getVarsFromBDDArray(pointer));
         }
     }
 
@@ -37,7 +39,8 @@ public class BDDArrays {
         if(values != null){
             return values;
         }else{
-            return (CDDLib.getValuesFromBDDArray(pointer));
+            CDDLib.getValuesFromBDDArray(pointer);
+            return null;//(CDDLib.getValuesFromBDDArray(pointer));
         }
     }
 

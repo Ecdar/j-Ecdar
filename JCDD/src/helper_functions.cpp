@@ -53,24 +53,18 @@ dbm::fed_t helper_functions::javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize 
     return cFed;
 }
 
-jobjectArray helper_functions::cPointerToJavaArray(
-        JNIEnv *env,
-         int** arrayPointer, int numArrays, int lengthArrays) {
+jintArray helper_functions::cPointerToJavaArray(
+        JNIEnv *env, const int *arrayPointer, jsize len) {
 
-    // Get the int array class
-    jclass cls = env->FindClass("[I");
-
-    jintArray iniVal = env->NewIntArray(lengthArrays);
-    // Create the returnable jobjectArray with an initial value
-    jobjectArray outer = env->NewObjectArray(numArrays,cls, iniVal);
-
-    for (int i = 0; i < numArrays; i++)
-    {
-        jintArray inner = env->NewIntArray(lengthArrays);
-        env->SetIntArrayRegion(inner, 0, lengthArrays, arrayPointer[i]);
-        // set inner's values
-        env->SetObjectArrayElement(outer, i, inner);
-        env->DeleteLocalRef(inner);
-    }
-    return outer;
+        // convert updated array to jintArray
+        jintArray newT = env->NewIntArray(len);
+        if(newT == NULL){
+            return NULL; // out of memory error
+        }
+        jint arr[len];
+        for (int i = 0; i < len; i++) {
+            arr[i] = t[i];
+        }
+        env->SetIntArrayRegion(newT, 0, len, arr);
+        return newT;
 }

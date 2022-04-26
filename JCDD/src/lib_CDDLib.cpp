@@ -626,21 +626,23 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_bddToArray
  * Class:     lib_CDDLib
  * Method:    getVarsFromBDDArray
  */
-JNIEXPORT jobjectArray JNICALL Java_lib_CDDLib_getVarsFromBDDArray
+JNIEXPORT jintArray JNICALL getVarsFromBDDArray
   (JNIEnv *env, jclass, jlong bdd_arrays_pointer){
     bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
 
-    return helper_functions::cPointerToJavaArray(env, bdd_arrays_object->vars, bdd_arrays_object->numTraces,bdd_arrays_object->numBools);
+    int size = bdd_arrays_object->numTraces * bdd_arrays_object->numBools;
+    return helper_functions::cPointerToJavaArray(env, bdd_arrays_object->vars, size);
 }
 
 /*
  * Class:     lib_CDDLib
  * Method:    getValuesFromBDDArray
  */
-JNIEXPORT jobjectArray JNICALL getValuesFromBDDArray
+JNIEXPORT jintArray JNICALL getValuesFromBDDArray
   (JNIEnv *env, jclass, jlong bdd_arrays_pointer){
     bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
 
-    return helper_functions::cPointerToJavaArray(env, bdd_arrays_object->values, bdd_arrays_object->numTraces,bdd_arrays_object->numBools);
+    int size = bdd_arrays_object->numTraces * bdd_arrays_object->numBools;
+    return helper_functions::cPointerToJavaArray(env, bdd_arrays_object->values, size);
 }
 
