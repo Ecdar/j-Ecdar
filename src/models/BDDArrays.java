@@ -2,15 +2,19 @@ package models;
 
 import lib.CDDLib;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BDDArrays {
 
     private long pointer;
     int numTraces;
     int numBools;
-    private int[][] vars;
-    private int[][] values;
+    private List<List<Integer>> vars;
+    private List<List<Integer>> values;
 
     public BDDArrays(long pointer) {
+        System.out.println("constr");
         this.pointer = pointer;
         numTraces= importNumTraces();
         numBools = importNumBools();
@@ -18,11 +22,11 @@ public class BDDArrays {
         values = importValues();
     }
 
-    public int[][] getVars() {
+    public List<List<Integer>>  getVars() {
         return vars;
     }
 
-    public int[][] getValues() {
+    public List<List<Integer>>  getValues() {
         return values;
     }
 
@@ -34,25 +38,41 @@ public class BDDArrays {
         return CDDLib.getNumBoolsFromBDDArray(pointer);
     }
 
-    public int[][] importVars() {
+    public List<List<Integer>> importVars() {
         checkForNull();
         if(vars != null){
             return vars;
         }else{
-
-            CDDLib.getVarsFromBDDArray(pointer);
-            return null;//new CDD(CDDLib.getVarsFromBDDArray(pointer));
+            List<List<Integer>> result = new ArrayList<>();
+            int[] vars=CDDLib.getVarsFromBDDArray(pointer);
+            for (int i=0; i<numTraces; i++) {
+                List<Integer> trace = new ArrayList<>();
+                for (int j = 0; j < numBools; j++) {
+                    trace.add(vars[i * numBools + j]);
+                }
+                result.add(trace);
+            }
+            return result;
         }
     }
 
-    public int[][] importValues() {
+    public List<List<Integer>> importValues() {
         checkForNull();
-
         if(values != null){
             return values;
         }else{
-            //CDDLib.getValuesFromBDDArray(pointer);
-            return null;//(CDDLib.getValuesFromBDDArray(pointer));
+            System.out.println("here");
+            List<List<Integer>> result = new ArrayList<>();
+            int[] vals=CDDLib.getValuesFromBDDArray(pointer);
+            for (int i=0; i<numTraces; i++) {
+                List<Integer> trace = new ArrayList<>();
+                for (int j = 0; j < numBools; j++) {
+                    System.out.println("vars" + vals[i * numBools + j]);
+                    trace.add(vals[i * numBools + j]);
+                }
+                result.add(trace);
+            }
+            return result;
         }
     }
 

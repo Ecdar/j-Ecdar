@@ -37,12 +37,10 @@ public class BoolTest {
         list.add(l1); //list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBddvar(BVs);
-        System.out.println("here!");
         CDD cdd =new CDD(list);
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
         System.out.println(bddArr.getValues());
-
-
+        System.out.println(bddArr.getVars());
 
 //        System.out.println("here too! " + cdd);
   //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
