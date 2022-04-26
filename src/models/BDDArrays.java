@@ -5,11 +5,15 @@ import lib.CDDLib;
 public class BDDArrays {
 
     private long pointer;
+    int numTraces;
+    int numBools;
     private int[][] vars;
     private int[][] values;
 
     public BDDArrays(long pointer) {
         this.pointer = pointer;
+        numTraces= importNumTraces();
+        numBools = importNumBools();
         vars = importVars();
         values = importValues();
     }
@@ -20,6 +24,14 @@ public class BDDArrays {
 
     public int[][] getValues() {
         return values;
+    }
+
+    public int importNumTraces() {
+           return CDDLib.getNumTracesFromBDDArray(pointer);
+    }
+
+    public int importNumBools() {
+        return CDDLib.getNumBoolsFromBDDArray(pointer);
     }
 
     public int[][] importVars() {
