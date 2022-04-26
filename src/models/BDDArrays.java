@@ -61,7 +61,6 @@ public class BDDArrays {
         if(values != null){
             return values;
         }else{
-            System.out.println("here");
             List<List<Integer>> result = new ArrayList<>();
             int[] vals=CDDLib.getValuesFromBDDArray(pointer);
             for (int i=0; i<numTraces; i++) {

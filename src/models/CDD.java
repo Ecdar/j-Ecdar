@@ -148,8 +148,7 @@ public class CDD {
         }
         if (copy.isBDD())
         {
-            List<Guard> guardList = CDD.toBoolGuards(copy);
-            guards.add(guardList);
+            guards = CDD.toBoolGuards(copy);
         }
         else {
             while (!copy.isTerminal()) {
@@ -159,7 +158,7 @@ public class CDD {
                 Zone z = new Zone(res.getDbm());
                 CDD bddPart = res.getBddPart();
                 List<Guard> guardList = z.buildGuardsFromZone(clocks, relevantClocks);
-                guardList.addAll(CDD.toBoolGuards(bddPart)); // TODO: once we have boolean
+                //guardList.addAll(CDD.toBoolGuards(bddPart)); // TODO: once we have boolean
                 guards.add(guardList);
             }
         }
@@ -172,21 +171,31 @@ public class CDD {
         return CDDLib.isBDD(this.pointer);
     }
 
-    public static List<Guard> toBoolGuards(CDD bdd){
-        if (bdd.isFalse())
-            return new ArrayList<>(){{add(new FalseGuard());}};
+    public static List<List<Guard>> toBoolGuards(CDD bdd){
+        if (bdd.isFalse()) {
+            return new ArrayList<>() {{
+                add( new ArrayList<>() {{add(new FalseGuard());}});
+            }};
+        }
         if (bdd.isTrue())
             return new ArrayList<>();
-        CDDNode node = bdd.getRoot();
-        List<Guard> guards = new ArrayList<>();
-        node.getElemIterable().forEach(
-                n -> {BoolVar var = BVs.get(n.getChild().getLevel()-bddStartLevel);
-                    String bits = Long.toString(n.getChild().getPointer(), 2);   //TODO: hate going for bit magic here, if anyone has a good idea, let me know!!! also, test this!
-                    boolean value = bits.charAt(bits.length())=='1' ? false : true ;
-                    guards.add(new BoolGuard(var,"==",value));
-                }
-        );
-        return guards;
+        assert(bdd.isBDD());
+        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(bdd.getPointer(),numBools));
+
+        List<List<Guard>> result = new ArrayList<>();
+        for (int i=0; i<= arrays.numTraces; i++)
+        {
+            List<Guard> guards = new ArrayList<>();
+            for (int j=0; j<= arrays.numBools; j++)
+            {
+                BoolVar var = BVs.get(arrays.getVars().get(i).get(j));
+                boolean val = (arrays.getValues().get(i).get(j)==1) ? true : false;
+                BoolGuard bg = new BoolGuard(var, "==",  val);
+                guards.add(bg);
+            }
+            result.add(guards);
+        }
+        return result;
     }
 
     public static List<Clock> getClocks() {
