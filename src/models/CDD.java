@@ -157,7 +157,7 @@ public class CDD {
         BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(bdd.getPointer(),numBools));
 
         List<Guard> orParts = new ArrayList<>();
-        System.out.println(arrays.numTraces + " " + arrays.numBools + " " + BVs.size() + " " + numBools);
+        System.out.println(arrays.numTraces + " " + arrays.numBools + " " + BVs.size() + " " + numBools + " " + bddStartLevel);
         for (int i=0; i< arrays.numTraces; i++)
         {
             List<Guard> andParts = new ArrayList<>();
@@ -165,7 +165,7 @@ public class CDD {
             {
                 int index = arrays.getVars().get(i).get(j);
                 if (index>=0) {
-                    BoolVar var = BVs.get(index);
+                    BoolVar var = BVs.get(index-bddStartLevel);
                     boolean val = (arrays.getValues().get(i).get(j) == 1) ? true : false;
                     BoolGuard bg = new BoolGuard(var, "==", val);
                     andParts.add(bg);
@@ -243,6 +243,7 @@ public class CDD {
         numClocks = 0;
         numBools= 0;
         clocks = new ArrayList<>();
+        BVs = new ArrayList<>();
         CDDLib.cddDone();
     }
 

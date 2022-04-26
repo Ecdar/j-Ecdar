@@ -17,6 +17,7 @@ public class Bisimilarity {
         List<Location> locs = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         List<Clock> clocks = aut.getClocks();
+        List<BoolVar> BVs = aut.getBVs();
         locs.addAll(aut.getLocations());
         edges.addAll(aut.getEdges());
         List<List<Location>> bisimilarLocs = new ArrayList<>();
@@ -25,7 +26,7 @@ public class Bisimilarity {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
-        //CDD.addBddvar(allBVs); TODO!
+        CDD.addBddvar(BVs);
         thereWasAChange= true;
 
 

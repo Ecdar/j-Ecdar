@@ -26,6 +26,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     public SimpleTransitionSystem(Automaton automaton) {
         this.automaton = automaton;
         clocks.addAll(automaton.getClocks());
+        BVs.addAll(automaton.getBVs());
 
         this.waiting = new ArrayDeque<>();
         this.passed = new ArrayList<>();
@@ -327,6 +328,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     public SimpleTransitionSystem pruneReachTimed(){
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
+        CDD.addBddvar(BVs);
 
         //TODO: this function is not correct yet. // FIXED: 05.1.2021
         // In the while loop, we should collect all edges associated to transitions (not just all locations associated to states), and remove all that were never associated

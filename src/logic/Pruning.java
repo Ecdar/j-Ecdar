@@ -10,6 +10,7 @@ public class Pruning {
     private static boolean printComments = true;
     private Automaton aut;
     List<Clock> clocks;
+    List<BoolVar> BVs;
     List<Edge> edges;
     List<Location> locations;
     //Map<Location, Location> locMap;
@@ -20,6 +21,7 @@ public class Pruning {
     public Pruning(SimpleTransitionSystem st) {
         aut = new Automaton(st.getAutomaton());
         clocks = aut.getClocks();
+        BVs = aut.getBVs();
         edges = aut.getEdges();
         locations = aut.getLocations();
         //locMap = new HashMap<>();
@@ -43,7 +45,7 @@ public class Pruning {
     public SimpleTransitionSystem prune() {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
-        //CDD.addBddvar(BVs); TODO!
+        CDD.addBddvar(BVs);
 
 
         for (Location l : locations)

@@ -89,7 +89,7 @@ public class Conjunction extends TransitionSystem {
     {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        //CDD.addBddvar(BVs);TODO!
+        CDD.addBddvar(BVs);
 
         String name="";
         Set<Edge> edgesSet = new HashSet<>();

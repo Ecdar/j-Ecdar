@@ -33,6 +33,8 @@ public class Quotient extends TransitionSystem {
         clocks.add(newClock);
         clocks.addAll(ts_spec.getClocks());
         clocks.addAll(ts_comp.getClocks());
+        BVs.addAll(ts_spec.getBVs());
+        BVs.addAll(ts_comp.getBVs());
         if (printComments) System.out.println("Clocks of ts1 ( " + ts_spec.getClocks() +" ) and ts2 ( " + ts_comp.getClocks() + " ) merged to + " + clocks);
 
 
@@ -78,6 +80,7 @@ public class Quotient extends TransitionSystem {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
+        CDD.addBddvar(BVs);
         String name = ts_spec.getSystems().get(0).getName() + "DIV" + ts_comp.getSystems().get(0).getName() ;
 
         // Lists of edges and locations for the newly built automaton

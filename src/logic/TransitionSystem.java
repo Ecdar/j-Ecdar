@@ -117,7 +117,7 @@ public abstract class TransitionSystem {
         {
             CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
             CDD.addClocks(clocks);
-            //CDD.addBddvar(allBVs); TODO!
+            CDD.addBddvar(BVs);
         }
 
         boolean isDeterministic = true;
@@ -139,8 +139,6 @@ public abstract class TransitionSystem {
     }
 
     public boolean isLeastConsistent(){
-
-        //CDD.addBddvar(getBVs()); TODO!
         boolean result = isConsistent(true);
         return result;
     }
@@ -155,7 +153,7 @@ public abstract class TransitionSystem {
         boolean isConsistent = true;
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        //CDD.addBddvar( ) TODO!
+        CDD.addBddvar(BVs);
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
         for (SimpleTransitionSystem ts : systems){
@@ -176,6 +174,7 @@ public abstract class TransitionSystem {
         boolean isCons = isFullyConsistent();
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
+        CDD.addBddvar(BVs);
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
@@ -213,7 +212,6 @@ public abstract class TransitionSystem {
 
     List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
         List<Move> moves = new ArrayList<>();
-        System.out.println("reached moveProduct");
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
 
