@@ -14,7 +14,7 @@ public class CddExtractionResult {
         cddPart = importCddPart();
         bddPart = importBddPart();
         dbm = importDbm();
-
+        CDDLib.deleteCDDExtractionResult(this.pointer);
     }
 
 

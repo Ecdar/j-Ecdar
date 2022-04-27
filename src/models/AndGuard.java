@@ -17,12 +17,24 @@ public class AndGuard extends Guard{
         this.guards= new ArrayList<>();
         for (List<Guard> g: guards)
             this.guards.addAll(g);
+
+        for (Guard g: this.guards)
+            if (g instanceof TrueGuard)
+                this.guards.remove(g);
+        if (this.guards.isEmpty())
+            this.guards.add(new TrueGuard());
     }
     public AndGuard(Guard... guards)
     {
         this.guards= new ArrayList<>();
         for (Guard g: guards)
             this.guards.add(g);
+        for (Guard g: this.guards)
+            if (g instanceof TrueGuard)
+                this.guards.remove(g);
+        if (this.guards.isEmpty())
+            this.guards.add(new TrueGuard());
+
     }
 
     public AndGuard(AndGuard copy, List<Clock> newClocks,List<Clock> oldClocks,   List<BoolVar> newBVs, List<BoolVar> oldBVs)
@@ -43,6 +55,12 @@ public class AndGuard extends Guard{
             if (g instanceof OrGuard)
                 this.guards.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
         }
+        for (Guard g: this.guards)
+            if (g instanceof TrueGuard)
+                this.guards.remove(g);
+        if (this.guards.isEmpty())
+            this.guards.add(new TrueGuard());
+
     }
 
 
@@ -72,11 +90,17 @@ public class AndGuard extends Guard{
 
     @Override
     public String toString() {
+
+
+
+
         String ret = "(";
         for (Guard g: guards)
             ret += g.toString() + " && ";
         if (guards.size()==0)
             return "";
+        if (guards.size()==1)
+            return guards.get(0).toString();
         return ret.substring(0,ret.length()-4) + ")";
     }
 

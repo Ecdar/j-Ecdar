@@ -2,6 +2,7 @@ package models;
 
 import io.grpc.internal.DnsNameResolver;
 import lib.CDDLib;
+import lib.DBMLib;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,9 @@ public class BDDArrays {
         numBools = importNumBools();
         vars = importVars();
         values = importValues();
+
+        CDDLib.deleteBDDArrays(this.pointer);
+
     }
 
     public String toString()

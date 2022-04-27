@@ -82,6 +82,10 @@ public class CDDLib {
     public static native int[] getValuesFromBDDArray(long bddArrayPointer);
     public static native int getNumTracesFromBDDArray(long bddArrayPointer);
     public static native int getNumBoolsFromBDDArray(long bddArrayPointer);
+    public static native boolean deleteBDDArrays(long bddArrayPointer);
+    public static native boolean deleteCDDExtractionResult(long extractionResultPointer);
+
+
 
     public static native int[] getDbmFromExtractionResult(long extractionResultPointer);
     public static native boolean cddEquiv(long lCdd, long rCdd);

@@ -667,3 +667,35 @@ JNIEXPORT jint JNICALL Java_lib_CDDLib_getNumTracesFromBDDArray
     bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
     return bdd_arrays_object->numTraces;
 }
+
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    deleteBDDArrays
+ * Signature: (JI)Z
+ */
+jboolean JNICALL Java_lib_CDDLib_deleteBDDArrays
+  (JNIEnv *env, jclass, jlong bdd_arrays_pointer){
+    bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
+    for(int i = 0; i < bdd_arrays_object->numTraces; ++i) {
+        delete [] bdd_arrays_object->vars[i];
+        delete [] bdd_arrays_object->values[i];
+    }
+    delete[] bdd_arrays_object->vars;
+    delete[] bdd_arrays_object->values;
+
+    return 1;
+}
+
+
+/*
+ * Class:     lib_CDDLib
+ * Method:    deleteCDDExtractionResult
+ * Signature: (JI)Z
+ */
+jboolean JNICALL Java_lib_CDDLib_deleteCDDExtractionResult
+  (JNIEnv *env, jclass, jlong extraction_result_pointer){
+    extraction_result* result_object = (extraction_result*)extraction_result_pointer;
+    delete[] result_object->dbm;
+    return 1;
+}
