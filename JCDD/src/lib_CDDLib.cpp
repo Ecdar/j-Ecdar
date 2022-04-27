@@ -677,10 +677,6 @@ JNIEXPORT jint JNICALL Java_lib_CDDLib_getNumTracesFromBDDArray
 jboolean JNICALL Java_lib_CDDLib_deleteBDDArrays
   (JNIEnv *env, jclass, jlong bdd_arrays_pointer){
     bdd_arrays* bdd_arrays_object = (bdd_arrays*)bdd_arrays_pointer;
-    for(int i = 0; i < bdd_arrays_object->numTraces; ++i) {
-        delete [] bdd_arrays_object->vars[i];
-        delete [] bdd_arrays_object->values[i];
-    }
     delete[] bdd_arrays_object->vars;
     delete[] bdd_arrays_object->values;
 
