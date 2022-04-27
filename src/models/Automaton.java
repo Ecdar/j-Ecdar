@@ -58,9 +58,7 @@ public class Automaton {
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
             addTargetInvariantToEdges();
-            System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
             makeInputEnabled();
-            System.out.println("PFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
             CDD.done();
         }
     }

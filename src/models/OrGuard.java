@@ -75,7 +75,7 @@ public class OrGuard extends Guard{
             ret += g.toString() + " or ";
         if (guards.size()==0)
             return "";
-        return ret.substring(0,ret.length()-5) + ")";
+        return ret.substring(0,ret.length()-4) + ")";
     }
 
     @Override

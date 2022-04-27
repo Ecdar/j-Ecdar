@@ -1,5 +1,6 @@
 package models;
 
+import io.grpc.internal.DnsNameResolver;
 import lib.CDDLib;
 
 import java.util.ArrayList;
@@ -14,12 +15,39 @@ public class BDDArrays {
     private List<List<Integer>> values;
 
     public BDDArrays(long pointer) {
-        System.out.println("constr");
         this.pointer = pointer;
         numTraces= importNumTraces();
         numBools = importNumBools();
         vars = importVars();
         values = importValues();
+    }
+
+    public String toString()
+    {
+        StringBuffer res = new StringBuffer();
+        res.append("Number of traces: " + numTraces + "\n");
+        res.append("Number of bools: " + numBools + "\n");
+
+        res.append("Vars: " + "\n");
+        for (int i=0; i<numTraces; i++) {
+            res.append("Trace : " + i + "\n");
+            for (int j=0; j<numBools; j++)
+            {
+                res.append(vars.get(i).get(j));
+            }
+            res.append("\n");
+        }
+
+        res.append("Values: " + "\n");
+        for (int i=0; i<numTraces; i++) {
+            res.append("Trace : " + i + "\n");
+            for (int j=0; j<numBools; j++)
+            {
+                res.append(values.get(i).get(j));
+            }
+            res.append("\n");
+        }
+        return res.toString();
     }
 
     public List<List<Integer>>  getVars() {
@@ -45,7 +73,6 @@ public class BDDArrays {
         }else{
             List<List<Integer>> result = new ArrayList<>();
             int[] vars=CDDLib.getVarsFromBDDArray(pointer);
-            System.out.println(vars.length);
             for (int i=0; i<numTraces; i++) {
                 List<Integer> trace = new ArrayList<>();
                 for (int j = 0; j < numBools; j++) {
@@ -67,7 +94,6 @@ public class BDDArrays {
             for (int i=0; i<numTraces; i++) {
                 List<Integer> trace = new ArrayList<>();
                 for (int j = 0; j < numBools; j++) {
-                    System.out.println("vars" + vals[i * numBools + j]);
                     trace.add(vals[i * numBools + j]);
                 }
                 result.add(trace);

@@ -432,7 +432,7 @@ public class XMLParser {
         List<Guard> orParts = new ArrayList<>();
 
         String[] disj = text.split("or");
-
+        System.out.println(text + " " + disj.length);
         for (String outer : disj) {
             List<Guard> andParts = new ArrayList<>();
             String[] rawInvariants = outer.split("&&");
@@ -478,7 +478,11 @@ public class XMLParser {
                         symbol = "!=";
                         isStrict = true;
 
-                    } else assert (false);
+                    } else
+                    {
+                        System.out.println(invariant);
+                        assert (false);
+                    }
                     String[] inv = invariant.split(symbol);
                     Clock clk = findClock(clockList, inv[0]);
 

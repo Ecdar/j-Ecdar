@@ -88,8 +88,6 @@ public class Pruning {
                 CDD initial = CDD.zeroCDD();
                 if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
                 {
-                    System.out.println(targetLoc.getInconsistentPart());
-                    System.out.println("Inital location is fully inconsistent");
                     initIsInconsistent=true;
                     break;
                 }
@@ -179,10 +177,7 @@ public class Pruning {
 
             // take the inconsistent federation and free the clocks of the output transition
             CDD target = new CDD(targetLoc.getInconsistentPart().getPointer());
-            System.out.println("interesting: ");
-            System.out.println(target);
             target = target.transitionBack(e);
-            System.out.println(target);
             CDD guardCDD = e.getGuardCDD();
             CDD fedAfterRemovingInconsistentPart =guardCDD.minus(target);
 

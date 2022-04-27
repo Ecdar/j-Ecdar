@@ -291,7 +291,6 @@ public class Controller {
                 return ts;
             }
 
-        System.out.println("Automaton does not exist  " + str);
         return null;
     }
 

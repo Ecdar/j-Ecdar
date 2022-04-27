@@ -52,7 +52,6 @@ public class Quotient extends TransitionSystem {
 
         outputs = new HashSet<>(outputsOfSpec);
         outputs.removeAll(outputsOfComp);
-        System.out.println();
 
         if (printComments) System.out.println("ts1.in = " + ts_spec.getInputs() +", ts1.out = " + ts_spec.getOutputs());
         if (printComments) System.out.println("ts2.in = " + ts_comp.getInputs() +", ts2.out = " + ts_comp.getOutputs());
@@ -344,7 +343,6 @@ public class Quotient extends TransitionSystem {
         SymbolicLocation location = currentState.getLocation();
 
         List<Move> moves = getNextMoves(location, channel);
-        System.out.println("quotient create new trans");
         return createNewTransitions(currentState, moves, allClocks);
     }
 

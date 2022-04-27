@@ -72,7 +72,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     // Checks if automaton is deterministic
     public boolean isDeterministicHelper() {
-        System.out.println("is deterministic helper start");
 
         Set<Channel> actions = getActions();
 
@@ -92,7 +91,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 List<Transition> tempTrans = getNextTransitions(currState, action);
                 if (checkMovesOverlap(tempTrans)) {
-                    System.out.println("moves overlap");
                     return false;
                 }
 
@@ -104,7 +102,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
             }
         }
 
-        System.out.println("is deterministic helper emd");
         return true;
     }
 
@@ -294,7 +291,6 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         List<Move> moves = getNextMoves(currentState.getLocation(), channel);
-        System.out.println("simple transition sys create new trans");
         return createNewTransitions(currentState, moves, allClocks);
     }
 

@@ -45,7 +45,6 @@ public class CDD {
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
-        System.out.println(clock + ": " + clocks);
         assert(false);
         return 0;
     }
@@ -55,14 +54,12 @@ public class CDD {
         for (int i = 0; i < BVs.size(); i++){
             if(bv.hashCode() == BVs.get(i).hashCode()) return i;
         }
-        System.out.println(bv + ": " + BVs);
         assert(false);
         return 0;
     }
 
     public CDD(Guard guard){
         CDD res = cddFalse();
-        System.out.println("new guard " +  guard);
         if (guard instanceof FalseGuard) {
             res = cddFalse();
         }
@@ -79,18 +76,13 @@ public class CDD {
             res = fromBoolGuard((BoolGuard) guard);
         }
         else if (guard instanceof AndGuard) {
-            System.out.println("AndGuard");
             res = cddTrue();
             for (Guard g : ((AndGuard)guard).getGuards())
             {
                 res = res.conjunction(new CDD(g));
             }
-            res.printDot();
-            System.out.println("done adding ands");
-            System.out.println("What??" + CDD.toGuardList(res, clocks));
         }
         else if (guard instanceof OrGuard) {
-            System.out.println("OrGuard");
             res = cddFalse();
             for (Guard g : ((OrGuard)guard).getGuards())
             {
@@ -99,7 +91,6 @@ public class CDD {
         }
         else
         {
-            System.out.println(guard);
             assert(false);
         }
         this.pointer = res.pointer;
@@ -107,7 +98,6 @@ public class CDD {
 
     public static CDD fromBoolGuard(BoolGuard guard)
     {
-        System.out.println(" bg : " + guard + " " + bddStartLevel + " " + getIndexOfBV(guard.getVar()) );
         if (guard.getValue())
             return createBddNode(bddStartLevel + getIndexOfBV(guard.getVar()));
         else
@@ -115,7 +105,6 @@ public class CDD {
     }
 
     public static Guard toGuardList(CDD state, List<Clock> relevantClocks){
-        System.out.println("turning to guard");
         CDD copy = new CDD(state.pointer);
         copy = copy.removeNegative().reduce();
         if (copy.equiv(cddFalse())) // special case for guards
@@ -150,30 +139,21 @@ public class CDD {
 
     public static Guard toBoolGuards(CDD bdd){
 
-        System.out.println("a");
         if (bdd.isFalse()) {
-
-            System.out.println("b");
             return new FalseGuard();
         }
         if (bdd.isTrue())
             return new TrueGuard();
 
-        System.out.println("c");
         assert(bdd.isBDD());
 
-        System.out.println("d + numBools" + numBools);
-        bdd.printDot("testCDD.txt");
 
         long ptr = bdd.getPointer();
-        System.out.println("e");
         BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr,numBools));
 
         List<Guard> orParts = new ArrayList<>();
-        System.out.println(arrays.numTraces + " " + arrays.numBools + " " + BVs.size() + " " + numBools + " " + bddStartLevel);
         for (int i=0; i< arrays.numTraces; i++)
         {
-            System.out.println("f");
             List<Guard> andParts = new ArrayList<>();
             for (int j=0; j< arrays.numBools; j++)
             {
@@ -309,14 +289,12 @@ public class CDD {
     }
 
     public static CDD allocateLower(int i, int j, int lowerBound) {
-        System.out.println("Allocate upper and lower have not been fixed yet. The values are not correctly translated to the C backend");
         assert(false);
         checkIfRunning();
         return new CDD(CDDLib.lower(i,j,lowerBound));
     }
 
     public static CDD allocateUpper(int i, int j, int upperBound) {
-        System.out.println("Allocate upper and lower have not been fixed yet. The values are not correctly translated to the C backend");
         assert(false);
         checkIfRunning();
         return new CDD(CDDLib.upper(i,j,upperBound));
@@ -511,9 +489,6 @@ public class CDD {
                 bl++;
             }
         }
-        System.out.println(list);
-        System.out.println(Arrays.toString(clockResets) + " " + Arrays.toString(clockValues) + " "  + Arrays.toString(boolResets) + " " + Arrays.toString(boolValues) + " " + numClocks + " " + numBools);
-        System.out.println("wtf");
         return state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
     }
 

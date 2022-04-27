@@ -58,7 +58,6 @@ public class Refinement {
     }
 
     public boolean check() {
-        System.out.println("check");
         Refinement.RET_REF = false;
         return checkRef();
     }
@@ -68,7 +67,6 @@ public class Refinement {
     }
 
     public boolean checkPreconditions() {
-        System.out.println("Check precond");
         boolean precondMet = true;
 
         // check for duplicate automata
@@ -100,13 +98,11 @@ public class Refinement {
             errMsg.append("Not all outputs of the right side are present on the left side.\n");// OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
         }
 
-        System.out.println("before least consistent checks");
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts1.getLastErr());
         }
 
-        System.out.println("before second consistent check");
 
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
@@ -119,7 +115,6 @@ public class Refinement {
         // one or more of the preconditions failed, so fail refinement
         if (!checkPreconditions())
             return false;
-        System.out.println("preconditions checked");
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(allClocks);
@@ -138,7 +133,6 @@ public class Refinement {
 
             StatePair curr = waiting.pop();
 
-            System.out.println("curr: " + curr.prettyPrint());
             if (RET_REF)
                 currNode = curr.getNode();
 
@@ -158,14 +152,12 @@ public class Refinement {
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
-                System.out.println("output error "  );
                 CDD.done();
                 return false;
             }
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
-                System.out.println("input error "  );
                 CDD.done();
                 return false;
             }
@@ -188,8 +180,6 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
-        System.out.println("in the beginning: " + CDD.toGuardList(t1.getTarget().getInvarCDD(),allClocks));
-        System.out.println("in the beginning: " + CDD.toGuardList(t2.getTarget().getInvarCDD(),allClocks));
         //System.out.println(t1.getEdges().get(0).getChannel());
         //System.out.println(t1.getSource().getLocation().getName());
         //System.out.println(t2.getSource().getLocation().getName());
@@ -201,14 +191,11 @@ public class Refinement {
 
 
         CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
-        System.out.println("just guards " + CDD.toGuardList(copyBeforeResets,allClocks));
         target1.applyResets(t1.getUpdates());
         //System.out.println("after first reset " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         target1.applyResets(t2.getUpdates());
-        System.out.println(t1.getUpdates() + " " + t2.getUpdates());
 
-        System.out.println("after resets " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
         target1.delay();// = target1.getInvarCDD().delay();
         //System.out.println("delayed " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
@@ -242,7 +229,6 @@ public class Refinement {
             //invariantTest.minus(target1.getInvarCDD()).printDot();
 //            invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
 
-            System.out.println("invarfed after substraction not empty!");
             return null;
          }
 
@@ -280,9 +266,6 @@ public class Refinement {
        // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
-            System.out.println("left: " + CDD.toGuardList(leftCDD,allClocks));
-            System.out.println("right: " + CDD.toGuardList(rightCDD,allClocks));
-            System.out.println("trans2 does not satisfy all solution of trans2");
             return false;
         }
         for (Transition transition1 : trans1) {
@@ -319,9 +302,7 @@ public class Refinement {
     }
 
     private boolean checkActions(State state1, State state2, boolean isInput) {
-        System.out.println("check action reached: isInput: " + isInput);
         for (Channel action : (isInput ? inputs2 : outputs1)) {
-            System.out.println("action is " + action);
             List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action, allClocks)
                     : ts1.getNextTransitions(state1, action, allClocks);
 
@@ -330,18 +311,15 @@ public class Refinement {
                 List<Transition> transitions2;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
-                    System.out.println("Creating transition 2");
                     transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
                             : ts2.getNextTransitions(state2, action, allClocks);
 
                     if (transitions2.isEmpty()) {
                         //state2.getInvarCDD().printDot();
 
-                        System.out.println("trans 2 empty");
                         return false;
                     }
                 } else {
-                    System.out.println("making selfloop");
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     transitions2 = new ArrayList<>();
                     Transition loop = new Transition(state2, state2.getInvarCDD());
@@ -354,7 +332,6 @@ public class Refinement {
                     return false;
             }
         }
-        System.out.println("finale");
         return true;
     }
 

@@ -295,7 +295,6 @@ public class Composition extends TransitionSystem {
 
         if (checkForOutputs(channel, locations))
             resultMoves = computeResultMoves(locations, channel);
-        System.out.println("composition create new trans");
         List<Transition> transitions = createNewTransitions(currentState, resultMoves, allClocks);
         return transitions;
     }

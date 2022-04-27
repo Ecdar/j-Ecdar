@@ -79,7 +79,6 @@ public class Main {
             String queryString = argStrBuilder.toString();
 
             try {
-                System.out.println(inputFolderPath + " " + queryString);
                 if(inputFolderPath.endsWith(".xml")){
                     System.out.println(Controller.handleRequest("-xml " + inputFolderPath, queryString, false));
                 }else{

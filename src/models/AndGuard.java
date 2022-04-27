@@ -74,10 +74,10 @@ public class AndGuard extends Guard{
     public String toString() {
         String ret = "(";
         for (Guard g: guards)
-            ret += g.toString() + " and ";
+            ret += g.toString() + " && ";
         if (guards.size()==0)
             return "";
-        return ret.substring(0,ret.length()-5) + ")";
+        return ret.substring(0,ret.length()-4) + ")";
     }
 
     @Override

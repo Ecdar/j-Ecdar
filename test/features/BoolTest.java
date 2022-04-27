@@ -32,8 +32,9 @@ public class BoolTest {
         CDD cdd =ba.disjunction(bb.conjunction(bc));
         System.out.println("size " + BVs.size());
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
-        System.out.println("bdd values " + bddArr.getValues());
-        System.out.println("bdd vars " + bddArr.getVars());
+
+        System.out.println(bddArr.toString());
+
         System.out.println(cdd);
         //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
         CDD.done();
@@ -86,17 +87,16 @@ public class BoolTest {
         BoolGuard bg_b_true = new BoolGuard(b, "==",true);
         BoolGuard bg_c_true = new BoolGuard(c, "==",true);
         BoolGuard bg_c_false = new BoolGuard(c, "==",false);
-        List<Guard> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
-        List<Guard> l2 = new ArrayList<>(List.of(bg_a_true,bg_b_true,bg_c_false));
-        List<Guard> l3 = new ArrayList<>(List.of(bg_a_false,bg_b_true,bg_c_false));
-        List<List<Guard>> list = new ArrayList();
-        list.add(l1); list.add(l2); list.add(l3);
+        Guard l1 = new AndGuard(bg_a_true,bg_b_false,bg_c_false);
+        Guard l2 = new AndGuard(bg_a_true,bg_b_true,bg_c_false);
+        Guard l3 = new AndGuard(bg_a_false,bg_b_true,bg_c_false);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBddvar(BVs);
-        System.out.println("here!");
+        System.out.println("or guard " + new OrGuard(l1,l2,l3));
         CDD cdd =new CDD(new OrGuard(l1,l2,l3));
-        System.out.println("here too! " + cdd);
-        assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
+        cdd.printDot();
+        System.out.println( l1 + "  " +  l2 + "  " +  l3 + "  " + cdd);
+        //assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
         CDD.done();
     }
 
@@ -484,6 +484,7 @@ public class BoolTest {
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
         XMLFileWriter.toXML("BoolAutomaton.xml",new Automaton[]{aut});
         Automaton newAut = XMLParser.parse("boolAutomaton.xml",false)[0];
+        XMLFileWriter.toXML("BoolAutomatonNew.xml",new Automaton[]{newAut});
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());

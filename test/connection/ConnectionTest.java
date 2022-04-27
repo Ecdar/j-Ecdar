@@ -28,14 +28,22 @@ public class ConnectionTest {
     }
 
     public ArrayList<String> getResult(){
-        String result = outContent.toString();
-        System.out.println(result);
-        result = result.substring(result.lastIndexOf("[") + 1);
-        result = result.substring(0, result.lastIndexOf("]"));
-        ArrayList<String> list =  new ArrayList<>(Arrays.asList(result.split(",")));
-        list.replaceAll(String::trim);
-        list.removeIf(String::isEmpty);
-        return list;
+        try {
+
+
+            String result = outContent.toString();
+            System.out.println(result);
+            result = result.substring(result.lastIndexOf("[") + 1);
+            result = result.substring(0, result.lastIndexOf("]"));
+            ArrayList<String> list = new ArrayList<>(Arrays.asList(result.split(",")));
+            list.replaceAll(String::trim);
+            list.removeIf(String::isEmpty);
+            return list;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return new ArrayList<>(){{add("Error: null");}};
+        }
     }
 
     @Test

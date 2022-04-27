@@ -81,7 +81,6 @@ public class Federation {
     public Federation down() {
         int[][] zones = getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
         if (zones.length == 0) {
-            System.out.println("down of empty fed");
             return this;
         }
         int dim = (int) Math.sqrt(zones[0].length);
@@ -164,7 +163,6 @@ public class Federation {
         int[][] zones1 = this.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
         int[][] zones2 = fed.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
         if (zones1.length == 0) {
-            System.out.println("intersect with empty federation");
             return this;
         }
         int dim = (int) Math.sqrt(zones1[0].length);
@@ -174,7 +172,6 @@ public class Federation {
     public Federation free(int index) {
         int[][] zones = getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
         if (zones.length == 0) {
-            System.out.println("free with empty federation");
             return this;
         }
         int dim = (int) Math.sqrt(zones[0].length);
@@ -210,7 +207,6 @@ public class Federation {
         int[][] zones1 = fed1.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
         int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
         if (zones1.length == 0) {
-            System.out.println("Fed eq with empty Federation");
             if (zones2.length == 0)
                 return true;
             else
@@ -244,7 +240,6 @@ public class Federation {
         int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
 
         if (zones1.length == 0) {
-            System.out.println("predt with empty federation");
             return fed1; // todo: fed2?
         }
 

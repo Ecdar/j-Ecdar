@@ -56,15 +56,12 @@ public abstract class TransitionSystem {
     List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
         List<Transition> transitions = new ArrayList<>();
         // loop through moves
-        System.out.println("create new trans");
         for (Move move : moves) {
-            System.out.println("current state : " + currentState.getInvarCDD());
             State targetState = new State(move.getTarget(), currentState.getInvarCDD());
             targetState.applyGuards(move.getGuardCDD());
 
             if (targetState.getInvarCDD().isFalse())
             {
-                System.out.println("target invar not valid");
                 continue;
             }
 
@@ -76,10 +73,8 @@ public abstract class TransitionSystem {
 
             if (targetState.getInvarCDD().isFalse())
             {
-                System.out.println("no valid target state");
                 continue;
             }
-            System.out.println("Transition with " + CDD.toGuardList(targetState.getInvarCDD(),clocks) + " and guardCDD " + CDD.toGuardList(guardCDD,CDD.getClocks()));
             transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
         return transitions;
@@ -149,7 +144,6 @@ public abstract class TransitionSystem {
 
     private boolean isConsistent(boolean canPrune) {
         boolean isDeterm = isDeterministic();
-        System.out.println("is deterministic: " + isDeterm);
         boolean isConsistent = true;
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
@@ -185,7 +179,6 @@ public abstract class TransitionSystem {
             nonImpl.add(ts.getName());
         }
         if(!isImpl) {
-            System.out.println("OUTPUT URGENT");
             buildErrMessage(nonImpl, "not output urgent");
         }
         CDD.done();

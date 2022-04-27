@@ -66,7 +66,6 @@ public class Bisimilarity {
                 }
             }
             bisimilarLocs.addAll(splitOffList);
-            System.out.println(bisimilarLocs);
         }
 
         locs = new ArrayList<>();
@@ -133,7 +132,6 @@ public class Bisimilarity {
         if (l1.getInvariantCDD().equiv(l2.getInvariantCDD())) {
             return false;
         }
-        System.out.println("Feds not equal: " + l1.getName() + " "  + l2.getName());
         return true;
     }
 
@@ -157,7 +155,6 @@ public class Bisimilarity {
         {
             Channel c = e1.getChan();
             if (edgesL2.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()).isEmpty()) {
-                System.out.println("chan not there 1 " + c + " " +  l1.getName() + " " + l2.getName());
                 return true;
             }
             CDD e1CDD = s1.conjunction(e1.getGuardCDD());
@@ -173,7 +170,6 @@ public class Bisimilarity {
                 }
                 if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
                 {
-                    System.out.println("updates not equal 1 " + l1.getName() + " " + l2.getName());
                     return true;
                 }
 
@@ -181,11 +177,7 @@ public class Bisimilarity {
                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
                     if (l1.getName().equals(l2.getName())) {
-                        System.out.println("same location: " + l1.getName() + " " + getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs) + "  " + getIndexInBislimlarLocs(e2.getTarget(), bisimilarLocs));
-                        System.out.println(e1.getTarget().getName() + " " +  e2.getTarget().getName() + " " + e1.getChannel() + " " + e2.getChannel());
-                        System.out.println(bisimilarLocs);
                     }
-                    System.out.println("different target location lists 1");
                     return true;
                 }
             }
@@ -202,7 +194,6 @@ public class Bisimilarity {
             //if (c.getName().equals("c[0]"))
            //     System.out.println("this i did reach" + edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()) );
             if (edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()).isEmpty()) {
-                System.out.println("not the same channel 2 " + l1.getName() + " " + l2.getName());
                 return true;
             }
             CDD e2CDD = s2.conjunction(e2.getGuardCDD());
@@ -219,7 +210,6 @@ public class Bisimilarity {
 
                 if (CDD.intersects(e2CDD,s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
-                    System.out.println("different target location lists 2");
 
                     return true;
                 }
@@ -227,13 +217,11 @@ public class Bisimilarity {
 
             }
             if (!CDD.isSubset(e2CDD, e1CDD)) {
-                System.out.println("outfed not subset " + l1.getName() + " " + l2.getName());
                 return true;
             }
         }
 
 
-        System.out.println("no difference " + l1.getName() + " " + l2.getName());
 
 
         return false;
