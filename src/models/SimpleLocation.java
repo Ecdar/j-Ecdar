@@ -51,7 +51,8 @@ public class SimpleLocation extends SymbolicLocation {
     }
 
     public CDD getInvariantCDD() {
-        return new CDD(location.getInvariant());
+        CDD cdd = new CDD(location.getInvariant());
+        return cdd;
     }
 
     @Override

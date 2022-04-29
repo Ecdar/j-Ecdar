@@ -133,6 +133,7 @@ public class Refinement {
 
             StatePair curr = waiting.pop();
 
+            System.out.println("Current state: " + curr.prettyPrint());
             if (RET_REF)
                 currNode = curr.getNode();
 
@@ -152,12 +153,16 @@ public class Refinement {
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
+
+                System.out.println("not holds 1");
                 CDD.done();
                 return false;
             }
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
+
+                System.out.println("not holds 2");
                 CDD.done();
                 return false;
             }
@@ -266,6 +271,10 @@ public class Refinement {
        // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
+            System.out.println("left CDD "  + leftCDD);
+            System.out.println("right CDD "  + rightCDD);
+            System.out.println("minus " +leftCDD.minus(rightCDD));
+            System.out.println("subtraction fail");
             return false;
         }
         for (Transition transition1 : trans1) {
@@ -315,8 +324,8 @@ public class Refinement {
                             : ts2.getNextTransitions(state2, action, allClocks);
 
                     if (transitions2.isEmpty()) {
-                        //state2.getInvarCDD().printDot();
-
+                        state2.getInvarCDD().printDot();
+                        System.out.println("transitions2 empty");
                         return false;
                     }
                 } else {
@@ -328,8 +337,10 @@ public class Refinement {
 
 
 
-                if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
+                if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2))) {
+                    System.out.println("create pairs failed");
                     return false;
+                }
             }
         }
         return true;

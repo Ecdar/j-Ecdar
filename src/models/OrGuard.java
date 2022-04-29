@@ -104,6 +104,8 @@ public class OrGuard extends Guard{
             ret += g.toString() + " or ";
         if (guards.size()==0)
             return "";
+        if (guards.size()==1)
+            return guards.get(0).toString();
         return ret.substring(0,ret.length()-4) + ")";
     }
 

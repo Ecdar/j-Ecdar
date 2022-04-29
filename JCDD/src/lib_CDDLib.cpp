@@ -286,7 +286,7 @@ JNIEXPORT jint JNICALL Java_lib_CDDLib_addBddvar
  */
 JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddBddvar
   (JNIEnv *, jclass, jint level){
-      cdd* cdd_object = new cdd(cdd_bddvar(level));
+      cdd* cdd_object = cdd_bddvar(level);
       return (jlong)cdd_object;
 }
 
@@ -297,7 +297,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddBddvar
  */
 JNIEXPORT jlong JNICALL Java_lib_CDDLib_cddNBddvar
   (JNIEnv *, jclass, jint level){
-    cdd* cdd_object = new cdd(cdd_bddnvar(level));
+    cdd* cdd_object = cdd_bddnvar(level);
     return (jlong)cdd_object;
 }
 

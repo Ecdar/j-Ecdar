@@ -163,7 +163,7 @@ public class VariousTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);clocks.add(y);
         CDD.addClocks(clocks);
-        CDD test = CDD.allocateInterval(1,0,2,false,3,false);
+        CDD test = CDD.allocateInterval(1,0,2,true,3,true);
         System.out.println(CDD.toGuardList(test,clocks));
         test.printDot();
         assert(true);

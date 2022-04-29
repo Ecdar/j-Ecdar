@@ -6,6 +6,8 @@ import javax.annotation.processing.SupportedSourceVersion;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static models.CDD.getIndexOfBV;
+
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
     final List<Clock> clocks;
@@ -30,7 +32,23 @@ public abstract class TransitionSystem {
 
     public State getInitialState() {
         CDD initCDD = CDD.zeroCDDDelayed();
-        State state = new State(getInitialLocation(), initCDD);
+        CDD bddPart = CDD.cddTrue();
+        for (BoolVar bv : BVs)
+        {
+            System.out.println(bv);
+            if (bv.getInitialValue())
+                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+            else {
+                System.out.println("lalala" + getIndexOfBV(bv) + " " + BVs.size() + " " + CDD.BVs.size() + " "+ CDD.bddStartLevel + getIndexOfBV(bv));
+                System.out.println("negation1 " + CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+
+            }
+        }
+
+        System.out.println("1 Init CDD created!!!!!!!!!!!!! " + bddPart);
+
+        State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
         state.applyInvariants();
         return state;
     }
@@ -38,7 +56,18 @@ public abstract class TransitionSystem {
     public State getInitialStateRef( CDD invs) {
 
         CDD initCDD = CDD.zeroCDDDelayed();
-        State state = new State(getInitialLocation(), initCDD);
+        CDD bddPart = CDD.cddTrue();
+        for (BoolVar bv : CDD.BVs)
+        {
+            System.out.println(bv);
+            if (bv.getInitialValue())
+                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+            else
+                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+        }
+        System.out.println("Init CDD created!!!!!!!!!!!!! " + initCDD.conjunction(bddPart));
+
+        State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
 
         state.applyInvariants();
         state.applyGuards(invs);
@@ -148,6 +177,11 @@ public abstract class TransitionSystem {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
         CDD.addBddvar(BVs);
+
+
+
+
+
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
         for (SimpleTransitionSystem ts : systems){

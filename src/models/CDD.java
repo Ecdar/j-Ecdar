@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class CDD {
 
@@ -26,7 +27,7 @@ public class CDD {
 
     static boolean cddIsRunning;
     private static List<Clock> clocks = new ArrayList<>();
-    private static List<BoolVar> BVs = new ArrayList<>();
+    public static List<BoolVar> BVs = new ArrayList<>();
 
 
     public CDD(){
@@ -49,7 +50,7 @@ public class CDD {
         return 0;
     }
 
-    private static int getIndexOfBV(BoolVar bv) {
+    public static int getIndexOfBV(BoolVar bv) {
 
         for (int i = 0; i < BVs.size(); i++){
             if(bv.hashCode() == BVs.get(i).hashCode()) return i;
@@ -106,13 +107,18 @@ public class CDD {
 
     public static Guard toGuardList(CDD state, List<Clock> relevantClocks){
         CDD copy = new CDD(state.pointer);
-        copy = copy.removeNegative().reduce();
+
         if (copy.equiv(cddFalse())) // special case for guards
         {
             return new FalseGuard();
         }
+        if (copy.equiv(cddTrue())) // special case for guards
+        {
+            return new TrueGuard();
+        }
         if (copy.isBDD())
         {
+            System.out.println("here");
             return CDD.toBoolGuards(copy);
         }
         else {
@@ -126,6 +132,9 @@ public class CDD {
                 List<Guard> andParts = new ArrayList<>();
                 andParts.add(z.buildGuardsFromZone(clocks, relevantClocks));
                 andParts.add(CDD.toBoolGuards(bddPart));
+                andParts = andParts.stream().filter(e -> !(e instanceof TrueGuard)).collect(Collectors.toList());
+                if (andParts.isEmpty())
+                    andParts.add(new TrueGuard());
                 orParts.add(new AndGuard(andParts));
             }
             return new OrGuard(orParts);
@@ -147,17 +156,21 @@ public class CDD {
 
         assert(bdd.isBDD());
 
-
         long ptr = bdd.getPointer();
         BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr,numBools));
 
+        System.out.println("*****************************************************");
+        System.out.println(arrays.toString());
+        System.out.println("*****************************************************");
         List<Guard> orParts = new ArrayList<>();
         for (int i=0; i< arrays.numTraces; i++)
         {
             List<Guard> andParts = new ArrayList<>();
             for (int j=0; j< arrays.numBools; j++)
             {
+
                 int index = arrays.getVars().get(i).get(j);
+                System.out.println(index);
                 if (index>=0) {
                     BoolVar var = BVs.get(index-bddStartLevel);
                     boolean val = (arrays.getValues().get(i).get(j) == 1) ? true : false;
@@ -277,10 +290,10 @@ public class CDD {
         return new CDD();
     }
 
-    public static CDD allocateInterval(int i, int j, int lower, boolean lower_strict, int upper, boolean upper_strict){
+    public static CDD allocateInterval(int i, int j, int lower, boolean lower_included, int upper, boolean upper_included){
         checkIfRunning();
         // TODO: Negation of lower strict should be moved to a new function allocate_interval function in the CDD library
-        return new CDD(CDDLib.interval(i,j,lower, !lower_strict,upper, upper_strict));
+        return new CDD(CDDLib.interval(i,j,lower, lower_included,upper, !upper_included)).removeNegative();
     }
 
     public static CDD allocateFromDbm(int[] dbm, int dim){
@@ -290,12 +303,12 @@ public class CDD {
 
     public static CDD allocateLower(int i, int j, int lowerBound, boolean strict) {
         checkIfRunning();
-        return new CDD(CDDLib.lower(i,j,lowerBound,strict));
+        return new CDD(CDDLib.lower(i,j,lowerBound,strict)).removeNegative();
     }
 
     public static CDD allocateUpper(int i, int j, int upperBound, boolean strict) {
         checkIfRunning();
-        return new CDD(CDDLib.upper(i,j,upperBound,strict));
+        return new CDD(CDDLib.upper(i,j,upperBound,strict)).removeNegative();
     }
 
     public static CDD createBddNode(int level) {
@@ -680,7 +693,7 @@ public class CDD {
         for (Update up : updates) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), false, u.getValue(), false));
+                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;

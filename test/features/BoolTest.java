@@ -8,9 +8,13 @@ import org.junit.Test;
 import parser.XMLFileWriter;
 import parser.XMLParser;
 
+import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static models.CDD.bddStartLevel;
+import static models.CDD.getIndexOfBV;
 
 public class BoolTest {
 
@@ -399,14 +403,38 @@ public class BoolTest {
 //here: [cg: (x<1 && y≥2 && y≤7) || (x≤10 && y<2) || (x≤10 && y>7) || (x>10) - bg:()]
     }
 
+    @Test
+    public void arraysSimple()
+    {
+        CDD.init(100,100,100);
+        CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk"));}});
+        BoolVar bv = new BoolVar("a",false);
+        CDD.addBddvar(new ArrayList<>(){{add(bv);}});
+
+        CDD test = CDD.createNegatedBddNode(bddStartLevel);
+        System.out.println(CDD.numBools);
+        BDDArrays arr = new BDDArrays(CDDLib.bddToArray(test.getPointer(),CDD.numBools));
+        System.out.println(arr);
+
+    }
+
+
+
+    @Test
+    public void testBooleanRefinement()
+    {
+
+        Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
+        assert(new Refinement(new SimpleTransitionSystem(auts[0]),new SimpleTransitionSystem(auts[1])).check());
+    }
 
 
     @Test
     public void testBoolSafeLoadXML() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
+        Clock x = new Clock("exp_x");
+        Clock y = new Clock("exp_y");
+        BoolVar a = new BoolVar("exp_a",false);
+        BoolVar b = new BoolVar("exp_b",true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b);
 
@@ -416,7 +444,7 @@ public class BoolTest {
 
         ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
         ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
+        ClockGuard g3 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
         ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
 
         ClockGuard g5= new ClockGuard(x, 6, Relation.LESS_EQUAL);
@@ -481,19 +509,23 @@ public class BoolTest {
         bools.add(a);
         bools.add(b);
 
-        Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
+        Automaton aut = new Automaton("exp", locations, edges, clocks, bools,false);
         XMLFileWriter.toXML("BoolAutomaton.xml",new Automaton[]{aut});
         Automaton newAut = XMLParser.parse("boolAutomaton.xml",false)[0];
         XMLFileWriter.toXML("BoolAutomatonNew.xml",new Automaton[]{newAut});
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-        assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());
-        assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(newAut)).check());
+       // assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());
+      //  assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(newAut)).check());
 
 
         System.out.println(aut.toString());
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         System.out.println(newAut.toString());
+
+        XMLFileWriter.toXML("same1.xml",new Automaton[]{aut});
+        XMLFileWriter.toXML("same2.xml",new Automaton[]{newAut});
+
 
         assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(aut)).check());
         assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(newAut)).check());
