@@ -220,7 +220,7 @@ jlong JNICALL Java_lib_CDDLib_getChildFromElemArray
 jint JNICALL Java_lib_CDDLib_getBoundFromElemArray
   (JNIEnv *env, jclass java_class, jlong cddNode_pointer, jint index){
     cddNode* node = (cddNode*) cddNode_pointer;
-    return (jint)dbm_raw2bound(node->elem[index].bnd);
+    return (jint)node->elem[index].bnd;
 }
 
 /*

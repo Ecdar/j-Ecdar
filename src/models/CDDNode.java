@@ -35,9 +35,9 @@ public class CDDNode {
         return CDDLib.isFalse(pointer);
     }
 
-    public Elem getElemAtIndex(int index){
+    public Segment getElemAtIndex(int index){
         int bound = CDDLib.getBoundFromElemArray(pointer, index);
         long cddNodePointer = CDDLib.getChildFromElemArray(pointer, index);
-        return new Elem(new CDDNode(cddNodePointer), bound);
+        return new Segment(new CDDNode(cddNodePointer), bound);
     }
 }

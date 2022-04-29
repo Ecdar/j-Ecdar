@@ -91,12 +91,12 @@ public class CDDTest {
         CDD.addClocks(clocks);
         CDD cdd1 = CDD.allocateInterval(1,0,3, false,5,false);
         CDDNode node = cdd1.getRoot();
-        List<Elem> bounds = new ArrayList<>();
+        List<Segment> bounds = new ArrayList<>();
 
         node.getElemIterable().forEach(bounds::add);
 
-        assertEquals(6, bounds.get(0).getBound());
-        assertEquals(11, bounds.get(1).getBound());
+        assertEquals(3, bounds.get(0).getBound());
+        assertEquals(5, bounds.get(1).getBound());
     }
 
     @Test

@@ -2,7 +2,7 @@ package models;
 
 import java.util.Iterator;
 
-public class ElemIterable implements Iterable<Elem> {
+public class ElemIterable implements Iterable<Segment> {
     private CDDNode node;
 
     public ElemIterable(CDDNode node) {
@@ -10,7 +10,7 @@ public class ElemIterable implements Iterable<Elem> {
     }
 
     @Override
-    public Iterator<Elem> iterator() {
+    public Iterator<Segment> iterator() {
         return new ElemIterator(node);
     }
 }

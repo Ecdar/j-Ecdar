@@ -1,10 +1,10 @@
 package models;
 
-public class Elem{
+public class Segment {
     private CDDNode child;
     private int bound;
 
-    public Elem(CDDNode child, int bound) {
+    public Segment(CDDNode child, int bound) {
         this.child = child;
         this.bound = bound;
     }
