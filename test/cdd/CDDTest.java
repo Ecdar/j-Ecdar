@@ -248,6 +248,8 @@ public class CDDTest {
 
         CDD cdd = CDD.allocateUpper(1,0,6,true);
         CDDNode node = cdd.getRoot();
+        System.out.println("here " + node);
+        System.out.println(node.getElemAtIndex(0).getBound());
 
         cdd.printDot(); // --> the CDD is correct, so I guess the test is wrong
         assertEquals(0, node.getElemAtIndex(0).getBound());
