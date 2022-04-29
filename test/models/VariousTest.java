@@ -145,6 +145,14 @@ public class VariousTest {
 
     }
 
+    @Test
+    public void conversionTest()
+    {
+        int rawUpperBound = 43;
+        int converted = rawUpperBound>>1;
+        boolean included  =  (rawUpperBound & 1)==0 ? false : true;
+        System.out.println(converted + " " + included);
+    }
 
     @Test
     public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException

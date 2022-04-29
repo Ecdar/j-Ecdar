@@ -75,8 +75,8 @@ public class CDDTest {
         CDD cdd3 = cdd1.disjunction(cdd2);
         CDDNode node = cdd3.getRoot();
 
-        assertEquals(6, node.getElemAtIndex(0).getBound());
-        assertEquals(13, node.getElemAtIndex(1).getBound());
+        assertEquals(6, node.getSegmentAtIndex(0).getUpperBound());
+        assertEquals(13, node.getSegmentAtIndex(1).getUpperBound());
 
         CDD.free(cdd1);
         CDD.free(cdd2);
@@ -95,8 +95,10 @@ public class CDDTest {
 
         node.getElemIterable().forEach(bounds::add);
 
-        assertEquals(3, bounds.get(0).getBound());
-        assertEquals(5, bounds.get(1).getBound());
+        assertEquals(1, bounds.get(0).getUpperBound());
+        assertEquals(true,bounds.get(0).isUpperBoundIncluded());
+        assertEquals(2, bounds.get(1).getUpperBound());
+        assertEquals(true,bounds.get(0).isUpperBoundIncluded());
     }
 
     @Test
@@ -168,13 +170,15 @@ public class CDDTest {
         clocks.add(new Clock("a"));
         CDD.addClocks(clocks);
 
-        CDD cdd1 = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
+        CDD cdd1 = CDD.allocateFromDbm(new int[]{1, 0, 80, 1}, 2);
         CDDNode node = cdd1.getRoot();
 
-        assertTrue(node.getElemAtIndex(0).getChild().isFalseTerminal());
-        assertTrue(node.getElemAtIndex(1).getChild().isTrueTerminal());
-        assertEquals(0, node.getElemAtIndex(0).getBound());
-        assertEquals(11, node.getElemAtIndex(1).getBound());
+        cdd1.printDot();
+
+        assertTrue(node.getSegmentAtIndex(0).getChild().isFalseTerminal());
+        assertTrue(node.getSegmentAtIndex(1).getChild().isTrueTerminal());
+        assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
+        assertEquals(11, node.getSegmentAtIndex(1).getUpperBound());
 
         CDD.free(cdd1);
     }
@@ -232,8 +236,8 @@ public class CDDTest {
 
         cdd.printDot();
 
-        assertEquals(6, node.getElemAtIndex(0).getBound());
-        assertEquals(CDD_INF, node.getElemAtIndex(1).getBound());
+        assertEquals(6, node.getSegmentAtIndex(0).getUpperBound());
+        assertEquals(CDD_INF, node.getSegmentAtIndex(1).getUpperBound());
 
         CDD.free(cdd);
 
@@ -249,11 +253,11 @@ public class CDDTest {
         CDD cdd = CDD.allocateUpper(1,0,6,true);
         CDDNode node = cdd.getRoot();
         System.out.println("here " + node);
-        System.out.println(node.getElemAtIndex(0).getBound());
+        System.out.println(node.getSegmentAtIndex(0).getUpperBound());
 
         cdd.printDot(); // --> the CDD is correct, so I guess the test is wrong
-        assertEquals(0, node.getElemAtIndex(0).getBound());
-        assertEquals(6, node.getElemAtIndex(1).getBound());
+        assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
+        assertEquals(6, node.getSegmentAtIndex(1).getUpperBound());
 
         CDD.free(cdd);
     }

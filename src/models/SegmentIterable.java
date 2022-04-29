@@ -2,15 +2,15 @@ package models;
 
 import java.util.Iterator;
 
-public class ElemIterable implements Iterable<Segment> {
+public class SegmentIterable implements Iterable<Segment> {
     private CDDNode node;
 
-    public ElemIterable(CDDNode node) {
+    public SegmentIterable(CDDNode node) {
         this.node = node;
     }
 
     @Override
     public Iterator<Segment> iterator() {
-        return new ElemIterator(node);
+        return new SegementIterator(node);
     }
 }

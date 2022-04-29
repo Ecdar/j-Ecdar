@@ -19,11 +19,11 @@ public class CDDNode {
         return CDDLib.getNodeLevel(pointer);
     }
 
-    public ElemIterable getElemIterable(){
-        return new ElemIterable(this);
+    public SegmentIterable getElemIterable(){
+        return new SegmentIterable(this);
     }
 
-    public boolean isEndOfElems(int index){
+    public boolean isEndOfSegments(int index){
         return CDDLib.isElemArrayNullTerminator(pointer,index);
     }
 
@@ -35,7 +35,7 @@ public class CDDNode {
         return CDDLib.isFalse(pointer);
     }
 
-    public Segment getElemAtIndex(int index){
+    public Segment getSegmentAtIndex(int index){
         int bound = CDDLib.getBoundFromElemArray(pointer, index);
         long cddNodePointer = CDDLib.getChildFromElemArray(pointer, index);
         return new Segment(new CDDNode(cddNodePointer), bound);
