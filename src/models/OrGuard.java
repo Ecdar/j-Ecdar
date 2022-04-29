@@ -1,6 +1,7 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,12 +18,31 @@ public class OrGuard extends Guard{
         this.guards= new ArrayList<>();
         for (List<Guard> g: guards)
             this.guards.addAll(g);
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<this.guards.size(); i++)
+            if (this.guards.get(i) instanceof OrGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            this.guards.remove(i);
+        if (this.guards.isEmpty())
+            this.guards.add(new FalseGuard());
     }
     public OrGuard(Guard... guards)
     {
         this.guards= new ArrayList<>();
         for (Guard g: guards)
             this.guards.add(g);
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<this.guards.size(); i++)
+            if (this.guards.get(i) instanceof FalseGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            this.guards.remove(i);
+        if (this.guards.isEmpty())
+            this.guards.add(new FalseGuard());
+
     }
 
     public OrGuard(OrGuard copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs)
@@ -41,6 +61,15 @@ public class OrGuard extends Guard{
             if (g instanceof OrGuard)
                 this.guards.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
         }
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<guards.size(); i++)
+            if (guards.get(i) instanceof FalseGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            guards.remove(i);
+        if (this.guards.isEmpty())
+            this.guards.add(new FalseGuard());
     }
 
 
@@ -62,7 +91,7 @@ public class OrGuard extends Guard{
         OrGuard other = (OrGuard) o;
         if (other.guards.size()!=guards.size())
             return  false;
-        for (int i =0; i<= other.guards.size(); i++)
+        for (int i =0; i< other.guards.size(); i++)
             if (!guards.get(i).equals(other.guards.get(i)))
                 return false;
         return true;

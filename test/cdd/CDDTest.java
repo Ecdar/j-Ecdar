@@ -227,10 +227,10 @@ public class CDDTest {
         clocks.add(new Clock("a"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateLower(1,0,3);
+        CDD cdd = CDD.allocateLower(1,0,3, true);
         CDDNode node = cdd.getRoot();
 
-        assertEquals(3, node.getElemAtIndex(0).getBound());
+        assertEquals(6, node.getElemAtIndex(0).getBound());
         assertEquals(CDD_INF, node.getElemAtIndex(1).getBound());
 
         CDD.free(cdd);
@@ -244,12 +244,12 @@ public class CDDTest {
         clocks.add(new Clock("a"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateUpper(1,0,6);
+        CDD cdd = CDD.allocateUpper(1,0,6,true);
         CDDNode node = cdd.getRoot();
 
         cdd.printDot(); // --> the CDD is correct, so I guess the test is wrong
         assertEquals(0, node.getElemAtIndex(0).getBound());
-        assertEquals(6, node.getElemAtIndex(1).getBound());
+        assertEquals(12, node.getElemAtIndex(1).getBound());
 
         CDD.free(cdd);
     }

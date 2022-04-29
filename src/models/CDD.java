@@ -288,16 +288,16 @@ public class CDD {
         return new CDD(CDDLib.cddFromDbm(dbm, dim));
     }
 
-    public static CDD allocateLower(int i, int j, int lowerBound) {
+    public static CDD allocateLower(int i, int j, int lowerBound, boolean strict) {
         assert(false);
         checkIfRunning();
-        return new CDD(CDDLib.lower(i,j,lowerBound));
+        return new CDD(CDDLib.lower(i,j,lowerBound,strict));
     }
 
-    public static CDD allocateUpper(int i, int j, int upperBound) {
+    public static CDD allocateUpper(int i, int j, int upperBound, boolean strict) {
         assert(false);
         checkIfRunning();
-        return new CDD(CDDLib.upper(i,j,upperBound));
+        return new CDD(CDDLib.upper(i,j,upperBound,strict));
     }
 
     public static CDD createBddNode(int level) {

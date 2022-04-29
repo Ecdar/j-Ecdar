@@ -141,7 +141,7 @@ public class VariousTest {
         Guard origin2Guards = CDD.toGuardList(origin1,clocks);
         System.out.println(origin2Guards);
 
-        assert(origin2Guards.toString().equals("[[x==0, y<=3, y-x<=3, x-y<=0]]"));
+        assert(origin2Guards.toString().equals("((x==0 && y<=3 && y-x<=3 && x-y<=0))"));
 
     }
 

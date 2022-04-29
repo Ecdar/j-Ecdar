@@ -1,8 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class AndGuard extends Guard{
 
@@ -11,6 +9,15 @@ public class AndGuard extends Guard{
     public AndGuard(List<Guard> guards)
     {
         this.guards=guards;
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<this.guards.size(); i++)
+            if (this.guards.get(i) instanceof TrueGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            this.guards.remove(i);
+        if (this.guards.isEmpty())
+            this.guards.add(new TrueGuard());
     }
     public AndGuard(List<Guard>... guards)
     {
@@ -18,20 +25,30 @@ public class AndGuard extends Guard{
         for (List<Guard> g: guards)
             this.guards.addAll(g);
 
-        for (Guard g: this.guards)
-            if (g instanceof TrueGuard)
-                this.guards.remove(g);
+
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<this.guards.size(); i++)
+            if (this.guards.get(i) instanceof TrueGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            this.guards.remove(i);
         if (this.guards.isEmpty())
             this.guards.add(new TrueGuard());
     }
     public AndGuard(Guard... guards)
     {
         this.guards= new ArrayList<>();
-        for (Guard g: guards)
-            this.guards.add(g);
-        for (Guard g: this.guards)
-            if (g instanceof TrueGuard)
-                this.guards.remove(g);
+        for (Guard g : guards)
+           this.guards.add(g);
+
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<this.guards.size(); i++)
+            if (this.guards.get(i) instanceof TrueGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            this.guards.remove(i);
         if (this.guards.isEmpty())
             this.guards.add(new TrueGuard());
 
@@ -55,9 +72,13 @@ public class AndGuard extends Guard{
             if (g instanceof OrGuard)
                 this.guards.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
         }
-        for (Guard g: this.guards)
-            if (g instanceof TrueGuard)
-                this.guards.remove(g);
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i<guards.size(); i++)
+            if (guards.get(i) instanceof TrueGuard)
+                indices.add(i);
+        Collections.reverse(indices);
+        for (int i : indices)
+            guards.remove(i);
         if (this.guards.isEmpty())
             this.guards.add(new TrueGuard());
 
@@ -82,7 +103,9 @@ public class AndGuard extends Guard{
         AndGuard other = (AndGuard) o;
         if (other.guards.size()!=guards.size())
             return  false;
-        for (int i =0; i<= other.guards.size(); i++)
+        if (guards.size()==0)
+            return true;
+        for (int i =0; i< other.guards.size(); i++)
             if (!guards.get(i).equals(other.guards.get(i)))
                 return false;
         return true;

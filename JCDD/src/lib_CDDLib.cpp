@@ -126,8 +126,9 @@ jlong JNICALL Java_lib_CDDLib_interval
  * Signature: (III)J
  */
 jlong JNICALL Java_lib_CDDLib_lower
-  (JNIEnv *, jclass, jint i, jint j, jint lower){
-    cdd* cdd_object = new cdd(cdd_lower(i,j,lower));
+  (JNIEnv *, jclass, jint i, jint j, jint lower, jboolean lower_strict){
+     raw_t lower_raw = dbm_boundbool2raw(lower,lower_strict);
+    cdd* cdd_object = new cdd(cdd_lower(i,j,lower_raw));
     return (jlong)cdd_object;
 }
 
@@ -137,8 +138,9 @@ jlong JNICALL Java_lib_CDDLib_lower
  * Signature: (III)J
  */
 jlong JNICALL Java_lib_CDDLib_upper
-  (JNIEnv *, jclass, jint i, jint j, jint upper){
-    cdd* cdd_object = new cdd(cdd_upper(i,j,upper));
+  (JNIEnv *, jclass, jint i, jint j, jint upper, jboolean upper_strict){
+    raw_t upper_raw = dbm_boundbool2raw(upper,upper_strict);
+    cdd* cdd_object = new cdd(cdd_upper(i,j,upper_raw));
     return (jlong)cdd_object;
 }
 

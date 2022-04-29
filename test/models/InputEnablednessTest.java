@@ -105,8 +105,8 @@ public class InputEnablednessTest {
         Edge e5 = new Edge(l0, l0, i2, true, guards_e5, noUpdate);
         //Edge e6 = new Edge(l0, l0, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e6_g1, e6_g2, e6_g3, e6_g4))), noUpdate);
         //Edge e7 = new Edge(l0, l0, i2, true, new ArrayList<>(Collections.singletonList(Arrays.asList(e7_g1, e7_g2))), noUpdate);
-        Edge e8 = new Edge(l1, l1, i1, true, new AndGuard(e8_g1/*, e8_g2*/), noUpdate);
-        Edge e9 = new Edge(l1, l1, i2, true, new AndGuard(e9_g1/*, e9_g2*/), noUpdate);
+        Edge e8 = new Edge(l1, l1, i1, true,e8_g1/*, e8_g2*/, noUpdate);
+        Edge e9 = new Edge(l1, l1, i2, true, e9_g1/*, e9_g2*/, noUpdate);
         Edge e10 = new Edge(l2, l2, i1, true, new TrueGuard(), noUpdate);
         Edge e11 = new Edge(l2, l2, i2, true, new TrueGuard(), noUpdate);
         Edge e12 = new Edge(l3, l3, i1, true, new TrueGuard(), noUpdate);

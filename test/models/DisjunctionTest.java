@@ -124,7 +124,7 @@ public class DisjunctionTest {
         System.out.println(out);
 
 
-        assert(out.toString().equals("[[x<=3], [x>=7, x<9]]"));
+        assert(out.toString().equals("(x<=3 or (x>=7 && x<9))"));
 
 
     }
