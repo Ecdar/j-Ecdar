@@ -8,7 +8,6 @@ public class CDDNode {
 
     CDDNode(long pointer){
         this.pointer = pointer;
-        level = CDDLib.getNodeLevel(pointer);
     }
 
     public long getPointer() {
@@ -16,7 +15,8 @@ public class CDDNode {
     }
 
     public int getLevel(){
-        return level;
+        assert(false); // TODO: this function crashes
+        return CDDLib.getNodeLevel(pointer);
     }
 
     public ElemIterable getElemIterable(){
