@@ -289,13 +289,11 @@ public class CDD {
     }
 
     public static CDD allocateLower(int i, int j, int lowerBound, boolean strict) {
-        assert(false);
         checkIfRunning();
         return new CDD(CDDLib.lower(i,j,lowerBound,strict));
     }
 
     public static CDD allocateUpper(int i, int j, int upperBound, boolean strict) {
-        assert(false);
         checkIfRunning();
         return new CDD(CDDLib.upper(i,j,upperBound,strict));
     }

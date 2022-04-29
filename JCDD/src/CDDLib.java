@@ -40,8 +40,8 @@ public class CDDLib {
     public static native long negation(long pointer);
     public static native long reduce(long pointer);
     public static native long interval(int i, int j, int lower, boolean lower_strict, int upper, boolean upper_strict);
-    public static native long lower(int i, int j, int lower);
-    public static native long upper(int i, int j, int upper);
+    public static native long lower(int i, int j, int lower, boolean strict);
+    public static native long upper(int i, int j, int upper, boolean strict);
     public static native int cddNodeCount(long pointer);
     public static native void cddAddClocks(int n);
     public static native long getRootNode(long pointer);
