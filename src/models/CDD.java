@@ -495,8 +495,10 @@ public class CDD {
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel+ getIndexOfBV(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
+                System.out.println(bddStartLevel + " " + getIndexOfBV(u.getBV()));
+                System.out.println("heeeere: " + boolResets[bl] + " " + boolValues[bl]);
                 bl++;
             }
         }

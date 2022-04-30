@@ -39,8 +39,7 @@ public abstract class TransitionSystem {
             if (bv.getInitialValue())
                 bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
             else {
-                System.out.println("lalala" + getIndexOfBV(bv) + " " + BVs.size() + " " + CDD.BVs.size() + " "+ CDD.bddStartLevel + getIndexOfBV(bv));
-                System.out.println("negation1 " + CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+
                 bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
 
             }
@@ -142,6 +141,8 @@ public abstract class TransitionSystem {
             CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
+
+            System.out.println("allClocks " + clocks + " bddStartLevel " + CDD.bddStartLevel);
         }
 
         boolean isDeterministic = true;

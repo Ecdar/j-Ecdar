@@ -68,3 +68,14 @@ jintArray helper_functions::cPointerToJavaArray(
         env->SetIntArrayRegion(newT, 0, len, arr);
         return newT;
 }
+
+
+int32_t* helper_functions::jintToCIntArray(JNIEnv *env, jintArray dbm, jsize len) {
+    // build array to pass to library
+    int32_t *t = new int32_t[len];
+    jint *arr = env->GetIntArrayElements(dbm, 0);
+    for (int i = 0; i < len; i++)
+        t[i] = arr[i];
+    env->ReleaseIntArrayElements(dbm, arr, JNI_ABORT);
+    return t;
+}
