@@ -442,8 +442,8 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
     auto converted_bool_resets = helper_functions::jintToCIntArray(env, bool_resets, num_bool_resets);
     auto converted_bool_values = helper_functions::jintToCIntArray(env, bool_values, num_bool_resets);
 
-    printf("converted_bool_resets %i" + converted_bool_resets[0]);
-    printf("converted_bool_values %i" + converted_bool_values[0]);
+    printf("converted_bool_resets %i" , converted_bool_resets[0]);
+    printf("converted_bool_values %i" , converted_bool_values[0]);
 
     cdd* cdd_result = new cdd(cdd_apply_reset(*cdd_object,
             converted_clock_resets, converted_clock_values, num_clock_resets,
