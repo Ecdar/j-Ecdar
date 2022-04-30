@@ -63,7 +63,6 @@ jintArray helper_functions::cPointerToJavaArray(
         }
         jint arr[len];
         for (int i = 0; i < len; i++) {
-            printf("%i", arrayPointer[i]);
             arr[i] = arrayPointer[i];
         }
         env->SetIntArrayRegion(newT, 0, len, arr);

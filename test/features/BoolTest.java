@@ -411,10 +411,13 @@ public class BoolTest {
         BoolVar bv = new BoolVar("a",false);
         CDD.addBddvar(new ArrayList<>(){{add(bv);}});
 
-        CDD test = CDD.createNegatedBddNode(bddStartLevel);
+        CDD test = new CDD(CDDLib.cddNBddvar(bddStartLevel));
+        test.printDot();
         System.out.println(CDD.numBools);
         BDDArrays arr = new BDDArrays(CDDLib.bddToArray(test.getPointer(),CDD.numBools));
         System.out.println(arr);
+        System.out.println(arr.getValues().get(0));
+        CDD.done();
 
     }
 

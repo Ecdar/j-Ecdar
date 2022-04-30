@@ -98,6 +98,7 @@ public class BDDArrays {
             for (int i=0; i<numTraces; i++) {
                 List<Integer> trace = new ArrayList<>();
                 for (int j = 0; j < numBools; j++) {
+                    System.out.println("erg: " + (i * numBools + j) + " "+ vals[i * numBools + j]);
                     trace.add(vals[i * numBools + j]);
                 }
                 result.add(trace);
