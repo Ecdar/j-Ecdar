@@ -162,6 +162,7 @@ public class CDD {
         System.out.println("*****************************************************");
         System.out.println(arrays.toString());
         System.out.println("*****************************************************");
+        System.out.println(BVs.size() + " "+ bddStartLevel);
         List<Guard> orParts = new ArrayList<>();
         for (int i=0; i< arrays.numTraces; i++)
         {
