@@ -367,6 +367,10 @@ public class CDD {
     public CDD applyReset(int[] clockResets, int[] clockValues, int[] boolResets, int[] boolValues){
         checkIfRunning();
         checkForNull();
+        assert(clockResets.length==clockValues.length);
+        assert(boolResets.length==boolValues.length);
+        if (clockResets.length>=1 && boolResets.length>=1 && boolValues.length>=1)
+            System.out.println("Clock resets: "  + clockResets[0] + " Clock values: "  + clockValues[0] +" Bool resets: "  + boolResets[0] + " bool values: "  + boolValues[0]);
         return new CDD(CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues)).removeNegative().reduce();
     }
 
@@ -503,7 +507,9 @@ public class CDD {
                 bl++;
             }
         }
-        return state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
+        CDD res= state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
+        res.printDot();
+        return res;
     }
 
     private void checkForNull(){

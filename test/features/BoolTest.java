@@ -413,10 +413,25 @@ public class BoolTest {
 
         CDD test = new CDD(CDDLib.cddNBddvar(bddStartLevel));
         test.printDot();
-        System.out.println(CDD.numBools);
         BDDArrays arr = new BDDArrays(CDDLib.bddToArray(test.getPointer(),CDD.numBools));
         System.out.println(arr);
-        System.out.println(arr.getValues().get(0));
+
+
+        System.out.println("###########################################################################");
+
+        CDD test1 = new CDD(CDDLib.cddBddvar(bddStartLevel));
+        test1.printDot();
+        BDDArrays arr1 = new BDDArrays(CDDLib.bddToArray(test1.getPointer(),CDD.numBools));
+        System.out.println(arr1);
+
+
+
+
+
+
+
+
+
         CDD.done();
 
     }
