@@ -1,6 +1,5 @@
 package logic;
 
-import Exceptions.InvalidQueryException;
 import models.Automaton;
 import org.json.simple.parser.ParseException;
 import parser.JSONParser;
@@ -10,37 +9,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 public class Controller {
-    private static final List<String> Queries = new ArrayList<>();
     private static List<SimpleTransitionSystem> transitionSystems = new ArrayList<>();
     private static final int FEATURE_REFINEMENT = 0;
     private static final int FEATURE_COMPOSITION = 1;
     private static final int FEATURE_CONJUNCTION = 2;
     private static final int FEATURE_QUOTIENT = 3;
 
-    public static List<String> handleRequest(String location, String query, boolean trace) throws Exception {
-        addQueries(query);
+    public static List<Query> handleRequest(String location, String query, boolean trace) throws Exception {
+        List<Query> queries = new ArrayList<>();
+        List<String> queryStrings = Arrays.asList(query.split(";"));
+        for (int i = 0; i < queryStrings.size(); i++){
+            queries.add(new Query(queryStrings.get(i)));
+        }
 
-        // Separates location and Queries
         ArrayList<String> temp = new ArrayList<>(Arrays.asList(location.split(" ")));
         boolean isJson = temp.get(0).equals("-json");
         String folderLoc = temp.get(1);
 
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
-        return runQueries(trace);
+        return handleQueries(queries, trace);
     }
 
-    public static String handleRequest(String query) throws Exception {
-        addQueries(query);
-        List<String> responseList = runQueries(false);
-
-        return String.join(" ", responseList);
-    }
-
-    private static void addQueries(String query){
-        Queries.clear();
-        Queries.addAll(Arrays.asList(query.split(";")));
+    public static Query handleRequest(String queryString) throws Exception {
+        Query query = new Query(queryString);
+        return handleQuery(query, false);
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
@@ -62,82 +57,108 @@ public class Controller {
         }
     }
 
+    private static Query handleQuery(Query query,boolean trace){
+        switch (query.getType()){
+            case REFINEMENT:
+                return handleRefinement(query, trace);
+            case CONSISTENCY:
+                return handleConsistency(query);
+            case IMPLEMENTATION:
+                return handleImplementation(query);
+            case DETERMINISM:
+                return handleDeterminism(query);
+            case GET_COMPONENT:
+                return handleGetComponent(query);
+            case BISIM_MINIM:
+                return handleBisimMinim(query);
+            case PRUNE:
+                return handlePrune(query);
+            default:
+                throw new RuntimeException("Invalid query type");
+        }
+    }
 
-    private static List<String> runQueries(boolean trace) throws Exception {
-        List<String> returnlist = new ArrayList<>();
+    private static Query handleRefinement(Query query, boolean trace){
+        List<String> refSplit = Arrays.asList(query.getQuery().split("<="));
+        Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
+        boolean refCheck;
+        if (trace) {
+            refCheck = ref.check(true);
+            query.setResult(refCheck);
+            if(refCheck){
+                query.addResultString(JSONParser.writeRefinement(ref.getTree()));
+            }
+        }
+        else {
+            query.setResult(ref.check());
+        }
 
-        for (int i = 0; i < Queries.size(); i++) {
-            Queries.set(i, Queries.get(i).replaceAll("\\s+", ""));
-            isQueryValid(Queries.get(i));
-            String componentName = null;
-            if(Queries.get(i).contains("save-as")){
-                String[] saveQuery = Queries.get(i).split("save-as");
-                Queries.set(i, saveQuery[0]);
-                componentName = saveQuery[1];
-            }
-            if (Queries.get(i).contains("refinement")) {
-                List<String> refSplit = Arrays.asList(Queries.get(i).replace("refinement:", "").split("<="));
-                Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
-                boolean refCheck;
-                if (trace) {
-                    refCheck = ref.check(true);
-                    returnlist.add(refCheck ? "true " + JSONParser.writeRefinement(ref.getTree()) : "false ");
-                }
-                else {
-                    refCheck = ref.check();
-                    returnlist.add(refCheck ? "true" : "false");
-                }
+        if (!query.getResult()) {
+            query.addResultString(ref.getErrMsg());
+        }
+        return query;
+    }
 
-                if (i == Queries.size()-1 && refCheck) continue;
-                returnlist.add("\n");
-                if (!refCheck) returnlist.add(ref.getErrMsg());
-            }
-            if (Queries.get(i).contains("consistency")) {
-                String cons = Queries.get(i).replace("consistency:", "");
-                TransitionSystem ts = runQuery(cons);
-                boolean passed = ts.isLeastConsistent();
-                returnlist.add(String.valueOf(passed));
-                if(!passed) returnlist.add("\n" + ts.getLastErr());
-            }
-            if (Queries.get(i).contains("implementation")) {
-                String impl = Queries.get(i).replace("implementation:", "");
-                TransitionSystem ts = runQuery(impl);
-                boolean passed = ts.isImplementation();
-                returnlist.add(String.valueOf(passed));
-                if(!passed) returnlist.add("\n" + ts.getLastErr());
-            }
-            if (Queries.get(i).contains("determinism")) {
-                String impl = Queries.get(i).replace("determinism:", "");
-                TransitionSystem ts = runQuery(impl);
-                boolean passed = ts.isDeterministic();
-                returnlist.add(String.valueOf(passed));
-                if(!passed) returnlist.add("\n" + ts.getLastErr());
-            }
-            if(Queries.get(i).contains("get-component")){
-                String query = Queries.get(i).replace("get-component:", "");
-                TransitionSystem ts = runQuery(query);
-                saveAutomaton(ts.getAutomaton(), componentName);
-            }
-            if(Queries.get(i).contains("bisim-minim")){
-                String impl = Queries.get(i).replace("bisim-minim:", "");
-                TransitionSystem ts = runQuery(impl);
-                Automaton aut = ts.getAutomaton();
+    private static Query handleConsistency(Query query){
+        TransitionSystem ts = runQuery(query.getQuery());
+        query.setResult(ts.isLeastConsistent());
+        if(!query.getResult()){
+            query.addResultString(ts.getLastErr());
+        }
+        return query;
+    }
 
-                aut = Bisimilarity.checkBisimilarity(aut);
+    private static Query handleImplementation(Query query){
+        TransitionSystem ts = runQuery(query.getQuery());
+        query.setResult(ts.isImplementation());
+        if(!query.getResult()){
+            query.addResultString(ts.getLastErr());
+        }
+        return query;
+    }
 
-                saveAutomaton(aut, componentName);
-            }
-            if(Queries.get(i).contains("prune")){
-                String impl = Queries.get(i).replace("prune:", "");
-                TransitionSystem ts = runQuery(impl);
-                Automaton aut = ts.getAutomaton();
+    private static Query handleDeterminism(Query query){
+        TransitionSystem ts = runQuery(query.getQuery());
+        query.setResult(ts.isDeterministic());
+        if(!query.getResult()){
+            query.addResultString(ts.getLastErr());
+        }
+        return query;
+    }
 
-                SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
-                aut = simp.pruneReachTimed().getAutomaton();
+    private static Query handleGetComponent(Query query){
+        TransitionSystem ts = runQuery(query.getQuery());
+        saveAutomaton(ts.getAutomaton(), query.getComponentName());
+        return query;
+    }
 
-                saveAutomaton(aut, componentName);
-            }
-            //add if contains specification or smth else
+    private static Query handleBisimMinim(Query query){
+        TransitionSystem ts = runQuery(query.getQuery());
+        Automaton aut = ts.getAutomaton();
+
+        aut = Bisimilarity.checkBisimilarity(aut);
+
+        saveAutomaton(aut, query.getComponentName());
+        return query;
+    }
+
+    private static Query handlePrune(Query query){
+        TransitionSystem ts = runQuery(query.getQuery());
+        Automaton aut = ts.getAutomaton();
+
+        SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
+        aut = simp.pruneReachTimed().getAutomaton();
+
+        saveAutomaton(aut, query.getComponentName());
+        return query;
+    }
+
+    private static List<Query> handleQueries(List<Query> queries, boolean trace){
+        List<Query> returnlist = new ArrayList<>();
+
+        for (Query query: queries) {
+            Query queryResult = handleQuery(query, trace);
+            returnlist.add(queryResult);
         }
 
         return returnlist;
@@ -250,60 +271,5 @@ public class Controller {
             }
         }
         return -1;
-    }
-
-    public static void isQueryValid(String query) throws Exception {
-        checkRefinementSyntax(query);
-        isParBalanced(query);
-        beforeAfterParantheses(query);
-        checkSyntax(query);
-    }
-
-    private static void checkRefinementSyntax(String query) throws InvalidQueryException {
-        if (query.contains("<=") && !query.contains("refinement:")) throw new InvalidQueryException("Expected: \"refinement:\"");
-
-        if (query.matches(".*<=.*<=.*")) throw new InvalidQueryException("There can only be one refinement");
-    }
-
-    private static void isParBalanced(String query) throws InvalidQueryException {
-        int counter = 0;
-
-        for (int i = 0; i < query.length(); i++) {
-            if (query.charAt(i) == '(') {
-                counter++;
-            }
-            if (query.charAt(i) == ')') {
-                counter--;
-            }
-        }
-
-        if (counter != 0) throw new InvalidQueryException("Parentheses are not balanced");
-    }
-
-    private static void beforeAfterParantheses(String query) throws InvalidQueryException {
-        String testString = "/=|&:(";
-
-        for (int i = 0; i < query.length(); i++) {
-            if (query.charAt(i) == '(') {
-                if (i != 0) {
-                    if (testString.indexOf(query.charAt(i - 1)) == -1)
-                        throw new InvalidQueryException("Before opening Parentheses can be either operator or second Parentheses");
-                }
-                if (i + 1 < query.length()) {
-                    if (!(query.charAt(i + 1) == '(' || Character.isLetter(query.charAt(i + 1)) || Character.isDigit(query.charAt(i + 1))))
-                        throw new InvalidQueryException("After opening Parentheses can be either other Parentheses or component");
-                }
-            }
-        }
-    }
-
-    private static void checkSyntax(String query) throws InvalidQueryException {
-        String testString = "/=|&:";
-        for (int i = 0; i < query.length(); i++) {
-            if (testString.indexOf(query.charAt(i)) != -1) {
-                return;
-            }
-        }
-        throw new InvalidQueryException("Incorrect syntax, does not contain any feature");
     }
 }
