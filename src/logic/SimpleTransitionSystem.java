@@ -118,6 +118,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 State state1 = new State(trans.get(i).getSource());
                 State state2 = new State(trans.get(j).getSource());
 
+                // TODO: do a transitionBack here, in case the target invariant was not included into the guards
+
                 state1.applyGuards(trans.get(i).getGuardCDD());
                 state2.applyGuards(trans.get(j).getGuardCDD());
 

@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static models.CDD.bddStartLevel;
-import static models.CDD.getIndexOfBV;
+import static models.CDD.*;
 
 public class BoolTest {
 
@@ -493,11 +492,28 @@ public class BoolTest {
     @Test
     public void inputEnabled()
     {
-        Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
-        Automaton auts1[] = XMLParser.parse("samples/xml/booleanRefinement.xml",true);
-        XMLFileWriter.toXML("inputenabledbool1.xml",new SimpleTransitionSystem(auts1[2]));
-        assert(new Refinement(new SimpleTransitionSystem(auts[3]),new SimpleTransitionSystem(auts1[2])).check());
-        assert(new Refinement(new SimpleTransitionSystem(auts1[2]),new SimpleTransitionSystem(auts[3])).check());
+        Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinementOneAut.xml",true);
+        XMLFileWriter.toXML("inputenabledbool1.xml",new SimpleTransitionSystem(auts[0]));
+
+    }
+
+
+    @Test
+    public void transitionBack()
+    {
+        CDD.init(100,100,100);
+        CDD.addClocks(new ArrayList<>() {{add(new Clock("clk"));}});
+        BoolVar a = new BoolVar("a",false);
+        CDD.addBddvar(new ArrayList<>(){{add(a);}});
+
+        CDD state = CDD.allocateInterval(1,0,0,true,5,true);
+        Update update = new BoolUpdate(a,true);
+        List<Update> updates = new ArrayList<>();
+        updates.add(update);
+        Edge e = new Edge(null,null,null,true,new TrueGuard(),updates);
+        CDD result = state.transitionBack(e);
+        System.out.println(result);
+        CDD.done();
     }
 
 

@@ -636,7 +636,7 @@ public class CDD {
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel+ getIndexOfBV(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
                 bl++;
             }
@@ -652,6 +652,7 @@ public class CDD {
     {
         if (e.getUpdates().size()==0)
         {
+            System.out.println("no update " + e.getGuardCDD());
             return this.conjunction(e.getGuardCDD());
         }
         int numBools = 0;
@@ -677,11 +678,12 @@ public class CDD {
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel+ getIndexOfBV(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
                 bl++;
             }
         }
+        System.out.println("guard: " + e.getGuardCDD() + " update: " + turnUpdatesToCDD(e.getUpdates()) + " clockResets: " + clockResets.toString() + " boolResets: " + boolResets.toString());
         return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets).removeNegative().reduce();
     }
 
@@ -732,7 +734,7 @@ public class CDD {
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel+ getIndexOfBV(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
                 bl++;
             }

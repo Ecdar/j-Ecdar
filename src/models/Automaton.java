@@ -30,8 +30,8 @@ public class Automaton {
     private Set<Channel> inputAct, outputAct, actions;
     private Location initLoc;
 
-    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks,List<BoolVar> BVs) {
-        this(name, locations, edges, clocks, BVs,true);
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs) {
+        this(name, locations, edges, clocks, BVs, true);
     }
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInpEnabled) {
@@ -52,20 +52,19 @@ public class Automaton {
         this.BVs = BVs;
 
 
-
         if (makeInpEnabled) {
-            CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
             addTargetInvariantToEdges();
-            //makeInputEnabled();
+            makeInputEnabled();
             CDD.done();
         }
     }
 
     // Copy constructor
-    public Automaton(Automaton copy){
-        this.name = copy.name+"Copy";
+    public Automaton(Automaton copy) {
+        this.name = copy.name + "Copy";
 
         this.clocks = new ArrayList<>();
         for (Clock c : copy.clocks) {
@@ -80,7 +79,7 @@ public class Automaton {
         this.locations = new ArrayList<>();
         for (Location loc : copy.locations) {
             this.locations.add(new Location(loc, clocks, copy.clocks, BVs, copy.BVs));
-            if(loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
+            if (loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
         }
 
         this.edges = new ArrayList<>();
@@ -95,10 +94,10 @@ public class Automaton {
         this.actions = copy.actions;
     }
 
-    public HashMap<Clock,Integer> getMaxBoundsForAllClocks(){
-        HashMap<Clock,Integer> res = new HashMap<Clock,Integer>();
+    public HashMap<Clock, Integer> getMaxBoundsForAllClocks() {
+        HashMap<Clock, Integer> res = new HashMap<Clock, Integer>();
 
-        for(Clock clock: clocks) {
+        for (Clock clock : clocks) {
             for (Edge edge : edges) {
                 int clockMaxBound = edge.getMaxConstant(clock);
                 if (!(res.containsKey(clock)))
@@ -110,15 +109,14 @@ public class Automaton {
                 int clockMaxBound = location.getMaxConstant(clock);
                 if (!(res.containsKey(clock)))
                     res.put(clock, clockMaxBound);
-                if ( clockMaxBound > res.get(clock))
+                if (clockMaxBound > res.get(clock))
                     res.put(clock, clockMaxBound);
             }
-            if (!res.containsKey(clock) | res.get(clock)==0)
-                res.put(clock,1);
+            if (!res.containsKey(clock) | res.get(clock) == 0)
+                res.put(clock, 1);
         }
         return res;
     }
-
 
 
     public String getName() {
@@ -226,53 +224,46 @@ public class Automaton {
 
 
     public void makeInputEnabled() {
+        for (Location loc : getLocations()) {
+            System.out.println("now in location " + loc);
+            CDD sourceInvariantCDD = loc.getInvariantCDD();
+            // loop through all inputs
+            for (Channel input : getInputAct()) {
 
-        if (clocks.size() > 0) {
-            for (Location loc : getLocations()) {
-                CDD sourceInvariantCDD = loc.getInvariantCDD();
-                // loop through all inputs
-                for (Channel input : getInputAct()) {
-                    // build CDD of zones from edges
-                    List<Edge> inputEdges = getEdgesFromLocationAndSignal(loc, input);
-                    CDD resCDD;
-                    CDD cddOfAllInputs = CDD.cddFalse();
-                    if (!inputEdges.isEmpty()) {
-                        for (Edge edge : inputEdges) {
-                            CDD target = edge.getTarget().getInvariantCDD();
-                            //CDD preReset = CDD.applyReset(target, edge.getUpdates()); // Does not work for back propagation
-                            //CDD preGuard = preReset.conjunction(edge.getGuardCDD());
-                            CDD preGuard1 = target.transitionBack(edge);
-                            //assert (preGuard1.equiv(preGuard));
-                            cddOfAllInputs = cddOfAllInputs.disjunction(preGuard1);
-                        }
-
-                        // subtract the federation of zones from the original fed
-                        resCDD = sourceInvariantCDD.minus(cddOfAllInputs);
-                    } else {
-                        resCDD = sourceInvariantCDD;
+                // build CDD of zones from edges
+                List<Edge> inputEdges = getEdgesFromLocationAndSignal(loc, input);
+                CDD resCDD;
+                CDD cddOfAllEdgesWithCurrentInput = CDD.cddFalse();
+                if (!inputEdges.isEmpty()) {
+                    for (Edge edge : inputEdges) {
+                        CDD target = edge.getTarget().getInvariantCDD();
+                        System.out.println("Target CDD: " + target);
+                        CDD preGuard1 = target.transitionBack(edge);
+                        System.out.println("Pre guard 1: " + preGuard1);
+                        cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.disjunction(preGuard1);
+                        System.out.println("cddOfAllEdgesWithCurrentInput: " + cddOfAllEdgesWithCurrentInput);
                     }
-                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
-                    getEdges().add(newEdge);
 
-
+                    // subtract the federation of zones from the original fed
+                    resCDD = sourceInvariantCDD.minus(cddOfAllEdgesWithCurrentInput);
+                } else {
+                    resCDD = sourceInvariantCDD;
                 }
+                Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
+                getEdges().add(newEdge);
+
+
             }
         }
+
     }
 
     public void addTargetInvariantToEdges() {
-        //if ( clocks.size() > 0) {
-            for (Edge edge : getEdges()) {
-                CDD targetCDD = edge.getTarget().getInvariantCDD();
-                System.out.println("targetCDD " + targetCDD);
-
-                CDD past = targetCDD.transitionBack(edge);
-                System.out.println("past " + past);
-                System.out.println("past.conjunction(edge.getGuardCDD() " + past.conjunction(edge.getGuardCDD()) );
-
-                edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
-            }
-       // } // TODO: else part will be important once we have bool support => I hope BDDs work just the same
+        for (Edge edge : getEdges()) {
+            CDD targetCDD = edge.getTarget().getInvariantCDD();
+            CDD past = targetCDD.transitionBack(edge);
+            edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
+        }
     }
 
 }
