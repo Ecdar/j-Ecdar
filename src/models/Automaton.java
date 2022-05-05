@@ -58,7 +58,7 @@ public class Automaton {
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
             addTargetInvariantToEdges();
-            makeInputEnabled();
+            //makeInputEnabled();
             CDD.done();
         }
     }
@@ -261,14 +261,18 @@ public class Automaton {
     }
 
     public void addTargetInvariantToEdges() {
-        if ( clocks.size() > 0) {
+        //if ( clocks.size() > 0) {
             for (Edge edge : getEdges()) {
                 CDD targetCDD = edge.getTarget().getInvariantCDD();
+                System.out.println("targetCDD " + targetCDD);
+
                 CDD past = targetCDD.transitionBack(edge);
+                System.out.println("past " + past);
+                System.out.println("past.conjunction(edge.getGuardCDD() " + past.conjunction(edge.getGuardCDD()) );
 
                 edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
             }
-        } // TODO: else part will be important once we have bool support
+       // } // TODO: else part will be important once we have bool support => I hope BDDs work just the same
     }
 
 }

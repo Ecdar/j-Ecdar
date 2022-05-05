@@ -45,6 +45,27 @@ public class BoolTest {
     }
 
     @Test
+    public void testDisjunction() {
+
+        Clock a = new Clock("a");
+        Clock b = new Clock("b");
+        List<Clock> clocks = new ArrayList<>();
+        clocks.add(a); clocks.add(b);
+
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(clocks);
+        CDD ba = CDD.allocateInterval(1,0,3, true,5, true);
+        CDD bb = CDD.allocateInterval(2,0,2,true,8,true);
+        CDD cdd =ba.disjunction(bb);
+        System.out.println("size " + clocks.size());
+
+        System.out.println(cdd);
+        //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
+        CDD.done();
+    }
+
+
+    @Test
     public void testBoolArray() {
 
         BoolVar a = new BoolVar("a",false);
@@ -423,16 +444,31 @@ public class BoolTest {
         test1.printDot();
         BDDArrays arr1 = new BDDArrays(CDDLib.bddToArray(test1.getPointer(),CDD.numBools));
         System.out.println(arr1);
+        CDD.done();
+
+        assert(arr.getVars().get(0).get(0) ==1);
+        assert(arr.getValues().get(0).get(0) ==0);
+        assert(arr1.getVars().get(0).get(0) ==1);
+        assert(arr1.getValues().get(0).get(0) ==1);
 
 
+        System.out.println("###########################################################################");
 
+        CDD.init(100,100,100);
+        CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk"));add(new Clock("testclk1"));}});
+        BoolVar bv1 = new BoolVar("a",false);
+        CDD.addBddvar(new ArrayList<>(){{add(bv1);}});
 
+        CDD test2 = new CDD(CDDLib.cddNBddvar(bddStartLevel));
+        BDDArrays arr2 = new BDDArrays(CDDLib.bddToArray(test2.getPointer(),CDD.numBools));
+        System.out.println(arr2);
 
-
-
-
+        assert(arr2.getVars().get(0).get(0) ==3);
+        assert(arr2.getValues().get(0).get(0) ==0);
 
         CDD.done();
+
+
 
     }
 
@@ -441,10 +477,29 @@ public class BoolTest {
     @Test
     public void testBooleanRefinement()
     {
-
         Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
         assert(new Refinement(new SimpleTransitionSystem(auts[0]),new SimpleTransitionSystem(auts[1])).check());
+        assert(new Refinement(new SimpleTransitionSystem(auts[1]),new SimpleTransitionSystem(auts[0])).check());
     }
+
+    @Test
+    public void testIsImplementation()
+    {
+        Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
+        assert(new SimpleTransitionSystem(auts[2]).isDeterministic());
+        assert(!(new SimpleTransitionSystem(auts[2]).isImplementation()));
+    }
+
+    @Test
+    public void inputEnabled()
+    {
+        Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
+        Automaton auts1[] = XMLParser.parse("samples/xml/booleanRefinement.xml",true);
+        XMLFileWriter.toXML("inputenabledbool1.xml",new SimpleTransitionSystem(auts1[2]));
+        assert(new Refinement(new SimpleTransitionSystem(auts[3]),new SimpleTransitionSystem(auts1[2])).check());
+        assert(new Refinement(new SimpleTransitionSystem(auts1[2]),new SimpleTransitionSystem(auts[3])).check());
+    }
+
 
 
     @Test

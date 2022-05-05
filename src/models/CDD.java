@@ -118,7 +118,6 @@ public class CDD {
         }
         if (copy.isBDD())
         {
-            System.out.println("here");
             return CDD.toBoolGuards(copy);
         }
         else {
@@ -159,10 +158,7 @@ public class CDD {
         long ptr = bdd.getPointer();
         BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr,numBools));
 
-        System.out.println("*****************************************************");
-        System.out.println(arrays.toString());
-        System.out.println("*****************************************************");
-        System.out.println(BVs.size() + " "+ bddStartLevel);
+
         List<Guard> orParts = new ArrayList<>();
         for (int i=0; i< arrays.numTraces; i++)
         {
@@ -171,7 +167,6 @@ public class CDD {
             {
 
                 int index = arrays.getVars().get(i).get(j);
-                System.out.println(index);
                 if (index>=0) {
                     BoolVar var = BVs.get(index-bddStartLevel);
                     boolean val = (arrays.getValues().get(i).get(j) == 1) ? true : false;
@@ -369,8 +364,6 @@ public class CDD {
         checkForNull();
         assert(clockResets.length==clockValues.length);
         assert(boolResets.length==boolValues.length);
-        if (clockResets.length>=1 && boolResets.length>=1 && boolValues.length>=1)
-            System.out.println("Clock resets: "  + clockResets[0] + " Clock values: "  + clockValues[0] +" Bool resets: "  + boolResets[0] + " bool values: "  + boolValues[0]);
         return new CDD(CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues)).removeNegative().reduce();
     }
 
@@ -502,13 +495,10 @@ public class CDD {
                 BoolUpdate u = (BoolUpdate) up;
                 boolResets[bl] = bddStartLevel+ getIndexOfBV(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
-                System.out.println(bddStartLevel + " " + getIndexOfBV(u.getBV()));
-                System.out.println("heeeere: " + boolResets[bl] + " " + boolValues[bl]);
                 bl++;
             }
         }
         CDD res= state.applyReset(clockResets,clockValues,boolResets,boolValues).removeNegative().reduce();
-        res.printDot();
         return res;
     }
 
