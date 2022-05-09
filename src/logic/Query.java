@@ -11,6 +11,7 @@ public class Query {
     private List<String> resultList;
     private boolean result;
     private String componentName;
+    private static int nextDefaultComponentId = 0;
 
     public Query(String query) throws Exception {
         queryString = query.replaceAll("\\s+", "");
@@ -40,13 +41,27 @@ public class Query {
         } else if(queryString.contains("get-component")){
             queryType = QueryType.GET_COMPONENT;
             queryString = queryString.replace("get-component:", "");
+            if(componentName == null){
+                SetDefaultComponentName();
+            }
         } else if(queryString.contains("bisim-minim")){
             queryType = QueryType.BISIM_MINIM;
             queryString = queryString.replace("bisim-minim:", "");
+            if(componentName == null){
+                SetDefaultComponentName();
+            }
         } else if(queryString.contains("prune")){
             queryType = QueryType.PRUNE;
             queryString = queryString.replace("prune:", "");
+            if(componentName == null){
+                SetDefaultComponentName();
+            }
         }
+    }
+
+    private void SetDefaultComponentName() {
+        componentName = "automaton" + nextDefaultComponentId;
+        nextDefaultComponentId++;
     }
 
     public void setResult(boolean result) {
