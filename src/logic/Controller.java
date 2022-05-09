@@ -166,7 +166,7 @@ public class Controller {
 
     public static void saveToDisk(String location){
         for(TransitionSystem system : transitionSystems){
-            JsonFileWriter.writeToJson(system.getAutomaton(), location);
+            JsonAutomatonEncoder.writeToJson(system.getAutomaton(), location);
         }
     }
 
@@ -216,6 +216,11 @@ public class Controller {
         }
 
         return getTransitionSystem(feature, transitionSystems);
+    }
+
+    public static String getJsonComponent(String componentName) {
+        TransitionSystem transitionSystem = findComponent(componentName);
+        return JsonAutomatonEncoder.getAutomatonAsJson(transitionSystem.getAutomaton());
     }
 
     private static TransitionSystem getTransitionSystem(int feature, List<TransitionSystem> transitionSystems) {

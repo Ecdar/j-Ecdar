@@ -62,10 +62,9 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
                     );
                     break;
                 case GET_COMPONENT:
-                    break;
                 case BISIM_MINIM:
-                    break;
                 case PRUNE:
+                    getComponent(response, queryResponseBuilder);
                     break;
                 default:
                     responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Query has an invalid type").asRuntimeException());
@@ -76,5 +75,13 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
         } catch (Exception e) {
             responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(e.getClass().getName() + ": " + e.getMessage()).asRuntimeException());
         }
+    }
+
+    private void getComponent(Query response, QueryProtos.QueryResponse.Builder queryResponseBuilder) {
+        String jsonComponent = Controller.getJsonComponent(response.getComponentName());
+        queryResponseBuilder.setComponent(
+                QueryProtos.QueryResponse.ComponentResult.newBuilder()
+                        .setComponent(ComponentProtos.Component.newBuilder().setJson(jsonComponent).build()).build()
+        );
     }
 }
