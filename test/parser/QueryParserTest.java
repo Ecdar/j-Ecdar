@@ -514,4 +514,20 @@ public class QueryParserTest {
             assertEquals(e.getMessage(), "After opening Parentheses can be either other Parentheses or component");
         }
     }
+
+    @Test
+    public void testComponentName() throws Exception {
+        Controller.parseComponents("./samples/json/EcdarUniversity", true);
+        Query query = new Query("get-component: Machine save-as TestMachine");
+
+        assertEquals("TestMachine", query.getComponentName());
+    }
+
+    @Test
+    public void testDefaultComponentName() throws Exception {
+        Controller.parseComponents("./samples/json/EcdarUniversity", true);
+        Query query = new Query("get-component: Machine");
+
+        assertEquals("automaton0", query.getComponentName());
+    }
 }
