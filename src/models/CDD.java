@@ -658,6 +658,7 @@ public class CDD {
     {
         if (e.getUpdates().size()==0)
         {
+            System.out.println("returned because no update");
             return this.conjunction(e.getGuardCDD());
         }
         int numBools = 0;
