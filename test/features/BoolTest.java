@@ -1,6 +1,8 @@
 package features;
 
 import lib.CDDLib;
+import logic.Bisimilarity;
+import logic.Quotient;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import models.*;
@@ -487,6 +489,96 @@ public class BoolTest {
         Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
         assert(new SimpleTransitionSystem(auts[2]).isDeterministic());
         assert(!(new SimpleTransitionSystem(auts[2]).isImplementation()));
+    }
+
+    @Test
+    public void testInvalidTransitionMartijn()
+    {
+        Automaton auts[] = XMLParser.parse("samples/xml/refinement_bool.xml",true);
+       XMLFileWriter.toXML("martijn.xml", new SimpleTransitionSystem(auts[5]));
+        assert(new SimpleTransitionSystem(auts[5]).isDeterministic());
+        assert(new SimpleTransitionSystem(auts[5]).isFullyConsistent());
+    }
+
+    @Test
+    public void testBoolQuotientOneTemplate()
+    {
+        CDD.done();
+        Automaton auts[] = XMLParser.parse("samples/xml/BoolQuotientOneTemplate.xml",true);
+
+        CDD.init(100,100,100);
+        CDD.addClocks(new ArrayList<>(){{add(new Clock("x"));}});
+        CDD.addBddvar(new ArrayList<>());
+        System.out.println("found the bug: " + CDD.cddTrue().removeNegative().negation().removeNegative());
+        CDD.done();
+    }
+
+    @Test
+    public void testBoolQuotient()
+    {
+        CDD.done();
+        Automaton auts[] = XMLParser.parse("samples/xml/BoolQuotient.xml",true);
+        XMLFileWriter.toXML("TInputEnabled.xml", new SimpleTransitionSystem(auts[0]));
+        System.out.println("PARSING COMPLETE");
+        Quotient q = new Quotient(new SimpleTransitionSystem(auts[1]),new SimpleTransitionSystem(auts[0]));
+        SimpleTransitionSystem sts = q.calculateQuotientAutomaton();
+        XMLFileWriter.toXML("quotient_bool.xml",sts);
+
+        SimpleTransitionSystem sts1 = q.calculateQuotientAutomaton(true);
+        XMLFileWriter.toXML("quotient_bool1.xml",sts1);
+
+        Automaton finalAut  =Bisimilarity.checkBisimilarity(sts1.getAutomaton());
+        XMLFileWriter.toXML("bsimreducedQuotient.xml", new SimpleTransitionSystem(finalAut));
+    }
+
+    @Test
+    public void testRefinementByNiels()
+    {
+        Automaton auts[] = XMLParser.parse("samples/xml/refinement_bool.xml",false);
+        assert(new SimpleTransitionSystem(auts[0]).isDeterministic());
+        assert(new SimpleTransitionSystem(auts[0]).isFullyConsistent());
+        assert(new SimpleTransitionSystem(auts[0]).isLeastConsistent());
+        assert(new SimpleTransitionSystem(auts[1]).isDeterministic());
+        assert(new SimpleTransitionSystem(auts[1]).isFullyConsistent());
+        assert(new SimpleTransitionSystem(auts[1]).isLeastConsistent());
+        assert(new Refinement(new SimpleTransitionSystem(auts[1]), new SimpleTransitionSystem(auts[0])).check());
+        assert(new Refinement(new SimpleTransitionSystem(auts[0]), new SimpleTransitionSystem(auts[1])).check());
+    }
+
+    @Test
+    public void testImplementationByNiels()
+    {
+        Automaton auts[] = XMLParser.parse("samples/xml/refinement_bool.xml",false);
+        SimpleTransitionSystem sts0 = new  SimpleTransitionSystem(auts[2]);
+        assert(sts0.isDeterministic());
+        boolean result0 = sts0.isImplementation();
+        System.out.println(sts0.getLastErr());
+        System.out.println("Template 0: " + result0);
+
+        SimpleTransitionSystem sts1 = new  SimpleTransitionSystem(auts[3]);
+        assert(sts1.isDeterministic());
+        boolean result1 = sts1.isImplementation();
+        System.out.println(sts1.getLastErr());
+        System.out.println("Template 1: " + result1);
+
+        SimpleTransitionSystem sts2 = new  SimpleTransitionSystem(auts[4]);
+        assert(sts2.isDeterministic());
+        boolean result2 = sts2.isImplementation();
+        System.out.println(sts2.getLastErr());
+        System.out.println("Template 2: " + result2);
+
+    }
+
+
+    @Test
+    public void testIsConsistent()
+    {
+        Automaton auts[] = XMLParser.parse("samples/xml/is_consistent_single.xml",false);
+        SimpleTransitionSystem sts0 = new  SimpleTransitionSystem(auts[0]);
+        assert(sts0.isDeterministic());
+        boolean result0 = sts0.isImplementation();
+        System.out.println(sts0.getLastErr());
+        System.out.println("Template 0: " + result0);
     }
 
     @Test

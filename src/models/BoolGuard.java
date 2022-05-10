@@ -31,6 +31,7 @@ public class BoolGuard extends Guard {
 
     // Copy constructor
     public BoolGuard(BoolGuard copy, List<BoolVar> oldBVs, List<BoolVar> newBVs) {
+        System.out.println("old bvs" + oldBVs + " " + copy.getVar());
         var = newBVs.get(oldBVs.indexOf(copy.getVar()));
         comperator = copy.comperator;
         value = copy.value;

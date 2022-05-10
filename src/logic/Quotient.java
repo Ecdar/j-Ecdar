@@ -1,7 +1,9 @@
 package logic;
 
 import models.*;
+
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Quotient extends TransitionSystem {
@@ -35,13 +37,14 @@ public class Quotient extends TransitionSystem {
         clocks.addAll(ts_comp.getClocks());
         BVs.addAll(ts_spec.getBVs());
         BVs.addAll(ts_comp.getBVs());
-        if (printComments) System.out.println("Clocks of ts1 ( " + ts_spec.getClocks() +" ) and ts2 ( " + ts_comp.getClocks() + " ) merged to + " + clocks);
+        if (printComments)
+            System.out.println("Clocks of ts1 ( " + ts_spec.getClocks() + " ) and ts2 ( " + ts_comp.getClocks() + " ) merged to + " + clocks);
 
 
         // inputs should contain inputs of ts1, outputs of ts2 and a new input
         inputs = new HashSet<>(ts_spec.getInputs());
         inputs.addAll(ts_comp.getOutputs());
-        newChan = new Channel("newInput");
+        newChan = new Channel("i_new");
         inputs.add(newChan);
 
         Set<Channel> outputsOfSpec = new HashSet<>(ts_spec.getOutputs());
@@ -53,9 +56,11 @@ public class Quotient extends TransitionSystem {
         outputs = new HashSet<>(outputsOfSpec);
         outputs.removeAll(outputsOfComp);
 
-        if (printComments) System.out.println("ts1.in = " + ts_spec.getInputs() +", ts1.out = " + ts_spec.getOutputs());
-        if (printComments) System.out.println("ts2.in = " + ts_comp.getInputs() +", ts2.out = " + ts_comp.getOutputs());
-        if (printComments) System.out.println("quotient.in = " + inputs +", quotioent.out = " + outputs);
+        if (printComments)
+            System.out.println("ts1.in = " + ts_spec.getInputs() + ", ts1.out = " + ts_spec.getOutputs());
+        if (printComments)
+            System.out.println("ts2.in = " + ts_comp.getInputs() + ", ts2.out = " + ts_comp.getOutputs());
+        if (printComments) System.out.println("quotient.in = " + inputs + ", quotioent.out = " + outputs);
 
     }
 
@@ -70,37 +75,41 @@ public class Quotient extends TransitionSystem {
         // which means the location has no invariants
         SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{ts_spec, ts_comp});
         ((ComplexLocation) initLoc).removeInvariants();
-        if (printComments) System.out.println("ts1.init = " + ts_spec.getInitialLocation() + ", ts2.init= " + ts_comp.getInitialLocation());
+        if (printComments)
+            System.out.println("ts1.init = " + ts_spec.getInitialLocation() + ", ts2.init= " + ts_comp.getInitialLocation());
         if (printComments) System.out.println("quotients.init = " + initLoc);
         return initLoc;
     }
 
     public SimpleTransitionSystem calculateQuotientAutomaton() {
+        return calculateQuotientAutomaton(false);
+    }
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+    public SimpleTransitionSystem calculateQuotientAutomaton(boolean prepareForBisimilarityReduction) {
+
+        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
         CDD.addClocks(clocks);
         CDD.addBddvar(BVs);
-        String name = ts_spec.getSystems().get(0).getName() + "DIV" + ts_comp.getSystems().get(0).getName() ;
+        String name = ts_spec.getSystems().get(0).getName() + "DIV" + ts_comp.getSystems().get(0).getName();
 
         // Lists of edges and locations for the newly built automaton
-        List<Edge>  edges = new ArrayList<Edge>();
-        List<Location>  locations = new ArrayList<Location>();
+        List<Edge> edges = new ArrayList<Edge>();
+        List<Location> locations = new ArrayList<Location>();
 
         // Map so I can easily access the new locations via their name
-        Map<String,Location> locationMap = new HashMap<String,Location>();
-
-        // TODO: currently I assume the init location to not be urgent
-        Location init = new Location(ts_spec.getSystems().get(0).getAutomaton().getInitLoc().getName() + "DIV" + ts_comp.getSystems().get(0).getAutomaton().getInitLoc().getName() , new TrueGuard() , true, ts_spec.getSystems().get(0).getAutomaton().getInitLoc().isUrgent() || ts_comp.getSystems().get(0).getAutomaton().getInitLoc().isUrgent() , false, false);
+        Map<String, Location> locationMap = new HashMap<String, Location>();
 
         // just an easy way to access spec and comp from here on
         // TODO: check that there is only one automaton in each, maybe implement so that several automata can be explored at once
+        assert (ts_spec.getSystems().size() == 1);
+        assert (ts_comp.getSystems().size() == 1);
         Automaton spec = ts_spec.getSystems().get(0).getAutomaton();
         Automaton comp = ts_comp.getSystems().get(0).getAutomaton();
-
+        System.out.println("INITIALIZED");
         // create product of locations
         for (Location l_spec : spec.getLocations()) {
             for (Location l_comp : comp.getLocations()) {
-                // TODO: I assume that if one location in the product is univ./inc., the product is univ/inc. and I do not need to create a location for them.
+                // I assume that if one location in the product is univ./inc., the product is univ/inc. and I do not need to create a location for them.
                 if (!l_comp.getName().equals("univ") && !l_spec.getName().equals("univ") && !l_comp.getName().equals("inc") && !l_spec.getName().equals("inc")) {
                     boolean isInitial = l_spec.isInitial() && l_comp.isInitial();
                     boolean isUrgent = l_spec.isUrgent() || l_comp.isUrgent();
@@ -113,11 +122,11 @@ public class Quotient extends TransitionSystem {
         }
 
         // Create univ. and inc. location
-        Location univ =   new Location("univ", new TrueGuard(), false, false, true, false);
+        Location univ = new Location("univ", new TrueGuard(), false, false, true, false);
         Location inc = new Location("inc", new TrueGuard(), false, true, false, true);
 
-        locationMap.put("univ",univ);
-        locationMap.put("inc",inc);
+        locationMap.put("univ", univ);
+        locationMap.put("inc", inc);
         locations.add(univ);
         locations.add(inc);
 
@@ -125,45 +134,42 @@ public class Quotient extends TransitionSystem {
         allChans.addAll(inputs);
         allChans.addAll(outputs);
 
-
+        System.out.println("INITIALIZED2");
         // now come all the rules for building transitions
         for (Location l_spec : spec.getLocations())
-            for (Location l_comp : comp.getLocations())
-            {
+            for (Location l_comp : comp.getLocations()) {
                 // loc is the location we are currently analyzing
-                Location loc = locationMap.get(l_spec.getName()+"DIV"+l_comp.getName());
-                //System.out.println(loc.getName());
+                Location loc = locationMap.get(l_spec.getName() + "DIV" + l_comp.getName());
 
                 // selfloops for the inc / univ state will be newly created, so we do not need to take care of them here
-                // TODO: I assume only the spec can have inc./univ. location. Is that true? NO!
-                // TODO: Maybe that is now fixed. Check that!
                 if (!l_spec.getName().equals("inc") && !l_spec.getName().equals("univ") && !l_comp.getName().equals("inc") && !l_comp.getName().equals("univ")) {
 
+                    System.out.println("RULE 2");
                     // Rule 2 (First transition in Figure)
                     if (!(l_spec.getInvariant() instanceof TrueGuard)) {
                         // negate the spec. invariant
+                        CDD invarNegated = l_spec.getInvariantCDD().negation();
 
-                            CDD invarNegated = l_spec.getInvariantCDD().negation();
-                                // merge the current part with the invariant of the component, to create each new transition
-
-                                edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(l_comp.getInvariantCDD().conjunction(invarNegated),clocks), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
-                       }
-
+                        // merge the negation with the invariant of the component, to create each new transition
+                        CDD combined = l_comp.getInvariantCDD().conjunction(invarNegated);
+                        List<Update> updates = new ArrayList<Update>() {{
+                            add(new ClockUpdate(newClock, 0));
+                        }};
+                        edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(combined, clocks), updates));
+                    }
+                    System.out.println("RULE1");
                     // Rule 1
-                    if (!(l_spec.getInvariant() instanceof TrueGuard)) {
-                        // TODO: I interpreted this rule as "for every channel". This will also create a transition for the new symbol. That is fine!
+                    if (!(l_comp.getInvariant() instanceof TrueGuard)) {
                         // negate the comp. invariant.
-                        // TODO: some of the guards in the list we get here might actually be mergable
                         CDD l_comp_invar_negated = l_comp.getInvariantCDD().negation();
                         for (Channel c : allChans) {
-                                boolean isInput = false;
-                                if (inputs.contains(c)) isInput = true;
-                                edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(l_comp_invar_negated,clocks), new ArrayList<>()));
-
+                            boolean isInput = false;
+                            if (inputs.contains(c)) isInput = true;
+                            edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(l_comp_invar_negated, clocks), new ArrayList<>()));
                         }
                     }
 
-
+                    System.out.println("RULE3");
                     // rule 3 (cartesian product)
                     for (Channel c : allChans) {
                         // only if both spec and comp have a transition with this channel
@@ -171,11 +177,15 @@ public class Quotient extends TransitionSystem {
                             // in case spec / comp has multiple transitions with c, we need to take every combination
                             for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c))
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                    // find the target location. If it is inc / univ in spec, change it to the new inv/univ location
+                                    // find the target location. If it is inc / univ in spec, change it to the new inc/univ location
                                     Location target = locationMap.get(e_spec.getTarget().getName() + "DIV" + e_comp.getTarget().getName());
-                                    if (e_spec.getTarget().getName().equals("inc"))
+                                    if (e_spec.getTarget().getName().equals("inc")) // todo: make those attributes of the location class
                                         target = inc;
                                     if (e_spec.getTarget().getName().equals("univ"))
+                                        target = univ;
+                                    if (e_comp.getTarget().getName().equals("inc")) // todo: make those attributes of the location class
+                                        target = inc;
+                                    if (e_comp.getTarget().getName().equals("univ"))
                                         target = univ;
                                     // combine both guards
                                     CDD guard = e_spec.getGuardCDD().conjunction(e_comp.getGuardCDD());
@@ -184,35 +194,42 @@ public class Quotient extends TransitionSystem {
                                     List<Update> updatesList = new ArrayList<Update>();
                                     updatesList.addAll(e_spec.getUpdates());
                                     updatesList.addAll(e_comp.getUpdates());
-                                    //Update[] updates = updatesList.toArray(new Update[0]); // TODO: Check whether this is really the way to initialize an array from a list
-                                    edges.add(new Edge(loc, target, c, !(e_comp.isInput() && !e_spec.isInput()), CDD.toGuardList(guard,clocks), updatesList));
+
+
+
+                                    // TODO: previously isInput was defined like this: !(e_comp.isInput() && !e_spec.isInput()) Is the current version better?
+                                    boolean isInput = inputs.contains(e_comp.getChan()) ? true : false;
+                                    Edge resultE = new Edge(loc, target, c, isInput , CDD.toGuardList(guard, clocks), updatesList);
+
+                                    if (c.getName().equals("a") && resultE.getTarget().getName().equals("id5DIVid1") )
+                                        System.out.println("result: "  + resultE);
+                                    edges.add(resultE);
                                 }
                         }
 
                     }
-
+                    System.out.println("RULE4");
                     // Rule 4
                     for (Channel c : ts_comp.getOutputs()) {
-                        List<Guard> collectedNegationsSpec = new ArrayList<Guard>();
                         if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                             // collect all guards from spec transitions, negated
                             CDD guardsOfSpec = CDD.cddFalse();
                             for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c))
-                                //collectedNegationsSpec.addAll(e_spec.getGuards().stream().map(Guard::negate).collect(Collectors.toList()));
-                                 guardsOfSpec= guardsOfSpec.disjunction(e_spec.getGuardCDD());
+                                guardsOfSpec = guardsOfSpec.disjunction(e_spec.getGuardCDD());
                             CDD negated = guardsOfSpec.negation();
 
 
-
-                            // TODO: Currently I am creating a transition if c-transitions in spec is empty.  Correct?
-                            if (!collectedNegationsSpec.isEmpty() || spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty())
+                            // TODO: Currently I am not creating a transition if c-transitions in spec is empty.  Correct?
+                            if (negated.isNotFalse()) //|| spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty())
                                 // for each c-transtion in comp, create a new transition with the negated guard
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                    edges.add(new Edge(loc, inc, c, true,CDD.toGuardList(e_comp.getGuardCDD().conjunction(negated),clocks), new ArrayList<Update>(){{add(new ClockUpdate(newClock, 0));}}));
+                                    edges.add(new Edge(loc, inc, c, true, CDD.toGuardList(e_comp.getGuardCDD().conjunction(negated), clocks), new ArrayList<Update>() {{
+                                        add(new ClockUpdate(newClock, 0));
+                                    }}));
                                 }
                         }
                     }
-
+                    System.out.println("RULE5");
                     //Rule 5
                     for (Channel c : allChans) {
                         // for all channels that are not in the components alphabet
@@ -221,105 +238,105 @@ public class Quotient extends TransitionSystem {
                             if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
                                     // create a transition to a new location with updated spec location, but some comp. location
+                                    assert(!e_spec.getTarget().getName().equals("inc"));
+                                    assert(!e_spec.getTarget().getName().equals("univ"));
                                     edges.add(new Edge(loc, locationMap.get(e_spec.getTarget().getName() + "DIV" + l_comp.getName()), c, e_spec.isInput(), e_spec.getGuards(), e_spec.getUpdates()));
                                 }
                             }
                         }
                     }
-
+                    System.out.println("RULE6");
                     //Rule 6
                     for (Channel c : ts_comp.getOutputs()) {
                         CDD collectedGuardsComp = CDD.cddFalse();
-                        if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
-                            // collect all negated guards from c-transitions in  comp
-                            for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
-                                collectedGuardsComp = collectedGuardsComp.disjunction(e_comp.getGuardCDD());//.stream().map(Guard::negate).collect(Collectors.toList()));
-                            }
-                            CDD negated = collectedGuardsComp.negation();
-                            // if guards have been collected, or the component didn't have c-transitions, for each spec trans create a transition
-                            if (negated.isNotFalse() || comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty())
-                                for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
-
-                                    //combined.addAll(e_spec.getGuards()); //TODO: THIS IS IMPORTANT! Is this supposed to be in?????
-                                    edges.add(new Edge(loc, univ, c, e_spec.isInput(), CDD.toGuardList(negated,clocks), new ArrayList<>()));
-                                }
+                        // collect all negated guards from c-transitions in  comp
+                        for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
+                            collectedGuardsComp = collectedGuardsComp.disjunction(e_comp.getTarget().getInvariantCDD().transitionBack(e_comp));
                         }
+
+                        System.out.println(loc.getName() + " " + c + " " + collectedGuardsComp.removeNegative().reduce());
+                        System.out.println(collectedGuardsComp.removeNegative().reduce().equiv(CDD.cddTrue()));
+                        System.out.println(loc.getName() + " " + c + " " + collectedGuardsComp.removeNegative().reduce().negation().removeNegative());
+                        System.out.println(collectedGuardsComp.equiv(CDD.cddFalse()));
+                        CDD negated = collectedGuardsComp.negation().removeNegative();
+                        // if guards have been collected
+                        if (negated.isNotFalse())
+                            edges.add(new Edge(loc, univ, c, inputs.contains(c), CDD.toGuardList(negated, clocks), new ArrayList<>()));
                     }
 
 
-                   // for each input, create a selfloop in inc.
-                   for (Channel c : getInputs()) {
+                    // for each input, create a selfloop in inc.
+                    for (Channel c : getInputs()) {
                         Guard g = new ClockGuard(newClock, null, 0, Relation.LESS_EQUAL);
-
                         edges.add(new Edge(inc, inc, c, true, g, new ArrayList<>()));
                     }
 
-                    // for each input or output,  create a selfloop in univ.
-                    for (Channel c : getInputs()) {
-                        edges.add(new Edge(univ, univ, c, true, new TrueGuard(), new ArrayList<>()));
-                    }
-                    for (Channel c : getOutputs()) {
-                        edges.add(new Edge(univ, univ, c, false, new TrueGuard(), new ArrayList<>()));
-                    }
+
+
+                    System.out.println("ONE LOOP DONE");
                 }
             }
 
-
-        // turning transitions to univ that are not restricted by spec into selfloops
-        // TODO: did I do this as we intended
-
-        // first: collect all channels c, so that in every location of the specification, c only selfloops
-        Set<Channel> channelsThatOnlySelfLoopInSpec = new HashSet<Channel>();
-        for (Channel c: allChans)
-        {
-            // this boolean will become true if we find a transition that is not a selfloop
-            boolean foundLocationsThatDoesNotLoop = false;
-            for (Location l : spec.getLocations())
-            {
-                // if there is no c-transition, c cannot be ignored
-                if (spec.getEdgesFromLocationAndSignal(l, c).isEmpty())
-                    foundLocationsThatDoesNotLoop = true;
-                else
-                    for (Edge e : spec.getEdgesFromLocationAndSignal(l, c))
-                        // if a transition with c is not a selfloop, c cannot be ignored.
-                        if (!e.getSource().getName().equals(e.getTarget().getName()))
-                            foundLocationsThatDoesNotLoop=true;
-            }
-            if (foundLocationsThatDoesNotLoop==false)
-                channelsThatOnlySelfLoopInSpec.add(c);
+        // for each input or output,  create a selfloop in univ.
+        for (Channel c : getInputs()) {
+            System.out.println("in  " + c);
+            edges.add(new Edge(univ, univ, c, true, new TrueGuard(), new ArrayList<>()));
         }
+        for (Channel c : getOutputs()) {
+            System.out.println("Out " + c);
+            edges.add(new Edge(univ, univ, c, false, new TrueGuard(), new ArrayList<>()));
+        }
+
+        System.out.println("OUT OF FOR");
+        if (prepareForBisimilarityReduction) {
+            // turning transitions to univ that are not restricted by spec into selfloops
+            // TODO: did I do this as we intended
+
+            // first: collect all channels c, so that in every location of the specification, c only selfloops
+            Set<Channel> channelsThatOnlySelfLoopInSpec = new HashSet<Channel>();
+            for (Channel c : allChans) {
+                // this boolean will become true if we find a transition that is not a selfloop
+                boolean foundLocationsThatDoesNotLoop = false;
+                for (Location l : spec.getLocations()) {
+                    // if there is no c-transition, c cannot be ignored
+                    if (spec.getEdgesFromLocationAndSignal(l, c).isEmpty())
+                        foundLocationsThatDoesNotLoop = true;
+                    else
+                        for (Edge e : spec.getEdgesFromLocationAndSignal(l, c))
+                            // if a transition with c is not a selfloop, c cannot be ignored.
+                            if (!e.getSource().getName().equals(e.getTarget().getName()))
+                                foundLocationsThatDoesNotLoop = true;
+                }
+                if (foundLocationsThatDoesNotLoop == false)
+                    channelsThatOnlySelfLoopInSpec.add(c);
+            }
 
         // Cannot edit the lists of locations / transitions while we loop through them, so we need to collect the ones we want to add/remove.
         Set<Edge> toRemove = new HashSet<Edge>();
         Set<Edge> toAdd = new HashSet<Edge>();
         // for every channel that is independent, loop through all edges and transitions, to remove the ones that lead to univ and replace them by selfloops
-        for (Channel c: channelsThatOnlySelfLoopInSpec)
-        {
-            for (Edge e: edges)
-            {
-                if (e.getTarget().getName().equals("univ") && e.getChannel().equals(c))
-                {
+        for (Channel c : channelsThatOnlySelfLoopInSpec) {
+            for (Edge e : edges) {
+                if (e.getTarget().getName().equals("univ") && e.getChannel().equals(c)) {
                     toRemove.add(e);
                     toAdd.add(new Edge(e.getSource(), e.getSource(), e.getChannel(), e.isInput(), e.getGuards(), e.getUpdates()));
                 }
             }
         }
 
-        for (Edge e: toRemove)
+        for (Edge e : toRemove)
             edges.remove(e);
-        for (Edge e: toAdd)
+        for (Edge e : toAdd)
             edges.add(e);
+        }
 
-
-        Automaton aut = new Automaton(name,  locations,  edges, clocks, BVs, false);
+        Automaton aut = new Automaton(name, locations, edges, clocks, BVs, false);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);
 
         CDD.done();
         return simp;
     }
-
-
 
 
     public Set<Channel> getInputs() {
@@ -330,7 +347,7 @@ public class Quotient extends TransitionSystem {
         return outputs;
     }
 
-    public List<SimpleTransitionSystem> getSystems(){
+    public List<SimpleTransitionSystem> getSystems() {
         // no idea what this is for
         List<SimpleTransitionSystem> result = new ArrayList<>();
         result.addAll(ts_spec.getSystems());
@@ -359,8 +376,6 @@ public class Quotient extends TransitionSystem {
             // rule 2
             Move newMove = new Move(location, new InconsistentLocation(), new ArrayList<>());
             // invariant is negation of invariant of ts1 and invariant of ts2
-
-
             CDD negatedInvar = loc1.getInvariantCDD().negation();
             CDD combined = negatedInvar.conjunction(loc2.getInvariantCDD());
             newMove.setGuards(combined);
@@ -371,7 +386,6 @@ public class Quotient extends TransitionSystem {
             if (getActions().contains(channel)) {
                 Move newMove1 = new Move(location, new UniversalLocation(), new ArrayList<>());
                 // negate invariant of ts2
-                //assert (loc2.getInvariants().size()<=1);
                 newMove1.setGuards(loc2.getInvariantCDD().negation());
                 newMove1.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove1);
@@ -402,7 +416,6 @@ public class Quotient extends TransitionSystem {
                 CDD negated = movesTS1.negation();
 
 
-
                 for (Move move : movesFrom2) {
                     Move newMove2 = new Move(location, new InconsistentLocation(), new ArrayList<>());
                     newMove2.setGuards(move.getGuardCDD().conjunction(negated));
@@ -415,12 +428,12 @@ public class Quotient extends TransitionSystem {
                 CDD movesTS2 = CDD.cddFalse();
                 for (CDD cdd : movesT2)
                     movesTS2 = movesTS2.disjunction(cdd);
-                // for doesn't make sense since we don't use anything from movesFrom1
-                //for (Move move : movesFrom1) {
-                    Move newMove4 = new Move(location, new UniversalLocation(), new ArrayList<>());
-                    newMove4.setGuards(movesTS2);
-                    resultMoves.add(newMove4);
-               // }
+
+                movesTS2 = movesTS2.negation().removeNegative();
+                Move newMove4 = new Move(location, new UniversalLocation(), new ArrayList<>());
+                newMove4.setGuards(movesTS2);
+                resultMoves.add(newMove4);
+
             }
 
             // rule 5

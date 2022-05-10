@@ -313,6 +313,31 @@ public class XMLParser {
     }
 
 
+    private static String findFirstOperator(String text) {
+        int index = 0;
+        int paranthesisCounter = 0;
+        int lastSplit = 0;
+
+        for (index =0; index<text.length(); index++) {
+            char c = text.charAt(index);
+            if (c == '(') {
+                paranthesisCounter++;
+            } else if (c == ')') {
+                paranthesisCounter--;
+            }
+            if (paranthesisCounter==0) {
+                if (text.substring(index).startsWith("or"))
+                    return "or";
+                if (text.substring(index).startsWith("&&"))
+                    return "&&";
+            }
+        }
+        assert false;
+        return null;
+
+    }
+
+
     public static List<String> splitSameLevelOfParantheses(String text, String splitter) {
         int index = 0;
         int paranthesisCounter = 0;
@@ -348,17 +373,16 @@ public class XMLParser {
     }
 
     private static Guard addGuards(String text, List<Clock> clockList, List<BoolVar> boolList) {  // ((A or C ) && (B or (A && B)))
-
+        text = text.replaceAll("\n"," ");
         text = removeTrailingSpaces(text);
-        System.out.println("started " + text);
         if (text.startsWith("("))
         {
-            System.out.println("arrived");
             int end = findClosingParen(text.toCharArray(),0);
             if (end==text.length()-1)
                 return addGuards(text.substring(1,text.length()-1), clockList,boolList);
         }
-        else
+
+        //else
         {
             String operator = "";
             if (!text.contains("or") && !text.contains("&&")) {
@@ -431,7 +455,6 @@ public class XMLParser {
                     }
 
                     BoolVar bl = findBV(boolList, inv[0]);
-                    System.out.println("now: " + bl + " " + inv[0] + "¨" +  boolList);
                     if (bl != null) {
                         BoolGuard newInv;
                         newInv = new BoolGuard(bl, symbol, Boolean.valueOf(inv[1]));
@@ -444,9 +467,11 @@ public class XMLParser {
                     operator = "or";
                 else
                     operator = "&&";
+
+                operator = findFirstOperator(text);
+
                 List<Guard> parts = new ArrayList<>();
                 for (String part : splitSameLevelOfParantheses(text, operator)) {
-                    System.out.println(text);
                     parts.add(addGuards(part, clockList, boolList));
                 }
                 if (operator.equals("or"))
@@ -462,62 +487,64 @@ public class XMLParser {
         return null;
 
     }
-/*
-    private static List<BoolGuard> addBoolGuards(String text, List<BoolVar> boolList) {
-        List<BoolGuard> guardList = new ArrayList<>();
-        for (String part : text.split("or")) {
-            List<BoolGuard> list = new ArrayList<>();
 
-            String[] rawInvariants = part.split("&&");
 
-            for (String invariant : rawInvariants) {
-                invariant = invariant.replaceAll(" ", "");
-                String symbol = "";
-                boolean isEq, isGreater, isStrict, isUnequal;
-                isEq = false;
-                isGreater = false;
-                isStrict = false;
-                isUnequal = false;
+    /*
+        private static List<BoolGuard> addBoolGuards(String text, List<BoolVar> boolList) {
+            List<BoolGuard> guardList = new ArrayList<>();
+            for (String part : text.split("or")) {
+                List<BoolGuard> list = new ArrayList<>();
 
-                if (invariant.contains("==")) {
-                    symbol = "==";
-                    isEq = true;
-                } else if (invariant.contains(">=")) {
-                    symbol = ">=";
-                    isGreater = true;
-                } else if (invariant.contains("<=")) {
-                    symbol = "<=";
-                } else if (invariant.contains(">")) {
-                    symbol = ">";
-                    isGreater = true;
-                    isStrict = true;
-                } else if (invariant.contains("<")) {
-                    symbol = "<";
-                    isStrict = true;
+                String[] rawInvariants = part.split("&&");
+
+                for (String invariant : rawInvariants) {
+                    invariant = invariant.replaceAll(" ", "");
+                    String symbol = "";
+                    boolean isEq, isGreater, isStrict, isUnequal;
+                    isEq = false;
+                    isGreater = false;
+                    isStrict = false;
+                    isUnequal = false;
+
+                    if (invariant.contains("==")) {
+                        symbol = "==";
+                        isEq = true;
+                    } else if (invariant.contains(">=")) {
+                        symbol = ">=";
+                        isGreater = true;
+                    } else if (invariant.contains("<=")) {
+                        symbol = "<=";
+                    } else if (invariant.contains(">")) {
+                        symbol = ">";
+                        isGreater = true;
+                        isStrict = true;
+                    } else if (invariant.contains("<")) {
+                        symbol = "<";
+                        isStrict = true;
+                    }
+                    else if (invariant.contains("!=")) {
+
+                        assert(false); // would require a disjunction of ClockGuards at this point, which needs refactoring
+                        symbol = "!=";
+                        isStrict = true;
+                        isUnequal=true;
+
+                    }
+                    String[] inv = invariant.split(symbol);
+                    BoolVar bl = findBV(boolList, inv[0]);
+
+                    if(bl!=null) {
+                        BoolGuard newInv;
+                        newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
+                        list.add(newInv);
+                    }
+
                 }
-                else if (invariant.contains("!=")) {
-
-                    assert(false); // would require a disjunction of ClockGuards at this point, which needs refactoring
-                    symbol = "!=";
-                    isStrict = true;
-                    isUnequal=true;
-
-                }
-                String[] inv = invariant.split(symbol);
-                BoolVar bl = findBV(boolList, inv[0]);
-
-                if(bl!=null) {
-                    BoolGuard newInv;
-                    newInv = new BoolGuard(bl, symbol,Boolean.valueOf(inv[1]));
-                    list.add(newInv);
-                }
-
+                guardList.addAll(list);
             }
-            guardList.addAll(list);
+            return guardList;
         }
-        return guardList;
-    }
-*/
+    */
     private static Guard addInvariants(String text, List<Clock> clockList, List<BoolVar> boolList) {
         return addGuards(text,clockList,boolList);
         /*

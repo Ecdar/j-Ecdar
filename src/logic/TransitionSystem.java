@@ -179,10 +179,6 @@ public abstract class TransitionSystem {
         CDD.addClocks(getClocks());
         CDD.addBddvar(BVs);
 
-
-
-
-
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
         for (SimpleTransitionSystem ts : systems){
@@ -198,8 +194,6 @@ public abstract class TransitionSystem {
     }
 
     public boolean isImplementation(){
-
-        //CDD.addBddvar() TODO!
         boolean isCons = isFullyConsistent();
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());

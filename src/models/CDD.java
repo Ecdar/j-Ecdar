@@ -107,13 +107,17 @@ public class CDD {
 
     public static Guard toGuardList(CDD state, List<Clock> relevantClocks){
         CDD copy = new CDD(state.pointer);
-
         if (copy.equiv(cddFalse())) // special case for guards
         {
             return new FalseGuard();
         }
         if (copy.equiv(cddTrue())) // special case for guards
         {
+            return new TrueGuard();
+        }
+        if (copy.isTrue()) // special case for guards
+        {
+            System.out.println("to true guard --> why did I not go into the first one??");
             return new TrueGuard();
         }
         if (copy.isBDD())
@@ -150,9 +154,9 @@ public class CDD {
         if (bdd.isFalse()) {
             return new FalseGuard();
         }
-        if (bdd.isTrue())
+        if (bdd.isTrue()) {
             return new TrueGuard();
-
+        }
         assert(bdd.isBDD());
 
         long ptr = bdd.getPointer();
@@ -186,6 +190,7 @@ public class CDD {
     @Override
     public String toString()
     {
+        System.out.println("to string");
         return CDD.toGuardList(this,clocks).toString();
     }
 
@@ -277,7 +282,10 @@ public class CDD {
         for (List<BoolVar> list: BVs)
             CDD.BVs.addAll(list);
         numBools = CDD.BVs.size();
-        bddStartLevel =  CDDLib.addBddvar(numBools);
+        if (numBools>0)
+            bddStartLevel =  CDDLib.addBddvar(numBools);
+        else
+            bddStartLevel = 0;
         return bddStartLevel;
     }
 
@@ -386,6 +394,7 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
+        System.out.println(guard + " " + update + " " + clockResets.length + " " + boolResets.length);
         return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
     }
 
@@ -538,7 +547,6 @@ public class CDD {
     }
 
     public static  boolean canDelayIndefinitely(CDD state) {
-
         CDD copy = new CDD(state.getPointer());
         if (copy.isTrue())
             return true;
@@ -551,21 +559,19 @@ public class CDD {
             CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
             copy = res.getCddPart().removeNegative().reduce();
             Zone z = new Zone(res.getDbm());
-            if (z.canDelayIndefinitely())  // TODO: is it enough if one can do it??
-                return true;
+            if (!z.canDelayIndefinitely())
+                return false;
         }
-//        System.out.println(" found a state that cannot delay indefinitely");
-        return false;
+        // found no states that cannot delay indefinitely
+        return true;
     }
 
     public static  boolean isUrgent(CDD state) {
-        System.out.println("not sure urgent works yet!");
-
         CDD copy = new CDD(state.getPointer());
         if (copy.isTrue())
             return false;
         if (copy.isFalse())
-            return false;
+            return true;
         if (copy.isBDD())
             return false;
         while (!copy.isTerminal())
@@ -573,10 +579,10 @@ public class CDD {
             CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
             Zone z = new Zone(res.getDbm());
             copy = res.getCddPart().removeNegative().reduce();
-            if (z.isUrgent())
-                return true; // TODO: is it enough if one is urgent?
+            if (!z.isUrgent())
+                return false;
         }
-        return false;
+        return true;
     }
 
     public static boolean intersects(CDD A, CDD B) {
@@ -652,7 +658,6 @@ public class CDD {
     {
         if (e.getUpdates().size()==0)
         {
-            System.out.println("no update " + e.getGuardCDD());
             return this.conjunction(e.getGuardCDD());
         }
         int numBools = 0;
@@ -683,7 +688,6 @@ public class CDD {
                 bl++;
             }
         }
-        System.out.println("guard: " + e.getGuardCDD() + " update: " + turnUpdatesToCDD(e.getUpdates()) + " clockResets: " + clockResets.toString() + " boolResets: " + boolResets.toString());
         return this.transitionBack(e.getGuardCDD(),turnUpdatesToCDD(e.getUpdates()),clockResets,boolResets).removeNegative().reduce();
     }
 

@@ -13,15 +13,16 @@ public class Bisimilarity {
     static boolean thereWasAChange = true;
 
 
-    public static Automaton checkBisimilarity(Automaton aut) {
-        List<Location> locs = new ArrayList<>();
-        List<Edge> edges = new ArrayList<>();
-        List<Clock> clocks = aut.getClocks();
-        List<BoolVar> BVs = aut.getBVs();
-        locs.addAll(aut.getLocations());
-        edges.addAll(aut.getEdges());
-        List<List<Location>> bisimilarLocs = new ArrayList<>();
-        bisimilarLocs.add(locs);
+    public static Automaton checkBisimilarity(Automaton aut1) {
+        Automaton copy = new Automaton(aut1);
+
+
+        List<Location> locs = copy.getLocations();
+        List<Edge> edges = copy.getEdges();
+        List<Clock> clocks = copy.getClocks();
+        List<BoolVar> BVs = copy.getBVs();
+        List<List<Location>> bisimilarLocs = new ArrayList<>(); // we will create a list of "lists of bisimilar locations"
+        bisimilarLocs.add(locs); // at the start we "assume all locs are bisimilar"
 
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
@@ -35,7 +36,7 @@ public class Bisimilarity {
             List<List<Location>> splitOffList = new ArrayList<>();
             for (List<Location>  locationList : bisimilarLocs )
             {
-                if (locationList.isEmpty() || locationList.size() == 1)
+                if (locationList.isEmpty() || locationList.size() == 1) // cant split any more locations from the current list
                     continue;
                 List<Location> splitOffPart = new ArrayList<>();
 
@@ -70,7 +71,7 @@ public class Bisimilarity {
 
         locs = new ArrayList<>();
 
-        for (List<Location> list : bisimilarLocs) {
+        for (List<Location> list : bisimilarLocs) { // for each list of bisimilar locks, we chose one (the first) to keep, and replace all the others with that one in any edge.
             Location chosen = list.get(0);
             locs.add(chosen);
             list.remove(chosen);
@@ -87,9 +88,9 @@ public class Bisimilarity {
         List<Edge> finalEdges = new ArrayList<>();
 
 
-        for (Location l: locs)
+        for (Location l: locs) // now we merge all the edges that have a similar source location, action and target
         {
-            for (Channel c : aut.getActions())
+            for (Channel c : copy.getActions())
             {
                 for (Location targetLoc : locs) {
                     CDD allCDDs = CDD.cddFalse();
@@ -108,7 +109,7 @@ public class Bisimilarity {
                         List<Update> updates = allEdges.get(0).getUpdates();
                         for (Edge e : allEdges)
                             assert(Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
-                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuardList(allCDDs, aut.getClocks()), allEdges.get(0).getUpdates()));
+                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuardList(allCDDs, copy.getClocks()), allEdges.get(0).getUpdates()));
                     }
 
                 }
@@ -116,7 +117,7 @@ public class Bisimilarity {
         }
 
         CDD.done();
-        return new Automaton(aut.getName()+"Bisimilar",locs,finalEdges,clocks, aut.getBVs());
+        return new Automaton(copy.getName()+"Bisimilar",locs,finalEdges,clocks, copy.getBVs());
 
     }
 

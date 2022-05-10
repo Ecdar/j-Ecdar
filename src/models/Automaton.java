@@ -56,8 +56,13 @@ public class Automaton {
             CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
+            System.out.println("adding target invariants");
             addTargetInvariantToEdges();
+
+            System.out.println("making input enabled");
             makeInputEnabled();
+
+            System.out.println("Automaton processed");
             CDD.done();
         }
     }
@@ -225,7 +230,6 @@ public class Automaton {
 
     public void makeInputEnabled() {
         for (Location loc : getLocations()) {
-            System.out.println("now in location " + loc);
             CDD sourceInvariantCDD = loc.getInvariantCDD();
             // loop through all inputs
             for (Channel input : getInputAct()) {
@@ -237,21 +241,20 @@ public class Automaton {
                 if (!inputEdges.isEmpty()) {
                     for (Edge edge : inputEdges) {
                         CDD target = edge.getTarget().getInvariantCDD();
-                        System.out.println("Target CDD: " + target);
                         CDD preGuard1 = target.transitionBack(edge);
-                        System.out.println("Pre guard 1: " + preGuard1);
                         cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.disjunction(preGuard1);
-                        System.out.println("cddOfAllEdgesWithCurrentInput: " + cddOfAllEdgesWithCurrentInput);
                     }
-
+                    cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.removeNegative().reduce();
                     // subtract the federation of zones from the original fed
                     resCDD = sourceInvariantCDD.minus(cddOfAllEdgesWithCurrentInput);
                 } else {
                     resCDD = sourceInvariantCDD;
                 }
-                Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
-                getEdges().add(newEdge);
 
+                if (resCDD.isNotFalse()) {
+                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
+                    getEdges().add(newEdge);
+                }
 
             }
         }
@@ -261,8 +264,11 @@ public class Automaton {
     public void addTargetInvariantToEdges() {
         for (Edge edge : getEdges()) {
             CDD targetCDD = edge.getTarget().getInvariantCDD();
+            System.out.println("collected a target invariant");
             CDD past = targetCDD.transitionBack(edge);
-            edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
+            System.out.println("transitioned back");
+            if (!past.equiv(CDD.cddTrue()))
+                edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
         }
     }
 
