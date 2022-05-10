@@ -1,6 +1,6 @@
 package parser;
 
-import logic.JsonFileWriter;
+import logic.JsonAutomatonEncoder;
 import logic.Pruning;
 import logic.SimpleTransitionSystem;
 import models.*;
@@ -175,7 +175,7 @@ public class JSONParserTest {
         selfloopZeno = new SimpleTransitionSystem(aut3[2]);
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopZeno);
         pruned.toXML("selfloopNonZeno.xml");
-        JsonFileWriter.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
+        JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
 
         String base = "C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1/";
         String[] components = new String[]{"GlobalDeclarations.json", "SystemDeclarations.json",
