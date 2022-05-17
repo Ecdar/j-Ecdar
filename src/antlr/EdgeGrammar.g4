@@ -1,19 +1,25 @@
-grammar GuardGrammar;
-
-@header {
-package GuardGrammar;
-}
+grammar EdgeGrammar;
 
 /*
  * Parser Rules
  */
 
-guard               : or? ';'? EOF ;
+@header {
+package EdgeGrammar;
+}
+
+edge                : (guard | update) EOF ;
+
+guard               : or? ';'? ;
+update              : assignments? ;
 
 or                  : (and '||' or) | and ;
 and                 : (compareExpr '&&' and) | compareExpr ;
-
 compareExpr         : TERM OPERATOR TERM ;
+
+assignments         : (assignment ',' assignments) | (assignment ','?) ;
+assignment          : TERM '=' TERM ;
+
 
 /*
  * Lexer Rules
@@ -24,7 +30,6 @@ ATOM    : (INT | 'true' | 'false') ;
 
 fragment DIGIT :   [0-9] ;
 INT            :   DIGIT+ ;
-
 
 fragment LOWERCASE : [a-z] ;
 fragment UPPERCASE : [A-Z] ;

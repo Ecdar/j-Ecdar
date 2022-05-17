@@ -135,7 +135,7 @@ public class XMLParser {
             for (Element label : labels) {
                 if (label.getAttributeValue("kind").equals("invariant")) {
                     if (!label.getText().isEmpty())
-                        invariants = addInvariants(label.getText(), clocks);
+                        invariants = GuardParser.parse(label.getText(), clocks);
                 }
             }
 
@@ -191,7 +191,7 @@ public class XMLParser {
                 switch (kind) {
                     case "guard":
                         if (!text.isEmpty())
-                            guards = addGuards(text, clocks);
+                            guards = GuardParser.parse(text, clocks);
                         break;
                     case "synchronisation":
                         String channel = text.replaceAll("\\?", "").replaceAll("!", "");
@@ -200,7 +200,7 @@ public class XMLParser {
                         break;
                     case "assignment":
                         if (!text.isEmpty())
-                            updates = addUpdates(text, clocks);
+                            updates = UpdateParser.parse(text, clocks);
                         break;
                 }
             }
@@ -235,119 +235,6 @@ public class XMLParser {
         Channel chan = new Channel(name);
         channels.add(chan);
         return chan;
-    }
-
-    private static List<List<Guard>> addGuards(String text, List<Clock> clockList) {
-        List<List<Guard>> guardList = new ArrayList<>();
-        for (String part : text.split("or")) {
-            List<Guard> list = new ArrayList<>();
-
-            String[] rawInvariants = part.split("&&");
-
-            for (String invariant : rawInvariants) {
-                invariant = invariant.replaceAll(" ", "");
-                String symbol = "";
-                boolean isEq, isGreater, isStrict;
-                isEq = false;
-                isGreater = false;
-                isStrict = false;
-
-                if (invariant.contains("==")) {
-                    symbol = "==";
-                    isEq = true;
-                } else if (invariant.contains(">=")) {
-                    symbol = ">=";
-                    isGreater = true;
-                } else if (invariant.contains("<=")) {
-                    symbol = "<=";
-                } else if (invariant.contains(">")) {
-                    symbol = ">";
-                    isGreater = true;
-                    isStrict = true;
-                } else if (invariant.contains("<")) {
-                    symbol = "<";
-                    isStrict = true;
-                }
-
-                String[] inv = invariant.split(symbol);
-                Clock clk = findClock(clockList, inv[0]);
-                //System.out.println(inv[0] + " " + clk);
-
-                Guard newInv;
-                if (isEq)
-                    newInv = new Guard(clk, Integer.parseInt(inv[1]));
-                else
-                    newInv = new Guard(clk, Integer.parseInt(inv[1]), isGreater, isStrict);
-
-                list.add(newInv);
-            }
-            guardList.add(list);
-        }
-        return guardList;
-    }
-    private static List<List<Guard>> addInvariants(String text, List<Clock> clockList) {
-        List<List<Guard>> outerList = new ArrayList<>();
-
-        String[] disj = text.split("or");
-
-        for (String outer : disj) {
-            List<Guard> list = new ArrayList<>();
-            String[] rawInvariants = outer.split("&&");
-
-        for (String invariant : rawInvariants) {
-            invariant = invariant.replaceAll(" ", "");
-            String symbol = "";
-            boolean isEq, isGreater, isStrict;
-            isEq = false;
-            isGreater = false;
-            isStrict = false;
-
-            if (invariant.contains("==")) {
-                symbol = "==";
-                isEq = true;
-            } else if (invariant.contains(">=")) {
-                symbol = ">=";
-                isGreater = true;
-            } else if (invariant.contains("<=")) {
-                symbol = "<=";
-            } else if (invariant.contains(">")) {
-                symbol = ">";
-                isGreater = true;
-                isStrict = true;
-            } else if (invariant.contains("<")) {
-                symbol = "<";
-                isStrict = true;
-            }
-            String[] inv = invariant.split(symbol);
-            Clock clk = findClock(clockList, inv[0]);
-
-            Guard newInv;
-            if (isEq)
-                newInv = new Guard(clk, Integer.parseInt(inv[1]));
-            else
-                newInv = new Guard(clk, Integer.parseInt(inv[1]), isGreater, isStrict);
-
-            list.add(newInv);
-        }
-
-        outerList.add(list);
-        }
-
-        return outerList;
-    }
-
-    private static List<Update> addUpdates(String text, List<Clock> clockList) {
-        List<Update> list = new ArrayList<>();
-        String[] rawUpdates = text.split(",");
-        for (String rawUpdate : rawUpdates) {
-            rawUpdate = rawUpdate.replaceAll(" ", "");
-
-            String[] update = rawUpdate.split("=");
-            Clock clk = findClock(clockList, update[0]);
-            Update newUpdate = new Update(clk, Integer.parseInt(update[1]));
-            list.add(newUpdate);
-        }
-        return list;
     }
 
     //Get JDOM document from DOM JSONParser

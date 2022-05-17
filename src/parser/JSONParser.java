@@ -10,8 +10,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -186,7 +184,7 @@ public class JSONParser {
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
             List<List<Guard>> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
-                    addInvarGuards(jsonObject.get("invariant").toString()));
+                    GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
 
@@ -196,107 +194,6 @@ public class JSONParser {
         return returnLocList;
     }
 
-    private static List<List<Guard>> addGuards(String invariant) {
-        List<List<Guard>> guardList = new ArrayList<>();
-        for (String part: invariant.split("or")) {
-            ArrayList<Guard> guards = new ArrayList<>();
-            String[] listOfInv = part.split("&&");
-
-            for (String str : listOfInv) {
-                String symbol = "";
-                boolean strict, greater, isEq;
-                strict = false;
-                greater = false;
-                isEq = false;
-
-                if (str.contains("==")) {
-                    symbol = "==";
-                    greater = false;
-                    isEq = true;
-                } else if (str.contains("<=")) {
-                    symbol = "<=";
-                } else if (str.contains(">=")) {
-                    symbol = ">=";
-                    greater = true;
-                } else if (str.contains("<") && !str.contains("=")) {
-                    symbol = "<";
-                    strict = true;
-                } else if (str.contains(">") && !str.contains("=")) {
-                    symbol = ">";
-                    greater = true;
-                    strict = true;
-                }
-
-                String[] s = str.split(symbol);
-                for (int x = 0; x < s.length; x++) {
-                    s[x] = s[x].replaceAll(" ", "");
-                }
-
-                if (isEq)
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
-                else
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
-            }
-
-            guardList.add(guards);
-        }
-        return guardList;
-    }
-    private static List<List<Guard>> addInvarGuards(String invariant) {
-
-        ArrayList<List<Guard>> guardsOuter = new ArrayList<>();
-
-
-        String[] listOfDisjc = invariant.split("or");
-
-       // System.out.println("whole: " + invariant);
-        for (String strOuter : listOfDisjc) {
-            String[] listOfInv = strOuter.split("&&");
-            ArrayList<Guard> guards = new ArrayList<>();
-            //System.out.println("discj part: " + strOuter);
-
-            for (String str : listOfInv) {
-               //System.out.println("conj. part: " + str);
-
-                String symbol = "";
-                boolean strict, greater, isEq;
-                strict = false;
-                greater = false;
-                isEq = false;
-
-                if (str.contains("==")) {
-                    symbol = "==";
-                    greater = false;
-                    isEq = true;
-                } else if (str.contains("<=")) {
-                    symbol = "<=";
-                } else if (str.contains(">=")) {
-                    symbol = ">=";
-                    greater = true;
-                } else if (str.contains("<") && !str.contains("=")) {
-                    symbol = "<";
-                    strict = true;
-                } else if (str.contains(">") && !str.contains("=")) {
-                    symbol = ">";
-                    greater = true;
-                    strict = true;
-                }
-
-                String[] s = str.split(symbol);
-                for (int x = 0; x < s.length; x++) {
-                    s[x] = s[x].replaceAll(" ", "");
-                }
-
-                if (isEq)
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1])));
-                else
-                    guards.add(new Guard(findClock(s[0]), Integer.parseInt(s[1]), greater, strict));
-            }
-            guardsOuter.add(guards);
-        }
-
-        return guardsOuter;
-    }
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
             if (clock.getName().equals(clockName)) return clock;
@@ -311,17 +208,17 @@ public class JSONParser {
             JSONObject jsonObject = (JSONObject) obj;
 
             List<List<Guard>> guards;
-            Update[] updates;
+            List<Update> updates;
 
-            if (!jsonObject.get("guard").toString().equals(""))
-                guards = addGuards((String) jsonObject.get("guard"));
-            else
+            if (!jsonObject.get("guard").toString().equals("")) {
+                guards = GuardParser.parse((String) jsonObject.get("guard"), componentClocks);
+            } else
                 guards = new ArrayList<>();
 
             if (!jsonObject.get("update").toString().equals(""))
-                updates = addUpdates((String) jsonObject.get("update"));
+                updates = UpdateParser.parse((String) jsonObject.get("update"), componentClocks);
             else
-                updates = new Update[]{};
+                updates = new ArrayList<>();
 
             Location sourceLocation = findLoc(locations, (String) jsonObject.get("sourceLocation"));
             Location targetLocation = findLoc(locations, (String) jsonObject.get("targetLocation"));
@@ -330,7 +227,7 @@ public class JSONParser {
 
             Channel c = addChannel(jsonObject.get("sync").toString());
             if (c != null) {
-                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updates);
+                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updates.toArray(new Update[0]));
                 edges.add(edge);
             }
         }
@@ -347,21 +244,6 @@ public class JSONParser {
         Channel chan = new Channel(name);
         globalChannels.add(chan);
         return chan;
-    }
-
-    private static Update[] addUpdates(String update) {
-        ArrayList<Update> updates = new ArrayList<>();
-        String[] listOfInv = update.split(",");
-
-        for (String str : listOfInv) {
-            String[] s = str.split("=");
-            for (int i = 0; i < s.length; i++)
-                s[i] = s[i].replaceAll(" ", "");
-            Update upd = new Update(findClock(s[0]), Integer.parseInt(s[1]));
-            updates.add(upd);
-        }
-
-        return updates.toArray(new Update[0]);
     }
 
     //Helper method for addEdge in order to find which Location is source and which one is target
