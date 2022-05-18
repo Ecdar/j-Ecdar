@@ -28,6 +28,12 @@ public class UpdateParser {
     }
 
     private static class UpdatesVisitor extends EdgeGrammarBaseVisitor<List<Update>>{
+        private List<Update> updates;
+
+        public UpdatesVisitor() {
+            updates = new ArrayList<>();
+        }
+
         @Override
         public List<Update> visitUpdate(EdgeGrammarParser.UpdateContext ctx) {
             if(ctx.assignments() != null){
@@ -39,15 +45,11 @@ public class UpdateParser {
 
         @Override
         public List<Update> visitAssignments(EdgeGrammarParser.AssignmentsContext ctx) {
-            List<Update> updates;
-            if(ctx.assignments() != null){
-                updates = visit(ctx.assignments());
-            }else {
-                updates = new ArrayList<>();
-            }
-
             AssignmentVisitor assignmentVisitor = new AssignmentVisitor();
             updates.add(assignmentVisitor.visit(ctx.assignment()));
+
+            if(ctx.assignments() != null)
+                updates = visit(ctx.assignments());
 
             return updates;
         }

@@ -27,12 +27,12 @@ public class GuardParserTest {
         List<List<Guard>> guardList = GuardParser.parse("x>=5 && y<6", clocks);
 
         Guard guard = guardList.get(0).get(0);
-        assertEquals(true, guard.isStrict());
-        assertEquals(6, guard.getUpperBound());
+        assertEquals(false, guard.isStrict());
+        assertEquals(5, guard.getLowerBound());
 
         Guard guard1 = guardList.get(0).get(1);
-        assertEquals(false, guard1.isStrict());
-        assertEquals(5, guard1.getLowerBound());
+        assertEquals(true, guard1.isStrict());
+        assertEquals(6, guard1.getUpperBound());
     }
 
     @Test
@@ -44,8 +44,8 @@ public class GuardParserTest {
         Guard guard2 = guardList.get(1).get(0);
 
         assertEquals(true, guard1.isStrict());
-        assertEquals(5, guard1.getUpperBound());
+        assertEquals(2, guard1.getLowerBound());
         assertEquals(true, guard2.isStrict());
-        assertEquals(2, guard2.getLowerBound());
+        assertEquals(5, guard2.getUpperBound());
     }
 }

@@ -30,6 +30,12 @@ public class GuardParser {
 
     private static class OrVisitor extends EdgeGrammarBaseVisitor<List<List<Guard>>>{
 
+        private List<List<Guard>> guardList;
+
+        public OrVisitor() {
+            guardList = new ArrayList<>();
+        }
+
         @Override
         public List<List<Guard>> visitGuard(EdgeGrammarParser.GuardContext ctx) {
             if(ctx.or() != null){
@@ -41,33 +47,32 @@ public class GuardParser {
 
         @Override
         public List<List<Guard>> visitOr(EdgeGrammarParser.OrContext ctx) {
-            List<List<Guard>> guardList;
-            if(ctx.or() != null){
-                guardList = visit(ctx.or());
-            }else {
-                guardList = new ArrayList<>();
-            }
-
             AndVisitor andVisitor = new AndVisitor();
             guardList.add(andVisitor.visit(ctx.and()));
+
+            if(ctx.or() != null)
+                visit(ctx.or());
 
             return guardList;
         }
     }
 
     private static class AndVisitor extends EdgeGrammarBaseVisitor<List<Guard>>{
+
+        private List<Guard> guards;
+
+        public AndVisitor() {
+            guards = new ArrayList<>();
+        }
+
         @Override
         public List<Guard> visitAnd(EdgeGrammarParser.AndContext ctx) {
-            List<Guard> guards;
-            if(ctx.and() != null){
-                guards = visit(ctx.and());
-            }else{
-                guards = new ArrayList<>();
-            }
-
             ExpressionVisitor expressionVisitor = new ExpressionVisitor();
             Guard guard = expressionVisitor.visit(ctx.compareExpr());
             guards.add(guard);
+
+            if(ctx.and() != null)
+                visit(ctx.and());
 
             return guards;
         }

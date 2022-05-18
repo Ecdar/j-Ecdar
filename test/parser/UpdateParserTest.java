@@ -26,9 +26,9 @@ public class UpdateParserTest {
 
         List<Update> updates = UpdateParser.parse("x=6, y=1", clocks);
 
-        assertEquals(1, updates.get(0).getValue());
-        assertEquals("y", updates.get(0).getClock().getName());
-        assertEquals(6, updates.get(1).getValue());
-        assertEquals("x", updates.get(1).getClock().getName());
+        assertEquals(6, updates.get(0).getValue());
+        assertEquals("x", updates.get(0).getClock().getName());
+        assertEquals(1, updates.get(1).getValue());
+        assertEquals("y", updates.get(1).getClock().getName());
     }
 }
