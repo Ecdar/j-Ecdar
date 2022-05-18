@@ -54,6 +54,10 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
                     );
                     break;
                 case IMPLEMENTATION:
+                    queryResponseBuilder.setImplementation(
+                            QueryProtos.QueryResponse.ImplementationResult.newBuilder()
+                                    .setSuccess(response.getResult()).build()
+                    );
                     break;
                 case DETERMINISM:
                     queryResponseBuilder.setDeterminism(

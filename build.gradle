@@ -49,7 +49,7 @@ protobuf {
 sourceSets {
     main {
         java {
-            srcDirs = ['src']
+            srcDirs = ['src', 'build/generated']
         }
         proto{
             srcDirs = ['src/proto']
