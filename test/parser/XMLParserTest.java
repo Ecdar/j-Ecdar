@@ -74,7 +74,7 @@ public class XMLParserTest {
     @Test
     public void testAutomaton() {
         Automaton actual = XMLParser.parse("./samples/xml/ImplTests.xml", false)[0];
-        assert expected.equals(actual);
+        assertEquals(expected, actual);
     }
 
     @Test
