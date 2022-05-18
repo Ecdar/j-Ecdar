@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'java-library'
     id 'com.google.protobuf' version '0.8.17'
+    id 'antlr'
 }
 
 repositories {
@@ -27,6 +28,8 @@ dependencies {
     implementation 'commons-cli:commons-cli:1.4'
     implementation 'org.jdom:jdom2:2.0.6'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    antlr "org.antlr:antlr4:4.10.1"
+    implementation 'org.antlr:antlr4-runtime:4.10.1'
     implementation files('lib/jcdd.jar')
 }
 
@@ -46,13 +49,21 @@ protobuf {
     }
 }
 
+generateGrammarSource {
+    maxHeapSize = "128m"
+    arguments += ["-visitor", "-no-listener"]
+}
+
 sourceSets {
     main {
         java {
-            srcDirs = ['src']
+            srcDirs = ['src', 'build/generated-src/antlr/main']
         }
         proto{
             srcDirs = ['src/proto']
+        }
+        antlr{
+            srcDirs = ['src/antlr']
         }
     }
 
