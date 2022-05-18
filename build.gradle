@@ -57,7 +57,7 @@ generateGrammarSource {
 sourceSets {
     main {
         java {
-            srcDirs = ['src', 'build/generated-src/antlr/main']
+            srcDirs = ['src', 'build/generated', 'build/generated-src/antlr/main']
         }
         proto{
             srcDirs = ['src/proto']
