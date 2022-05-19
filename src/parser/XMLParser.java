@@ -114,7 +114,7 @@ public class XMLParser {
                     String[] clockArr = clocks.split(",");
 
                     for (String clk : clockArr) {
-                        clockList.add(new Clock(automatonName + "_"+clk));
+                        clockList.add(new Clock(clk));
                     }
                 }
             }
@@ -145,8 +145,8 @@ public class XMLParser {
 
                     for (String bool : boolArr)
                         if (bool.contains("="))
-                            boolList.add(new BoolVar(automatonName + "_"+bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
-                        else boolList.add(new BoolVar(automatonName + "_"+bool, false));
+                            boolList.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
+                        else boolList.add(new BoolVar(bool, false));
                 }
             }
         }
@@ -264,7 +264,7 @@ public class XMLParser {
 
     private static Clock findClock(List<Clock> clocks, String name) {
         for (Clock clock : clocks)
-            if (clock.getName().equals(automatonName+"_"+name))
+            if (clock.getName().equals(name))
                 return clock;
 
         return null;
@@ -272,7 +272,7 @@ public class XMLParser {
 
     private static BoolVar findBV(List<BoolVar> BVs, String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(automatonName + "_"+name))
+            if (bv.getName().equals(name))
                 return bv;
 
         return null;

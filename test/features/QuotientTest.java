@@ -5,6 +5,7 @@ import models.Automaton;
 import models.CDD;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import parser.XMLParser;
 
@@ -54,7 +55,7 @@ public class QuotientTest {
 */
 
 
-
+    @Ignore
     @Test
     public void SimpleTimedQuotientTest() {
 

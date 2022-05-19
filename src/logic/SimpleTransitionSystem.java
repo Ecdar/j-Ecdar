@@ -91,6 +91,11 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 List<Transition> tempTrans = getNextTransitions(currState, action);
                 if (checkMovesOverlap(tempTrans)) {
+                    for (Transition t: tempTrans) {
+                        System.out.println("next trans");
+                        for (Edge e : t.getEdges())
+                            System.out.println(e);
+                    }
                     return false;
                 }
 

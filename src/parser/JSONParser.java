@@ -158,7 +158,7 @@ public class JSONParser {
                 String[] clockArr = clocks.split(",");
 
                 for (String s : clockArr) {
-                    componentClocks.add(new Clock(automatonName+"_"+s));
+                    componentClocks.add(new Clock(s));
                 }
             }
         }
@@ -359,7 +359,7 @@ public class JSONParser {
     }
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
-            if (clock.getName().equals(automatonName+"_"+clockName)) return clock;
+            if (clock.getName().equals(clockName)) return clock;
 
         return null;
     }

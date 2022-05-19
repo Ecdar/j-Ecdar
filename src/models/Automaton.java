@@ -68,35 +68,33 @@ public class Automaton {
     }
 
     // Copy constructor
-    public Automaton(Automaton copy) {
-        this.name = copy.name + "Copy";
+    public Automaton(Automaton origin) {
+        this.name = origin.name + "Copy";
 
         this.clocks = new ArrayList<>();
-        for (Clock c : copy.clocks) {
-            String[] split = c.getName().split("_");
-            this.clocks.add(new Clock(this.name + "_" + split[1]));
+        for (Clock c : origin.clocks) {
+            this.clocks.add(new Clock(c.getName()+"Copy"));
         }
         this.BVs = new ArrayList<>();
-        for (BoolVar c : copy.BVs) {
-            String[] split = c.getName().split("_");
-            this.BVs.add(new BoolVar(this.name + "_" + split[1], c.getInitialValue()));   // TODO: Do I need copies? Do I want copies?
+        for (BoolVar c : origin.BVs) {
+            this.BVs.add(new BoolVar(c.getName()+"Copy", c.getInitialValue()));
         }
         this.locations = new ArrayList<>();
-        for (Location loc : copy.locations) {
-            this.locations.add(new Location(loc, clocks, copy.clocks, BVs, copy.BVs));
+        for (Location loc : origin.locations) {
+            this.locations.add(new Location(loc, clocks, origin.clocks, BVs, origin.BVs));
             if (loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
         }
-
+        System.out.println(this.BVs +" " + origin.getBVs());
         this.edges = new ArrayList<>();
-        for (Edge e : copy.edges) {
-            int sourceIndex = copy.locations.indexOf(e.getSource());
-            int targetIndex = copy.locations.indexOf(e.getTarget());
-            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), copy.clocks, copy.BVs));
+        for (Edge e : origin.edges) {
+            int sourceIndex = origin.locations.indexOf(e.getSource());
+            int targetIndex = origin.locations.indexOf(e.getTarget());
+            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), origin.clocks, origin.BVs));
         }
 
-        this.inputAct = copy.inputAct;
-        this.outputAct = copy.outputAct;
-        this.actions = copy.actions;
+        this.inputAct = origin.inputAct;
+        this.outputAct = origin.outputAct;
+        this.actions = origin.actions;
     }
 
     public HashMap<Clock, Integer> getMaxBoundsForAllClocks() {

@@ -87,7 +87,7 @@ public class Refinement {
         // with the exception that the left side is allowed to have more outputs
 
         // inputs on the left must be equal to inputs on the right side
-        if (!inputs1.equals(inputs2)) {
+        if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
             errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
         }
@@ -185,9 +185,7 @@ public class Refinement {
 
     private StatePair buildStatePair(Transition t1, Transition t2) {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
-        //System.out.println(t1.getEdges().get(0).getChannel());
-        //System.out.println(t1.getSource().getLocation().getName());
-        //System.out.println(t2.getSource().getLocation().getName());
+
         target1.applyGuards(t2.getGuardCDD());
 
         if (target1.getInvarCDD().isFalse()) {
@@ -222,18 +220,6 @@ public class Refinement {
         CDD cdd = invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce();
         if (cdd.isNotFalse()){
 
-            //System.out.println(t1.getTarget().getLocation());
-            //System.out.println(t2.getTarget().getLocation());
-            //t2.getGuardCDD().printDot();
-//            copyBeforeResets.printDot();
-//            invariantTest.printDot();
-//            System.out.println(t1.getUpdates() + " " + t2.getUpdates());
-//            target1.getInvarCDD().printDot();
-
-            //t2.getTarget().getInvarCDD().printDot();
-            //invariantTest.minus(target1.getInvarCDD()).printDot();
-//            invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce().printDot();
-
             return null;
          }
 
@@ -246,7 +232,8 @@ public class Refinement {
        // if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
        //     assert(false);
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
-
+        if (target1.getLocation().getName().contains("DIV"))
+            System.out.println(target1.getLocation().getName());
         return new StatePair(target1, target2);
     }
 
@@ -271,10 +258,6 @@ public class Refinement {
        // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
-            System.out.println("left CDD "  + leftCDD);
-            System.out.println("right CDD "  + rightCDD);
-            System.out.println("minus " +leftCDD.minus(rightCDD));
-            System.out.println("subtraction fail");
             return false;
         }
         for (Transition transition1 : trans1) {
@@ -312,32 +295,32 @@ public class Refinement {
 
     private boolean checkActions(State state1, State state2, boolean isInput) {
         for (Channel action : (isInput ? inputs2 : outputs1)) {
-            List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action, allClocks)
+            List<Transition> leaderTransitions = isInput ? ts2.getNextTransitions(state2, action, allClocks)
                     : ts1.getNextTransitions(state1, action, allClocks);
 
-            if (!transitions1.isEmpty()) {
+            if (!leaderTransitions.isEmpty()) {
 
-                List<Transition> transitions2;
+                List<Transition> followerTransitions;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
-                    transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
+                    followerTransitions = isInput ? ts1.getNextTransitions(state1, action, allClocks)
                             : ts2.getNextTransitions(state2, action, allClocks);
 
-                    if (transitions2.isEmpty()) {
+                    if (followerTransitions.isEmpty()) {
                         state2.getInvarCDD().printDot();
-                        System.out.println("transitions2 empty");
+                        System.out.println("followerTransitions empty");
                         return false;
                     }
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
-                    transitions2 = new ArrayList<>();
+                    followerTransitions = new ArrayList<>();
                     Transition loop = new Transition(state2, state2.getInvarCDD());
-                    transitions2.add(loop);
+                    followerTransitions.add(loop);
                 }
 
 
 
-                if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2))) {
+                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions) : createNewStatePairs(leaderTransitions, followerTransitions))) {
                     System.out.println("create pairs failed");
                     return false;
                 }

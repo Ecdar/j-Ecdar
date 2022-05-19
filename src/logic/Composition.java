@@ -5,6 +5,8 @@ import models.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static logic.Helpers.randomString;
+
 public class Composition extends TransitionSystem {
     private final TransitionSystem[] systems;
     private final Set<Channel> inputs, outputs, syncs;
@@ -105,12 +107,56 @@ public class Composition extends TransitionSystem {
         maxBounds = res;
     }
 
+
     public Automaton createComposition(List<Automaton> autList)
     {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
         CDD.addBddvar(BVs);
         String name="";
+        // Renaming the clocks and BVs if there has been a name clash
+        List<Clock> newClocks = new ArrayList<>();
+        List<Clock> oldClocks = new ArrayList<>();
+        List<BoolVar> newBVs = new ArrayList<>();
+        List<BoolVar> oldBVs = new ArrayList<>();
+        for (Automaton aut : autList)
+        {
+            for (Clock c: aut.getClocks())
+            {
+                Clock newClock;
+                if (newClocks.stream().filter(clk->clk.getName().equals(c.getName())).collect(Collectors.toList()).isEmpty())
+                {
+                    newClock = new Clock(c.getName());
+                }
+                else {
+                    if (newClocks.stream().filter(clk->clk.getName().equals(aut.getName() + c.getName())).collect(Collectors.toList()).isEmpty())
+                        newClock = new Clock(aut.getName() + c.getName());
+                    else
+                        newClock = new Clock(aut.getName() + c.getName()+randomString());
+                }
+                newClocks.add(newClock);
+                oldClocks.add(c);
+            }
+            for (BoolVar bv: aut.getBVs())
+            {
+                BoolVar newBV;
+                if (newBVs.stream().filter(b->b.getName().equals(bv.getName())).collect(Collectors.toList()).isEmpty())
+                {
+                    newBV = new BoolVar(bv.getName(), bv.getInitialValue());
+                }
+                else {
+                    if (newBVs.stream().filter(b->b.getName().equals(aut.getName() + bv.getName())).collect(Collectors.toList()).isEmpty())
+                        newBV = new BoolVar(aut.getName() + bv.getName(), bv.getInitialValue());
+                    else
+                        newBV = new BoolVar(aut.getName() + bv.getName()+randomString(), bv.getInitialValue());
+                }
+                newBVs.add(newBV);
+                oldBVs.add(bv);
+            }
+        }
+
+
+
         Set<Edge> edgesSet = new HashSet<>();
         Set<Location> locationsSet = new HashSet<>();
         Map<String, Location> locMap = new HashMap<>();
@@ -205,8 +251,9 @@ public class Composition extends TransitionSystem {
 
         }
 
-
-        Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, BVs, false);
+        List <Location> locsWithNewClocks = updateClocksInLocs(locationsSet,newClocks, oldClocks,newBVs,oldBVs);
+        List <Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet,newClocks, oldClocks,newBVs,oldBVs);
+        Automaton resAut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, newClocks, newBVs, false);
         CDD.done();
         return resAut;
 

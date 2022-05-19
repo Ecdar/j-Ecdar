@@ -262,6 +262,26 @@ public abstract class TransitionSystem {
         return moves;
     }
 
+    public List<Location> updateClocksInLocs(Set<Location> locs, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs)
+    {
+        List<Location> result = new ArrayList<>();
+        for (Location loc: locs)
+        {
+            result.add(new Location(loc, newClocks, oldClocks,newBVs,oldBVs));
+        }
+        return result;
+    }
+
+    public List<Edge> updateClocksInEdges(Set<Edge> edges, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs)
+    {
+        List<Edge> result = new ArrayList<>();
+        for (Edge edge: edges)
+        {
+            result.add(new Edge(edge, newClocks, newBVs, edge.getSource(), edge.getTarget(), oldClocks,oldBVs));
+        }
+        return result;
+    }
+
     public void buildErrMessage(List<String> inc, String checkType) {
         if (! (lastErr.length()==0))
             lastErr.append(", ");

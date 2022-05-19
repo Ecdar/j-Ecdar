@@ -527,7 +527,7 @@ public class BoolTest {
         SimpleTransitionSystem sts1 = q.calculateQuotientAutomaton(true);
         XMLFileWriter.toXML("quotient_bool1.xml",sts1);
 
-        Automaton finalAut  =Bisimilarity.checkBisimilarity(sts1.getAutomaton());
+        Automaton finalAut = Bisimilarity.checkBisimilarity(sts1.getAutomaton());
         XMLFileWriter.toXML("bsimreducedQuotient.xml", new SimpleTransitionSystem(finalAut));
     }
 

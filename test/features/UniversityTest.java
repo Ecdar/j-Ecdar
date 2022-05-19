@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
+import parser.XMLFileWriter;
 import parser.XMLParser;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class UniversityTest {
     public void afterEachTest(){
         CDD.done();
     }
+
 
     @BeforeClass
     public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
@@ -82,6 +84,49 @@ public class UniversityTest {
 
         assertTrue(new Refinement(half1, half1Copy).check());
     }
+
+    @Test
+    public void newQuotientTest() {
+
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,adm2}), new Quotient(spec,researcher)).check());
+    }
+
+    @Test
+    public void newQuotientTest1() {
+
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new Quotient(spec,researcher)).check());
+    }
+
+
+    @Test
+    public void newQuotientTest2() {
+
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
+    }
+
+    @Test
+    public void newQuotientTest4() {
+        Quotient q = new Quotient(spec,adm);
+        XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
+
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new SimpleTransitionSystem(q.getAutomaton()) ).check());
+    }
+
+    @Test
+    public void newQuotientTest3() {
+        XMLFileWriter.toXML("adm2new.xml",new Automaton[]{adm2.getAutomaton()});
+        XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});
+
+
+        SimpleTransitionSystem st =  new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton());
+
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), st);
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+
 
     @Test
     public void testHalf2RefinesSelf() {

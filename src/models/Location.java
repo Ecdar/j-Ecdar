@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Location {
@@ -9,6 +10,8 @@ public class Location {
     private final String name;
     private Guard invariant;
     private int x,y;
+
+
 
     public CDD getInconsistentPart() {
         return inconsistentPart;
@@ -119,6 +122,7 @@ public class Location {
         this.isUniversal = copy.isUniversal;
         this.isInconsistent = copy.isInconsistent;
     }
+
 
     public String getName() {
         return name;

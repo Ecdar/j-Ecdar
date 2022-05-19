@@ -46,6 +46,7 @@ public class CDD {
         for (int i = 0; i < clocks.size(); i++){
             if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
         }
+        System.out.println("clock " + clock + " not in " + clocks);
         assert(false);
         return 0;
     }
@@ -658,7 +659,7 @@ public class CDD {
     {
         if (e.getUpdates().size()==0)
         {
-            System.out.println("returned because no update");
+            System.out.println("returned because no update ");
             return this.conjunction(e.getGuardCDD());
         }
         int numBools = 0;
