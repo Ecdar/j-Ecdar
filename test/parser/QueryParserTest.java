@@ -10,8 +10,6 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -336,6 +334,11 @@ public class QueryParserTest {
     @Test
     public void testQueryValid5() {
         QueryParser.parse("refinement:((HalfAdm1&&(HalfAdm1||HalfAdm2))||Researcher||(Machine&&Machine3))<=Spec", transitionSystems);
+    }
+
+    @Test
+    public void testQueryValidSaveAs() {
+        QueryParser.parse("get-component:Adm2 save-as Adm3; refinement:Adm3<=(HalfAdm1&&HalfAdm2)", transitionSystems);
     }
 
     @Test(expected = ParseCancellationException.class)
