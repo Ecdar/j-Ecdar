@@ -6,63 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Query {
-    private String queryString;
     private QueryType queryType;
     private List<String> resultList;
     private boolean result;
     private String componentName;
+    private String system1;
+    private String system2;
     private static int nextDefaultComponentId = 0;
 
-    public Query(String query) throws Exception {
-        queryString = query.replaceAll("\\s+", "");
-        isQueryValid(queryString);
-        resultList = new ArrayList<>();
-        if(queryString.contains("save-as")){
-            String[] saveQuery = queryString.split("save-as");
-            queryString = saveQuery[0];
-            componentName = saveQuery[1];
-        }
-        determineQueryType();
+    private Query(QueryBuilder builder){
+        this.resultList = new ArrayList<>();
+        this.queryType = builder.queryType;
+        this.system1 = builder.system1;
+        this.system2 = builder.system2;
+        this.componentName = builder.componentName;
     }
 
-    private void determineQueryType(){
-        if(queryString.contains("refinement")){
-            queryType = QueryType.REFINEMENT;
-            queryString = queryString.replace("refinement:", "");
-        } else if(queryString.contains("consistency")){
-            queryType = QueryType.CONSISTENCY;
-            queryString = queryString.replace("consistency:", "");
-        } else if(queryString.contains("implementation")){
-            queryType = QueryType.IMPLEMENTATION;
-            queryString = queryString.replace("implementation:", "");
-        } else if(queryString.contains("determinism")){
-            queryType = QueryType.DETERMINISM;
-            queryString = queryString.replace("determinism:", "");
-        } else if(queryString.contains("get-component")){
-            queryType = QueryType.GET_COMPONENT;
-            queryString = queryString.replace("get-component:", "");
-            if(componentName == null){
-                SetDefaultComponentName();
-            }
-        } else if(queryString.contains("bisim-minim")){
-            queryType = QueryType.BISIM_MINIM;
-            queryString = queryString.replace("bisim-minim:", "");
-            if(componentName == null){
-                SetDefaultComponentName();
-            }
-        } else if(queryString.contains("prune")){
-            queryType = QueryType.PRUNE;
-            queryString = queryString.replace("prune:", "");
-            if(componentName == null){
-                SetDefaultComponentName();
-            }
-        }
-    }
-
-    private void SetDefaultComponentName() {
-        componentName = "automaton" + nextDefaultComponentId;
-        nextDefaultComponentId++;
-    }
 
     public void setResult(boolean result) {
         this.result = result;
@@ -74,10 +33,6 @@ public class Query {
 
     public void addResultString(String resultString){
         resultList.add(resultString);
-    }
-
-    public String getQuery() {
-        return queryString;
     }
 
     public QueryType getType() {
@@ -92,6 +47,14 @@ public class Query {
         return String.join("\n", resultList);
     }
 
+    public String getSystem1() {
+        return system1;
+    }
+
+    public String getSystem2() {
+        return system2;
+    }
+
     public enum QueryType {
         REFINEMENT,
         CONSISTENCY,
@@ -102,58 +65,43 @@ public class Query {
         PRUNE
     }
 
-    public static void isQueryValid(String query) throws Exception {
-        checkRefinementSyntax(query);
-        isParBalanced(query);
-        beforeAfterParantheses(query);
-        checkSyntax(query);
-    }
+    public static class QueryBuilder{
+        private QueryType queryType;
+        private String componentName;
+        private String system1;
+        private String system2;
 
-    private static void checkRefinementSyntax(String query) throws InvalidQueryException {
-        if (query.contains("<=") && !query.contains("refinement:")) throw new InvalidQueryException("Expected: \"refinement:\"");
-
-        if (query.matches(".*<=.*<=.*")) throw new InvalidQueryException("There can only be one refinement");
-    }
-
-    private static void isParBalanced(String query) throws InvalidQueryException {
-        int counter = 0;
-
-        for (int i = 0; i < query.length(); i++) {
-            if (query.charAt(i) == '(') {
-                counter++;
-            }
-            if (query.charAt(i) == ')') {
-                counter--;
-            }
+        public QueryBuilder queryType(QueryType queryType){
+            this.queryType = queryType;
+            return this;
         }
 
-        if (counter != 0) throw new InvalidQueryException("Parentheses are not balanced");
-    }
+        public QueryBuilder componentName(String componentName){
+            this.componentName = componentName;
+            return this;
+        }
 
-    private static void beforeAfterParantheses(String query) throws InvalidQueryException {
-        String testString = "/=|&:(";
+        public QueryBuilder system1(String system1){
+            this.system1 = system1;
+            return this;
+        }
 
-        for (int i = 0; i < query.length(); i++) {
-            if (query.charAt(i) == '(') {
-                if (i != 0) {
-                    if (testString.indexOf(query.charAt(i - 1)) == -1)
-                        throw new InvalidQueryException("Before opening Parentheses can be either operator or second Parentheses");
-                }
-                if (i + 1 < query.length()) {
-                    if (!(query.charAt(i + 1) == '(' || Character.isLetter(query.charAt(i + 1)) || Character.isDigit(query.charAt(i + 1))))
-                        throw new InvalidQueryException("After opening Parentheses can be either other Parentheses or component");
-                }
+        public QueryBuilder system2(String system2){
+            this.system2 = system2;
+            return this;
+        }
+
+        public Query build(){
+            if(componentName == null){
+                setDefaultComponentName();
             }
+            return new Query(this);
+        }
+
+        private void setDefaultComponentName() {
+            componentName = "automaton" + nextDefaultComponentId;
+            nextDefaultComponentId++;
         }
     }
 
-    private static void checkSyntax(String query) throws InvalidQueryException {
-        String testString = "/=|&:";
-        for (int i = 0; i < query.length(); i++) {
-            if (testString.indexOf(query.charAt(i)) != -1) {
-                return;
-            }
-        }
-        throw new InvalidQueryException("Incorrect syntax, does not contain any feature");
-    }
 }

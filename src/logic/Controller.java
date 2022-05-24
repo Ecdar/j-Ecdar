@@ -3,6 +3,7 @@ package logic;
 import models.Automaton;
 import org.json.simple.parser.ParseException;
 import parser.JSONParser;
+import parser.QueryParser;
 import parser.XMLParser;
 
 import java.util.ArrayList;
@@ -18,11 +19,7 @@ public class Controller {
     private static final int FEATURE_QUOTIENT = 3;
 
     public static List<Query> handleRequest(String location, String query, boolean trace) throws Exception {
-        List<Query> queries = new ArrayList<>();
-        List<String> queryStrings = Arrays.asList(query.split(";"));
-        for (int i = 0; i < queryStrings.size(); i++){
-            queries.add(new Query(queryStrings.get(i)));
-        }
+        List<Query> queries = QueryParser.parse(query);
 
         ArrayList<String> temp = new ArrayList<>(Arrays.asList(location.split(" ")));
         boolean isJson = temp.get(0).equals("-json");
@@ -34,8 +31,8 @@ public class Controller {
     }
 
     public static Query handleRequest(String queryString) throws Exception {
-        Query query = new Query(queryString);
-        return handleQuery(query, false);
+        List<Query> queries = QueryParser.parse(queryString);
+        return handleQuery(queries.get(0), false);
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) {
@@ -79,8 +76,7 @@ public class Controller {
     }
 
     private static Query handleRefinement(Query query, boolean trace){
-        List<String> refSplit = Arrays.asList(query.getQuery().split("<="));
-        Refinement ref = new Refinement(runQuery(refSplit.get(0)), runQuery(refSplit.get(1)));
+        Refinement ref = new Refinement(runQuery(query.getSystem1()), runQuery(query.getSystem2()));
         boolean refCheck;
         if (trace) {
             refCheck = ref.check(true);
@@ -100,7 +96,7 @@ public class Controller {
     }
 
     private static Query handleConsistency(Query query){
-        TransitionSystem ts = runQuery(query.getQuery());
+        TransitionSystem ts = runQuery(query.getSystem1());
         query.setResult(ts.isLeastConsistent());
         if(!query.getResult()){
             query.addResultString(ts.getLastErr());
@@ -109,7 +105,7 @@ public class Controller {
     }
 
     private static Query handleImplementation(Query query){
-        TransitionSystem ts = runQuery(query.getQuery());
+        TransitionSystem ts = runQuery(query.getSystem1());
         query.setResult(ts.isImplementation());
         if(!query.getResult()){
             query.addResultString(ts.getLastErr());
@@ -118,7 +114,7 @@ public class Controller {
     }
 
     private static Query handleDeterminism(Query query){
-        TransitionSystem ts = runQuery(query.getQuery());
+        TransitionSystem ts = runQuery(query.getSystem1());
         query.setResult(ts.isDeterministic());
         if(!query.getResult()){
             query.addResultString(ts.getLastErr());
@@ -127,13 +123,13 @@ public class Controller {
     }
 
     private static Query handleGetComponent(Query query){
-        TransitionSystem ts = runQuery(query.getQuery());
+        TransitionSystem ts = runQuery(query.getSystem1());
         saveAutomaton(ts.getAutomaton(), query.getComponentName());
         return query;
     }
 
     private static Query handleBisimMinim(Query query){
-        TransitionSystem ts = runQuery(query.getQuery());
+        TransitionSystem ts = runQuery(query.getSystem1());
         Automaton aut = ts.getAutomaton();
 
         aut = Bisimilarity.checkBisimilarity(aut);
@@ -143,7 +139,7 @@ public class Controller {
     }
 
     private static Query handlePrune(Query query){
-        TransitionSystem ts = runQuery(query.getQuery());
+        TransitionSystem ts = runQuery(query.getSystem1());
         Automaton aut = ts.getAutomaton();
 
         SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));

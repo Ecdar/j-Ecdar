@@ -2,6 +2,8 @@ package parser;
 
 import logic.*;
 import models.Automaton;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -132,211 +134,111 @@ public class QueryParserTest {
     //Test entire Controller component
 
     @Test
-    public void testCompRefinesSpec() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage() );
-            fail();
-        }
+    public void testCompRefinesSpec() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testSpecNotRefinesSpec() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Spec)<=(Spec)", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testSpecNotRefinesSpec() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Spec)<=(Spec)", false).get(0).getResult(), false);
     }
 
     @Test
-    public void testMachNotRefinesMach() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testMachNotRefinesMach() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0).getResult(), false);
     }
 
     @Test
-    public void testMach3NotRefinesMach3() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine3<=Machine3", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testMach3NotRefinesMach3() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine3<=Machine3", false).get(0).getResult(), false);
     }
 
     @Test
-    public void testMach3RefinesMach() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity","refinement:Machine3<=Machine", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testMach3RefinesMach() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity","refinement:Machine3<=Machine", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testSpecNotRefinesAdm() {
-        try {
-            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Administration", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testSpecNotRefinesAdm() throws Exception {
+        assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Administration", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testSpecNotRefinesMachine() {
-        try {
-            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity","refinement:Spec<=Machine", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testSpecNotRefinesMachine() throws Exception {
+        assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity","refinement:Spec<=Machine", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testSpecNotRefinesResearcher() {
-        try {
-            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Researcher", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
-
+    public void testSpecNotRefinesResearcher() throws Exception {
+        assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Researcher", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testSpecNotRefinesMachine3() {
-        try {
-            assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Machine3", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testSpecNotRefinesMachine3() throws Exception {
+        assertNotEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Machine3", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testCompNotRefinesComp() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+    public void testCompNotRefinesComp() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)", false).get(0).getResult(), false);
     }
 
     @Test
-    public void testConjRefinesAdm2() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(HalfAdm1&&HalfAdm2)<=Adm2", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testConjRefinesAdm2() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(HalfAdm1&&HalfAdm2)<=Adm2", false).get(0).getResult(), true);
     }
     @Test
-    public void testDetermOne() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:HalfAdm1", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermOne() throws Exception {
+       assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:HalfAdm1", false).get(0).getResult(), true);
     }
     @Test
-    public void testDetermConj() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity","determinism:HalfAdm1&&HalfAdm2", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermConj() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity","determinism:HalfAdm1&&HalfAdm2", false).get(0).getResult(), true);
     }
     @Test
-    public void testDetermComp() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:Administration||Machine", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermComp() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:Administration||Machine", false).get(0).getResult(), true);
     }
     @Test
-    public void testDetermCompConj() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:Administration||Machine&&Researcher", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermCompConj() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:Administration||Machine&&Researcher", false).get(0).getResult(), true);
     }
     @Test
-    public void testDetermOneFail() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermOneFail() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9", false).get(0).getResult(), false);
     }
     @Test
-    public void testDetermCompFail() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9||G10", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermCompFail() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9||G10", false).get(0).getResult(), false);
     }
     @Test
-    public void testDetermConjFail() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9&&G10", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermConjFail() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9&&G10", false).get(0).getResult(), false);
     }
     @Test
-    public void testDetermConjCompFail() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9&&G10||G11", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDetermConjCompFail() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "determinism:G9&&G10||G11", false).get(0).getResult(), false);
     }
     @Test
-    public void testConsistencyOne() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:HalfAdm1", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testConsistencyOne() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:HalfAdm1", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testConsistencyConj() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:HalfAdm1&&HalfAdm2", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testConsistencyConj() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:HalfAdm1&&HalfAdm2", false).get(0).getResult(), true);
     }
     @Test
-    public void testConsistencyComp() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:Administration||Machine", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testConsistencyComp() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:Administration||Machine", false).get(0).getResult(), true);
     }
     @Test
-    public void testConsistencyCompConj() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:Administration||Machine&&Researcher", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testConsistencyCompConj() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "consistency:Administration||Machine&&Researcher", false).get(0).getResult(), true);
     }
     @Test
-    public void testImplementationComp() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G8||G13", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testImplementationComp() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G8||G13", false).get(0).getResult(), true);
     }
 
 //    @Test
@@ -350,175 +252,118 @@ public class QueryParserTest {
 
 
     @Test
-    public void testFailImplementationComp() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G8||G15", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testFailImplementationComp() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G8||G15", false).get(0).getResult(), false);
     }
     @Test
-    public void testImplementationOne() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G8", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testImplementationOne() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G8", false).get(0).getResult(), true);
     }
     @Test
-    public void testFailImplementationOne() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G9", false).get(0).getResult(), false);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testFailImplementationOne() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/ImplTests.xml ", "implementation:G9", false).get(0).getResult(), false);
     }
 
     @Test
-    public void testAdm2RefinesConj() {
-        try {
-            assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Adm2<=(HalfAdm1&&HalfAdm2)", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testAdm2RefinesConj() throws Exception {
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Adm2<=(HalfAdm1&&HalfAdm2)", false).get(0).getResult(), true);
     }
 
     @Test
-    public void testSeveralQueries1() {
-        try {
-            List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Spec; refinement:Machine<=Machine", false);
-            assertTrue(!result.get(0).getResult() && !result.get(1).getResult());
-        } catch (Exception e) {
-            fail();
-        }
+    public void testSeveralQueries1() throws Exception {
+        List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Spec; refinement:Machine<=Machine", false);
+        assertTrue(!result.get(0).getResult() && !result.get(1).getResult());
     }
 
     @Test
-    public void testSeveralQueries2() {
-        try {
-            List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec; refinement:Machine3<=Machine3", false);
-            assertTrue(result.get(0).getResult() && !result.get(1).getResult());
-        } catch (Exception e) {
-            fail();
-        }
+    public void testSeveralQueries2() throws Exception {
+        List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec; refinement:Machine3<=Machine3", false);
+        assertTrue(result.get(0).getResult() && !result.get(1).getResult());
     }
 
     @Test
-    public void testDelayRefZ3RefinesZ4() {
-        try {
-            assertEquals(Controller.handleRequest("-xml ./samples/xml/delayRefinement.xml", "refinement:Z3<=Z4", false).get(0).getResult(), true);
-        } catch (Exception e) {
-            fail();
-        }
+    public void testDelayRefZ3RefinesZ4() throws Exception {
+        assertEquals(Controller.handleRequest("-xml ./samples/xml/delayRefinement.xml", "refinement:Z3<=Z4", false).get(0).getResult(), true);
     }
 
     //Query validator tests
 
     @Test
     public void testQueryValid1() {
-        try {
-            Query query = new Query("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
-            assertTrue(true);
-        } catch (Exception e) {
-            fail();
-        }
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1&&HalfAdm2)");
     }
 
     @Test
     public void testQueryValid2() {
-        try {
-            Query query = new Query("refinement:(Administration||Researcher||Machine)<=Spec");
-            assertTrue(true);
-        } catch (Exception e) {
-            fail();
-        }
+        QueryParser.parse("refinement:(Administration||Researcher||Machine)<=Spec");
     }
 
     @Test
     public void testQueryValid3() {
-        try {
-            Query query = new Query("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec");
-            assertTrue(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
+        QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec");
     }
 
     @Test
     public void testQueryValid4() {
-        try {
-            Query query = new Query("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine1&&Machine2))<=Spec");
-            assertTrue(true);
-        } catch (Exception e) {
-            fail();
-        }
+        QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine1&&Machine2))<=Spec");
     }
 
     @Test
     public void testQueryValid5() {
-        try {
-            Query query = new Query("refinement:((HalfAdm1&&(HA1||HA2))||Researcher||(Machine1&&Machine2))<=Spec");
-            assertTrue(true);
-        } catch (Exception e) {
-            fail();
-        }
+        QueryParser.parse("refinement:((HalfAdm1&&(HA1||HA2))||Researcher||(Machine1&&Machine2))<=Spec");
     }
 
-    @Test
+    @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid1() {
-        try {
-            Query query = new Query("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)");
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "Expected: \"refinement:\"");
-        }
+        QueryParser.parse("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)");
     }
 
-    @Test
+    @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid2() {
-        try {
-            Query query = new Query("refinement:Adm2(<=(HalfAdm1&&HalfAdm2)");
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "Parentheses are not balanced");
-        }
+        QueryParser.parse("refinement:Adm2(<=(HalfAdm1&&HalfAdm2)");
     }
 
-    @Test
+    @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid3() {
-        try {
-            Query query = new Query("refinement:Adm2<=(HalfAdm1&&HalfAdm2)<=Spec");
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "There can only be one refinement");
-        }
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1&&HalfAdm2)<=Spec");
     }
 
-    @Test
+    @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid4() {
-        try {
-            Query query = new Query("refinement:Adm2<=(HalfAdm1(&&HalfAdm2))");
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "Before opening Parentheses can be either operator or second Parentheses");
-        }
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1(&&HalfAdm2))");
+    }
+
+    @Test(expected = ParseCancellationException.class)
+    public void testQueryNotValid5() {
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1||(&&HalfAdm2))");
     }
 
     @Test
-    public void testQueryNotValid5() {
-        try {
-            Query query = new Query("refinement:Adm2<=(HalfAdm1||(&&HalfAdm2))");
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getMessage(), "After opening Parentheses can be either other Parentheses or component");
-        }
+    public void testQueryParsingSaveAs(){
+        Query query = QueryParser.parse("get-component: Machine1 && Machine2 save-as TestMachine").get(0);
+
+        assertEquals("TestMachine", query.getComponentName());
+        assertEquals("Machine1&&Machine2", query.getSystem1());
+        assertEquals(Query.QueryType.GET_COMPONENT, query.getType());
+    }
+
+    @Test
+    public void testQueryParsingMultiple(){
+        List<Query> queries = QueryParser.parse("get-component: Machine1 && Machine2 save-as TestMachine; refinement: Machine1 <= Machine2");
+
+        assertEquals("TestMachine", queries.get(0).getComponentName());
+        assertEquals("Machine1&&Machine2", queries.get(0).getSystem1());
+        assertEquals(Query.QueryType.GET_COMPONENT, queries.get(0).getType());
+
+        assertTrue(queries.get(1).getComponentName().startsWith("automaton"));
+        assertEquals("Machine1", queries.get(1).getSystem1());
+        assertEquals("Machine2", queries.get(1).getSystem2());
     }
 
     @Test
     public void testComponentName() throws Exception {
         Controller.parseComponents("./samples/json/EcdarUniversity", true);
-        Query query = new Query("get-component: Machine save-as TestMachine");
+        Query query = QueryParser.parse("get-component: Machine save-as TestMachine").get(0);
 
         assertEquals("TestMachine", query.getComponentName());
     }
@@ -526,8 +371,10 @@ public class QueryParserTest {
     @Test
     public void testDefaultComponentName() throws Exception {
         Controller.parseComponents("./samples/json/EcdarUniversity", true);
-        Query query = new Query("get-component: Machine");
+        List<Query> queries = QueryParser.parse("get-component: Machine; get-component: Researcher");
 
-        assertEquals("automaton0", query.getComponentName());
+        assertTrue(queries.get(0).getComponentName().startsWith("automaton"));
+        assertTrue(queries.get(1).getComponentName().startsWith("automaton"));
+        assertNotEquals(queries.get(0).getComponentName(), queries.get(1).getComponentName());
     }
 }

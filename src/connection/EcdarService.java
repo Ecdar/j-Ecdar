@@ -37,7 +37,7 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
         try {
             Query response = Controller.handleRequest(request.getQuery());
             QueryProtos.QueryResponse.Builder queryResponseBuilder = QueryProtos.QueryResponse.newBuilder().setQuery(
-                    QueryProtos.Query.newBuilder().setQuery(response.getQuery()).build()
+                    QueryProtos.Query.newBuilder().setQuery(request.getQuery()).build()
             );
 
             switch (response.getType()){
