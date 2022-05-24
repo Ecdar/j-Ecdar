@@ -1,9 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Location {
 
@@ -151,8 +148,6 @@ public class Location {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Location location = (Location) o;
-
-
         return isInitial == location.isInitial &&
                 isUrgent == location.isUrgent &&
                 isUniversal == location.isUniversal &&
@@ -165,4 +160,11 @@ public class Location {
     public String toString() {
         return name;
     }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isInitial, isUrgent, isUniversal, isInconsistent, name, invariant);
+    }
+
 }

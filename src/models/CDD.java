@@ -191,7 +191,6 @@ public class CDD {
     @Override
     public String toString()
     {
-        System.out.println("to string");
         return CDD.toGuardList(this,clocks).toString();
     }
 

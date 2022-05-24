@@ -1,5 +1,6 @@
 package models;
 
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +13,16 @@ public class ComplexLocation extends SymbolicLocation {
 
     public ComplexLocation(List<SymbolicLocation> locations) {
         this.locations = locations;
+        CDD invar = CDD.cddTrue();
+        for (SymbolicLocation loc1 : locations)
+        {
+            CDD invarLoc = loc1.getInvariantCDD();
+            invar = invar.conjunction(invarLoc);
+        }
+        invariants = invar;
+    }
+    public ComplexLocation(SimpleLocation location) {
+        this.locations = new ArrayList<>(){{add(location);}};
         CDD invar = CDD.cddTrue();
         for (SymbolicLocation loc1 : locations)
         {

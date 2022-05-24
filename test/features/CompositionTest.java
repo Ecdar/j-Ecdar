@@ -108,7 +108,7 @@ public class CompositionTest {
         st.toXML("aWeirdOutput.xml");
         SimpleTransitionSystem st2 = new SimpleTransitionSystem(comp.getAutomaton());
         st2.toXML("aWeirdOutput2.xml");
-
+        assert(new Refinement(comp,spec).check());
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());

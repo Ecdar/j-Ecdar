@@ -1,5 +1,6 @@
 package logic;
 
+import io.grpc.netty.shaded.io.netty.handler.ssl.SslClientHelloHandler;
 import models.*;
 
 import javax.annotation.processing.SupportedSourceVersion;
@@ -129,11 +130,11 @@ public class Refinement {
             treeSize++;
         }
 
-        while (!waiting.isEmpty()) {
 
+        while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
 
-            System.out.println("Current state: " + curr.prettyPrint());
+
             if (RET_REF)
                 currNode = curr.getNode();
 
@@ -145,11 +146,36 @@ public class Refinement {
             // mark the pair of states as visited
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
             StatePair pair = new StatePair(newState1, newState2, currNode);
+
+            if (curr.getLeft().getLocation().getName().contains("L5L9"))
+                if (curr.getRight().getLocation().getName().equals("L18DIVL1")) {
+                    System.out.println("Current state: " + curr.prettyPrint());
+                    System.out.println(waiting.size() + " " + passed.size());
+                }
+            //assert(!waitingContainsStatePair(curr));
+            assert(!passedContainsStatePair(curr));
+
+
+
+
+
+            if (!passed.containsKey(locPair)) {
+                for (LocationPair keyPair : passed.keySet())
+                   if (keyPair.equals(locPair)) {
+                       System.out.println("rest");
+                       assert (false);
+                   }
+            }
+
+
+
+
             if (passed.containsKey(locPair))
                 passed.get(locPair).add(pair);
             else
                 passed.put(locPair, new ArrayList<>(Collections.singletonList(pair)));
 
+            assert(passedContainsStatePair(curr));
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
@@ -158,6 +184,7 @@ public class Refinement {
                 CDD.done();
                 return false;
             }
+            //System.out.println("done with first check");
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
@@ -232,8 +259,6 @@ public class Refinement {
        // if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
        //     assert(false);
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
-        if (target1.getLocation().getName().contains("DIV"))
-            System.out.println(target1.getLocation().getName());
         return new StatePair(target1, target2);
     }
 
@@ -258,6 +283,10 @@ public class Refinement {
        // leftCDD.minus(rightCDD).reduce().removeNegative().printDot();
         // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
         if (leftCDD.minus(rightCDD).isNotFalse()) {
+            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            System.out.println(leftCDD);
+            System.out.println(rightCDD);
+            System.out.println(leftCDD.minus(rightCDD));
             return false;
         }
         for (Transition transition1 : trans1) {
@@ -266,7 +295,6 @@ public class Refinement {
                 if (pair != null) {
                     pairFound = true;
                     if (!passedContainsStatePair(pair) && !waitingContainsStatePair(pair)) {
-
                         waiting.add(pair);
                         if (RET_REF) {
                             currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
@@ -314,13 +342,28 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     followerTransitions = new ArrayList<>();
-                    Transition loop = new Transition(state2, state2.getInvarCDD());
-                    followerTransitions.add(loop);
+                    if (isInput) {
+                        Transition loop = new Transition(state1, state1.getInvarCDD());
+                        followerTransitions.add(loop);
+                    }
+                    else {
+                        Transition loop = new Transition(state2, state2.getInvarCDD());
+                        followerTransitions.add(loop);
+                    }
+
                 }
 
 
-
                 if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions) : createNewStatePairs(leaderTransitions, followerTransitions))) {
+                    System.out.println(isInput);
+                    System.out.println("followerTransitions: " + followerTransitions.size());
+                    for (Transition t: followerTransitions)
+                        for (Edge e : t.getEdges())
+                            System.out.println(e);
+                    System.out.println("leaderTransitions: " + leaderTransitions.size());
+                    for (Transition t: leaderTransitions)
+                        for (Edge e : t.getEdges())
+                            System.out.println(e);
                     System.out.println("create pairs failed");
                     return false;
                 }
@@ -333,6 +376,10 @@ public class Refinement {
        LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
 
         if (passed.containsKey(locPair)) {
+
+
+
+
             return listContainsStatePair(pair, passed.get(locPair));
         }
 
@@ -346,6 +393,9 @@ public class Refinement {
     private boolean listContainsStatePair(StatePair pair, Iterable<StatePair> pairs) {
         State currLeft = pair.getLeft();
         State currRight = pair.getRight();
+
+
+
 
         for (StatePair state : pairs) {
             // check for zone inclusion
@@ -375,7 +425,7 @@ public class Refinement {
         HashMap<Clock,Integer> res = new HashMap<>();
         res.putAll(ts1.getMaxBounds());
         res.putAll(ts2.getMaxBounds());
-
+        System.out.println("BOUNDS: " + res);
         maxBounds = res;
     }
 

@@ -15,6 +15,7 @@ import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -103,13 +104,15 @@ public class UniversityTest {
 
         assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
     }
-
     @Test
     public void newQuotientTest4() {
         Quotient q = new Quotient(spec,adm);
         XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
-
-        assertTrue(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new SimpleTransitionSystem(q.getAutomaton()) ).check());
+        XMLFileWriter.toXML("comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new SimpleTransitionSystem(q.getAutomaton()) );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
     }
 
     @Test

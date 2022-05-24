@@ -95,4 +95,6 @@ public class DBMLib {
     public static native boolean fed_intersects_dbm(int[][]fed1, int[][] fed2, int dim);
 
     public static native int[] dbm_extrapolateMaxBounds(int[] dbm, int dim, int[] max);
+
+    public static native int[] dbm_extrapolateMaxBoundsDiag(int[] dbm, int dim, int[] max);
 }

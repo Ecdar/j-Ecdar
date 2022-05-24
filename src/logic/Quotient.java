@@ -419,10 +419,11 @@ public class Quotient extends TransitionSystem {
         newClocks.add(newClock);
         List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),newClocks, oldClocks,newBVs,oldBVs);
         List <Edge> edgesWithNewClocks = updateClocksInEdges(new HashSet<>(edges),newClocks, oldClocks,newBVs,oldBVs);
-        Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, newClocks, newBVs, false);
+        CDD.done();
+        Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, newClocks, newBVs, true);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);
-        CDD.done();
+
         return simp;
     }
 

@@ -335,6 +335,7 @@ public class Composition extends TransitionSystem {
 
     // build a list of transitions from a given state and a signal
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
+
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
         // these will store the locations of the target states and the corresponding transitions

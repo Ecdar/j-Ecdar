@@ -61,8 +61,13 @@ public class State {
             return;
         CDD copy = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
-        //System.out.println("max bounds : "  + maxBounds);
-        //System.out.println(CDD.toGuardList(copy,relevantClocks));
+        boolean print = false;
+        if (copy.toString().contains("30"))
+        {
+            System.out.println("max bounds : " + maxBounds);
+            System.out.println(CDD.toGuardList(copy, relevantClocks));
+            print = true;
+        }
         if (copy.isBDD())
         {
             return;
@@ -72,10 +77,10 @@ public class State {
         {
             CddExtractionResult extractResult = copy.reduce().removeNegative().extractBddAndDbm();
             copy = extractResult.getCddPart().removeNegative().reduce();
-            //copy.printDot();
+
             Zone z = new Zone(extractResult.getDbm());
-//            z.printDBM(true,true);
             CDD bddPart = extractResult.getBddPart();
+
             int[] bounds = new int[CDD.numClocks];
             int counter =1;
             bounds[0] = 0; // special clock
@@ -95,17 +100,21 @@ public class State {
                 }
                 counter++;
             }
-            CDD before = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
+            if (print)
+            {
+                for (int i: bounds)
+                    System.out.print(i + " ");
+                System.out.println();
+            }
             z.extrapolateMaxBounds(bounds);
+            if (print) z.printDBM(true,true);
             CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
-            //System.out.println(CDD.toGuardList(before,relevantClocks));
-            //System.out.println(CDD.toGuardList( extrapolatedDBMCDD, relevantClocks));
             CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
-            //System.out.println(CDD.toGuardList( extrapolatedCDD, relevantClocks));
             resCDD = resCDD.disjunction(extrapolatedCDD);
-            //System.out.println(CDD.toGuardList( resCDD, relevantClocks));
+
         }
-        //System.out.println(CDD.toGuardList( resCDD, relevantClocks));
+        if (print)
+            System.out.println(resCDD);
         invarCDD = resCDD;
     }
 
