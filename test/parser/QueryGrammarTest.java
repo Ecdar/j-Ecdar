@@ -34,7 +34,7 @@ public class QueryGrammarTest {
         assertEquals(6, tokens.size());
         assertEquals(QueryGrammarLexer.QUERY_TYPE, tokens.get(0).getType());
         assertEquals(QueryGrammarLexer.VARIABLE, tokens.get(2).getType());
-        assertEquals(QueryGrammarLexer.OPERATOR, tokens.get(3).getType());
+        assertEquals(QueryGrammarLexer.CONJUNCTION, tokens.get(3).getType());
         assertEquals(QueryGrammarLexer.VARIABLE, tokens.get(4).getType());
     }
 
@@ -56,7 +56,7 @@ public class QueryGrammarTest {
         QueryGrammarParser.QueryContext ctx = parser.queries().query(0);
         assertEquals("get-component", ctx.QUERY_TYPE().getText());
         assertEquals("A", ctx.saveSystem().system().system(0).system(0).VARIABLE().getText());
-        assertEquals("||", ctx.saveSystem().system().OPERATOR().getText());
+        assertEquals("||", ctx.saveSystem().system().COMPOSITION().getText());
         assertEquals("F", ctx.saveSystem().system().system(1).VARIABLE().getText());
     }
 

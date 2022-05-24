@@ -3,7 +3,7 @@ package parser;
 import QueryGrammar.QueryGrammarParser;
 import QueryGrammar.QueryGrammarBaseVisitor;
 import QueryGrammar.QueryGrammarLexer;
-import logic.Query;
+import logic.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -14,7 +14,10 @@ import java.util.List;
 
 public class QueryParser {
 
-    public static List<Query> parse(String queryString){
+    private static List<SimpleTransitionSystem> transitionSystems;
+
+    public static List<Query> parse(String queryString, List<SimpleTransitionSystem> systems){
+        transitionSystems = systems;
         CharStream charStream = CharStreams.fromString(queryString);
         QueryGrammarLexer lexer = new QueryGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
@@ -78,10 +81,11 @@ public class QueryParser {
 
             Query.QueryBuilder builder = new Query.QueryBuilder();
 
+            SystemVisitor systemVisitor = new SystemVisitor();
             return builder
                     .queryType(Query.QueryType.REFINEMENT)
-                    .system1(ctx.system(0).getText())
-                    .system2(ctx.system(1).getText());
+                    .system1(systemVisitor.visit(ctx.system(0)))
+                    .system2(systemVisitor.visit(ctx.system(1)));
         }
 
 
@@ -94,7 +98,43 @@ public class QueryParser {
                 builder.componentName(ctx.VARIABLE().getText());
             }
 
-            return builder.system1(ctx.system().getText());
+            SystemVisitor systemVisitor = new SystemVisitor();
+            return builder.system1(systemVisitor.visit(ctx.system()));
+        }
+    }
+
+    public static class SystemVisitor extends QueryGrammarBaseVisitor<TransitionSystem>{
+
+        private TransitionSystem findComponent(String name){
+            for (SimpleTransitionSystem ts : transitionSystems){
+                if (ts.getName().equalsIgnoreCase(name))
+                    return ts;
+            }
+            throw new RuntimeException("Automaton does not exist  " + name);
+        }
+
+        @Override
+        public TransitionSystem visitSystem(QueryGrammarParser.SystemContext ctx) {
+            if(ctx.system().size() == 2){
+                TransitionSystem system1 = visit(ctx.system(0));
+                TransitionSystem system2 = visit(ctx.system(1));
+
+                if(ctx.CONJUNCTION() != null){
+                    return new Conjunction(new TransitionSystem[]{system1, system2});
+                }else if(ctx.COMPOSITION() != null){
+                    return new Composition(new TransitionSystem[]{system1, system2});
+                }else if(ctx.QUOTIENT() != null){
+                    return new Quotient(system1, system2); // TODO: Check if correct
+                }else {
+                    throw new RuntimeException("Expected composition, conjunction or quotient");
+                }
+            }
+
+            if(ctx.system().size() == 1){
+                return visit(ctx.system(0));
+            } else {
+               return findComponent(ctx.VARIABLE().getText());
+            }
         }
     }
 }

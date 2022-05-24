@@ -23,8 +23,10 @@ saveSystem  : system
             ;
 
 system      : VARIABLE
-            | system OPERATOR system
             |  '(' system ')'
+            | system CONJUNCTION system
+            | system COMPOSITION system
+            | system QUOTIENT system
             ;
 
 
@@ -44,6 +46,8 @@ fragment SYMBOL    : ('.' | 'þ' | '€' | '_' | 'ð' | 'đ' | 'œ') ;
 fragment LETTER      : (LOWERCASE | UPPERCASE) ;
 VARIABLE             : LETTER (LETTER | DIGIT | SYMBOL)* ;
 
-OPERATOR    : '&&' | '||' | '\\' ;
+CONJUNCTION          : '&&' ;
+COMPOSITION          : '||' ;
+QUOTIENT             : '\\' ;
 
 WS : [ \t\r\n]+ -> skip ;

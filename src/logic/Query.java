@@ -10,8 +10,8 @@ public class Query {
     private List<String> resultList;
     private boolean result;
     private String componentName;
-    private String system1;
-    private String system2;
+    private TransitionSystem system1;
+    private TransitionSystem system2;
     private static int nextDefaultComponentId = 0;
 
     private Query(QueryBuilder builder){
@@ -47,11 +47,11 @@ public class Query {
         return String.join("\n", resultList);
     }
 
-    public String getSystem1() {
+    public TransitionSystem getSystem1() {
         return system1;
     }
 
-    public String getSystem2() {
+    public TransitionSystem getSystem2() {
         return system2;
     }
 
@@ -68,8 +68,8 @@ public class Query {
     public static class QueryBuilder{
         private QueryType queryType;
         private String componentName;
-        private String system1;
-        private String system2;
+        private TransitionSystem system1;
+        private TransitionSystem system2;
 
         public QueryBuilder queryType(QueryType queryType){
             this.queryType = queryType;
@@ -81,12 +81,12 @@ public class Query {
             return this;
         }
 
-        public QueryBuilder system1(String system1){
+        public QueryBuilder system1(TransitionSystem system1){
             this.system1 = system1;
             return this;
         }
 
-        public QueryBuilder system2(String system2){
+        public QueryBuilder system2(TransitionSystem system2){
             this.system2 = system2;
             return this;
         }
