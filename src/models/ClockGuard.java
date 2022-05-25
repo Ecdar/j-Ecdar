@@ -105,12 +105,23 @@ public class ClockGuard extends Guard {
         return null;
     }
 
+    public int makeRaw(int bound, Relation rel)
+    {
+        //TODO: Check this with martijn and ulrik: important!
+        if (rel.equals(Relation.LESS_THAN) || rel.equals(Relation.GREATER_THAN))
+            return bound*2+1;
+        else
+            return bound*2;
+
+
+    }
+
     @Override
     int getMaxConstant() {
         if (isDiagonal())
             return 0;
         else
-            return bound;
+            return makeRaw(bound,rel);
     }
 
     @Override

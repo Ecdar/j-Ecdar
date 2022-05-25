@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -18,6 +19,7 @@ public class DBMTest {
     private static State state1, state2, state3, state4, state5;
     private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
+    private static Clock x,y,z;
 
 
     @After
@@ -30,16 +32,16 @@ public class DBMTest {
         Location l1 = new Location("L0", new TrueGuard(), false, false, false, false);
         SymbolicLocation sl1 = new SimpleLocation(l1);
 
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
-        Clock z = new Clock("z");
+        x = new Clock("x");
+        y = new Clock("y");
+        z = new Clock("z");
 
-        clockList.addAll(Arrays.asList(x, y, z));
+        clockList.addAll(Arrays.asList(x, y,z));
         CDD.init(100,100,100);
         CDD.addClocks(clockList);
         // STATES----------------------
         // From 0 to inf
-        Zone z1 = new Zone(new int[]{1, 1, DBM_INF, 1});
+        Zone z1 = new Zone(new int[]{1, 1, 10, 20});
         CDD cdd1 = CDD.allocateFromDbm(z1.getDbm(),clockList.size()+1);
         state1 = new State(sl1, cdd1);
 
@@ -67,7 +69,7 @@ public class DBMTest {
 
         g5 = new ClockGuard(x, 505, Relation.GREATER_EQUAL);
         g6 = new ClockGuard(y, 8, Relation.GREATER_EQUAL);
-
+        CDD.done();
     }
 
     @Test
@@ -99,6 +101,78 @@ public class DBMTest {
     public void testRaw2Bound1() {
         assertEquals(0, DBMLib.raw2bound(1));
     }
+
+
+    @Test
+    public void testExtrapolate() {
+        CDD.init(100,100,100);
+        CDD.addClocks(clockList);
+        HashMap<Clock,Integer> map = new HashMap<>();
+        map.put(x,10);
+        map.put(y,30);
+        map.put(z,10);
+
+        Guard g1 = new ClockGuard(x, y, 40, Relation.LESS_THAN );  //x>4
+        //Guard g2 = new ClockGuard(x, null, 80, Relation.LESS_THAN); //x<8
+        //Guard g3 = new ClockGuard(y, null, 20,Relation.GREATER_THAN); //y>2
+        //Guard g4 = new ClockGuard(y, null, 50,Relation.LESS_THAN); //y<5
+
+        List<Guard> disj1 = new ArrayList<>();
+        disj1.add(g1);
+        //disj1.add(g2);
+        //disj1.add(g3);
+       // disj1.add(g4);
+        Guard dis1 = new AndGuard(disj1);
+
+        Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);
+        State state1 = new State(new SimpleLocation(l1),new CDD(dis1));
+        state1.delay();
+        System.out.println(state1);
+        state1.extrapolateMaxBounds(map,clockList);
+        System.out.println(state1);
+        assertEquals(state1.toString(), "{L1, (x>1 && y>2 && y-x<1)}");
+        CDD.done();
+    }
+
+    @Test
+    public void testExtrapolate1() {
+
+        int[] arr = new int[]{1,-24,1,-12,-7,-24,
+                117, 1 ,101,25 ,55 ,1,
+                17,-24 , 1,-12,-7,-24,
+                 93,-11,77,1,31,-11,
+                 88,-16,72,-4,1,-16,
+                121,9,105,33,59,1};
+        Zone z = new Zone(arr);
+        z= z.close();
+        z.printDBM(true,true);
+        System.out.println(z.isValid());
+        int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+    }
+
+    @Test
+    public void testExtrapolate2() {
+
+        int[] arr = new int[]{1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                121,1,1,1,1,1,};
+        Zone z = new Zone(arr);
+        z.printDBM(true,true);
+        System.out.println(z.isValid());
+        int[] bounds = new int[] {0, 12, 31, 41, 41, 41};
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+    }
+
 
     @Test
     public void testRaw2Bound2() {

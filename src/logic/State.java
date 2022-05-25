@@ -1,5 +1,6 @@
 package logic;
 
+import lib.DBMLib;
 import models.*;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class State {
         CDD copy = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
         boolean print = false;
-        if (copy.toString().contains("30"))
+        if (copy.toString().contains("50"))
         {
             System.out.println("max bounds : " + maxBounds);
             System.out.println(CDD.toGuardList(copy, relevantClocks));
@@ -106,9 +107,12 @@ public class State {
                     System.out.print(i + " ");
                 System.out.println();
             }
-            z.extrapolateMaxBounds(bounds);
-            if (print) z.printDBM(true,true);
-            CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
+            Zone copyZone = new Zone(z);
+            Zone newZone = new Zone(DBMLib.dbm_close(z.getDbm(),z.getSize()));
+            newZone.extrapolateMaxBounds(bounds);
+            if (print && !copyZone.equals(newZone)) copyZone.printDBM(false,false);
+            if (print && !copyZone.equals(newZone)) newZone.printDBM(false,false);
+            CDD extrapolatedDBMCDD = CDD.allocateFromDbm(newZone.getDbm(),CDD.numClocks);
             CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
             resCDD = resCDD.disjunction(extrapolatedCDD);
 
@@ -118,6 +122,67 @@ public class State {
         invarCDD = resCDD;
     }
 
+    public void extrapolateMaxBoundsDiag(HashMap<Clock,Integer> maxBounds, List<Clock> relevantClocks){
+        if (invarCDD.isTrue())
+            return;
+        CDD copy = new CDD(invarCDD.getPointer());
+        CDD resCDD = CDD.cddFalse();
+        boolean print = false;
+        if (copy.toString().contains("30"))
+        {
+            System.out.println("max bounds : " + maxBounds);
+            System.out.println(CDD.toGuardList(copy, relevantClocks));
+            print = true;
+        }
+        if (copy.isBDD())
+        {
+            return;
+        }
+        else
+            while (!copy.isTerminal())
+            {
+                CddExtractionResult extractResult = copy.reduce().removeNegative().extractBddAndDbm();
+                copy = extractResult.getCddPart().removeNegative().reduce();
+
+                Zone z = new Zone(extractResult.getDbm());
+                CDD bddPart = extractResult.getBddPart();
+
+                int[] bounds = new int[CDD.numClocks];
+                int counter =1;
+                bounds[0] = 0; // special clock
+                for (Clock clk :CDD.getClocks())
+                {
+                    if (!maxBounds.containsKey(clk))
+                    {
+                        bounds[counter]=0;
+                    }
+                    else if (relevantClocks.contains(clk) )
+                    {
+                        bounds[counter] =maxBounds.get(clk);
+                    }
+                    else
+                    {
+                        bounds[counter] = 0;
+                    }
+                    counter++;
+                }
+                if (print)
+                {
+                    for (int i: bounds)
+                        System.out.print(i + " ");
+                    System.out.println();
+                }
+                z.extrapolateMaxBoundsDiag(bounds);
+                if (print) z.printDBM(true,true);
+                CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
+                CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
+                resCDD = resCDD.disjunction(extrapolatedCDD);
+
+            }
+        if (print)
+            System.out.println(resCDD);
+        invarCDD = resCDD;
+    }
     @Override
     public String toString() {
         return "{" + location + ", " + invarCDD + '}';
