@@ -3,12 +3,16 @@ package parser;
 import logic.*;
 import logic.query.Query;
 import models.Automaton;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +23,7 @@ public class QueryParserTest {
 
     private ArrayList<SimpleTransitionSystem> transitionSystems;
 
-    @BeforeClass
+    @Before
     public void beforeEachTest() throws FileNotFoundException {
         String base = "./samples/json/EcdarUniversity/";
         String[] components = new String[]{"GlobalDeclarations.json",
@@ -55,95 +59,110 @@ public class QueryParserTest {
         transitionSystems.add(half2);
     }
 
+    private TransitionSystem testVisitSystem(String systemString) throws Exception{
+        CharStream charStream = CharStreams.fromString("get-component:" + systemString);
+        QueryGrammar.QueryGrammarLexer lexer = new QueryGrammar.QueryGrammarLexer(charStream);
+        lexer.addErrorListener(new ErrorListener());
+        TokenStream tokens = new CommonTokenStream(lexer);
+
+        QueryGrammar.QueryGrammarParser parser = new QueryGrammar.QueryGrammarParser(tokens);
+        parser.addErrorListener(new ErrorListener());
+        QueryParser.SystemVisitor visitor = new QueryParser.SystemVisitor();
+        Field field = QueryParser.class.getDeclaredField("transitionSystems");
+        field.setAccessible(true);
+        field.set(null, transitionSystems);
+        return visitor.visitSystem(parser.queries().query(0).saveSystem().system());
+    }
 
     @Test
-    public void testCompositionOfThree() {
+    public void testCompositionOfThree() throws Exception {
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{adm, machine, researcher});
-        TransitionSystem ts2 = QueryParser.parse("get-component:(Administration||Machine||Researcher)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("(Administration||Machine||Researcher)");
 
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testCompositionOfOne() {
-        TransitionSystem ts = QueryParser.parse("get-component:(Spec)", transitionSystems).get(0).getSystem1();
+    public void testCompositionOfOne() throws Exception {
+        TransitionSystem ts = testVisitSystem("(Spec)");
         assertEquals(spec, ts);
     }
 
     @Test
-    public void testCompositionOfOneMultiBrackets() {
-        TransitionSystem ts = QueryParser.parse("get-component:((Spec))", transitionSystems).get(0).getSystem1();
+    public void testCompositionOfOneMultiBrackets() throws Exception {
+        TransitionSystem ts = testVisitSystem("((Spec))");
         assertEquals(spec, ts);
     }
 
     @Test
-    public void testCompositionOfThreeExtraBrackets() {
+    public void testCompositionOfThreeExtraBrackets() throws Exception {
         TransitionSystem transitionSystem1 = new Composition(new TransitionSystem[]{adm, machine});
 
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{transitionSystem1, researcher});
-        TransitionSystem ts2 = QueryParser.parse("get-component:((Administration||Machine)||Researcher)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("((Administration||Machine)||Researcher)");
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testConjunctionOfThree() {
+    public void testConjunctionOfThree() throws Exception {
         TransitionSystem ts1 = new Conjunction(new TransitionSystem[]{adm, machine, researcher});
-        TransitionSystem ts2 = QueryParser.parse("get-component:(Administration&&Machine&&Researcher)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("(Administration&&Machine&&Researcher)");
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testConjunctionOfThreeExtraBrackets() {
+    public void testConjunctionOfThreeExtraBrackets() throws Exception {
         TransitionSystem transitionSystem1 = new Conjunction(new TransitionSystem[]{adm, machine});
 
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{transitionSystem1, researcher});
-        TransitionSystem ts2 = QueryParser.parse("get-component:((Administration&&Machine)||Researcher)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("((Administration&&Machine)||Researcher)");
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testQuery1() {
+    public void testQuery1() throws Exception {
         TransitionSystem trs1 = new Conjunction(new TransitionSystem[]{adm, machine, machine});
 
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{trs1, researcher, half1});
-        TransitionSystem ts2 = QueryParser.parse("get-component:((Administration&&Machine&&Machine)||Researcher||HalfAdm1)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("((Administration&&Machine&&Machine)||Researcher||HalfAdm1)");
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testQuery2() {
+    public void testQuery2() throws Exception {
         TransitionSystem trs1 = new Conjunction(new TransitionSystem[]{machine, researcher});
 
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{researcher, machine, trs1, spec});
-        TransitionSystem ts2 = QueryParser.parse("get-component:(Researcher||Machine||(Machine&&Researcher)||Spec)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("(Researcher||Machine||(Machine&&Researcher)||Spec)");
+
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testQuery3() {
+    public void testQuery3() throws Exception {
         TransitionSystem trs1 = new Conjunction(new TransitionSystem[]{researcher, machine});
         TransitionSystem trs2 = new Conjunction(new TransitionSystem[]{machine, researcher});
 
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{trs1, trs2});
-        TransitionSystem ts2 = QueryParser.parse("get-component:((Researcher&&Machine)||(Machine&&Researcher))", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("((Researcher&&Machine)||(Machine&&Researcher))");
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void testQuery4() {
+    public void testQuery4() throws Exception {
         TransitionSystem trs1 = new Composition(new TransitionSystem[]{machine, researcher});
         TransitionSystem trs2 = new Conjunction(new TransitionSystem[]{spec, trs1, machine});
         TransitionSystem trs3 = new Conjunction(new TransitionSystem[]{machine, machine, machine});
 
         TransitionSystem ts1 = new Composition(new TransitionSystem[]{researcher, trs3, trs2});
-        TransitionSystem ts2 = QueryParser.parse("get-component:(Researcher||(Machine&&Machine&&Machine)||(Spec&&(Machine||Researcher)&&Machine))", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("(Researcher||(Machine&&Machine&&Machine)||(Spec&&(Machine||Researcher)&&Machine))");
         assertEquals(ts1, ts2);
     }
 
     @Test
-    public void Half1ConjHalf2() {
+    public void Half1ConjHalf2() throws Exception {
         TransitionSystem ts1 = new Conjunction(new TransitionSystem[]{half1, half2});
-        TransitionSystem ts2 = QueryParser.parse("get-component:(HalfAdm1&&HalfAdm2)", transitionSystems).get(0).getSystem1();
+        TransitionSystem ts2 = testVisitSystem("(HalfAdm1&&HalfAdm2)");
 
         assertEquals(ts1, ts2);
     }
