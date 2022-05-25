@@ -20,7 +20,7 @@ public class QueryParserTest {
     private ArrayList<SimpleTransitionSystem> transitionSystems;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws FileNotFoundException {
+    public void beforeEachTest() throws FileNotFoundException {
         String base = "./samples/json/EcdarUniversity/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Administration.json",
@@ -43,10 +43,7 @@ public class QueryParserTest {
         half2 = new SimpleTransitionSystem(machines[7]);
 
         Controller.parseComponents(base, true);
-    }
 
-    @Before
-    public void beforeEachTest(){
         transitionSystems = new ArrayList<>();
         transitionSystems.add(adm);
         transitionSystems.add(machine);
