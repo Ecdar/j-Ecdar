@@ -4,6 +4,7 @@ import QueryGrammar.QueryGrammarParser;
 import QueryGrammar.QueryGrammarBaseVisitor;
 import QueryGrammar.QueryGrammarLexer;
 import logic.*;
+import logic.query.Query;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -36,7 +37,9 @@ public class QueryParser {
             QueryVisitor queryVisitor = new QueryVisitor();
             List<Query> queries = new ArrayList<>();
             for (QueryGrammarParser.QueryContext queryCtx: ctx.query()){
-                queries.add(queryVisitor.visitQuery(queryCtx).build());
+                Query query = queryVisitor.visitQuery(queryCtx).build();
+                query.handle();
+                queries.add(query);
             }
             return queries;
         }

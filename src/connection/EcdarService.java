@@ -7,7 +7,7 @@ import com.google.protobuf.Empty;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import logic.Controller;
-import logic.Query;
+import logic.query.Query;
 
 import java.util.List;
 

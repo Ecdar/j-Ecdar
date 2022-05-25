@@ -1,16 +1,14 @@
 package parser;
 
 import logic.*;
+import logic.query.Query;
 import models.Automaton;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +20,7 @@ public class QueryParserTest {
     private ArrayList<SimpleTransitionSystem> transitionSystems;
 
     @BeforeClass
-    public static void setUpBeforeClass() {
+    public static void setUpBeforeClass() throws FileNotFoundException {
         String base = "./samples/json/EcdarUniversity/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Administration.json",
