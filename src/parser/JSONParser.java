@@ -9,6 +9,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,12 +24,16 @@ public class JSONParser {
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
     private static final List<Clock> componentClocks = new ArrayList<>();
 
-    public static Automaton[] parse(String folderPath, boolean makeInpEnabled) {
+    public static Automaton[] parse(String folderPath, boolean makeInpEnabled) throws FileNotFoundException {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
         System.out.println(folderPath);
         ArrayList<String> locations = new ArrayList<>(Collections.singletonList(folderPath + "/GlobalDeclarations.json"));
-        locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
+        if (files != null) {
+            locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
+        }else {
+            throw new FileNotFoundException("Could not find any .json files at location: " + folderPath + "/Components");
+        }
 
         objectList = parseFiles(locations);
 

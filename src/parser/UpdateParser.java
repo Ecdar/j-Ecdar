@@ -20,8 +20,10 @@ public class UpdateParser {
         clocks = clockList;
         CharStream charStream = CharStreams.fromString(updateString);
         EdgeGrammar.EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
+        lexer.addErrorListener(new ErrorListener());
         TokenStream tokens = new CommonTokenStream(lexer);
         EdgeGrammar.EdgeGrammarParser parser = new EdgeGrammarParser(tokens);
+        parser.addErrorListener(new ErrorListener());
 
         UpdatesVisitor updatesVisitor = new UpdatesVisitor();
         return updatesVisitor.visit(parser.update());

@@ -1,7 +1,7 @@
 package connection;
 
 import logic.Controller;
-import logic.Query;
+import logic.query.Query;
 import org.apache.commons.cli.*;
 
 import java.util.ArrayList;

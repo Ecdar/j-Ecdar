@@ -7,7 +7,7 @@ import com.google.protobuf.Empty;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import logic.Controller;
-import logic.Query;
+import logic.query.Query;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
         try {
             Query response = Controller.handleRequest(request.getQuery());
             QueryProtos.QueryResponse.Builder queryResponseBuilder = QueryProtos.QueryResponse.newBuilder().setQuery(
-                    QueryProtos.Query.newBuilder().setQuery(response.getQuery()).build()
+                    QueryProtos.Query.newBuilder().setQuery(request.getQuery()).build()
             );
 
             switch (response.getType()){

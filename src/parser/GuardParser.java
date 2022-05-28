@@ -21,8 +21,10 @@ public class GuardParser {
         clocks = clockList;
         CharStream charStream = CharStreams.fromString(guardString);
         EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
+        lexer.addErrorListener(new ErrorListener());
         TokenStream tokens = new CommonTokenStream(lexer);
         EdgeGrammarParser parser = new EdgeGrammarParser(tokens);
+        parser.addErrorListener(new ErrorListener());
 
         OrVisitor orVisitor = new OrVisitor();
         return orVisitor.visit(parser.guard());

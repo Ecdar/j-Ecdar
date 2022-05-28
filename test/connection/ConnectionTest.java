@@ -1,13 +1,13 @@
 package connection;
 
-import Exceptions.InvalidQueryException;
 import logic.Controller;
-import logic.Query;
+import logic.query.Query;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,7 +127,7 @@ public class ConnectionTest {
         assertEquals("Automaton G14 is non-deterministic.\nAutomaton G14 is not output urgent.\n", queries.get(1).getResultStrings());
     }
 
-    @Test(expected = InvalidQueryException.class)
+    @Test(expected = FileNotFoundException.class)
     public void testRunInvalidQuery() throws Exception {
         List<Query> queries = Controller.handleRequest("-json sdfsd", "xcv", false);
     }
