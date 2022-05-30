@@ -448,6 +448,19 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
     return (jlong)cdd_result;
 }
 
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBoundsNoClose(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
+    jsize len = env->GetArrayLength(dbm);
+    jsize max_len = env->GetArrayLength(max);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    auto convertedMax = helper_functions::jintToC(env, max, max_len);
+    cdd_dbm_extrapolateMaxBounds_no_close(converted, dim, convertedMax);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+
 /*
  * Class:     lib_CDDLib
  * Method:    minus

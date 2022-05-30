@@ -98,6 +98,5 @@ public class DBMLib {
 
     public static native int[] dbm_extrapolateMaxBoundsDiag(int[] dbm, int dim, int[] max);
 
-    public static native int[] dbm_extrapolateMaxBoundsNoClose(int[] dbm, int dim, int[] max);
 
 }

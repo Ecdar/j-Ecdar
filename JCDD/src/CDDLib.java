@@ -86,6 +86,7 @@ public class CDDLib {
     public static native boolean deleteCDDExtractionResult(long extractionResultPointer);
 
 
+    public static native int[] dbm_extrapolateMaxBoundsNoClose(int[] dbm, int dim, int[] max);
 
     public static native int[] getDbmFromExtractionResult(long extractionResultPointer);
     public static native boolean cddEquiv(long lCdd, long rCdd);
