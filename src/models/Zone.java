@@ -1,5 +1,6 @@
 package models;
 
+import lib.CDDLib;
 import lib.DBMLib;
 
 import models.Relation;
@@ -140,7 +141,7 @@ public class Zone {
     }
 
     public void extrapolateMaxBounds(int[] maxBounds){
-        dbm = DBMLib.dbm_extrapolateMaxBounds(dbm, size, maxBounds);
+        dbm = CDDLib.dbm_extrapolateMaxBoundsNoClose(dbm, size, maxBounds);
     }
     public void extrapolateMaxBoundsDiag(int[] maxBounds){
         dbm = DBMLib.dbm_extrapolateMaxBoundsDiag(dbm, size, maxBounds);
