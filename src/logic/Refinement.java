@@ -150,7 +150,7 @@ public class Refinement {
                     System.out.println(waiting.size() + " " + passed.size());
                 }*/
             //assert(!waitingContainsStatePair(curr));
-            assert(!passedContainsStatePair(curr));
+            //assert(!passedContainsStatePair(curr));
 
 
 
@@ -172,7 +172,7 @@ public class Refinement {
             else
                 passed.put(locPair, new ArrayList<>(Collections.singletonList(pair)));
 
-            assert(passedContainsStatePair(curr));
+           // assert(passedContainsStatePair(curr));
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
@@ -295,7 +295,8 @@ public class Refinement {
                 StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null) {
                     pairFound = true;
-                    if (!passedContainsStatePair(pair) && !waitingContainsStatePair(pair)) {
+                    if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)  ) {
+
                         waiting.add(pair);
                         if (RET_REF) {
                             currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
@@ -377,13 +378,9 @@ public class Refinement {
        LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
 
         if (passed.containsKey(locPair)) {
-
-
-
-
-            return listContainsStatePair(pair, passed.get(locPair));
+            boolean res = listContainsStatePair(pair, passed.get(locPair));
+            return res ;
         }
-
         return false;
     }
 

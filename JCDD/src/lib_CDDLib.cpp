@@ -449,7 +449,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
 }
 
 
-JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBoundsNoClose(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
+JNIEXPORT jintArray JNICALL Java_lib_CDDLib_extrapolateMaxBoundsNoClose(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
     jsize len = env->GetArrayLength(dbm);
     jsize max_len = env->GetArrayLength(max);
 
