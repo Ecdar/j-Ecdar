@@ -51,8 +51,7 @@ public class Refinement {
         return errMsg.toString();
     }
 
-    public boolean check(boolean ret_ref) {
-
+    public boolean check(boolean ret_ref) { // TODO: test this.
         Refinement.NODE_ID = 0;
         Refinement.RET_REF = ret_ref;
         return checkRef();
@@ -96,14 +95,13 @@ public class Refinement {
         // the left side must contain all outputs from the right side
         if (!outputs1.containsAll(outputs2)) {
             precondMet = false;
-            errMsg.append("Not all outputs of the right side are present on the left side.\n");// OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
+            errMsg.append("Not all outputs of the right side are present on the left side.\n");
         }
 
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts1.getLastErr());
         }
-
 
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
@@ -134,7 +132,6 @@ public class Refinement {
         while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
 
-
             if (RET_REF)
                 currNode = curr.getNode();
 
@@ -147,11 +144,11 @@ public class Refinement {
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
             StatePair pair = new StatePair(newState1, newState2, currNode);
 
-            if (curr.getLeft().getLocation().getName().contains("L5L9"))
+           /* if (curr.getLeft().getLocation().getName().contains("L5L9"))
                 if (curr.getRight().getLocation().getName().equals("L18DIVL1")) {
                     System.out.println("Current state: " + curr.prettyPrint());
                     System.out.println(waiting.size() + " " + passed.size());
-                }
+                }*/
             //assert(!waitingContainsStatePair(curr));
             assert(!passedContainsStatePair(curr));
 
@@ -253,8 +250,12 @@ public class Refinement {
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
         //if (!target1.getInvZone().isValid()) return null;
-        //if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
-       //     assert(false);
+        if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+            assert(false);
+        if (target1.getInvarCDD().toString().contains("60")) {
+            System.out.println("QUOTIENT SIDE: " + t2.getTarget().getLocation().getName() + " OTHER: " + target1.getLocation().getName());
+            System.out.println(target1.getInvarCDD());
+        }
         target1.extrapolateMaxBounds(maxBounds,allClocks);
        // if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
        //     assert(false);

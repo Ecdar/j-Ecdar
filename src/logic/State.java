@@ -63,8 +63,9 @@ public class State {
         CDD copy = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
         boolean print = false;
-        if (copy.toString().contains("50"))
+        if (copy.toString().contains("500"))
         {
+            System.out.println("location " + location.getName());
             System.out.println("max bounds : " + maxBounds);
             System.out.println(CDD.toGuardList(copy, relevantClocks));
             print = true;

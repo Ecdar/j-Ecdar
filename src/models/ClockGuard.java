@@ -119,9 +119,9 @@ public class ClockGuard extends Guard {
     @Override
     int getMaxConstant() {
         if (isDiagonal())
-            return 0;
+            return 0; // TODO: supposed to be 0?
         else
-            return makeRaw(bound,rel);
+            return bound; //makeRaw(bound,rel);
     }
 
     @Override
