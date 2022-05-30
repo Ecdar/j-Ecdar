@@ -455,7 +455,7 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBoundsNoClose(JNI
 
     auto converted = helper_functions::jintToC(env, dbm, len);
     auto convertedMax = helper_functions::jintToC(env, max, max_len);
-    cdd_dbm_extrapolateMaxBounds_no_close(converted, dim, convertedMax);
+    cdd_dbm_extrapolate_no_close(converted, dim, convertedMax);
 
     return helper_functions::cToJint(env, converted, len);
 }
