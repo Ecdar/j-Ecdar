@@ -8,11 +8,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Refinement {
+    int counter =0;
     private final TransitionSystem ts1, ts2;
     private final List<Clock> allClocks;
     private final List<BoolVar> allBVs;
-    private final Map<LocationPair, List<StatePair>> passed;
-    private final Deque<StatePair> waiting;
+    private final Map<LocationPair, StatePair> passed;
+    private final Map<LocationPair, StatePair> waiting;
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
     private GraphNode refGraph;
     private GraphNode currNode;
@@ -26,7 +27,7 @@ public class Refinement {
     public Refinement(TransitionSystem system1, TransitionSystem system2) {
         this.ts1 = system1;
         this.ts2 = system2;
-        this.waiting = new ArrayDeque<>();
+        this.waiting = new HashMap<>();
         this.passed = new HashMap<>();
 
         allClocks = new ArrayList<>(ts1.getClocks());
@@ -66,6 +67,8 @@ public class Refinement {
         return refGraph;
     }
 
+
+
     public boolean checkPreconditions() {
         boolean precondMet = true;
 
@@ -89,7 +92,7 @@ public class Refinement {
         // inputs on the left must be equal to inputs on the right side
         if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
-            errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
+            errMsg.append("Inputs on the left side are not subset to inputs on the right side.\n");
         }
 
         // the left side must contain all outputs from the right side
@@ -97,6 +100,23 @@ public class Refinement {
             precondMet = false;
             errMsg.append("Not all outputs of the right side are present on the left side.\n");
         }
+
+        Set<Channel> output1Copy = new HashSet<>(outputs1);
+        output1Copy.retainAll(inputs2);
+        // the left side must contain all outputs from the right side
+        if (!output1Copy.isEmpty()){
+            precondMet = false;
+            errMsg.append("Alphabet mismatch.\n");
+        }
+
+        Set<Channel> output2Copy = new HashSet<>(outputs2);
+        output1Copy.retainAll(inputs1);
+        // the left side must contain all outputs from the right side
+        if (!output1Copy.isEmpty()){
+            precondMet = false;
+            errMsg.append("Alphabet mismatch.\n");
+        }
+
 
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
@@ -120,17 +140,23 @@ public class Refinement {
         CDD.addBddvar(allBVs);
 
         // the first states we look at are the initial ones
-        waiting.push(getInitialStatePair());
+        StatePair initPair = getInitialStatePair();
+        LocationPair initLocPair = new LocationPair(initPair.getLeft().getLocation(),initPair.getRight().getLocation());
+        waiting.put(initLocPair, initPair);
 
         if (RET_REF) {
-            refGraph = new GraphNode(waiting.getFirst());
+            refGraph = new GraphNode(initPair);
             currNode = refGraph;
             treeSize++;
         }
 
 
         while (!waiting.isEmpty()) {
-            StatePair curr = waiting.pop();
+            Map.Entry entry = (Map.Entry) waiting.entrySet().toArray()[0];
+            LocationPair locPairCurr = (LocationPair) entry.getKey();
+            StatePair curr = (StatePair) entry.getValue();
+
+            waiting.remove(locPairCurr);
 
             if (RET_REF)
                 currNode = curr.getNode();
@@ -167,10 +193,12 @@ public class Refinement {
 
 
 
-            if (passed.containsKey(locPair))
-                passed.get(locPair).add(pair);
+            if (passed.containsKey(locPair)) {
+                passed.get(locPair).getLeft().disjunctCDD(left.getInvarCDD());
+                passed.get(locPair).getRight().disjunctCDD(right.getInvarCDD());
+            }
             else
-                passed.put(locPair, new ArrayList<>(Collections.singletonList(pair)));
+                passed.put(locPair,pair);
 
            // assert(passedContainsStatePair(curr));
             // check that for every output in TS 1 there is a corresponding output in TS 2
@@ -211,52 +239,47 @@ public class Refinement {
         State target1 = new State(t1.getTarget().getLocation(), t1.getGuardCDD());
 
         target1.applyGuards(t2.getGuardCDD());
-
         if (target1.getInvarCDD().isFalse()) {
             return null;
         }
 
-
-        CDD copyBeforeResets = new CDD(target1.getInvarCDD().getPointer());
         target1.applyResets(t1.getUpdates());
-        //System.out.println("after first reset " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
-
         target1.applyResets(t2.getUpdates());
 
-        target1.delay();// = target1.getInvarCDD().delay();
-        //System.out.println("delayed " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
+        target1.delay();
 
         target1.applyInvariants(t1.getTarget().getInvarCDDDirectlyFromInvariants());
-        //System.out.println(((SimpleLocation)t1.getTarget().getLocation()).getActualLocation().getInvariant());
-        //System.out.println("delayed + first invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         CDD invariantTest = new CDD(target1.getInvarCDD().getPointer());
         target1.applyInvariants(t2.getTarget().getInvarCDDDirectlyFromInvariants());
-        //System.out.println(((SimpleLocation)t2.getTarget().getLocation()).getActualLocation().getInvariant());
-        //System.out.println("delayed + second invariant " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
-        //System.out.println("In the end " + CDD.toGuardList(target1.getInvarCDD(),allClocks));
 
         // Check if the invariant of the other side does not cut solutions and if so, report failure
         // This also happens to be a delay check
 
-        //System.out.println(CDD.toGuardList(invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce(),allClocks));
-
         CDD cdd = invariantTest.minus(target1.getInvarCDD()).removeNegative().reduce();
         if (cdd.isNotFalse()){
-
             return null;
          }
 
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
         //if (!target1.getInvZone().isValid()) return null;
-        if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
-            assert(false);
-        if (target1.getInvarCDD().toString().contains("60")) {
+        //if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+        //    assert(false);
+        boolean print = false;
+        counter ++;
+        if (counter == 507)
             System.out.println("QUOTIENT SIDE: " + t2.getTarget().getLocation().getName() + " OTHER: " + target1.getLocation().getName());
-            System.out.println(target1.getInvarCDD());
-        }
+
+        /*for (Clock c: allClocks)
+            //if (c.getName().equals("quo_new"))
+            {
+                maxBounds.remove(c);
+                maxBounds.put(c,20);
+            }*/
+
         target1.extrapolateMaxBounds(maxBounds,allClocks);
+
        // if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
        //     assert(false);
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
@@ -296,8 +319,14 @@ public class Refinement {
                 if (pair != null) {
                     pairFound = true;
                     if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)  ) {
+                        LocationPair locPair = new LocationPair(pair.getLeft().getLocation(),pair.getRight().getLocation());
+                        if (waiting.containsKey(locPair)) {
+                            waiting.get(locPair).getLeft().disjunctCDD(pair.getLeft().getInvarCDD());
+                            waiting.get(locPair).getRight().disjunctCDD(pair.getRight().getInvarCDD());
+                        }
+                        else
+                            waiting.put(locPair,pair);
 
-                        waiting.add(pair);
                         if (RET_REF) {
                             currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
                             treeSize++;
@@ -378,36 +407,33 @@ public class Refinement {
        LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
 
         if (passed.containsKey(locPair)) {
-            boolean res = listContainsStatePair(pair, passed.get(locPair));
+            boolean res = listContainsStatePair(pair, passed);
             return res ;
         }
         return false;
     }
 
     private boolean waitingContainsStatePair(StatePair pair) {
-        return listContainsStatePair(pair, waiting);
+
+        LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
+        if (waiting.containsKey(locPair)) {
+            boolean res = listContainsStatePair(pair, waiting);
+            return res ;
+        }
+        return false;
     }
 
-    private boolean listContainsStatePair(StatePair pair, Iterable<StatePair> pairs) {
+    private boolean listContainsStatePair(StatePair pair, Map<LocationPair,StatePair> pairs) {
         State currLeft = pair.getLeft();
         State currRight = pair.getRight();
 
-
-
-
-        for (StatePair state : pairs) {
-            // check for zone inclusion
-            State passedLeft = state.getLeft();
-            State passedRight = state.getRight();
-
-            if (passedLeft.getLocation().equals(currLeft.getLocation()) &&
-                    passedRight.getLocation().equals(currRight.getLocation())) {
-                if (CDD.isSubset(currLeft.getInvarCDD(),passedLeft.getInvarCDD()) &&
-                        CDD.isSubset(currRight.getInvarCDD(),passedRight.getInvarCDD())) {
-                    supersetNode = state.getNode();
-                    return true;
-                }
-            }
+        StatePair state = pairs.get(new LocationPair(pair.getLeft().getLocation(),pair.getRight().getLocation()));
+        State passedLeft = state.getLeft();
+        State passedRight = state.getRight();
+        if (CDD.isSubset(currLeft.getInvarCDD(),passedLeft.getInvarCDD()) &&
+                CDD.isSubset(currRight.getInvarCDD(),passedRight.getInvarCDD())) {
+            supersetNode = state.getNode();
+            return true;
         }
 
         return false;

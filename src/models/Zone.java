@@ -141,7 +141,7 @@ public class Zone {
     }
 
     public void extrapolateMaxBounds(int[] maxBounds){
-        dbm = CDDLib.dbm_extrapolateMaxBoundsNoClose(dbm, size, maxBounds);
+        dbm = DBMLib.dbm_extrapolateMaxBounds(dbm, size, maxBounds);
     }
     public void extrapolateMaxBoundsDiag(int[] maxBounds){
         dbm = DBMLib.dbm_extrapolateMaxBoundsDiag(dbm, size, maxBounds);

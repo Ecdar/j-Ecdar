@@ -113,15 +113,8 @@ public class DBMTest {
         map.put(z,10);
 
         Guard g1 = new ClockGuard(x, y, 40, Relation.LESS_THAN );  //x>4
-        //Guard g2 = new ClockGuard(x, null, 80, Relation.LESS_THAN); //x<8
-        //Guard g3 = new ClockGuard(y, null, 20,Relation.GREATER_THAN); //y>2
-        //Guard g4 = new ClockGuard(y, null, 50,Relation.LESS_THAN); //y<5
-
         List<Guard> disj1 = new ArrayList<>();
         disj1.add(g1);
-        //disj1.add(g2);
-        //disj1.add(g3);
-       // disj1.add(g4);
         Guard dis1 = new AndGuard(disj1);
 
         Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);

@@ -77,14 +77,14 @@ public class UnspecTest {
     }
 
     @Test
-    public void compNotRefinesB() {
-        // should fail because right side has more inputs
+    public void compRefinesB() {
+        // in the old test case, the refinement should fail because right side has more inputs, now it should pass
         CDD.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.addAll(aa.getClocks());
         clocks.addAll(aaCopy.getClocks());
         clocks.addAll(b.getClocks());
         CDD.addClocks(clocks);
-        assertFalse(new Refinement(new Composition(new TransitionSystem[]{a, aa}), b).check());
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{a, aa}), b).check());
     }
 }

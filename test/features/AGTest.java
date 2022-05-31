@@ -124,8 +124,9 @@ public class AGTest {
     }
 
     @Test
-    public void ANotRefinesAA() {
-        // should fail because right side has more inputs
-        assertFalse(new Refinement(a, aa).check());
+    public void ARefinesAA() {
+        // was supposed to fail because right side has more inputs
+        // now that the left side inputs has to be a subset, its okay
+        assertTrue(new Refinement(a, aa).check());
     }
 }
