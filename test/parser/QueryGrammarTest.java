@@ -39,6 +39,18 @@ public class QueryGrammarTest {
     }
 
     @Test
+    public void testLexerQuotient(){
+        List<Token> tokens = getTokensFromText("refinement: A <= B \\\\ (A || Q)");
+
+        assertEquals(11, tokens.size());
+        assertEquals(QueryGrammarLexer.VARIABLE, tokens.get(1).getType());
+        assertEquals(QueryGrammarLexer.QUOTIENT, tokens.get(4).getType());
+        assertEquals(QueryGrammarLexer.VARIABLE, tokens.get(6).getType());
+        assertEquals(QueryGrammarLexer.COMPOSITION, tokens.get(7).getType());
+        assertEquals(QueryGrammarLexer.VARIABLE, tokens.get(8).getType());
+    }
+
+    @Test
     public void testLexerMultipleQueries(){
         List<Token> tokens = getTokensFromText("refinement: A <= B; get-component: C");
 
@@ -58,6 +70,16 @@ public class QueryGrammarTest {
         assertEquals("A", ctx.saveSystem().system().system(0).system(0).VARIABLE().getText());
         assertEquals("||", ctx.saveSystem().system().COMPOSITION().getText());
         assertEquals("F", ctx.saveSystem().system().system(1).VARIABLE().getText());
+    }
+
+    @Test
+    public void testParsingQuotient(){
+        QueryGrammarParser parser = createParserNoError(getTokensFromText("refinement: A <= B \\\\ (A || Q)"));
+
+        QueryGrammarParser.QueryContext ctx = parser.queries().query(0);
+        assertEquals("A", ctx.refinement().system(0).VARIABLE().getText());
+        assertEquals("\\\\", ctx.refinement().system(1).QUOTIENT().getText());
+        assertEquals("B", ctx.refinement().system(1).system(0).getText());
     }
 
     @Test
