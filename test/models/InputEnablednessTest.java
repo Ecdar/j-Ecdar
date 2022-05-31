@@ -84,9 +84,9 @@ public class InputEnablednessTest {
     @Test
     public void testAutomaton() {
         SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
-        st.toXML("wtf.xml");
+        st.toXML("testOutput/wtf.xml");
         SimpleTransitionSystem st1 = new SimpleTransitionSystem(expected);
-        st1.toXML("wtf-exp.xml");
+        st1.toXML("testOutput/wtf-exp.xml");
         assert actual.equals(expected);
     }
 

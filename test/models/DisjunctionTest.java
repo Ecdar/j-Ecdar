@@ -46,12 +46,12 @@ public class DisjunctionTest {
     @Test
     public void testSafeLoadRef() {
 
-        ((SimpleTransitionSystem)D1).toXML("D1_test.xml");
-        ((SimpleTransitionSystem)D2).toXML("D2_test.xml");
+        ((SimpleTransitionSystem)D1).toXML("testOutput/D1_test.xml");
+        ((SimpleTransitionSystem)D2).toXML("testOutput/D2_test.xml");
 
-        automata = XMLParser.parse("D1_test.xml", false);
+        automata = XMLParser.parse("testOutput/D1_test.xml", false);
         D1 = new SimpleTransitionSystem(automata[0]);
-        automata = XMLParser.parse("D2_test.xml", false);
+        automata = XMLParser.parse("testOutput/D2_test.xml", false);
         D2 = new SimpleTransitionSystem(automata[0]);
 
         assert(new Refinement(D1, D2).check() && new Refinement(D2, D1).check());

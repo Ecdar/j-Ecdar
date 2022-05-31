@@ -30,7 +30,7 @@ public class VariousTest {
 
         SimpleTransitionSystem simp2 = new SimpleTransitionSystem(aut2[0]);
 
-        simp2.toXML("simple1.xml");
+        simp2.toXML("testOutput/simple1.xml");
 
         assert (true);
     }

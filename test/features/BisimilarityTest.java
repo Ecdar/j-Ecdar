@@ -20,7 +20,7 @@ public class BisimilarityTest {
         Automaton[] auts = XMLParser.parse("./samples/xml/bisimilarity.xml", true);
         Automaton aut  = Bisimilarity.checkBisimilarity(auts[0]);
         SimpleTransitionSystem sys = new SimpleTransitionSystem(aut);
-        sys.toXML("bisim2.xml");
+        sys.toXML("testOutput/bisim2.xml");
 
         assertTrue(true);
     }
@@ -33,7 +33,7 @@ public class BisimilarityTest {
         Automaton[] auts = XMLParser.parse("./samples/xml/quotient/example_critical_sections_final_versions_pruned.xml", false);
         Automaton aut = Bisimilarity.checkBisimilarity(auts[9]);
         SimpleTransitionSystem sys = new SimpleTransitionSystem(aut);
-        sys.toXML("bisim1.xml");
+        sys.toXML("testOutput/bisim1.xml");
         assertTrue(aut.getLocations().size()==2);
     }
     @Test
@@ -44,7 +44,7 @@ public class BisimilarityTest {
         Automaton[] auts = XMLParser.parse("./samples/xml/quotient/example_critical_sections_final_versions_pruned.xml", false);
         Automaton aut = Bisimilarity.checkBisimilarity(auts[10]);
         SimpleTransitionSystem sys = new SimpleTransitionSystem(aut);
-        sys.toXML("bisim3.xml");
+        sys.toXML("testOutput/bisim3.xml");
         assertTrue(aut.getLocations().size()==3);
     }
 

@@ -58,7 +58,7 @@ public class PruningTest {
     public void SelfloopZenoPruning() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopZeno);
-        pruned.toXML("selfloopZeno.xml");
+        pruned.toXML("testOutput/selfloopZeno.xml");
         JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
         SimpleTransitionSystem exp = expectedOutputSelfloopZeno;
 
@@ -69,7 +69,7 @@ public class PruningTest {
     public void SelfloopNonZenoPruning() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopNonZeno);
-        pruned.toXML("selfloopNonZeno.xml");
+        pruned.toXML("testOutput/selfloopNonZeno.xml");
         SimpleTransitionSystem exp = expectedOutputSelfloopNonZeno;
 
         System.out.println("finished pruning");
@@ -81,7 +81,7 @@ public class PruningTest {
     public void SelfloopSimple1() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple1);
-        pruned.toXML("simple1.xml");
+        pruned.toXML("testOutput/simple1.xml");
         SimpleTransitionSystem exp = expectedOutputSimple1;
 
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
@@ -92,7 +92,7 @@ public class PruningTest {
     public void SelfloopSimple2() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple2);
-        pruned.toXML("simple2.xml");
+        pruned.toXML("testOutput/simple2.xml");
         SimpleTransitionSystem exp = expectedOutputSimple2;
 
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
@@ -103,7 +103,7 @@ public class PruningTest {
     public void SelfloopSimple3() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple3);
-        pruned.toXML("simple3.xml");
+        pruned.toXML("testOutput/simple3.xml");
         SimpleTransitionSystem exp = expectedOutputSimple3;
 
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
@@ -114,7 +114,7 @@ public class PruningTest {
     public void SelfloopSimple4() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple4);
-        pruned.toXML("simple4.xml");
+        pruned.toXML("testOutput/simple4.xml");
         SimpleTransitionSystem exp = expectedOutputSimple4;
 
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
@@ -126,7 +126,7 @@ public class PruningTest {
     public void SelfloopSimple4InpComp() {
 
         SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple4inpComp);
-        pruned.toXML("simple4inpComp.xml");
+        pruned.toXML("testOutput/simple4inpComp.xml");
         SimpleTransitionSystem exp = expectedOutputSimple4inpComp;
 
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
@@ -139,7 +139,7 @@ public class PruningTest {
         System.out.println("calculating reach pruning");
 
         SimpleTransitionSystem outPrunedReach1 = compTimedReach.pruneReachTimed();
-        outPrunedReach1.toXML("compTimedReach.xml");
+        outPrunedReach1.toXML("testOutput/compTimedReach.xml");
 
 
 
@@ -152,7 +152,7 @@ public class PruningTest {
     public void TestInconsistencyPruning() {
 
         SimpleTransitionSystem outPrunedReach1 = compTimedInc.pruneIncTimed();
-        outPrunedReach1.toXML("compTimedInc.xml");
+        outPrunedReach1.toXML("testOutput/compTimedInc.xml");
 
         assertTrue(outPrunedReach1.getAutomaton().getLocations().size() == 3);
     }
@@ -160,7 +160,7 @@ public class PruningTest {
     public void TestInconsistencyPruning1() {
 
         SimpleTransitionSystem outPrunedReach1 = compTimedInc1.pruneIncTimed();
-        outPrunedReach1.toXML("compTimedInc1.xml");
+        outPrunedReach1.toXML("testOutput/compTimedInc1.xml");
 
         assertTrue(outPrunedReach1.getAutomaton().getLocations().size() == 1);
     }
@@ -168,7 +168,7 @@ public class PruningTest {
     public void TestInconsistencyPruning2() {
 
         SimpleTransitionSystem outPrunedReach1 = compTimedInc2.pruneIncTimed();
-        outPrunedReach1.toXML("compTimedInc2.xml");
+        outPrunedReach1.toXML("testOutput/compTimedInc2.xml");
 
         assertTrue(outPrunedReach1.getAutomaton().getLocations().size() == 3);
     }
@@ -176,7 +176,7 @@ public class PruningTest {
     public void TestInconsistencyPruning3() {
 
         SimpleTransitionSystem outPrunedReach1 = compTimedInc3.pruneIncTimed();
-        outPrunedReach1.toXML("compTimedInc3.xml");
+        outPrunedReach1.toXML("testOutput/compTimedInc3.xml");
 
         assertTrue(outPrunedReach1.getAutomaton().getLocations().size() == 3);
     }
@@ -184,7 +184,7 @@ public class PruningTest {
     public void TestInconsistencyPruning4() {
 
         SimpleTransitionSystem outPrunedReach1 = compTimedInc4.pruneIncTimed();
-        outPrunedReach1.toXML("compTimedInc4.xml");
+        outPrunedReach1.toXML("testOutput/compTimedInc4.xml");
 
         assertTrue(outPrunedReach1.getAutomaton().getLocations().size() == 2);
     }
