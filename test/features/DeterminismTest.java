@@ -144,7 +144,7 @@ public class DeterminismTest {
 
     @Test
     public void testG13(){
-        ((SimpleTransitionSystem) (G13)).toXML("st-ic.xml");
+        ((SimpleTransitionSystem) (G13)).toXML("testOutput/st-ic.xml");
         assertTrue(G13.isDeterministic());
     }
 

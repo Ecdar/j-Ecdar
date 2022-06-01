@@ -56,7 +56,7 @@ public class CompositionTest {
         Composition comp = new Composition(new TransitionSystem[]{ machine, researcher});
         Automaton aut = comp.getAutomaton();
         SimpleTransitionSystem s = new SimpleTransitionSystem(aut);
-        s.toXML("compositionTest.xml");
+        s.toXML("testOutput/compositionTest.xml");
         assertTrue(true);
     }
 
@@ -66,14 +66,14 @@ public class CompositionTest {
         Composition comp = new Composition(new TransitionSystem[]{ adm, machine, researcher });
         Automaton aut = comp.getAutomaton();
         SimpleTransitionSystem s = new SimpleTransitionSystem(aut);
-        s.toXML("compositionTest1.xml");
+        s.toXML("testOutput/compositionTest1.xml");
         assertTrue(true);
     }
 
     @Test
     public void selfloopTest() {
 
-        Automaton[] aut1 = XMLParser.parse("selfloopNonZeno.xml", false);
+        Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);
         SimpleTransitionSystem selfloop = new SimpleTransitionSystem(aut1[0]);
         SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(aut1[0]);
         Refinement ref = new Refinement(selfloop,selfloop1);
@@ -102,9 +102,9 @@ public class CompositionTest {
 
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
         SimpleTransitionSystem st = new SimpleTransitionSystem(comp.getAutomaton());
-        st.toXML("aWeirdOutput.xml");
+        st.toXML("testOutput/aWeirdOutput.xml");
         SimpleTransitionSystem st2 = new SimpleTransitionSystem(comp.getAutomaton());
-        st2.toXML("aWeirdOutput2.xml");
+        st2.toXML("testOutput/aWeirdOutput2.xml");
 
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
