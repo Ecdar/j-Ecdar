@@ -48,6 +48,6 @@ VARIABLE             : LETTER (LETTER | DIGIT | SYMBOL)* ;
 
 CONJUNCTION          : '&&' ;
 COMPOSITION          : '||' ;
-QUOTIENT             : '\\' ;
+QUOTIENT             : '\\\\' ;
 
 WS : [ \t\r\n]+ -> skip ;
