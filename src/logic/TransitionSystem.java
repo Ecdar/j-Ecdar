@@ -2,7 +2,6 @@ package logic;
 
 import models.*;
 
-import javax.annotation.processing.SupportedSourceVersion;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,21 +84,21 @@ public abstract class TransitionSystem {
         List<Transition> transitions = new ArrayList<>();
         // loop through moves
         for (Move move : moves) {
-            State targetState = new State(move.getTarget(), currentState.getInvarCDD());
+            State targetState = new State(move.getTarget(), currentState.getCDD());
             targetState.applyGuards(move.getGuardCDD());
 
-            if (targetState.getInvarCDD().isFalse())
+            if (targetState.getCDD().isFalse())
             {
                 continue;
             }
 
-            CDD guardCDD = new CDD(targetState.getInvarCDD().getPointer());
+            CDD guardCDD = new CDD(targetState.getCDD().getPointer());
 
             targetState.applyResets(move.getUpdates());
             targetState.delay();
             targetState.applyInvariants();
 
-            if (targetState.getInvarCDD().isFalse())
+            if (targetState.getCDD().isFalse())
             {
                 continue;
             }

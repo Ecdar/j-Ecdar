@@ -116,7 +116,7 @@ public class UniversityTest {
         System.out.println(ref.getErrMsg());
         assertTrue(res);
     }
-
+/*
     @Test
     public void newQuotientTest4B() {
         Quotient q = new Quotient(spec,researcher);
@@ -201,7 +201,7 @@ public class UniversityTest {
         assertTrue(res);
     }
 
-
+*/
 
     @Test
     public void testHalf2RefinesSelf() {

@@ -3,7 +3,6 @@ package logic;
 import lib.DBMLib;
 import models.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,14 +18,14 @@ public class State {
 
     public State(State oldState) {
         this.location = oldState.getLocation();
-        this.invarCDD = new CDD(oldState.getInvarCDD().getPointer());
+        this.invarCDD = new CDD(oldState.getCDD().getPointer());
     }
 
     public SymbolicLocation getLocation() {
         return location;
     }
 
-    public CDD getInvarCDD() {
+    public CDD getCDD() {
         return invarCDD;
     }
 
@@ -66,15 +65,6 @@ public class State {
             return;
         CDD bcddLeftToAnalyse = new CDD(invarCDD.getPointer());
         CDD resCDD = CDD.cddFalse();
-        boolean print = false;
-        if (bcddLeftToAnalyse.toString().contains("500")) // DEBUG PRINT
-        {
-            System.out.println("location " + location.getName());
-            System.out.println("max bounds : " + maxBounds);
-            System.out.println(CDD.toGuardList(bcddLeftToAnalyse, relevantClocks));
-            print = true;
-        }
-
 
         int[] bounds = new int[CDD.numClocks];
         int counter =1;
@@ -111,24 +101,13 @@ public class State {
 
             Zone z = new Zone(extractResult.getDbm());
             CDD bddPart = extractResult.getBddPart();
-
-            if (print)
-            {
-                for (int i: bounds)
-                    System.out.print(i + " ");
-                System.out.println();
-            }
-            Zone copyZone = new Zone(z);
             Zone newZone = new Zone(DBMLib.dbm_close(z.getDbm(),z.getSize()));
             newZone.extrapolateMaxBounds(bounds);
-            if (print && !copyZone.equals(newZone)) copyZone.printDBM(false,false);
-            if (print && !copyZone.equals(newZone)) newZone.printDBM(false,false);
             CDD extrapolatedDBMCDD = CDD.allocateFromDbm(newZone.getDbm(),CDD.numClocks);
             CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
             resCDD = resCDD.disjunction(extrapolatedCDD);
         }
-        if (print)
-            System.out.println(resCDD);
+
         invarCDD = resCDD;
     }
 

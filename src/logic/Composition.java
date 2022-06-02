@@ -265,7 +265,7 @@ public class Composition extends TransitionSystem {
 
         for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
-            if (CDD.isSubset(s.getInvarCDD(),st.getInvarCDD()))
+            if (CDD.isSubset(s.getCDD(),st.getCDD()))
                 contained = true;
         }
         return contained;
@@ -278,7 +278,7 @@ public class Composition extends TransitionSystem {
         for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
 
-            if (CDD.isSubset(s.getInvarCDD(),st.getInvarCDD())) {
+            if (CDD.isSubset(s.getCDD(),st.getCDD())) {
                 contained = true;
             }
         }
