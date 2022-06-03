@@ -185,7 +185,6 @@ public class Refinement {
                 return false;
             }
 
-
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
@@ -194,7 +193,7 @@ public class Refinement {
                 CDD.done();
                 return false;
             }
-            //System.out.println("done with first check");
+
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
@@ -223,10 +222,11 @@ public class Refinement {
     private boolean checkDelay(State leftState, State rightState)
     {
         assert (leftState.getCDD().equiv(rightState.getCDD()));
-        CDD currentState = leftState.getCDD();
-        currentState.delay();
-        CDD leftPart = currentState.conjunction(leftState.getInvarCDDDirectlyFromInvariants());
-        CDD rightPart = currentState.conjunction(rightState.getInvarCDDDirectlyFromInvariants());
+        CDD currentStateCDD = leftState.getCDD();
+        currentStateCDD=currentStateCDD.delay();
+
+        CDD leftPart = currentStateCDD.conjunction(leftState.getInvarCDDDirectlyFromInvariants());
+        CDD rightPart = currentStateCDD.conjunction(rightState.getInvarCDDDirectlyFromInvariants());
         if (CDD.isSubset(leftPart,rightPart))
             return true;
         return false;
@@ -268,8 +268,6 @@ public class Refinement {
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
         //if (!leaderTarget.getInvZone().isValid()) return null;
-        if ( leaderTarget.getCDD().equiv(CDD.getUnrestrainedCDD()))
-            assert(false);
 
         leaderTarget.extrapolateMaxBounds(maxBounds,allClocks);
         // if ( leaderTarget.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))

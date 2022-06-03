@@ -18,6 +18,7 @@ public class CompositionTest {
 
     @After
     public void afterEachTest(){
+        CDD.done();
     }
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,

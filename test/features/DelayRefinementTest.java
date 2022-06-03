@@ -25,7 +25,7 @@ public class DelayRefinementTest {
 
     @After
     public void afterEachTest(){
-
+        CDD.done();
     }
 //Class
 
@@ -533,5 +533,19 @@ public class DelayRefinementTest {
     public void Q2RefinesQ1() {
         assertFalse(new Refinement(new SimpleTransitionSystem(automata[54]), new SimpleTransitionSystem(automata[53])).check());
     }
+
+    @Test
+    public void M1RefinesM0() {
+        Refinement ref = new Refinement(new SimpleTransitionSystem(automata[57]), new SimpleTransitionSystem(automata[56]));
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+    @Test
+    public void notM0RefinesM1() {
+        assertFalse(new Refinement(new SimpleTransitionSystem(automata[56]), new SimpleTransitionSystem(automata[57])).check());
+    }
+
 
 }

@@ -76,10 +76,11 @@ public class State {
                 if (!maxBounds.containsKey(clk))
                 {
                     System.out.println("clock: " + clk + " " + maxBounds + " relevant clocks " + relevantClocks);
-                    assert false;
+                   // assert false; // TODO: should we really get into here??
                     bounds[counter]=0;
                 }
-                bounds[counter] =maxBounds.get(clk);
+                else
+                    bounds[counter] =maxBounds.get(clk);
             }
             else
             {

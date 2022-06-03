@@ -310,7 +310,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 			<source ref="id57"/>
 			<target ref="id55"/>
 			<label kind="synchronisation" x="-112" y="-56">i?</label>
-			<label kind="assignment" x="-72" y="-104">x=0</label>
+			<label kind="assignment" x="-72" y="-104">y=0</label>
 			<nail x="-144" y="-80"/>
 		</transition>
 	</template>
@@ -1441,6 +1441,36 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 			<source ref="id282"/>
 			<target ref="id283"/>
 			<label kind="synchronisation" x="8" y="89">ri?</label>
+		</transition>
+	</template>
+	<template>
+		<name>M0</name>
+		<declaration>clock x;</declaration>
+		<location id="id291" x="0" y="0">
+			<label kind="invariant" x="-10" y="17">x&lt;10</label>
+		</location>
+		<init ref="id291"/>
+		<transition id="id292" controllable="false">
+			<source ref="id291"/>
+			<target ref="id291"/>
+			<label kind="synchronisation" x="18" y="-34">o!</label>
+			<nail x="85" y="-34"/>
+			<nail x="85" y="42"/>
+		</transition>
+	</template>
+	<template>
+		<name>M1</name>
+		<declaration>clock z;</declaration>
+		<location id="id293" x="0" y="0">
+			<label kind="invariant" x="-10" y="17">z&lt;5</label>
+		</location>
+		<init ref="id293"/>
+		<transition id="id294" controllable="false">
+			<source ref="id293"/>
+			<target ref="id293"/>
+			<label kind="synchronisation" x="29" y="-38">o!</label>
+			<nail x="59" y="-42"/>
+			<nail x="59" y="51"/>
 		</transition>
 	</template>
 	<system>// List one or more processes to be composed into a system.
