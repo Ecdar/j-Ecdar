@@ -44,7 +44,6 @@ public class DisjunctionTest {
 
     @Test
     public void testRef() {
-
         assert(new Refinement(D1, D2).check() && new Refinement(D2, D1).check());
 
 
@@ -53,11 +52,11 @@ public class DisjunctionTest {
     @Test
     public void testSafeLoadRef() {
 
-        ((SimpleTransitionSystem)D1).toXML("D1_test.xml");
-        ((SimpleTransitionSystem)D2).toXML("D2_test.xml");
+        ((SimpleTransitionSystem)D1).toXML("testOutput/D1_test.xml");
+        ((SimpleTransitionSystem)D2).toXML("testOutput/D2_test.xml");
 
-        Automaton[] automata1 = XMLParser.parse("D1_test.xml", false);
-        Automaton[] automata2 = XMLParser.parse("D2_test.xml", false);
+        Automaton[] automata1 = XMLParser.parse("testOutput/D1_test.xml", false);
+        Automaton[] automata2 = XMLParser.parse("testOutput/D2_test.xml", false);
         CDD.done();
         CDD.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();

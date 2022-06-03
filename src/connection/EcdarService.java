@@ -7,6 +7,7 @@ import com.google.protobuf.Empty;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import logic.Controller;
+import logic.query.Query;
 
 import java.util.List;
 
@@ -34,14 +35,57 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
     public void sendQuery(QueryProtos.Query request,
                           StreamObserver<QueryProtos.QueryResponse> responseObserver) {
         try {
-            String response = Controller.handleRequest(request.getQuery());
-            QueryProtos.QueryResponse queryResponse = QueryProtos.QueryResponse.newBuilder().setQuery(
-                    QueryProtos.Query.newBuilder().setQuery(response).build()
-            ).build();
-            responseObserver.onNext(queryResponse);
+            Query response = Controller.handleRequest(request.getQuery());
+            QueryProtos.QueryResponse.Builder queryResponseBuilder = QueryProtos.QueryResponse.newBuilder().setQuery(
+                    QueryProtos.Query.newBuilder().setQuery(request.getQuery()).build()
+            );
+
+            switch (response.getType()){
+                case REFINEMENT:
+                    queryResponseBuilder.setRefinement(
+                            QueryProtos.QueryResponse.RefinementResult.newBuilder()
+                                    .setSuccess(response.getResult()).build()
+                    );
+                    break;
+                case CONSISTENCY:
+                    queryResponseBuilder.setConsistency(
+                            QueryProtos.QueryResponse.ConsistencyResult.newBuilder()
+                                    .setSuccess(response.getResult()).build()
+                    );
+                    break;
+                case IMPLEMENTATION:
+                    queryResponseBuilder.setImplementation(
+                            QueryProtos.QueryResponse.ImplementationResult.newBuilder()
+                                    .setSuccess(response.getResult()).build()
+                    );
+                    break;
+                case DETERMINISM:
+                    queryResponseBuilder.setDeterminism(
+                            QueryProtos.QueryResponse.DeterminismResult.newBuilder()
+                                    .setSuccess(response.getResult()).build()
+                    );
+                    break;
+                case GET_COMPONENT:
+                case BISIM_MINIM:
+                case PRUNE:
+                    getComponent(response, queryResponseBuilder);
+                    break;
+                default:
+                    responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Query has an invalid type").asRuntimeException());
+            }
+
+            responseObserver.onNext(queryResponseBuilder.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(e.getClass().getName() + ": " + e.getMessage()).asRuntimeException());
         }
+    }
+
+    private void getComponent(Query response, QueryProtos.QueryResponse.Builder queryResponseBuilder) {
+        String jsonComponent = Controller.getJsonComponent(response.getComponentName());
+        queryResponseBuilder.setComponent(
+                QueryProtos.QueryResponse.ComponentResult.newBuilder()
+                        .setComponent(ComponentProtos.Component.newBuilder().setJson(jsonComponent).build()).build()
+        );
     }
 }

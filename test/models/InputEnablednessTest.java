@@ -135,12 +135,11 @@ public class InputEnablednessTest {
     @Test
     public void testAutomaton() {
         SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
-        st.toXML("wtf.xml");
+        st.toXML("testOutput/wtf.xml");
         SimpleTransitionSystem st1 = new SimpleTransitionSystem(expected);
-        st1.toXML("wtf-exp.xml");
+        st1.toXML("testOutput/wtf-exp.xml");
         assert (new Refinement(new SimpleTransitionSystem(expected),new SimpleTransitionSystem(actual)).check());
         assert (new Refinement(new SimpleTransitionSystem(actual),new SimpleTransitionSystem(expected)).check());
-
     }
 
 }

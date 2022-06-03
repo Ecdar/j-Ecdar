@@ -6,7 +6,6 @@ import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -194,12 +193,12 @@ public class ConjunctionTest {
         Refinement ref = new Refinement(ts1, new Conjunction(new TransitionSystem[]{t9, t10}));
         ref.check();
         System.out.println(ref.getErrMsg());
-        ((SimpleTransitionSystem) t9).toXML("t9.xml");
-        ((SimpleTransitionSystem) t10).toXML("t10.xml");
+        ((SimpleTransitionSystem) t9).toXML("testOutput/t9.xml");
+        ((SimpleTransitionSystem) t10).toXML("testOutput/t10.xml");
 
         System.out.println(new Conjunction(new TransitionSystem[]{t9, t10}).getInputs() + " " + new Conjunction(new TransitionSystem[]{t9, t10}).getOutputs() );
         System.out.println("ALPHA: " + ts1.getInputs() + " " + ts1.getOutputs() );
-        ts1.toXML("whynoinputs.xml");
+        ts1.toXML("testOutput/whynoinputs.xml");
         new SimpleTransitionSystem(t12.getAutomaton()).toXML("t12.xml");
 
         TransitionSystem ts2 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{ts1, t11}).getAutomaton());

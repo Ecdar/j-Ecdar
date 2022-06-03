@@ -9,6 +9,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,12 +25,16 @@ public class JSONParser {
     private static final List<Clock> componentClocks = new ArrayList<>();
     private static final List<BoolVar> BVs = new ArrayList<>();
 
-    public static Automaton[] parse(String folderPath, boolean makeInpEnabled) {
+    public static Automaton[] parse(String folderPath, boolean makeInpEnabled) throws FileNotFoundException {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
         System.out.println(folderPath);
         ArrayList<String> locations = new ArrayList<>(Collections.singletonList(folderPath + "/GlobalDeclarations.json"));
-        locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
+        if (files != null) {
+            locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
+        }else {
+            throw new FileNotFoundException("Could not find any .json files at location: " + folderPath + "/Components");
+        }
 
         objectList = parseFiles(locations);
 
@@ -214,7 +219,7 @@ public class JSONParser {
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
             Guard invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueGuard() :
-                    addInvarGuards(jsonObject.get("invariant").toString()));
+                    GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
 
@@ -224,138 +229,6 @@ public class JSONParser {
         return returnLocList;
     }
 
-    private static Guard addGuards(String invariant) {
-        List<Guard> orParts = new ArrayList<>();
-        for (String part: invariant.split("or")) {
-            ArrayList<Guard> andParts = new ArrayList<>();
-            String[] listOfInv = part.split("&&");
-
-            for (String str : listOfInv) {
-                if (str.equals("false"))
-                    andParts.add(new FalseGuard());
-                else if (str.equals("true"))
-                    andParts.add(new TrueGuard());
-                else {
-                    String symbol = "";
-                    boolean strict, greater, isEq;
-                    strict = false;
-                    greater = false;
-                    isEq = false;
-                    Relation rel = null;
-
-                    if (str.contains("==")) {
-                        symbol = "==";
-                        rel = Relation.EQUAL;
-                        greater = false;
-                        isEq = true;
-                    } else if (str.contains("<=")) {
-                        rel = Relation.LESS_EQUAL;
-                        symbol = "<=";
-                    } else if (str.contains(">=")) {
-                        rel = Relation.GREATER_EQUAL;
-                        symbol = ">=";
-                        greater = true;
-                    } else if (str.contains("<") && !str.contains("=")) {
-                        rel = Relation.LESS_THAN;
-                        symbol = "<";
-                        strict = true;
-                    } else if (str.contains(">") && !str.contains("=")) {
-                        rel = Relation.GREATER_THAN;
-                        symbol = ">";
-                        greater = true;
-                        strict = true;
-                    }
-
-                    String[] s = str.split(symbol);
-                    for (int x = 0; x < s.length; x++) {
-                        s[x] = s[x].replaceAll(" ", "");
-                    }
-
-                    Clock clk = findClock(s[0]);
-                    if (clk != null) {
-
-                        andParts.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
-                    } else {
-                        BoolVar bl = findBV(s[0]);
-                        Guard newInv;
-                        newInv = new BoolGuard(bl, symbol, Boolean.valueOf(s[1]));
-                        andParts.add(newInv);
-                    }
-                }
-            }
-            orParts.add(new AndGuard(andParts));
-        }
-        return new OrGuard(orParts);
-    }
-    private static Guard addInvarGuards(String invariant) {
-
-        List<Guard> orParts = new ArrayList<>();
-        String[] listOfDisjc = invariant.split("or");
-
-        for (String strOuter : listOfDisjc) {
-            String[] listOfInv = strOuter.split("&&");
-            ArrayList<Guard> andParts = new ArrayList<>();
-            //System.out.println("discj part: " + strOuter);
-
-            for (String str : listOfInv) {
-                if (str.equals("false"))
-                    andParts.add(new FalseGuard());
-                else if (str.equals("true"))
-                    andParts.add(new TrueGuard());
-                else {
-                    //System.out.println("conj. part: " + str);
-
-                    String symbol = "";
-                    boolean strict, greater, isEq;
-                    strict = false;
-                    greater = false;
-                    isEq = false;
-                    Relation rel = null;
-
-                    if (str.contains("==")) {
-                        rel = Relation.EQUAL;
-                        symbol = "==";
-                        greater = false;
-                        isEq = true;
-                    } else if (str.contains("<=")) {
-                        rel = Relation.LESS_EQUAL;
-                        symbol = "<=";
-                    } else if (str.contains(">=")) {
-                        rel = Relation.GREATER_EQUAL;
-                        symbol = ">=";
-                        greater = true;
-                    } else if (str.contains("<") && !str.contains("=")) {
-                        rel = Relation.LESS_THAN;
-                        symbol = "<";
-                        strict = true;
-                    } else if (str.contains(">") && !str.contains("=")) {
-                        rel = Relation.GREATER_THAN;
-                        symbol = ">";
-                        greater = true;
-                        strict = true;
-                    }
-
-                    String[] s = str.split(symbol);
-                    for (int x = 0; x < s.length; x++) {
-                        s[x] = s[x].replaceAll(" ", "");
-                    }
-
-                    Clock clk = findClock(s[0]);
-                    if (clk != null) {
-
-                        andParts.add(new ClockGuard(clk, Integer.parseInt(s[1]), rel));
-                    } else {
-                        BoolVar bl = findBV(s[0]);
-                        Guard newInv;
-                        newInv = new BoolGuard(bl, symbol, Boolean.valueOf(s[1]));
-                        andParts.add(newInv);
-                    }
-                }
-            }
-            orParts.add(new AndGuard(andParts));
-        }
-        return new OrGuard(orParts);
-    }
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
             if (clock.getName().equals(clockName)) return clock;
@@ -380,31 +253,18 @@ public class JSONParser {
             List<ClockUpdate> clockUpdates = new ArrayList<>();
             List<BoolUpdate> boolUpdates = new ArrayList<>();
 
-            Update[] updates;
+            List<Update> updates;
 
-            if (!jsonObject.get("guard").toString().equals(""))
-                guards = addGuards((String) jsonObject.get("guard"));
-            else
+            if (!jsonObject.get("guard").toString().equals("")) {
+                guards = GuardParser.parse((String) jsonObject.get("guard"), componentClocks);
+            } else
                 guards = new TrueGuard();
 
             if (!jsonObject.get("update").toString().equals(""))
-                updates = addUpdates((String) jsonObject.get("update"));
+                updates = UpdateParser.parse((String) jsonObject.get("update"), componentClocks);
             else
-                updates = new Update[]{};
-/*
-            for (List<Guard> gds: guards)
-            {
-                List<Guard> list = new ArrayList<>();
-                for (Guard g : gds) {
-                    if (g instanceof ClockGuard)
-                        list.add((ClockGuard)g);
-                    else
-                        list.add((BoolGuard)g);
-                }
-                guards.add(list);
-            }
+                updates = new ArrayList<>();
 
- */
             for (Update u: updates)
                 if (u instanceof  ClockUpdate)
                     clockUpdates.add((ClockUpdate) u);
@@ -439,33 +299,6 @@ public class JSONParser {
         Channel chan = new Channel(name);
         globalChannels.add(chan);
         return chan;
-    }
-
-    private static Update[] addUpdates(String update) {
-        ArrayList<Update> updates = new ArrayList<>();
-        String[] listOfInv = update.split(",");
-
-        for (String str : listOfInv) {
-            String[] s = str.split("=");
-            for (int i = 0; i < s.length; i++)
-                s[i] = s[i].replaceAll(" ", "");
-
-
-            Clock clk = findClock(s[0]);
-            if (clk != null) {
-                Update upd = new ClockUpdate(findClock(s[0]), Integer.parseInt(s[1]));
-                updates.add(upd);
-            }
-            else
-            {
-                Update upd = new BoolUpdate(findBV(s[0]), Boolean.parseBoolean(s[1]));
-                updates.add(upd);
-            }
-
-
-        }
-
-        return updates.toArray(new Update[0]);
     }
 
     //Helper method for addEdge in order to find which Location is source and which one is target

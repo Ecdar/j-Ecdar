@@ -191,7 +191,7 @@ public class DeterminismTest {
     public void testG13() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G13.getClocks());
-        ((SimpleTransitionSystem) (G13)).toXML("st-ic.xml");
+        ((SimpleTransitionSystem) (G13)).toXML("testOutput/st-ic.xml");
         assertTrue(new SimpleTransitionSystem((G13.getAutomaton())).isDeterministic());
     }
 
