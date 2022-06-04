@@ -67,7 +67,7 @@ public class EdgeGrammarTest {
     public void testParsing(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<4"));
 
-        EdgeGrammar.EdgeGrammarParser.CompareExprContext ctx = parser.guard().or().and().compareExpr();
+        EdgeGrammar.EdgeGrammarParser.CompareExprContext ctx = parser.guard().or().and().expression().compareExpr();
         assertEquals("x", ctx.TERM(0).getText());
         assertEquals("4", ctx.TERM(1).getText());
         assertEquals("<", ctx.OPERATOR().getText());
@@ -77,7 +77,7 @@ public class EdgeGrammarTest {
     public void testParsingWithOr(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<4||y>=5"));
 
-        EdgeGrammar.EdgeGrammarParser.CompareExprContext ctx = parser.guard().or().or().and().compareExpr();
+        EdgeGrammar.EdgeGrammarParser.CompareExprContext ctx = parser.guard().or().or().and().expression().compareExpr();
         assertEquals("y", ctx.TERM(0).getText());
         assertEquals("5", ctx.TERM(1).getText());
         assertEquals(">=", ctx.OPERATOR().getText());

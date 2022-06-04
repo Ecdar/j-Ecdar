@@ -1,51 +1,55 @@
 package parser;
 
-import models.Clock;
-import models.Guard;
+import models.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class GuardParserTest {
 
     @Test
     public void testGuardParser(){
+        List<BoolVar> BVs = new ArrayList<>();
         ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x"));}};
-        List<List<Guard>> guardList = GuardParser.parse("x>5", clocks);
+        ClockGuard guard = (ClockGuard) GuardParser.parse("x>5", clocks, BVs);
 
-        Guard guard = guardList.get(0).get(0);
-        assertEquals(true, guard.isStrict());
+        assertThat(guard, instanceOf(ClockGuard.class));
+        assertEquals(Relation.GREATER_THAN, guard.getRelation());
         assertEquals(5, guard.getLowerBound());
     }
 
     @Test
     public void testGuardParserAnd(){
+        List<BoolVar> BVs = new ArrayList<>();
         ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
-        List<List<Guard>> guardList = GuardParser.parse("x>=5 && y<6", clocks);
+        AndGuard AndGuard = (AndGuard)GuardParser.parse("x>=5 && y<6", clocks, BVs);
 
-        Guard guard = guardList.get(0).get(0);
-        assertEquals(false, guard.isStrict());
+        ClockGuard guard = (ClockGuard)AndGuard.getGuards().get(0);
+        assertEquals(Relation.GREATER_EQUAL, guard.getRelation());
         assertEquals(5, guard.getLowerBound());
 
-        Guard guard1 = guardList.get(0).get(1);
-        assertEquals(true, guard1.isStrict());
+        ClockGuard guard1 = (ClockGuard)AndGuard.getGuards().get(1);
+        assertEquals(Relation.LESS_THAN, guard1.getRelation());
         assertEquals(6, guard1.getUpperBound());
     }
 
     @Test
     public void testGuardParserOr(){
+        List<BoolVar> BVs = new ArrayList<>();
         ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
-        List<List<Guard>> guardList = GuardParser.parse("x>2 || y<5", clocks);
+        OrGuard orGuard = (OrGuard) GuardParser.parse("x>2 || y<5", clocks, BVs);
 
-        Guard guard1 = guardList.get(0).get(0);
-        Guard guard2 = guardList.get(1).get(0);
+        ClockGuard guard = (ClockGuard)orGuard.getGuards().get(0);
+        assertEquals(Relation.GREATER_THAN, guard.getRelation());
+        assertEquals(2, guard.getLowerBound());
 
-        assertEquals(true, guard1.isStrict());
-        assertEquals(2, guard1.getLowerBound());
-        assertEquals(true, guard2.isStrict());
-        assertEquals(5, guard2.getUpperBound());
+        ClockGuard guard1 = (ClockGuard)orGuard.getGuards().get(1);
+        assertEquals(Relation.LESS_THAN, guard1.getRelation());
+        assertEquals(5, guard1.getUpperBound());
     }
 }
