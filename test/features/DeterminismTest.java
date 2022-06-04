@@ -221,7 +221,7 @@ public class DeterminismTest {
         CDD.init(100,100,100);
         CDD.addClocks(G17.getClocks());
         SimpleTransitionSystem inputEnabled = new SimpleTransitionSystem((G17.getAutomaton()));
-        inputEnabled.toXML("inputEnabledTestG17.xml");
+        inputEnabled.toXML("testOutput/inputEnabledTestG17.xml");
         assertTrue(inputEnabled.isDeterministic());
     }
 

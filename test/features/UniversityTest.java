@@ -393,8 +393,8 @@ public class UniversityTest {
         Automaton comp1 = new Composition(new TransitionSystem[]{adm, machine, researcher}).getAutomaton();
         Automaton comp2 = new Composition(new TransitionSystem[]{admCopy, machineCopy, researcherCopy}).getAutomaton();
 
-        new SimpleTransitionSystem(comp1).toXML("comp1");
-        new SimpleTransitionSystem(comp2).toXML("comp2");
+        new SimpleTransitionSystem(comp1).toXML("testOutput/comp1.xml");
+        new SimpleTransitionSystem(comp2).toXML("testOutput/comp2.xml");
 
         assertTrue(new Refinement(new SimpleTransitionSystem(comp1),new SimpleTransitionSystem(comp2)).check());
         assertTrue(new Refinement(new SimpleTransitionSystem(comp2),new SimpleTransitionSystem(comp1)).check());

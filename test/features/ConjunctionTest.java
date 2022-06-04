@@ -199,7 +199,7 @@ public class ConjunctionTest {
         System.out.println(new Conjunction(new TransitionSystem[]{t9, t10}).getInputs() + " " + new Conjunction(new TransitionSystem[]{t9, t10}).getOutputs() );
         System.out.println("ALPHA: " + ts1.getInputs() + " " + ts1.getOutputs() );
         ts1.toXML("testOutput/whynoinputs.xml");
-        new SimpleTransitionSystem(t12.getAutomaton()).toXML("t12.xml");
+        new SimpleTransitionSystem(t12.getAutomaton()).toXML("testOutput/t12.xml");
 
         TransitionSystem ts2 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{ts1, t11}).getAutomaton());
 
