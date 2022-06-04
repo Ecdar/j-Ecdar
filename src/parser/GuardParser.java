@@ -3,8 +3,7 @@ package parser;
 import EdgeGrammar.EdgeGrammarParser;
 import EdgeGrammar.EdgeGrammarLexer;
 import EdgeGrammar.EdgeGrammarBaseVisitor;
-import models.Clock;
-import models.Guard;
+import models.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,9 +15,11 @@ import java.util.List;
 public class GuardParser {
 
     private static List<Clock> clocks;
+    private static List<BoolVar> BVs;
 
-    public static List<List<Guard>> parse(String guardString, List<Clock> clockList){
+    public static Guard parse(String guardString, List<Clock> clockList, List<BoolVar> BVList) {
         clocks = clockList;
+        BVs = BVList;
         CharStream charStream = CharStreams.fromString(guardString);
         EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
@@ -27,19 +28,23 @@ public class GuardParser {
         parser.addErrorListener(new ErrorListener());
 
         OrVisitor orVisitor = new OrVisitor();
-        return orVisitor.visit(parser.guard());
+        List<Guard> guards = orVisitor.visit(parser.guard());
+        if(guards.size() > 1)
+            return new OrGuard(guards);
+        else
+            return guards.get(0);
     }
 
-    private static class OrVisitor extends EdgeGrammarBaseVisitor<List<List<Guard>>>{
+    private static class OrVisitor extends EdgeGrammarBaseVisitor<List<Guard>>{
 
-        private List<List<Guard>> guardList;
+        private List<Guard> orGuards;
 
         public OrVisitor() {
-            guardList = new ArrayList<>();
+            orGuards = new ArrayList<>();
         }
 
         @Override
-        public List<List<Guard>> visitGuard(EdgeGrammarParser.GuardContext ctx) {
+        public List<Guard> visitGuard(EdgeGrammarParser.GuardContext ctx) {
             if(ctx.or() != null){
                 return visit(ctx.or());
             }else{
@@ -48,14 +53,18 @@ public class GuardParser {
         }
 
         @Override
-        public List<List<Guard>> visitOr(EdgeGrammarParser.OrContext ctx) {
+        public List<Guard> visitOr(EdgeGrammarParser.OrContext ctx) {
             AndVisitor andVisitor = new AndVisitor();
-            guardList.add(andVisitor.visit(ctx.and()));
+            List<Guard> andGuards = andVisitor.visit(ctx.and());
+            if(andGuards.size() > 1)
+                orGuards.add(new AndGuard(andGuards));
+            else
+                orGuards.add(andGuards.get(0));
 
             if(ctx.or() != null)
                 visit(ctx.or());
 
-            return guardList;
+            return orGuards;
         }
     }
 
@@ -70,7 +79,7 @@ public class GuardParser {
         @Override
         public List<Guard> visitAnd(EdgeGrammarParser.AndContext ctx) {
             ExpressionVisitor expressionVisitor = new ExpressionVisitor();
-            Guard guard = expressionVisitor.visit(ctx.compareExpr());
+            Guard guard = expressionVisitor.visit(ctx.expression());
             guards.add(guard);
 
             if(ctx.and() != null)
@@ -88,6 +97,29 @@ public class GuardParser {
             return null;
         }
 
+        private static BoolVar findBV(List<BoolVar> BVs, String name) {
+            for (BoolVar bv : BVs)
+                if (bv.getName().equals(name))
+                    return bv;
+
+            return null;
+        }
+
+        @Override
+        public Guard visitExpression(EdgeGrammarParser.ExpressionContext ctx) {
+            return visitChildren(ctx);
+        }
+
+        @Override
+        public Guard visitTrue(EdgeGrammarParser.TrueContext ctx) {
+            return new TrueGuard();
+        }
+
+        @Override
+        public Guard visitFalse(EdgeGrammarParser.FalseContext ctx) {
+            return new FalseGuard();
+        }
+
         @Override
         public Guard visitCompareExpr(EdgeGrammarParser.CompareExprContext ctx) {
             int value = Integer.parseInt(ctx.TERM(1).getText());
@@ -95,18 +127,8 @@ public class GuardParser {
             Clock clock = findClock(ctx.TERM(0).getText());
             Guard guard;
 
-            if(operator.equals("==")){
-                guard = new Guard(clock, value);
-            }else {
-                boolean isStrict = false, greater = false;
-                if(operator.startsWith(">")){
-                    greater = true;
-                }
-                if(operator.length() == 1){
-                    isStrict = true;
-                }
-                guard = new Guard(clock, value, greater, isStrict);
-            }
+            Relation relation = Relation.fromString(operator);
+            guard = new ClockGuard(clock, value, relation);
 
             return guard;
         }

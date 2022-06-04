@@ -1,12 +1,15 @@
 grammar EdgeGrammar;
 
+@header {
+package EdgeGrammar;
+}
+
+options { caseInsensitive = true; }
+
 /*
  * Parser Rules
  */
 
-@header {
-package EdgeGrammar;
-}
 
 edge                : (guard | update) EOF ;
 
@@ -14,8 +17,11 @@ guard               : or? ';'? ;
 update              : assignments? ;
 
 or                  : (and '||' or) | and ;
-and                 : (compareExpr '&&' and) | compareExpr ;
+and                 : (expression '&&' and) | expression ;
+expression          : true | false | compareExpr ;
 compareExpr         : TERM OPERATOR TERM ;
+true                : TRUE ;
+false               : FALSE ;
 
 assignments         : (assignment ',' assignments) | (assignment ','?) ;
 assignment          : TERM '=' TERM ;
@@ -25,8 +31,10 @@ assignment          : TERM '=' TERM ;
  * Lexer Rules
  */
 
-TERM    : (ATOM | VARIABLE) ;
-ATOM    : (INT | 'true' | 'false') ;
+TRUE    : 'true' ;
+FALSE    : 'false' ;
+
+TERM    : (INT | VARIABLE) ;
 
 fragment DIGIT :   [0-9] ;
 INT            :   DIGIT+ ;
