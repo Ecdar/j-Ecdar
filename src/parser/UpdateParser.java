@@ -3,7 +3,9 @@ package parser;
 import EdgeGrammar.EdgeGrammarLexer;
 import EdgeGrammar.EdgeGrammarParser;
 import EdgeGrammar.EdgeGrammarBaseVisitor;
+import models.BoolVar;
 import models.Clock;
+import models.ClockUpdate;
 import models.Update;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -15,9 +17,11 @@ import java.util.List;
 
 public class UpdateParser {
     private static List<Clock> clocks;
+    private static List<BoolVar> BVs;
 
-    public static List<Update> parse(String updateString, List<Clock> clockList){
+    public static List<Update> parse(String updateString, List<Clock> clockList, List<BoolVar> BVList){
         clocks = clockList;
+        BVs = BVList;
         CharStream charStream = CharStreams.fromString(updateString);
         EdgeGrammar.EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
@@ -65,11 +69,19 @@ public class UpdateParser {
             return null;
         }
 
+        private static BoolVar findBV(List<BoolVar> BVs, String name) {
+            for (BoolVar bv : BVs)
+                if (bv.getName().equals(name))
+                    return bv;
+
+            return null;
+        }
+
         @Override
         public Update visitAssignment(EdgeGrammarParser.AssignmentContext ctx) {
             Clock clock = findClock(ctx.TERM(0).getText());
 
-            return new Update(clock, Integer.parseInt(ctx.TERM(1).getText()));
+            return new ClockUpdate(clock, Integer.parseInt(ctx.TERM(1).getText()));
         }
     }
 }

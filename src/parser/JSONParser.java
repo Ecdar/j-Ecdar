@@ -219,7 +219,7 @@ public class JSONParser {
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
             Guard invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueGuard() :
-                    GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks));
+                    GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks, BVs));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
 
@@ -256,12 +256,12 @@ public class JSONParser {
             List<Update> updates;
 
             if (!jsonObject.get("guard").toString().equals("")) {
-                guards = GuardParser.parse((String) jsonObject.get("guard"), componentClocks);
+                guards = GuardParser.parse((String) jsonObject.get("guard"), componentClocks, BVs);
             } else
                 guards = new TrueGuard();
 
             if (!jsonObject.get("update").toString().equals(""))
-                updates = UpdateParser.parse((String) jsonObject.get("update"), componentClocks);
+                updates = UpdateParser.parse((String) jsonObject.get("update"), componentClocks, BVs);
             else
                 updates = new ArrayList<>();
 
