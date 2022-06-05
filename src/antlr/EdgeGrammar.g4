@@ -18,24 +18,21 @@ update              : assignments? ;
 
 or                  : (and '||' or) | and ;
 and                 : (expression '&&' and) | expression ;
-expression          : true | false | clockExpr | boolExpr ;
+expression          : BOOLEAN | clockExpr | boolExpr ;
 clockExpr           : VARIABLE OPERATOR INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 
-true                : TRUE ;
-false               : FALSE ;
-
 assignments         : (assignment ',' assignments) | (assignment ','?) ;
-assignment          : VARIABLE '=' INT ;
+assignment          : clockAssignment | boolAssignment ;
+clockAssignment     : VARIABLE '=' INT ;
+boolAssignment      : VARIABLE '=' BOOLEAN ;
 
 
 /*
  * Lexer Rules
  */
 
-TRUE        : 'true' ;
-FALSE       : 'false' ;
-BOOLEAN     : TRUE | FALSE ;
+BOOLEAN     : 'true' | 'false' ;
 
 fragment DIGIT :   [0-9] ;
 INT            :   DIGIT+ ;

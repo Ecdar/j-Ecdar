@@ -3,10 +3,7 @@ package parser;
 import EdgeGrammar.EdgeGrammarLexer;
 import EdgeGrammar.EdgeGrammarParser;
 import EdgeGrammar.EdgeGrammarBaseVisitor;
-import models.BoolVar;
-import models.Clock;
-import models.ClockUpdate;
-import models.Update;
+import models.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -69,7 +66,7 @@ public class UpdateParser {
             return null;
         }
 
-        private static BoolVar findBV(List<BoolVar> BVs, String name) {
+        private static BoolVar findBV(String name) {
             for (BoolVar bv : BVs)
                 if (bv.getName().equals(name))
                     return bv;
@@ -79,9 +76,21 @@ public class UpdateParser {
 
         @Override
         public Update visitAssignment(EdgeGrammarParser.AssignmentContext ctx) {
+            return visitChildren(ctx);
+        }
+
+        @Override
+        public Update visitClockAssignment(EdgeGrammarParser.ClockAssignmentContext ctx) {
             Clock clock = findClock(ctx.VARIABLE().getText());
 
             return new ClockUpdate(clock, Integer.parseInt(ctx.INT().getText()));
+        }
+
+        @Override
+        public Update visitBoolAssignment(EdgeGrammarParser.BoolAssignmentContext ctx) {
+            BoolVar bv = findBV(ctx.VARIABLE().getText());
+
+            return new BoolUpdate(bv, Boolean.parseBoolean(ctx.BOOLEAN().getText()));
         }
     }
 }

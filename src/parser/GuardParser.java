@@ -107,17 +107,11 @@ public class GuardParser {
 
         @Override
         public Guard visitExpression(EdgeGrammarParser.ExpressionContext ctx) {
+             if(ctx.BOOLEAN() != null) {
+                 boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
+                 return value ? new TrueGuard() : new FalseGuard();
+             }
             return visitChildren(ctx);
-        }
-
-        @Override
-        public Guard visitTrue(EdgeGrammarParser.TrueContext ctx) {
-            return new TrueGuard();
-        }
-
-        @Override
-        public Guard visitFalse(EdgeGrammarParser.FalseContext ctx) {
-            return new FalseGuard();
         }
 
         @Override

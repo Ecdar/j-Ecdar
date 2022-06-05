@@ -88,7 +88,7 @@ public class EdgeGrammarTest {
     public void testParsingUpdate(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x = 0"));
 
-        EdgeGrammar.EdgeGrammarParser.AssignmentContext ctx = parser.update().assignments().assignment();
+        EdgeGrammar.EdgeGrammarParser.ClockAssignmentContext ctx = parser.update().assignments().assignment().clockAssignment();
         assertEquals("x", ctx.VARIABLE().getText());
         assertEquals("0", ctx.INT().getText());
     }
