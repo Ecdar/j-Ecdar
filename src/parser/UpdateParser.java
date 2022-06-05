@@ -79,9 +79,9 @@ public class UpdateParser {
 
         @Override
         public Update visitAssignment(EdgeGrammarParser.AssignmentContext ctx) {
-            Clock clock = findClock(ctx.TERM(0).getText());
+            Clock clock = findClock(ctx.VARIABLE().getText());
 
-            return new ClockUpdate(clock, Integer.parseInt(ctx.TERM(1).getText()));
+            return new ClockUpdate(clock, Integer.parseInt(ctx.INT().getText()));
         }
     }
 }

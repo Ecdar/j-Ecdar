@@ -1,5 +1,6 @@
 package parser;
 
+import EdgeGrammar.EdgeGrammarLexer;
 import org.antlr.v4.runtime.*;
 import org.junit.Test;
 
@@ -30,9 +31,9 @@ public class EdgeGrammarTest {
         List<Token> tokens = getTokensFromText("x>=5");
 
         assertEquals(4, tokens.size());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(0).getType());
+        assertEquals(EdgeGrammarLexer.VARIABLE, tokens.get(0).getType());
         assertEquals(EdgeGrammar.EdgeGrammarLexer.OPERATOR, tokens.get(1).getType());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(2).getType());
+        assertEquals(EdgeGrammarLexer.INT, tokens.get(2).getType());
     }
 
     @Test
@@ -40,13 +41,13 @@ public class EdgeGrammarTest {
         List<Token> tokens = getTokensFromText("x<=5 && y==3");
 
         assertEquals(8, tokens.size());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(0).getType());
+        assertEquals(EdgeGrammarLexer.VARIABLE, tokens.get(0).getType());
         assertEquals(EdgeGrammar.EdgeGrammarLexer.OPERATOR, tokens.get(1).getType());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(2).getType());
+        assertEquals(EdgeGrammarLexer.INT, tokens.get(2).getType());
 
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(4).getType());
+        assertEquals(EdgeGrammarLexer.VARIABLE, tokens.get(4).getType());
         assertEquals(EdgeGrammar.EdgeGrammarLexer.OPERATOR, tokens.get(5).getType());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(6).getType());
+        assertEquals(EdgeGrammarLexer.INT, tokens.get(6).getType());
     }
 
     @Test
@@ -54,22 +55,22 @@ public class EdgeGrammarTest {
         List<Token> tokens = getTokensFromText("x<=5 || y==3");
 
         assertEquals(8, tokens.size());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(0).getType());
+        assertEquals(EdgeGrammarLexer.VARIABLE, tokens.get(0).getType());
         assertEquals(EdgeGrammar.EdgeGrammarLexer.OPERATOR, tokens.get(1).getType());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(2).getType());
+        assertEquals(EdgeGrammarLexer.INT, tokens.get(2).getType());
 
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(4).getType());
+        assertEquals(EdgeGrammarLexer.VARIABLE, tokens.get(4).getType());
         assertEquals(EdgeGrammar.EdgeGrammarLexer.OPERATOR, tokens.get(5).getType());
-        assertEquals(EdgeGrammar.EdgeGrammarLexer.TERM, tokens.get(6).getType());
+        assertEquals(EdgeGrammarLexer.INT, tokens.get(6).getType());
     }
 
     @Test
     public void testParsing(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<4"));
 
-        EdgeGrammar.EdgeGrammarParser.CompareExprContext ctx = parser.guard().or().and().expression().compareExpr();
-        assertEquals("x", ctx.TERM(0).getText());
-        assertEquals("4", ctx.TERM(1).getText());
+        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = parser.guard().or().and().expression().clockExpr();
+        assertEquals("x", ctx.VARIABLE().getText());
+        assertEquals("4", ctx.INT().getText());
         assertEquals("<", ctx.OPERATOR().getText());
     }
 
@@ -77,9 +78,9 @@ public class EdgeGrammarTest {
     public void testParsingWithOr(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<4||y>=5"));
 
-        EdgeGrammar.EdgeGrammarParser.CompareExprContext ctx = parser.guard().or().or().and().expression().compareExpr();
-        assertEquals("y", ctx.TERM(0).getText());
-        assertEquals("5", ctx.TERM(1).getText());
+        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = parser.guard().or().or().and().expression().clockExpr();
+        assertEquals("y", ctx.VARIABLE().getText());
+        assertEquals("5", ctx.INT().getText());
         assertEquals(">=", ctx.OPERATOR().getText());
     }
 
@@ -88,7 +89,7 @@ public class EdgeGrammarTest {
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x = 0"));
 
         EdgeGrammar.EdgeGrammarParser.AssignmentContext ctx = parser.update().assignments().assignment();
-        assertEquals("x", ctx.TERM(0).getText());
-        assertEquals("0", ctx.TERM(1).getText());
+        assertEquals("x", ctx.VARIABLE().getText());
+        assertEquals("0", ctx.INT().getText());
     }
 }

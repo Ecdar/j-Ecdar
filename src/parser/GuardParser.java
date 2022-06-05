@@ -97,7 +97,7 @@ public class GuardParser {
             return null;
         }
 
-        private static BoolVar findBV(List<BoolVar> BVs, String name) {
+        private static BoolVar findBV(String name) {
             for (BoolVar bv : BVs)
                 if (bv.getName().equals(name))
                     return bv;
@@ -121,16 +121,22 @@ public class GuardParser {
         }
 
         @Override
-        public Guard visitCompareExpr(EdgeGrammarParser.CompareExprContext ctx) {
-            int value = Integer.parseInt(ctx.TERM(1).getText());
+        public Guard visitClockExpr(EdgeGrammarParser.ClockExprContext ctx) {
+            int value = Integer.parseInt(ctx.INT().getText());
             String operator = ctx.OPERATOR().getText();
-            Clock clock = findClock(ctx.TERM(0).getText());
-            Guard guard;
+            Clock clock = findClock(ctx.VARIABLE().getText());
 
             Relation relation = Relation.fromString(operator);
-            guard = new ClockGuard(clock, value, relation);
+            return new ClockGuard(clock, value, relation);
+        }
 
-            return guard;
+        @Override
+        public Guard visitBoolExpr(EdgeGrammarParser.BoolExprContext ctx) {
+            boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
+            String operator = ctx.OPERATOR().getText();
+            BoolVar bv = findBV(ctx.VARIABLE().getText());
+
+            return new BoolGuard(bv, operator, value);
         }
     }
 }
