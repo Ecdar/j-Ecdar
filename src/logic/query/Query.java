@@ -3,7 +3,9 @@ package logic.query;
 import logic.TransitionSystem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Query {
     private QueryType queryType;
@@ -33,7 +35,7 @@ public abstract class Query {
     }
 
     public void addResultString(String resultString){
-        resultList.add(resultString);
+        resultList.addAll(Arrays.stream(resultString.split(",")).map(String::trim).collect(Collectors.toList()));
     }
 
     public QueryType getType() {
