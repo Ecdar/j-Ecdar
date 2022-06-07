@@ -495,7 +495,7 @@ public class BoolTest {
     public void testInvalidTransitionMartijn()
     {
         Automaton auts[] = XMLParser.parse("samples/xml/refinement_bool.xml",true);
-       XMLFileWriter.toXML("martijn.xml", new SimpleTransitionSystem(auts[5]));
+        XMLFileWriter.toXML("testOutput/martijn.xml", new SimpleTransitionSystem(auts[5]));
         assert(new SimpleTransitionSystem(auts[5]).isDeterministic());
         assert(new SimpleTransitionSystem(auts[5]).isFullyConsistent());
     }
