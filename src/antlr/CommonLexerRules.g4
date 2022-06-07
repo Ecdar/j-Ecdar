@@ -1,5 +1,7 @@
 lexer grammar CommonLexerRules;
 
+BOOLEAN     : 'true' | 'false' ;
+
 fragment DIGIT :   [0-9] ;
 INT            :   DIGIT+ ;
 

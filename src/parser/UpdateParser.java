@@ -1,8 +1,8 @@
 package parser;
 
-import EdgeGrammar.EdgeGrammarLexer;
-import EdgeGrammar.EdgeGrammarParser;
-import EdgeGrammar.EdgeGrammarBaseVisitor;
+import UpdateGrammar.UpdateGrammarLexer;
+import UpdateGrammar.UpdateGrammarParser;
+import UpdateGrammar.UpdateGrammarBaseVisitor;
 import models.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -20,17 +20,17 @@ public class UpdateParser {
         clocks = clockList;
         BVs = BVList;
         CharStream charStream = CharStreams.fromString(updateString);
-        EdgeGrammar.EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
+        UpdateGrammar.UpdateGrammarLexer lexer = new UpdateGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
         TokenStream tokens = new CommonTokenStream(lexer);
-        EdgeGrammar.EdgeGrammarParser parser = new EdgeGrammarParser(tokens);
+        UpdateGrammar.UpdateGrammarParser parser = new UpdateGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
 
         UpdatesVisitor updatesVisitor = new UpdatesVisitor();
         return updatesVisitor.visit(parser.update());
     }
 
-    private static class UpdatesVisitor extends EdgeGrammarBaseVisitor<List<Update>>{
+    private static class UpdatesVisitor extends UpdateGrammarBaseVisitor<List<Update>>{
         private List<Update> updates;
 
         public UpdatesVisitor() {
@@ -38,7 +38,7 @@ public class UpdateParser {
         }
 
         @Override
-        public List<Update> visitUpdate(EdgeGrammarParser.UpdateContext ctx) {
+        public List<Update> visitUpdate(UpdateGrammarParser.UpdateContext ctx) {
             if(ctx.assignments() != null){
                 return visit(ctx.assignments());
             }else{
@@ -47,7 +47,7 @@ public class UpdateParser {
         }
 
         @Override
-        public List<Update> visitAssignments(EdgeGrammarParser.AssignmentsContext ctx) {
+        public List<Update> visitAssignments(UpdateGrammarParser.AssignmentsContext ctx) {
             AssignmentVisitor assignmentVisitor = new AssignmentVisitor();
             updates.add(assignmentVisitor.visit(ctx.assignment()));
 
@@ -58,7 +58,7 @@ public class UpdateParser {
         }
     }
 
-    private static class AssignmentVisitor extends EdgeGrammarBaseVisitor<Update>{
+    private static class AssignmentVisitor extends UpdateGrammarBaseVisitor<Update>{
         private Clock findClock(String clockName) {
             for (Clock clock : clocks)
                 if (clock.getName().equals(clockName)) return clock;
@@ -75,19 +75,19 @@ public class UpdateParser {
         }
 
         @Override
-        public Update visitAssignment(EdgeGrammarParser.AssignmentContext ctx) {
+        public Update visitAssignment(UpdateGrammarParser.AssignmentContext ctx) {
             return visitChildren(ctx);
         }
 
         @Override
-        public Update visitClockAssignment(EdgeGrammarParser.ClockAssignmentContext ctx) {
+        public Update visitClockAssignment(UpdateGrammarParser.ClockAssignmentContext ctx) {
             Clock clock = findClock(ctx.VARIABLE().getText());
 
             return new ClockUpdate(clock, Integer.parseInt(ctx.INT().getText()));
         }
 
         @Override
-        public Update visitBoolAssignment(EdgeGrammarParser.BoolAssignmentContext ctx) {
+        public Update visitBoolAssignment(UpdateGrammarParser.BoolAssignmentContext ctx) {
             BoolVar bv = findBV(ctx.VARIABLE().getText());
 
             return new BoolUpdate(bv, Boolean.parseBoolean(ctx.BOOLEAN().getText()));

@@ -1,8 +1,8 @@
 package parser;
 
-import EdgeGrammar.EdgeGrammarParser;
-import EdgeGrammar.EdgeGrammarLexer;
-import EdgeGrammar.EdgeGrammarBaseVisitor;
+import GuardGrammar.GuardGrammarParser;
+import GuardGrammar.GuardGrammarLexer;
+import GuardGrammar.GuardGrammarBaseVisitor;
 import exceptions.BooleanVariableNotFoundException;
 import exceptions.ClockNotFoundException;
 import models.*;
@@ -38,38 +38,38 @@ public class GuardParser {
         clocks = clockList;
         BVs = BVList;
         CharStream charStream = CharStreams.fromString(guardString);
-        EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
+        GuardGrammarLexer lexer = new GuardGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
         TokenStream tokens = new CommonTokenStream(lexer);
-        EdgeGrammarParser parser = new EdgeGrammarParser(tokens);
+        GuardGrammarParser parser = new GuardGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
 
         GuardVisitor guardVisitor = new GuardVisitor();
         return guardVisitor.visit(parser.guard());
     }
 
-    private static class GuardVisitor extends  EdgeGrammarBaseVisitor<Guard>{
+    private static class GuardVisitor extends  GuardGrammarBaseVisitor<Guard>{
 
         @Override
-        public Guard visitOr(EdgeGrammarParser.OrContext ctx) {
+        public Guard visitOr(GuardGrammarParser.OrContext ctx) {
             List<Guard> orGuards = new ArrayList<>();
-            for(EdgeGrammarParser.OrExpressionContext orExpression: ctx.orExpression()){
+            for(GuardGrammarParser.OrExpressionContext orExpression: ctx.orExpression()){
                 orGuards.add(visit(orExpression));
             }
 
             return new OrGuard(orGuards);
         }
 
-        public Guard visitAnd(EdgeGrammarParser.AndContext ctx) {
+        public Guard visitAnd(GuardGrammarParser.AndContext ctx) {
             List<Guard> guards = new ArrayList<>();
-            for (EdgeGrammarParser.ExpressionContext expression: ctx.expression()) {
+            for (GuardGrammarParser.ExpressionContext expression: ctx.expression()) {
                 guards.add(visit(expression));
             }
             return new AndGuard(guards);
         }
 
         @Override
-        public Guard visitExpression(EdgeGrammarParser.ExpressionContext ctx) {
+        public Guard visitExpression(GuardGrammarParser.ExpressionContext ctx) {
             if(ctx.BOOLEAN() != null) {
                 boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
                 return value ? new TrueGuard() : new FalseGuard();
@@ -80,7 +80,7 @@ public class GuardParser {
         }
 
         @Override
-        public Guard visitClockExpr(EdgeGrammarParser.ClockExprContext ctx) {
+        public Guard visitClockExpr(GuardGrammarParser.ClockExprContext ctx) {
             int value = Integer.parseInt(ctx.INT().getText());
             String operator = ctx.OPERATOR().getText();
             Clock clock = findClock(ctx.VARIABLE().getText());
@@ -90,7 +90,7 @@ public class GuardParser {
         }
 
         @Override
-        public Guard visitBoolExpr(EdgeGrammarParser.BoolExprContext ctx) {
+        public Guard visitBoolExpr(GuardGrammarParser.BoolExprContext ctx) {
             boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
             String operator = ctx.OPERATOR().getText();
             BoolVar bv = findBV(ctx.VARIABLE().getText());
