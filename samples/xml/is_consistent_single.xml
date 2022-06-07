@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan o0, o1, o2;</declaration>
+	<template>
+		<name>Template1</name>
+		<declaration>clock x;
+clock y;</declaration>
+		<location id="id0" x="-204" y="-127">
+			<label kind="invariant" x="-238" y="-187">x &lt;= 3</label>
+		</location>
+		<location id="id1" x="-76" y="-127">
+		</location>
+		<init ref="id0"/>
+		<transition id="id2" controllable="false">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-186" y="-161">x&lt;=3</label>
+			<label kind="synchronisation" x="-161" y="-152">o0!</label>
+			<label kind="assignment" x="-161" y="-118">x=0</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Process_0 = Template();
+Process_1 = RefinedTemplate();
+// List one or more processes to be composed into a system.
+system Process_0, Process_1;
+    </system>
+	<queries>
+		<query>
+			<formula>Template&lt;=RefinedTemplate
+			</formula>
+			<comment/>
+		</query>
+	</queries>
+</nta>
