@@ -1,7 +1,7 @@
 package models;
 
-import Exceptions.CddAlreadyRunningException;
-import Exceptions.CddNotRunningException;
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import org.junit.After;
@@ -9,10 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
-import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class InputEnablednessTest {
