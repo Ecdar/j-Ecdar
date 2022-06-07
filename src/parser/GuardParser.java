@@ -27,70 +27,69 @@ public class GuardParser {
         EdgeGrammarParser parser = new EdgeGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
 
-        OrVisitor orVisitor = new OrVisitor();
-        List<Guard> guards = orVisitor.visit(parser.guard());
-        if(guards.size() > 1)
-            return new OrGuard(guards);
-        else
-            return guards.get(0);
+        GuardVisitor guardVisitor = new GuardVisitor();
+        return guardVisitor.visit(parser.guard());
     }
 
-    private static class OrVisitor extends EdgeGrammarBaseVisitor<List<Guard>>{
-
-        private List<Guard> orGuards;
-
-        public OrVisitor() {
-            orGuards = new ArrayList<>();
-        }
-
+    private static class GuardVisitor extends  EdgeGrammarBaseVisitor<Guard>{
         @Override
-        public List<Guard> visitGuard(EdgeGrammarParser.GuardContext ctx) {
+        public Guard visitGuard(EdgeGrammarParser.GuardContext ctx) {
             if(ctx.or() != null){
-                return visit(ctx.or());
+                OrVisitor orVisitor = new OrVisitor();
+                return orVisitor.visit(ctx.or());
+            }else if(ctx.and() != null){
+                AndVisitor andVisitor = new AndVisitor();
+                return andVisitor.visit(ctx.and());
+            } else if(ctx.expression() != null){
+                ExpressionVisitor expressionVisitor = new ExpressionVisitor();
+                return expressionVisitor.visit(ctx.expression());
             }else{
                 return null;
             }
         }
+    }
+
+    private static class OrVisitor extends EdgeGrammarBaseVisitor<Guard>{
 
         @Override
-        public List<Guard> visitOr(EdgeGrammarParser.OrContext ctx) {
-            AndVisitor andVisitor = new AndVisitor();
-            List<Guard> andGuards = andVisitor.visit(ctx.and());
-            if(andGuards.size() > 1)
-                orGuards.add(new AndGuard(andGuards));
-            else
-                orGuards.add(andGuards.get(0));
+        public Guard visitOr(EdgeGrammarParser.OrContext ctx) {
+            List<Guard> orGuards = new ArrayList<>();
+            for(EdgeGrammarParser.OrExpressionContext orExpression: ctx.orExpression()){
+                orGuards.add(visit(orExpression));
+            }
 
-            if(ctx.or() != null)
-                visit(ctx.or());
+            return new OrGuard(orGuards);
+        }
 
-            return orGuards;
+        @Override
+        public Guard visitOrExpression(EdgeGrammarParser.OrExpressionContext ctx) {
+            if(ctx.expression() != null){
+                ExpressionVisitor expressionVisitor = new ExpressionVisitor();
+                return expressionVisitor.visit(ctx.expression());
+            }else if(ctx.and() != null){
+                AndVisitor andVisitor = new AndVisitor();
+                return new AndGuard(andVisitor.visit(ctx.and()));
+            }else{
+                throw new RuntimeException("Unexpected context");
+            }
         }
     }
 
-    private static class AndVisitor extends EdgeGrammarBaseVisitor<List<Guard>>{
-
-        private List<Guard> guards;
-
-        public AndVisitor() {
-            guards = new ArrayList<>();
-        }
+    private static class AndVisitor extends EdgeGrammarBaseVisitor<Guard>{
 
         @Override
-        public List<Guard> visitAnd(EdgeGrammarParser.AndContext ctx) {
+        public Guard visitAnd(EdgeGrammarParser.AndContext ctx) {
+            List<Guard> guards = new ArrayList<>();
             ExpressionVisitor expressionVisitor = new ExpressionVisitor();
-            Guard guard = expressionVisitor.visit(ctx.expression());
-            guards.add(guard);
-
-            if(ctx.and() != null)
-                visit(ctx.and());
-
-            return guards;
+            for (EdgeGrammarParser.ExpressionContext expression: ctx.expression()) {
+                guards.add(expressionVisitor.visit(expression));
+            }
+            return new AndGuard(guards);
         }
     }
 
     private static class ExpressionVisitor extends EdgeGrammarBaseVisitor<Guard> {
-         private Clock findClock(String clockName) {
+         private static Clock findClock(String clockName) {
             for (Clock clock : clocks)
                 if (clock.getName().equals(clockName)) return clock;
 
@@ -110,6 +109,9 @@ public class GuardParser {
              if(ctx.BOOLEAN() != null) {
                  boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
                  return value ? new TrueGuard() : new FalseGuard();
+             }else if(ctx.guard() != null){
+                 GuardVisitor guardVisitor = new GuardVisitor();
+                 return guardVisitor.visit(ctx.guard());
              }
             return visitChildren(ctx);
         }

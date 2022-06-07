@@ -1,6 +1,7 @@
 package parser;
 
 import EdgeGrammar.EdgeGrammarLexer;
+import EdgeGrammar.EdgeGrammarParser;
 import org.antlr.v4.runtime.*;
 import org.junit.Test;
 
@@ -68,17 +69,33 @@ public class EdgeGrammarTest {
     public void testParsing(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<4"));
 
-        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = parser.guard().or().and().expression().clockExpr();
+        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = parser.guard().expression().clockExpr();
         assertEquals("x", ctx.VARIABLE().getText());
         assertEquals("4", ctx.INT().getText());
         assertEquals("<", ctx.OPERATOR().getText());
     }
 
     @Test
+    public void testParsingOuterAnd(){
+        EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<=1 || (y<=2 || x<=3) && (y<=2 || x<=3) || y>6"));
+
+        EdgeGrammarParser.GuardContext guardContext = parser.guard();
+        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = guardContext.or().orExpression(1).and().expression(0).guard().or().orExpression(1).expression().clockExpr();
+        assertEquals("x", ctx.VARIABLE().getText());
+        assertEquals("3", ctx.INT().getText());
+        assertEquals("<=", ctx.OPERATOR().getText());
+
+        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx1 = guardContext.or().orExpression(1).and().expression(1).guard().or().orExpression(0).expression().clockExpr();
+        assertEquals("y", ctx1.VARIABLE().getText());
+        assertEquals("2", ctx1.INT().getText());
+        assertEquals("<=", ctx1.OPERATOR().getText());
+    }
+
+    @Test
     public void testParsingWithOr(){
         EdgeGrammar.EdgeGrammarParser parser = createParserNoError(getTokensFromText("x<4||y>=5"));
 
-        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = parser.guard().or().or().and().expression().clockExpr();
+        EdgeGrammar.EdgeGrammarParser.ClockExprContext ctx = parser.guard().or().orExpression(1).expression().clockExpr();
         assertEquals("y", ctx.VARIABLE().getText());
         assertEquals("5", ctx.INT().getText());
         assertEquals(">=", ctx.OPERATOR().getText());

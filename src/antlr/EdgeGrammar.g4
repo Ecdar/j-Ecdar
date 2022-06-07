@@ -13,12 +13,18 @@ options { caseInsensitive = true; }
 
 edge                : (guard | update) EOF ;
 
-guard               : or? ';'? ;
+guard               : expression
+                    | or ';'?
+                    | and
+                    ;
+
 update              : assignments? ;
 
-or                  : (and '||' or) | and ;
-and                 : (expression '&&' and) | expression ;
-expression          : BOOLEAN | clockExpr | boolExpr ;
+or                  : (orExpression '||')+ orExpression;
+orExpression        : expression | and ;
+
+and                 : (expression '&&')+ expression ;
+expression          : BOOLEAN | clockExpr | boolExpr | '(' guard ')';
 clockExpr           : VARIABLE OPERATOR INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 
