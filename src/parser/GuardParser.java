@@ -3,6 +3,8 @@ package parser;
 import EdgeGrammar.EdgeGrammarParser;
 import EdgeGrammar.EdgeGrammarLexer;
 import EdgeGrammar.EdgeGrammarBaseVisitor;
+import exceptions.BooleanVariableNotFoundException;
+import exceptions.ClockNotFoundException;
 import models.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,7 +23,7 @@ public class GuardParser {
         for (Clock clock : clocks)
             if (clock.getName().equals(clockName)) return clock;
 
-        return null;
+        throw new ClockNotFoundException("Clock: " + clockName + " was not found");
     }
 
     private static BoolVar findBV(String name) {
@@ -29,7 +31,7 @@ public class GuardParser {
             if (bv.getName().equals(name))
                 return bv;
 
-        return null;
+        throw new BooleanVariableNotFoundException("Boolean variable: " + name + " was not found");
     }
 
     public static Guard parse(String guardString, List<Clock> clockList, List<BoolVar> BVList) {
