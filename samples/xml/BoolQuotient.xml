@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan k;
+chan a;</declaration>
+	<template>
+		<name x="5" y="5">T</name>
+		<declaration>// Place local declarations here.
+bool f=false;</declaration>
+		<location id="id0" x="-34" y="-85">
+		</location>
+		<location id="id1" x="-178" y="-85">
+		</location>
+		<init ref="id1"/>
+		<transition id="id2" controllable="false">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="51" y="-161">k!</label>
+			<nail x="17" y="-153"/>
+			<nail x="51" y="-119"/>
+		</transition>
+		<transition id="id3" controllable="false">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-127" y="-136">f==true</label>
+			<label kind="synchronisation" x="-119" y="-119">k!</label>
+		</transition>
+		<transition id="id4">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-194" y="-187">a?</label>
+			<label kind="assignment" x="-194" y="-170">f=true</label>
+			<nail x="-212" y="-170"/>
+			<nail x="-136" y="-170"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">S</name>
+		<declaration>// Place local declarations here.
+bool x;</declaration>
+		<location id="id5" x="-178" y="-85">
+		</location>
+		<init ref="id5"/>
+		<transition id="id6" controllable="false">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-59" y="-136">k!</label>
+			<nail x="-93" y="-144"/>
+			<nail x="-59" y="-85"/>
+		</transition>
+		<transition id="id7">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-194" y="-187">a?</label>
+			<nail x="-212" y="-170"/>
+			<nail x="-136" y="-170"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Process = Template();
+// List one or more processes to be composed into a system.
+system Process;
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>

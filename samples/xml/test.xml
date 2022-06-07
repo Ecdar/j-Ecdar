@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>chan grant; chan cof; chan patent; chan pub; chan coin; chan tea;</declaration>
+  <template>
+    <name>Test</name>
+    <declaration>clock z; clock y; clock x;</declaration>
+	<location id="L0L5L6" x="0" y="0">
+      <name>L0L5L6</name>
+      <label kind="invariant" />
+    </location>
+	<location id="L1L5L7" x="0" y="0">
+      <name>L1L5L7</name>
+      <label kind="invariant" />
+    </location>
+	<location id="L0L5L7" x="0" y="0">
+      <name>L0L5L7</name>
+      <label kind="invariant">x&lt;=8 &amp;&amp; x-z&lt;=8 &amp;&amp; x-y&lt;=8</label>
+    </location>
+	
+    <init ref="L0L5L6" />
+	<transition controllable="false">
+      <source ref="L0L5L7" />
+      <target ref="L0L5L6" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">x&gt;=4</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+	<transition controllable="false">
+      <source ref="L0L5L7" />
+      <target ref="L0L5L7" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">y&gt;=2 &amp;&amp; x&lt;=8 &amp;&amp; x-z&lt;=8 &amp;&amp; x-y&lt;=6</label>
+      <label kind="assignment" />
+    </transition>
+	<transition>
+      <source ref="L0L5L7" />
+      <target ref="L1L5L7" />
+      <label kind="synchronisation">grant?</label>
+      <label kind="guard" />
+      <label kind="assignment">z = 0</label>
+    </transition>
+	   <transition controllable="false">
+      <source ref="L0L5L6" />
+      <target ref="L0L5L7" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">y&gt;=2 &amp;&amp; x&lt;=15 &amp;&amp; x-z&lt;=15 &amp;&amp; x-y&lt;=13</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+	  </template>
+  <system>system Test;</system>
+</nta>
