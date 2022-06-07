@@ -1,5 +1,7 @@
 grammar EdgeGrammar;
 
+import CommonLexerRules;
+
 @header {
 package EdgeGrammar;
 }
@@ -40,16 +42,4 @@ boolAssignment      : VARIABLE '=' BOOLEAN ;
 
 BOOLEAN     : 'true' | 'false' ;
 
-fragment DIGIT :   [0-9] ;
-INT            :   DIGIT+ ;
-
-fragment LOWERCASE : [a-z] ;
-fragment UPPERCASE : [A-Z] ;
-fragment SYMBOL    : ('.' | 'þ' | '€' | '_' | 'ð' | 'đ' | 'œ' | '-') ;
-fragment LETTER        : (LOWERCASE | UPPERCASE) ;
-
-VARIABLE    : LETTER (LETTER | DIGIT | SYMBOL)* ;
-
 OPERATOR    : ('>=' | '<=' | '==' | '<' | '>') ;
-
-WS : [ \t\r\n]+ -> skip ;
