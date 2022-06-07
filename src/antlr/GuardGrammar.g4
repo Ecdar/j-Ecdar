@@ -19,10 +19,10 @@ guard               : expression
                     | and
                     ;
 
-or                  : (orExpression '||')+ orExpression;
+or                  : (orExpression OR)+ orExpression;
 orExpression        : expression | and ;
 
-and                 : (expression '&&')+ expression ;
+and                 : (expression AND)+ expression ;
 expression          : BOOLEAN | clockExpr | boolExpr | '(' guard ')';
 clockExpr           : VARIABLE OPERATOR INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
@@ -30,5 +30,8 @@ boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 /*
  * Lexer Rules
  */
+
+AND         : '&&' | 'and' ;
+OR          : '||' | 'or'  ;
 
 OPERATOR    : ('>=' | '<=' | '==' | '<' | '>') ;

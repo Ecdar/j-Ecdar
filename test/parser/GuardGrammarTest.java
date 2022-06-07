@@ -100,4 +100,58 @@ public class GuardGrammarTest {
         assertEquals("5", ctx.INT().getText());
         assertEquals(">=", ctx.OPERATOR().getText());
     }
+
+    @Test
+    public void testParsingSymbolAndTextAnd(){
+        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<4 AND y>=5 and y>6 && y<7"));
+
+        GuardGrammarParser.AndContext andContext = parser.guard().and();
+
+        GuardGrammarParser.ClockExprContext clock1 = andContext.expression(0).clockExpr();
+        assertEquals("x", clock1.VARIABLE().getText());
+        assertEquals("4", clock1.INT().getText());
+        assertEquals("<", clock1.OPERATOR().getText());
+
+        GuardGrammarParser.ClockExprContext clock2 = andContext.expression(1).clockExpr();
+        assertEquals("y", clock2.VARIABLE().getText());
+        assertEquals("5", clock2.INT().getText());
+        assertEquals(">=", clock2.OPERATOR().getText());
+
+        GuardGrammarParser.ClockExprContext clock3 = andContext.expression(2).clockExpr();
+        assertEquals("y", clock3.VARIABLE().getText());
+        assertEquals("6", clock3.INT().getText());
+        assertEquals(">", clock3.OPERATOR().getText());
+
+        GuardGrammarParser.ClockExprContext clock4 = andContext.expression(3).clockExpr();
+        assertEquals("y", clock4.VARIABLE().getText());
+        assertEquals("7", clock4.INT().getText());
+        assertEquals("<", clock4.OPERATOR().getText());
+    }
+
+    @Test
+    public void testParsingSymbolAndTextOr(){
+        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<4 OR y>=5 or y>6 || y<7"));
+
+        GuardGrammarParser.OrContext orContext = parser.guard().or();
+
+        GuardGrammarParser.ClockExprContext clock1 = orContext.orExpression(0).expression().clockExpr();
+        assertEquals("x", clock1.VARIABLE().getText());
+        assertEquals("4", clock1.INT().getText());
+        assertEquals("<", clock1.OPERATOR().getText());
+
+        GuardGrammarParser.ClockExprContext clock2 = orContext.orExpression(1).expression().clockExpr();
+        assertEquals("y", clock2.VARIABLE().getText());
+        assertEquals("5", clock2.INT().getText());
+        assertEquals(">=", clock2.OPERATOR().getText());
+
+        GuardGrammarParser.ClockExprContext clock3 = orContext.orExpression(2).expression().clockExpr();
+        assertEquals("y", clock3.VARIABLE().getText());
+        assertEquals("6", clock3.INT().getText());
+        assertEquals(">", clock3.OPERATOR().getText());
+
+        GuardGrammarParser.ClockExprContext clock4 = orContext.orExpression(3).expression().clockExpr();
+        assertEquals("y", clock4.VARIABLE().getText());
+        assertEquals("7", clock4.INT().getText());
+        assertEquals("<", clock4.OPERATOR().getText());
+    }
 }
