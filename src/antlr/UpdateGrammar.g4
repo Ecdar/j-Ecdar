@@ -12,9 +12,8 @@ options { caseInsensitive = true; }
  * Parser Rules
  */
 
-update              : assignments? EOF ;
+update              : ((assignment ',')* assignment (',')?)? EOF ;
 
-assignments         : (assignment ',' assignments) | (assignment ','?) ;
 assignment          : clockAssignment | boolAssignment ;
 clockAssignment     : VARIABLE '=' INT ;
 boolAssignment      : VARIABLE '=' BOOLEAN ;

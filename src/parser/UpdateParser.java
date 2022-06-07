@@ -39,21 +39,10 @@ public class UpdateParser {
 
         @Override
         public List<Update> visitUpdate(UpdateGrammarParser.UpdateContext ctx) {
-            if(ctx.assignments() != null){
-                return visit(ctx.assignments());
-            }else{
-                return null;
-            }
-        }
-
-        @Override
-        public List<Update> visitAssignments(UpdateGrammarParser.AssignmentsContext ctx) {
             AssignmentVisitor assignmentVisitor = new AssignmentVisitor();
-            updates.add(assignmentVisitor.visit(ctx.assignment()));
-
-            if(ctx.assignments() != null)
-                updates = visit(ctx.assignments());
-
+            for(UpdateGrammarParser.AssignmentContext assignment : ctx.assignment()){
+                updates.add(assignmentVisitor.visit(assignment));
+            }
             return updates;
         }
     }

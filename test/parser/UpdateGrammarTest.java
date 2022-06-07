@@ -43,7 +43,7 @@ public class UpdateGrammarTest {
     public void testParsingUpdate(){
         UpdateGrammar.UpdateGrammarParser parser = createParserNoError(getTokensFromText("x = 0"));
 
-        UpdateGrammar.UpdateGrammarParser.ClockAssignmentContext ctx = parser.update().assignments().assignment().clockAssignment();
+        UpdateGrammar.UpdateGrammarParser.ClockAssignmentContext ctx = parser.update().assignment(0).clockAssignment();
         assertEquals("x", ctx.VARIABLE().getText());
         assertEquals("0", ctx.INT().getText());
     }
@@ -52,12 +52,12 @@ public class UpdateGrammarTest {
     public void testParsingUpdateMultiple(){
         UpdateGrammar.UpdateGrammarParser parser = createParserNoError(getTokensFromText("x=4, y=3"));
 
-        UpdateGrammarParser.AssignmentsContext assignments = parser.update().assignments();
-        UpdateGrammar.UpdateGrammarParser.ClockAssignmentContext clockAssignment1 = assignments.assignment().clockAssignment();
+        UpdateGrammarParser.UpdateContext updateContext = parser.update();
+        UpdateGrammar.UpdateGrammarParser.ClockAssignmentContext clockAssignment1 = updateContext.assignment(0).clockAssignment();
         assertEquals("x", clockAssignment1.VARIABLE().getText());
         assertEquals("4", clockAssignment1.INT().getText());
 
-        UpdateGrammar.UpdateGrammarParser.ClockAssignmentContext clockAssignment2 = assignments.assignments().assignment().clockAssignment();
+        UpdateGrammar.UpdateGrammarParser.ClockAssignmentContext clockAssignment2 = updateContext.assignment(1).clockAssignment();
         assertEquals("y", clockAssignment2.VARIABLE().getText());
         assertEquals("3", clockAssignment2.INT().getText());
     }
