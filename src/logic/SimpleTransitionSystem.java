@@ -1,7 +1,6 @@
 package logic;
 
 import models.*;
-import parser.JsonFileWriter;
 import parser.XMLFileWriter;
 
 import java.util.*;
@@ -317,7 +316,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public void toJson(String filename)
     {
-        JsonFileWriter.writeToJson(this.getAutomaton(),filename);
+        JsonAutomatonEncoder.writeToJson(this.getAutomaton(),filename);
     }
 
 

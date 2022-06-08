@@ -347,7 +347,7 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem((automata[0])),
                         new SimpleTransitionSystem((automata[1]))});
        Automaton array[] = new Automaton[]{comp.getAutomaton()};
-        XMLFileWriter.toXML("compT1T2.xml", array);
+        XMLFileWriter.toXML("testOutput/compT1T2.xml", array);
         assertTrue(new Refinement(comp, new SimpleTransitionSystem((automata[2]))).check());
     }
 /*

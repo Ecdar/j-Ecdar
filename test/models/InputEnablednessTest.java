@@ -1,7 +1,7 @@
 package models;
 
-import Exceptions.CddAlreadyRunningException;
-import Exceptions.CddNotRunningException;
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import org.junit.After;
@@ -9,10 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
-import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class InputEnablednessTest {
@@ -135,12 +133,11 @@ public class InputEnablednessTest {
     @Test
     public void testAutomaton() {
         SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
-        st.toXML("wtf.xml");
+        st.toXML("testOutput/wtf.xml");
         SimpleTransitionSystem st1 = new SimpleTransitionSystem(expected);
-        st1.toXML("wtf-exp.xml");
+        st1.toXML("testOutput/wtf-exp.xml");
         assert (new Refinement(new SimpleTransitionSystem(expected),new SimpleTransitionSystem(actual)).check());
         assert (new Refinement(new SimpleTransitionSystem(actual),new SimpleTransitionSystem(expected)).check());
-
     }
 
 }

@@ -1,22 +1,19 @@
 package features;
 
-import Exceptions.CddAlreadyRunningException;
-import Exceptions.CddNotRunningException;
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import logic.*;
 import models.Automaton;
 import models.CDD;
 import models.Clock;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import parser.JSONParser;
-import parser.XMLFileWriter;
 import parser.XMLParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SimpleTimeZone;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -393,8 +390,8 @@ public class UniversityTest {
         Automaton comp1 = new Composition(new TransitionSystem[]{adm, machine, researcher}).getAutomaton();
         Automaton comp2 = new Composition(new TransitionSystem[]{admCopy, machineCopy, researcherCopy}).getAutomaton();
 
-        new SimpleTransitionSystem(comp1).toXML("comp1");
-        new SimpleTransitionSystem(comp2).toXML("comp2");
+        new SimpleTransitionSystem(comp1).toXML("testOutput/comp1.xml");
+        new SimpleTransitionSystem(comp2).toXML("testOutput/comp2.xml");
 
         assertTrue(new Refinement(new SimpleTransitionSystem(comp1),new SimpleTransitionSystem(comp2)).check());
         assertTrue(new Refinement(new SimpleTransitionSystem(comp2),new SimpleTransitionSystem(comp1)).check());

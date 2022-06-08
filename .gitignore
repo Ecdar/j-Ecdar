@@ -64,3 +64,6 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+# Test files
+testOutput

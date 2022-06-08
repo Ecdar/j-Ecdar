@@ -1,7 +1,7 @@
 package cdd;
 
-import Exceptions.CddAlreadyRunningException;
-import Exceptions.CddNotRunningException;
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import models.*;
 import org.junit.After;
 import org.junit.Test;

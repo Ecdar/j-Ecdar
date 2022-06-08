@@ -1,7 +1,7 @@
 package features;
 
-import Exceptions.CddAlreadyRunningException;
-import Exceptions.CddNotRunningException;
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
@@ -191,7 +191,7 @@ public class DeterminismTest {
     public void testG13() throws CddNotRunningException, CddAlreadyRunningException {
         CDD.init(100,100,100);
         CDD.addClocks(G13.getClocks());
-        ((SimpleTransitionSystem) (G13)).toXML("st-ic.xml");
+        ((SimpleTransitionSystem) (G13)).toXML("testOutput/st-ic.xml");
         assertTrue(new SimpleTransitionSystem((G13.getAutomaton())).isDeterministic());
     }
 
@@ -221,7 +221,7 @@ public class DeterminismTest {
         CDD.init(100,100,100);
         CDD.addClocks(G17.getClocks());
         SimpleTransitionSystem inputEnabled = new SimpleTransitionSystem((G17.getAutomaton()));
-        inputEnabled.toXML("inputEnabledTestG17.xml");
+        inputEnabled.toXML("testOutput/inputEnabledTestG17.xml");
         assertTrue(inputEnabled.isDeterministic());
     }
 

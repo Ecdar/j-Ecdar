@@ -93,7 +93,9 @@ public class XMLFileWriter {
         XMLOutputter outter = new XMLOutputter();
         outter.setFormat(Format.getPrettyFormat());
         try {
-            outter.output(doc, new FileWriter(new File(filename)));
+            File file = new File(filename);
+            file.getParentFile().mkdirs();
+            outter.output(doc, new FileWriter(file));
         } catch (IOException e) {
             e.printStackTrace();
         }

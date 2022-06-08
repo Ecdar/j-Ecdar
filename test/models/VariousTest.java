@@ -1,7 +1,7 @@
 package models;
 
-import Exceptions.CddAlreadyRunningException;
-import Exceptions.CddNotRunningException;
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
@@ -35,7 +35,7 @@ public class VariousTest {
 
         SimpleTransitionSystem simp2 = new SimpleTransitionSystem(aut2[0]);
 
-        simp2.toXML("simple1.xml");
+        simp2.toXML("testOutput/simple1.xml");
 
         assert (true);
     }
