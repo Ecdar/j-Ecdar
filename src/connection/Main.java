@@ -1,9 +1,11 @@
 package connection;
 
-import logic.*;
-
-import java.util.List;
+import logic.Controller;
+import logic.query.Query;
 import org.apache.commons.cli.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Main {
@@ -79,11 +81,17 @@ public class Main {
             String queryString = argStrBuilder.toString();
 
             try {
+                List<Query> queries = new ArrayList<>();
                 if(inputFolderPath.endsWith(".xml")){
-                    System.out.println(Controller.handleRequest("-xml " + inputFolderPath, queryString, false));
+                    queries = Controller.handleRequest("-xml " + inputFolderPath, queryString, false);
                 }else{
-                    System.out.println(Controller.handleRequest("-json " + inputFolderPath, queryString, false));
+                    queries = Controller.handleRequest("-json " + inputFolderPath, queryString, false);
                 }
+                for (Query query: queries) {
+                    System.out.println(query.getResult());
+                    System.out.println(query.getResultStrings());
+                }
+
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();

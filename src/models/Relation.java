@@ -26,6 +26,17 @@ public enum Relation {/*
         return name.equals(otherName);
     }
 
+    public static Relation fromString(String text) {
+        if (text != null) {
+            for (Relation b : Relation.values()) {
+                if (b.name.equals(text)) {
+                    return b;
+                }
+            }
+        }
+        return null;
+    }
+
     public String toString() {
         return this.name;
     }
