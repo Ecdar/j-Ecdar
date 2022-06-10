@@ -105,7 +105,7 @@ public class UniversityTest {
 
         assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
     }
-/*
+
     @Test
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
@@ -116,6 +116,7 @@ public class UniversityTest {
         System.out.println(ref.getErrMsg());
         assertTrue(res);
     }
+/*
 
     @Test
     public void newQuotientTest4B() {

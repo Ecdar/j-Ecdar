@@ -100,28 +100,17 @@ public class ClockGuard extends Guard {
 
 
     public ClockGuard negate() {
-        // never negat individual clock guards, the negation of == would lead to problems!
+        // never negate individual clock guards, the negation of == would lead to problems!
         assert(false);
         return null;
-    }
-
-    public int makeRaw(int bound, Relation rel)
-    {
-        //TODO: Check this with martijn and ulrik: important!
-        if (rel.equals(Relation.LESS_THAN) || rel.equals(Relation.GREATER_THAN))
-            return bound*2+1;
-        else
-            return bound*2;
-
-
     }
 
     @Override
     int getMaxConstant() {
         if (isDiagonal())
-            return 0; // TODO: supposed to be 0?
+            return bound; // TODO: supposed to be bound or 0?
         else
-            return bound; //makeRaw(bound,rel);
+            return bound;
     }
 
     @Override

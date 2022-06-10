@@ -237,7 +237,7 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed(JNIEnv *env, jcla
         auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
         auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
 
-        return convertedFed2 >= convertedFed1;
+        return convertedFed1.le(convertedFed2);
 
 
   }
