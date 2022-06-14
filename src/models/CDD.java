@@ -116,7 +116,8 @@ public class CDD {
         }
         if (copy.isTrue()) // special case for guards
         {
-            System.out.println("to true guard --> why did I not go into the first one??");
+            assert(false);
+            //System.out.println("to true guard --> why did I not go into the first one??");
             return new TrueGuard();
         }
         if (copy.isBDD())
@@ -392,7 +393,6 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
-        System.out.println(guard + " " + update + " " + clockResets.length + " " + boolResets.length);
         return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
     }
 
@@ -656,7 +656,6 @@ public class CDD {
     {
         if (e.getUpdates().size()==0)
         {
-            System.out.println("returned because no update ");
             return this.conjunction(e.getGuardCDD());
         }
         int numBools = 0;
@@ -710,6 +709,7 @@ public class CDD {
 
 
     public CDD transitionBack(Move e) {
+        // TODO: check that this is up to date compared to the othter TransitionBack
         if (e.getUpdates().size()==0)
         {
             return this.conjunction(e.getGuardCDD());

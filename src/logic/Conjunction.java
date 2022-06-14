@@ -323,7 +323,7 @@ public class Conjunction extends TransitionSystem {
             if (moves.isEmpty())
                 return new ArrayList<>();
 
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
+            resultMoves = moveProduct(resultMoves, moves, i == 1, false);
         }
 
         return resultMoves;

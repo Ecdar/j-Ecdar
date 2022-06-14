@@ -379,7 +379,7 @@ public class Composition extends TransitionSystem {
             else
                 moveExisted = true;
 
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
+            resultMoves = moveProduct(resultMoves, moves, i == 1,false);
         }
 
         if (!moveExisted) return new ArrayList<>();

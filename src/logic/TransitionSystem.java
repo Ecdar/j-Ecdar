@@ -44,8 +44,6 @@ public abstract class TransitionSystem {
             }
         }
 
-        System.out.println("1 Init CDD created!!!!!!!!!!!!! " + bddPart);
-
         State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
         state.applyInvariants();
         return state;
@@ -231,7 +229,7 @@ public abstract class TransitionSystem {
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 
-    List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
+    List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest, boolean removeTargetInvars) {
         List<Move> moves = new ArrayList<>();
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
@@ -241,6 +239,8 @@ public abstract class TransitionSystem {
                 if (toNest) {
                     source = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getSource(), move2.getSource())));
                     target = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getTarget(), move2.getTarget())));
+                    if (removeTargetInvars)
+                        ((ComplexLocation)target).removeInvariants();
                 } else {
                     List<SymbolicLocation> newSourceLoc = new ArrayList<>(((ComplexLocation) move1.getSource()).getLocations());
                     newSourceLoc.add(move2.getSource());
@@ -249,6 +249,8 @@ public abstract class TransitionSystem {
                     List<SymbolicLocation> newTargetLoc = new ArrayList<>(((ComplexLocation) move1.getTarget()).getLocations());
                     newTargetLoc.add(move2.getTarget());
                     target = new ComplexLocation(newTargetLoc);
+                    if (removeTargetInvars)
+                        ((ComplexLocation)target).removeInvariants();
                 }
 
                 List<Edge> edges = new ArrayList<>(move1.getEdges());
