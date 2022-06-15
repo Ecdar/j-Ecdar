@@ -48,8 +48,8 @@ public class BoolTest {
     @Test
     public void testDisjunction() {
 
-        Clock a = new Clock("a");
-        Clock b = new Clock("b");
+        Clock a = new Clock("a", "AUT");
+        Clock b = new Clock("b", "AUT");
         List<Clock> clocks = new ArrayList<>();
         clocks.add(a); clocks.add(b);
 
@@ -128,8 +128,8 @@ public class BoolTest {
 
     @Test
     public void testTwoEdgesWithDifferentBool() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
         BoolVar a = new BoolVar("a",false);
         BoolVar b = new BoolVar("b",true);
         List<BoolVar> BVs = new ArrayList<>();
@@ -220,8 +220,8 @@ public class BoolTest {
 
     @Test
     public void testOverlappingZonesWithDifferentBool() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
         BoolVar a = new BoolVar("a",false);
         BoolVar b = new BoolVar("b",true);
         List<BoolVar> BVs = new ArrayList<>();
@@ -324,8 +324,8 @@ public class BoolTest {
 
     @Test
     public void sameButNowMakeInputEnabled() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
         BoolVar a = new BoolVar("a",false);
         BoolVar b = new BoolVar("b",true);
         List<BoolVar> BVs = new ArrayList<>();
@@ -429,7 +429,7 @@ public class BoolTest {
     public void arraysSimple()
     {
         CDD.init(100,100,100);
-        CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk"));}});
+        CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk", "Aut"));}});
         BoolVar bv = new BoolVar("a",false);
         CDD.addBddvar(new ArrayList<>(){{add(bv);}});
 
@@ -456,7 +456,7 @@ public class BoolTest {
         System.out.println("###########################################################################");
 
         CDD.init(100,100,100);
-        CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk"));add(new Clock("testclk1"));}});
+        CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk", "Aut"));add(new Clock("testclk1", "Aut"));}});
         BoolVar bv1 = new BoolVar("a",false);
         CDD.addBddvar(new ArrayList<>(){{add(bv1);}});
 
@@ -507,7 +507,7 @@ public class BoolTest {
         Automaton auts[] = XMLParser.parse("samples/xml/BoolQuotientOneTemplate.xml",true);
 
         CDD.init(100,100,100);
-        CDD.addClocks(new ArrayList<>(){{add(new Clock("x"));}});
+        CDD.addClocks(new ArrayList<>(){{add(new Clock("x", "Aut"));}});
         CDD.addBddvar(new ArrayList<>());
         System.out.println("found the bug: " + CDD.cddTrue().removeNegative().negation().removeNegative());
         CDD.done();
@@ -594,7 +594,7 @@ public class BoolTest {
     public void transitionBack()
     {
         CDD.init(100,100,100);
-        CDD.addClocks(new ArrayList<>() {{add(new Clock("clk"));}});
+        CDD.addClocks(new ArrayList<>() {{add(new Clock("clk", "Aut"));}});
         BoolVar a = new BoolVar("a",false);
         CDD.addBddvar(new ArrayList<>(){{add(a);}});
 
@@ -612,8 +612,8 @@ public class BoolTest {
 
     @Test
     public void testBoolSafeLoadXML() {
-        Clock x = new Clock("exp_x");
-        Clock y = new Clock("exp_y");
+        Clock x = new Clock("exp_x", "Aut");
+        Clock y = new Clock("exp_y", "Aut");
         BoolVar a = new BoolVar("exp_a",false);
         BoolVar b = new BoolVar("exp_b",true);
         List<BoolVar> BVs = new ArrayList<>();

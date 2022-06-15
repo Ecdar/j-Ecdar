@@ -73,7 +73,7 @@ public class Automaton {
 
         this.clocks = new ArrayList<>();
         for (Clock c : origin.clocks) {
-            this.clocks.add(new Clock(c.getName()+"Copy"));
+            this.clocks.add(new Clock(c.getName()+"Copy", name));
         }
         this.BVs = new ArrayList<>();
         for (BoolVar c : origin.BVs) {

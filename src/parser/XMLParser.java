@@ -114,7 +114,7 @@ public class XMLParser {
                     String[] clockArr = clocks.split(",");
 
                     for (String clk : clockArr) {
-                        clockList.add(new Clock(clk));
+                        clockList.add(new Clock(clk, automatonName));
                     }
                 }
             }

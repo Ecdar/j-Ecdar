@@ -9,19 +9,19 @@ import static models.CDD.getIndexOfBV;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
-    final List<Clock> clocks;
+    final ClockContainer clocks;
     final List <BoolVar> BVs;
     private StringBuilder lastErr = new StringBuilder();
 
     TransitionSystem() {
-        this.clocks = new ArrayList<>();
+        this.clocks = new ClockContainer();
         this.BVs = new ArrayList<>();
     }
 
     public abstract Automaton getAutomaton();
 
     public List<Clock> getClocks() {
-        return clocks;
+        return clocks.getClocks();
     }
 
     public List<BoolVar> getBVs() {
@@ -138,7 +138,7 @@ public abstract class TransitionSystem {
         if (!CDD.isCddIsRunning())
         {
             CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-            CDD.addClocks(clocks);
+            CDD.addClocks(clocks.getClocks());
             CDD.addBddvar(BVs);
 
             System.out.println("allClocks " + clocks + " bddStartLevel " + CDD.bddStartLevel);
@@ -224,7 +224,7 @@ public abstract class TransitionSystem {
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel){
-        return getNextTransitions(currentState, channel, clocks);
+        return getNextTransitions(currentState, channel, clocks.getClocks());
     }
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);

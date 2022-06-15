@@ -3,24 +3,35 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Clock {
-    private final String name;
+import logic.TransitionSystem;
 
-    public Clock(String name) {
+public class Clock {
+    private String name;
+    private String uniqueName;
+    private String ownerName;
+
+    public Clock(String name, String ownerName) {
         this.name = name;
+        this.uniqueName = name;
+        this.ownerName = ownerName;
     }
 
     public Clock(Clock copy){
-        assert(false);
         String s = copy.name;
 //        while (allClockNames.contains(s))
 //            s+="_";
 //        allClockNames.add(s);
         this.name = s;
+        this.uniqueName = copy.uniqueName;
+        this.ownerName = copy.ownerName;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getUniqueName(){
+        return uniqueName;
     }
 
     @Override
@@ -36,5 +47,21 @@ public class Clock {
         return "Clock{" +
                 "name='" + name + '\'' +
                 '}';
+    }
+
+    public void setUniqueName(int index) {
+        if(ownerName != null){
+            uniqueName = ownerName + "." + index + "." + name;
+        }
+    }
+
+    public void setUniqueName() {
+        if(ownerName != null){
+            uniqueName = ownerName + "." + name;
+        }
+    }
+
+    public String getOwnerName() {
+        return ownerName;
     }
 }

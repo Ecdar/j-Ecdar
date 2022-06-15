@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
+import parser.XMLFileWriter;
 import parser.XMLParser;
 
 import java.util.ArrayList;

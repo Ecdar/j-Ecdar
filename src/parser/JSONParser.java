@@ -162,7 +162,7 @@ public class JSONParser {
                 String[] clockArr = clocks.split(",");
 
                 for (String s : clockArr) {
-                    componentClocks.add(new Clock(s));
+                    componentClocks.add(new Clock(s, automatonName));
                 }
             }
         }

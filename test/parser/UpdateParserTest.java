@@ -15,7 +15,7 @@ public class UpdateParserTest {
     @Test
     public void testUpdateParser(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("z")); }};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("z", "Aut")); }};
 
         List<Update> updates = UpdateParser.parse("z=2", clocks, BVs);
 
@@ -26,7 +26,7 @@ public class UpdateParserTest {
     @Test
     public void testUpdateParserMultiple(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x", "Aut")); add(new Clock("y", "Aut")); }};
 
         List<Update> updates = UpdateParser.parse("x=6, y=1", clocks, BVs);
 
