@@ -87,7 +87,7 @@ public class Refinement {
         // with the exception that the left side is allowed to have more outputs
 
         // inputs on the left must be equal to inputs on the right side
-        if (!inputs1.equals(inputs2)) {
+        if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
             errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
         }

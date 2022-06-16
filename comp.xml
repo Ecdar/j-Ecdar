@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>chan cof; chan pub; chan coin; chan tea;</declaration>
+  <template>
+    <name>Machine | Researcher</name>
+    <declaration>clock y; clock x;</declaration>
+    <location id="L5L6" x="0" y="0">
+      <name>L5L6</name>
+      <label kind="invariant">true</label>
+    </location>
+    <location id="L5L7" x="0" y="0">
+      <name>L5L7</name>
+      <label kind="invariant">(x&lt;=8 &amp;&amp; x-y&lt;=8)</label>
+    </location>
+    <location id="L5U0" x="0" y="0">
+      <name>L5U0</name>
+      <label kind="invariant">true</label>
+    </location>
+    <location id="L4L9" x="0" y="0">
+      <name>L4L9</name>
+      <label kind="invariant">(y&lt;=6 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=4 &amp;&amp; y-x&lt;=6)</label>
+    </location>
+    <location id="L4L7" x="0" y="0">
+      <name>L4L7</name>
+      <label kind="invariant">(y&lt;=6 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=8 &amp;&amp; y-x&lt;=6)</label>
+    </location>
+    <location id="L4U0" x="0" y="0">
+      <name>L4U0</name>
+      <label kind="invariant">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+    </location>
+    <location id="L4L6" x="0" y="0">
+      <name>L4L6</name>
+      <label kind="invariant">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+    </location>
+    <location id="L5L9" x="0" y="0">
+      <name>L5L9</name>
+      <label kind="invariant">(x&lt;=4 &amp;&amp; x-y&lt;=4)</label>
+    </location>
+    <init ref="L5L6" />
+    <transition>
+      <source ref="L5L6" />
+      <target ref="L4L6" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">true</label>
+      <label kind="assignment">y = 0</label>
+    </transition>
+    <transition>
+      <source ref="L5L9" />
+      <target ref="L4L9" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">true</label>
+      <label kind="assignment">y = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L5L9" />
+      <target ref="L5L9" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(y&gt;=2 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=2)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L9" />
+      <target ref="L5L9" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(x&lt;=4 &amp;&amp; x-y&lt;=4)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition>
+      <source ref="L4L6" />
+      <target ref="L4L6" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition>
+      <source ref="L4U0" />
+      <target ref="L4U0" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition>
+      <source ref="L4L7" />
+      <target ref="L4L7" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L9" />
+      <target ref="L5L9" />
+      <label kind="synchronisation">cof!</label>
+      <label kind="guard">(y&gt;=4 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=0)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L5L6" />
+      <target ref="L5L7" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(y&gt;=2 &amp;&amp; x&lt;=15 &amp;&amp; x-y&lt;=13)</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L7" />
+      <target ref="L5L7" />
+      <label kind="synchronisation">cof!</label>
+      <label kind="guard">(y&gt;=4 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=4)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L5L7" />
+      <target ref="L5L6" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">x&gt;=4</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4U0" />
+      <target ref="L5U0" />
+      <label kind="synchronisation">cof!</label>
+      <label kind="guard">y&gt;=4</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L9" />
+      <target ref="L4L6" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">x&gt;=2</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L6" />
+      <target ref="L5U0" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">x&gt;15</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L5L9" />
+      <target ref="L5L6" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">x&gt;=2</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L7" />
+      <target ref="L4L6" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">x&gt;=4</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L7" />
+      <target ref="L5L7" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(x&lt;=8 &amp;&amp; x-y&lt;=8)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L4U0" />
+      <target ref="L4U0" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">true</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L5L7" />
+      <target ref="L5L7" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(y&gt;=2 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=6)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition>
+      <source ref="L5L7" />
+      <target ref="L4L7" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">true</label>
+      <label kind="assignment">y = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L6" />
+      <target ref="L5L9" />
+      <label kind="synchronisation">cof!</label>
+      <label kind="guard">y&gt;=4</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L5L6" />
+      <target ref="L5U0" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(y&gt;=2 &amp;&amp; x&gt;15)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition>
+      <source ref="L5U0" />
+      <target ref="L4U0" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">true</label>
+      <label kind="assignment">y = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L5U0" />
+      <target ref="L5U0" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">y&gt;=2</label>
+      <label kind="assignment" />
+    </transition>
+    <transition>
+      <source ref="L4L9" />
+      <target ref="L4L9" />
+      <label kind="synchronisation">coin?</label>
+      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L4L6" />
+      <target ref="L5L7" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">(x&lt;=15 &amp;&amp; x-y&lt;=15)</label>
+      <label kind="assignment">x = 0</label>
+    </transition>
+    <transition controllable="false">
+      <source ref="L4U0" />
+      <target ref="L5U0" />
+      <label kind="synchronisation">tea!</label>
+      <label kind="guard">true</label>
+      <label kind="assignment" />
+    </transition>
+    <transition controllable="false">
+      <source ref="L5U0" />
+      <target ref="L5U0" />
+      <label kind="synchronisation">pub!</label>
+      <label kind="guard">true</label>
+      <label kind="assignment" />
+    </transition>
+  </template>
+  <system>system Machine | Researcher;</system>
+</nta>

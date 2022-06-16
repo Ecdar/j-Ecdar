@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class UniversityTest {
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
-            machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy;
+            machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy, comp, specDIVadm;
 
     @After
     public void afterEachTest(){
@@ -41,6 +41,10 @@ public class UniversityTest {
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
+
+        Automaton compAut = XMLParser.parse("./comp.xml", true)[0];
+        Automaton specDIVadmAut = XMLParser.parse("./specDIVadm.xml", true)[0];
+
         CDD.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.addAll(machines[0].getClocks());
@@ -51,6 +55,8 @@ public class UniversityTest {
         clocks.addAll(machines[5].getClocks());
         clocks.addAll(machines[6].getClocks());
         clocks.addAll(machines[7].getClocks());
+        clocks.addAll(compAut.getClocks());
+        clocks.addAll(specDIVadmAut.getClocks());
         CDD.addClocks(clocks);
 
         adm = new SimpleTransitionSystem((machines[0]));
@@ -69,7 +75,14 @@ public class UniversityTest {
         half1Copy = new SimpleTransitionSystem(new Automaton((machines[6])));
         half2 = new SimpleTransitionSystem((machines[7]));
         half2Copy = new SimpleTransitionSystem(new Automaton((machines[7])));
+        comp = new SimpleTransitionSystem(new Automaton(compAut));
+        specDIVadm = new SimpleTransitionSystem(new Automaton(specDIVadmAut));
         CDD.done();
+    }
+
+    @Test
+    public void testInfiniteLoop() {
+        assertTrue(new Refinement(comp, specDIVadm).check());
     }
 
     @Test
