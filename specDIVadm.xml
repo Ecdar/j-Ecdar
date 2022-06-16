@@ -1,892 +1,943 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
 <nta>
-  <declaration>chan grant; chan patent; chan i_new; chan pub; chan coin;</declaration>
-  <template>
-    <name>SpecDIVAdministration</name>
-    <declaration>clock u; clock z; clock quo_new;</declaration>
-    <location id="L16DIVL3" x="0" y="0">
-      <name>L16DIVL3</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L16DIVL2" x="0" y="0">
-      <name>L16DIVL2</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L17DIVL2" x="0" y="0">
-      <name>L17DIVL2</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L17DIVL1" x="0" y="0">
-      <name>L17DIVL1</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L16DIVL0" x="0" y="0">
-      <name>L16DIVL0</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L17DIVL0" x="0" y="0">
-      <name>L17DIVL0</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L18DIVL1" x="0" y="0">
-      <name>L18DIVL1</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L18DIVL0" x="0" y="0">
-      <name>L18DIVL0</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L18DIVL3" x="0" y="0">
-      <name>L18DIVL3</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L18DIVL2" x="0" y="0">
-      <name>L18DIVL2</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="univ" x="0" y="0">
-      <name>univ</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="inc" x="0" y="0" color="#A66C0F">
-      <name>inc</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L17DIVL3" x="0" y="0">
-      <name>L17DIVL3</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L16DIVL1" x="0" y="0">
-      <name>L16DIVL1</name>
-      <label kind="invariant">true</label>
-    </location>
-    <init ref="L16DIVL0" />
-    <transition>
-      <source ref="L18DIVL2" />
-      <target ref="L18DIVL2" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="inc" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="L16DIVL0" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment">u = 0</label>
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="L17DIVL2" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL0" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
-      <label kind="assignment">z = 0</label>
-    </transition>
-    <transition>
-      <source ref="L17DIVL2" />
-      <target ref="L17DIVL2" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=2 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment">u = 0</label>
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="L18DIVL2" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L16DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="univ" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L18DIVL3" />
-      <target ref="L18DIVL3" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L16DIVL0" />
-      <target ref="L16DIVL0" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="inc" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">false</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L17DIVL3" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L18DIVL1" />
-      <target ref="L18DIVL1" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="L18DIVL3" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&gt;2 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;0 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="L16DIVL2" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L16DIVL3" />
-      <target ref="L16DIVL3" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL2" />
-      <target ref="inc" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">u&gt;20</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="L18DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&gt;2 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;0 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L16DIVL1" />
-      <target ref="L16DIVL1" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL0" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L17DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="L18DIVL0" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL0" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L18DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL0" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="L18DIVL3" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="L18DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL2" />
-      <target ref="L17DIVL2" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2)</label>
-      <label kind="assignment">u = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L17DIVL2" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
-      <label kind="assignment">z = 0</label>
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="inc" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">false</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="inc" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition>
-      <source ref="L17DIVL0" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L18DIVL2" />
-      <target ref="L18DIVL3" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">z = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L18DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL2" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L18DIVL0" />
-      <target ref="L18DIVL0" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="univ" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL2" />
-      <target ref="L18DIVL2" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">u&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL0" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2)</label>
-      <label kind="assignment">u = 0, z = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L16DIVL2" />
-      <target ref="L16DIVL3" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">z = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L16DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L17DIVL1" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="univ" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="univ" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL2" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="univ" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L17DIVL0" />
-      <target ref="L17DIVL0" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL0" />
-      <target ref="L18DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">u&gt;2</label>
-      <label kind="assignment">z = 0</label>
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="univ" />
-      <target ref="univ" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL0" />
-      <target ref="inc" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">u&gt;20</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="inc" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">quo_new = 0</label>
-    </transition>
-    <transition>
-      <source ref="L17DIVL2" />
-      <target ref="univ" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&lt;=2 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment">u = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L17DIVL3" />
-      <target ref="univ" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">z&gt;2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL0" />
-      <target ref="L18DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">z = 0</label>
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="L16DIVL3" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL3" />
-      <target ref="L16DIVL3" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL2" />
-      <target ref="L16DIVL2" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL2" />
-      <target ref="L16DIVL2" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL2" />
-      <target ref="L17DIVL2" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">u&gt;20</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL2" />
-      <target ref="L17DIVL2" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL2" />
-      <target ref="L17DIVL2" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL1" />
-      <target ref="L17DIVL1" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL0" />
-      <target ref="L16DIVL0" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL0" />
-      <target ref="L17DIVL0" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">u&gt;20</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL0" />
-      <target ref="L17DIVL0" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL0" />
-      <target ref="L17DIVL0" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL1" />
-      <target ref="L18DIVL1" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL0" />
-      <target ref="L18DIVL0" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL0" />
-      <target ref="L18DIVL0" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="L18DIVL3" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL3" />
-      <target ref="L18DIVL3" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL2" />
-      <target ref="L18DIVL2" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L18DIVL2" />
-      <target ref="L18DIVL2" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">quo_new&gt;0</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">patent?</label>
-      <label kind="guard">quo_new&gt;0</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">quo_new&gt;0</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="inc" />
-      <target ref="inc" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">quo_new&gt;0</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">grant?</label>
-      <label kind="guard">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L17DIVL3" />
-      <target ref="L17DIVL3" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L16DIVL1" />
-      <target ref="L16DIVL1" />
-      <label kind="synchronisation">i_new?</label>
-      <label kind="guard">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-  </template>
-  <system>system SpecDIVAdministration;</system>
+	<declaration>chan grant; chan patent; chan i_new; chan pub; chan coin; chan cof; chan tea;</declaration>
+	<template>
+		<name>SpecDIVAdministration</name>
+		<declaration>clock u; clock z; clock quo_new;</declaration>
+		<location id="id0" x="-527" y="93">
+			<name x="-537" y="63">L16DIVL3</name>
+			<label kind="invariant" x="-537" y="108">true</label>
+		</location>
+		<location id="id1" x="-416" y="-170">
+			<name x="-426" y="-200">L16DIVL2</name>
+			<label kind="invariant" x="-426" y="-155">true</label>
+		</location>
+		<location id="id2" x="-51" y="-280">
+			<name x="-61" y="-310">L17DIVL2</name>
+			<label kind="invariant" x="-61" y="-265">true</label>
+		</location>
+		<location id="id3" x="314" y="119">
+			<name x="304" y="89">L17DIVL1</name>
+			<label kind="invariant" x="304" y="134">true</label>
+		</location>
+		<location id="id4" x="221" y="-246">
+			<name x="211" y="-276">L16DIVL0</name>
+			<label kind="invariant" x="211" y="-231">true</label>
+		</location>
+		<location id="id5" x="-297" y="-34">
+			<name x="-307" y="-64">L18DIVL1</name>
+			<label kind="invariant" x="-307" y="-19">true</label>
+		</location>
+		<location id="id6" x="-42" y="-76">
+			<name x="-52" y="-106">L18DIVL0</name>
+			<label kind="invariant" x="-52" y="-61">true</label>
+		</location>
+		<location id="id7" x="-119" y="314">
+			<name x="-129" y="284">L18DIVL3</name>
+			<label kind="invariant" x="-129" y="329">true</label>
+		</location>
+		<location id="id8" x="-272" y="161">
+			<name x="-282" y="131">L18DIVL2</name>
+			<label kind="invariant" x="-282" y="176">true</label>
+		</location>
+		<location id="id9" x="-51" y="93">
+			<name x="-61" y="63">univ</name>
+			<label kind="invariant" x="-61" y="108">true</label>
+		</location>
+		<location id="id10" x="399" y="-93" color="#a66c0f">
+			<name x="389" y="-123">inc</name>
+			<label kind="invariant" x="389" y="-78">true</label>
+		</location>
+		<location id="id11" x="-255" y="-136">
+			<name x="-265" y="-166">L17DIVL3</name>
+			<label kind="invariant" x="-265" y="-121">true</label>
+		</location>
+		<init ref="id4"/>
+		<transition id="id12" controllable="false">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-560" y="144">tea!</label>
+			<nail x="-510" y="170"/>
+			<nail x="-578" y="153"/>
+		</transition>
+		<transition id="id13" controllable="false">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-527" y="110">cof!</label>
+			<nail x="-527" y="161"/>
+			<nail x="-561" y="136"/>
+		</transition>
+		<transition id="id14" controllable="false">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-432" y="-272">tea!</label>
+			<nail x="-450" y="-255"/>
+			<nail x="-348" y="-255"/>
+		</transition>
+		<transition id="id15" controllable="false">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-424" y="-221">cof!</label>
+			<nail x="-433" y="-238"/>
+			<nail x="-382" y="-238"/>
+		</transition>
+		<transition id="id16" controllable="false">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-347" y="-34">tea!</label>
+			<nail x="-314" y="25"/>
+			<nail x="-365" y="0"/>
+		</transition>
+		<transition id="id17" controllable="false">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-301" y="-30">cof!</label>
+			<nail x="-306" y="8"/>
+			<nail x="-340" y="-8"/>
+		</transition>
+		<transition id="id18" controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-271" y="-220">tea!</label>
+			<nail x="-289" y="-195"/>
+			<nail x="-187" y="-212"/>
+		</transition>
+		<transition id="id19" controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-254" y="-208">cof!</label>
+			<nail x="-272" y="-187"/>
+			<nail x="-204" y="-195"/>
+		</transition>
+		<transition id="id20" controllable="false">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-34" y="-271">tea!</label>
+			<nail x="-17" y="-229"/>
+			<nail x="-42" y="-221"/>
+		</transition>
+		<transition id="id21" controllable="false">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-59" y="-267">cof!</label>
+			<nail x="-68" y="-221"/>
+			<nail x="-85" y="-221"/>
+		</transition>
+		<transition id="id22" controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-254" y="135">tea!</label>
+			<nail x="-187" y="144"/>
+			<nail x="-195" y="195"/>
+		</transition>
+		<transition id="id23" controllable="false">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-254" y="140">cof!</label>
+			<nail x="-204" y="153"/>
+			<nail x="-212" y="178"/>
+		</transition>
+		<transition id="id24" controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-24" y="-101">tea!</label>
+			<nail x="34" y="-93"/>
+			<nail x="0" y="-42"/>
+		</transition>
+		<transition id="id25" controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-30" y="-85">cof!</label>
+			<nail x="17" y="-85"/>
+			<nail x="0" y="-51"/>
+		</transition>
+		<transition id="id26" controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-21" y="131">tea!</label>
+			<nail x="8" y="119"/>
+			<nail x="-51" y="178"/>
+		</transition>
+		<transition id="id27" controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-46" y="106">cof!</label>
+			<nail x="-8" y="119"/>
+			<nail x="-42" y="153"/>
+		</transition>
+		<transition id="id28" controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-101" y="297">cof!</label>
+			<nail x="-42" y="314"/>
+			<nail x="-59" y="365"/>
+		</transition>
+		<transition id="id29" controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-177" y="314">tea!</label>
+			<nail x="-153" y="374"/>
+			<nail x="-195" y="348"/>
+		</transition>
+		<transition id="id30" controllable="false">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="239" y="-276">tea!</label>
+			<nail x="331" y="-272"/>
+			<nail x="314" y="-212"/>
+		</transition>
+		<transition id="id31" controllable="false">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="239" y="-254">cof!</label>
+			<nail x="238" y="-246"/>
+			<nail x="297" y="-255"/>
+			<nail x="289" y="-229"/>
+		</transition>
+		<transition id="id32" controllable="false">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="256" y="152">tea!</label>
+			<nail x="314" y="178"/>
+			<nail x="238" y="161"/>
+		</transition>
+		<transition id="id33" controllable="false">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="365" y="127">cof!</label>
+			<nail x="374" y="119"/>
+			<nail x="357" y="170"/>
+		</transition>
+		<transition id="id34" controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="417" y="-127">tea!</label>
+			<nail x="476" y="-127"/>
+			<nail x="476" y="-68"/>
+		</transition>
+		<transition id="id35" controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="411" y="-89">cof!</label>
+			<nail x="450" y="-102"/>
+			<nail x="450" y="-76"/>
+		</transition>
+		<transition id="id36">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-332" y="131">true</label>
+			<label kind="synchronisation" x="-332" y="146">grant?</label>
+			<nail x="-302" y="131"/>
+			<nail x="-242" y="131"/>
+		</transition>
+		<transition id="id37">
+			<source ref="id11"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-60" y="-30">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+			<label kind="assignment" x="-60" y="0">quo_new = 0</label>
+		</transition>
+		<transition id="id38">
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id39">
+			<source ref="id11"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-60" y="-30">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+			<label kind="assignment" x="-60" y="0">u = 0</label>
+		</transition>
+		<transition id="id40">
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id41">
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-60" y="-30">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id42">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-111" y="-310">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
+			<label kind="synchronisation" x="-85" y="-357">grant?</label>
+			<nail x="-81" y="-310"/>
+			<nail x="-21" y="-310"/>
+		</transition>
+		<transition id="id43">
+			<source ref="id0"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-60" y="-30">(u&lt;=2 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+			<label kind="assignment" x="-60" y="0">u = 0</label>
+		</transition>
+		<transition id="id44">
+			<source ref="id5"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-60" y="-30">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id45" controllable="false">
+			<source ref="id0"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+		</transition>
+		<transition id="id46">
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id47">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
+			<label kind="synchronisation" x="339" y="-108">grant?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id48">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-111" y="63">true</label>
+			<label kind="synchronisation" x="-111" y="78">patent?</label>
+			<nail x="-81" y="63"/>
+			<nail x="-21" y="63"/>
+		</transition>
+		<transition id="id49" controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-179" y="284">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-179" y="299">pub!</label>
+			<nail x="-149" y="284"/>
+			<nail x="-89" y="284"/>
+		</transition>
+		<transition id="id50">
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+		</transition>
+		<transition id="id51" controllable="false">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="guard" x="161" y="-276">true</label>
+			<label kind="synchronisation" x="187" y="-297">pub!</label>
+			<nail x="191" y="-276"/>
+			<nail x="251" y="-276"/>
+		</transition>
+		<transition id="id52">
+			<source ref="id7"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-60" y="-30">false</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+			<label kind="assignment" x="-60" y="0">quo_new = 0</label>
+		</transition>
+		<transition id="id53" controllable="false">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-315" y="-166">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-315" y="-151">pub!</label>
+			<nail x="-285" y="-166"/>
+			<nail x="-225" y="-166"/>
+		</transition>
+		<transition id="id54" controllable="false">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-357" y="-64">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-357" y="-49">pub!</label>
+			<nail x="-327" y="-64"/>
+			<nail x="-267" y="-64"/>
+		</transition>
+		<transition id="id55">
+			<source ref="id0"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-60" y="-30">(u&gt;2 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;0 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id56">
+			<source ref="id3"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id57">
+			<source ref="id3"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id58" controllable="false">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-587" y="63">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-587" y="78">pub!</label>
+			<nail x="-557" y="63"/>
+			<nail x="-497" y="63"/>
+		</transition>
+		<transition id="id59">
+			<source ref="id3"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id60">
+			<source ref="id2"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-60" y="-30">u&gt;20</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+			<label kind="assignment" x="-60" y="0">quo_new = 0</label>
+		</transition>
+		<transition id="id61">
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id62">
+			<source ref="id4"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id63" controllable="false">
+			<source ref="id3"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+		</transition>
+		<transition id="id64">
+			<source ref="id7"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-60" y="-30">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id65">
+			<source ref="id4"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id66">
+			<source ref="id3"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+		</transition>
+		<transition id="id67" controllable="false">
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+		</transition>
+		<transition id="id68">
+			<source ref="id6"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id69">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-179" y="284">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-179" y="299">grant?</label>
+			<nail x="-149" y="284"/>
+			<nail x="-89" y="284"/>
+		</transition>
+		<transition id="id70">
+			<source ref="id0"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id71">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-315" y="-166">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-315" y="-151">grant?</label>
+			<nail x="-285" y="-166"/>
+			<nail x="-225" y="-166"/>
+		</transition>
+		<transition id="id72">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-357" y="-64">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-357" y="-49">grant?</label>
+			<nail x="-327" y="-64"/>
+			<nail x="-267" y="-64"/>
+		</transition>
+		<transition id="id73">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-60" y="-30">(u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+			<label kind="assignment" x="-60" y="0">u = 0</label>
+		</transition>
+		<transition id="id74" controllable="false">
+			<source ref="id2"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-60" y="-30">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">z = 0</label>
+		</transition>
+		<transition id="id75">
+			<source ref="id11"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-60" y="-30">false</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+			<label kind="assignment" x="-60" y="0">quo_new = 0</label>
+		</transition>
+		<transition id="id76">
+			<source ref="id3"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-60" y="-30">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+			<label kind="assignment" x="-60" y="0">quo_new = 0</label>
+		</transition>
+		<transition id="id77" controllable="false">
+			<source ref="id8"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">z = 0</label>
+		</transition>
+		<transition id="id78" controllable="false">
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+		</transition>
+		<transition id="id79">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="254" y="89">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="254" y="104">grant?</label>
+			<nail x="284" y="89"/>
+			<nail x="344" y="89"/>
+		</transition>
+		<transition id="id80">
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id81">
+			<source ref="id1"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id82">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
+			<label kind="synchronisation" x="339" y="-108">coin?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id83">
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id84">
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id85">
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+		</transition>
+		<transition id="id86">
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id87">
+			<source ref="id3"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id88" controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-102" y="-106">true</label>
+			<label kind="synchronisation" x="-102" y="-91">pub!</label>
+			<nail x="-72" y="-106"/>
+			<nail x="-12" y="-106"/>
+		</transition>
+		<transition id="id89">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
+			<label kind="synchronisation" x="339" y="-108">patent?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id90">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-111" y="63">true</label>
+			<label kind="synchronisation" x="-111" y="78">grant?</label>
+			<nail x="-81" y="63"/>
+			<nail x="-21" y="63"/>
+		</transition>
+		<transition id="id91">
+			<source ref="id1"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-60" y="-30">u&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id92">
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id93">
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-60" y="-30">(u&lt;=2 &amp;&amp; u-z&lt;=2 &amp;&amp; u-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+			<label kind="assignment" x="-60" y="0">u = 0, z = 0</label>
+		</transition>
+		<transition id="id94" controllable="false">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">z = 0</label>
+		</transition>
+		<transition id="id95">
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+		</transition>
+		<transition id="id96">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">(quo_new==0 &amp;&amp; quo_new-u&lt;=0 &amp;&amp; quo_new-z&lt;=0)</label>
+			<label kind="synchronisation" x="339" y="-108">i_new?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id97" controllable="false">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="254" y="89">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="254" y="104">pub!</label>
+			<nail x="284" y="89"/>
+			<nail x="344" y="89"/>
+		</transition>
+		<transition id="id98">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-111" y="63">true</label>
+			<label kind="synchronisation" x="-111" y="78">i_new?</label>
+			<nail x="-81" y="63"/>
+			<nail x="-21" y="63"/>
+		</transition>
+		<transition id="id99">
+			<source ref="id0"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+		</transition>
+		<transition id="id100">
+			<source ref="id5"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+		</transition>
+		<transition id="id101">
+			<source ref="id0"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id102">
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id103" controllable="false">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-111" y="63">true</label>
+			<label kind="synchronisation" x="-111" y="78">pub!</label>
+			<nail x="-81" y="63"/>
+			<nail x="-21" y="63"/>
+		</transition>
+		<transition id="id104">
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-60" y="-30">u&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+			<label kind="assignment" x="-60" y="0">z = 0</label>
+		</transition>
+		<transition id="id105">
+			<source ref="id0"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">i_new?</label>
+		</transition>
+		<transition id="id106">
+			<source ref="id9"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-111" y="63">true</label>
+			<label kind="synchronisation" x="-111" y="78">coin?</label>
+			<nail x="-81" y="63"/>
+			<nail x="-21" y="63"/>
+		</transition>
+		<transition id="id107">
+			<source ref="id0"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+			<label kind="assignment" x="-60" y="0">quo_new = 0</label>
+		</transition>
+		<transition id="id108">
+			<source ref="id2"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">patent?</label>
+		</transition>
+		<transition id="id109" controllable="false">
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-60" y="-30">z&gt;2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+		</transition>
+		<transition id="id110">
+			<source ref="id6"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">grant?</label>
+			<label kind="assignment" x="-60" y="0">z = 0</label>
+		</transition>
+		<transition id="id111">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-587" y="63">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-587" y="78">i_new?</label>
+			<nail x="-557" y="63"/>
+			<nail x="-497" y="63"/>
+		</transition>
+		<transition id="id112">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-587" y="63">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-587" y="78">coin?</label>
+			<nail x="-557" y="63"/>
+			<nail x="-497" y="63"/>
+		</transition>
+		<transition id="id113">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-476" y="-200">true</label>
+			<label kind="synchronisation" x="-476" y="-185">i_new?</label>
+			<nail x="-446" y="-200"/>
+			<nail x="-386" y="-200"/>
+		</transition>
+		<transition id="id114">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-476" y="-200">true</label>
+			<label kind="synchronisation" x="-476" y="-185">coin?</label>
+			<nail x="-446" y="-200"/>
+			<nail x="-386" y="-200"/>
+		</transition>
+		<transition id="id115">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-111" y="-310">u&gt;20</label>
+			<label kind="synchronisation" x="-128" y="-340">grant?</label>
+			<nail x="-81" y="-310"/>
+			<nail x="-21" y="-310"/>
+		</transition>
+		<transition id="id116">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-111" y="-310">(u&lt;=20 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20)</label>
+			<label kind="synchronisation" x="-68" y="-340">i_new?</label>
+			<nail x="-81" y="-310"/>
+			<nail x="-21" y="-310"/>
+		</transition>
+		<transition id="id117">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-111" y="-310">true</label>
+			<label kind="synchronisation" x="-136" y="-323">coin?</label>
+			<nail x="-81" y="-310"/>
+			<nail x="-21" y="-310"/>
+		</transition>
+		<transition id="id118">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="254" y="89">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="254" y="104">grant?</label>
+			<nail x="284" y="89"/>
+			<nail x="344" y="89"/>
+		</transition>
+		<transition id="id119">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="254" y="89">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="254" y="104">i_new?</label>
+			<nail x="284" y="89"/>
+			<nail x="344" y="89"/>
+		</transition>
+		<transition id="id120">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="254" y="89">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="254" y="104">coin?</label>
+			<nail x="284" y="89"/>
+			<nail x="344" y="89"/>
+		</transition>
+		<transition id="id121">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="guard" x="161" y="-276">true</label>
+			<label kind="synchronisation" x="93" y="-280">i_new?</label>
+			<nail x="191" y="-276"/>
+			<nail x="251" y="-276"/>
+		</transition>
+		<transition id="id122">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-357" y="-64">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-357" y="-49">i_new?</label>
+			<nail x="-327" y="-64"/>
+			<nail x="-267" y="-64"/>
+		</transition>
+		<transition id="id123">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-102" y="-106">true</label>
+			<label kind="synchronisation" x="-102" y="-91">i_new?</label>
+			<nail x="-72" y="-106"/>
+			<nail x="-12" y="-106"/>
+		</transition>
+		<transition id="id124">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-102" y="-106">true</label>
+			<label kind="synchronisation" x="-102" y="-91">coin?</label>
+			<nail x="-72" y="-106"/>
+			<nail x="-12" y="-106"/>
+		</transition>
+		<transition id="id125">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-179" y="284">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-179" y="299">i_new?</label>
+			<nail x="-149" y="284"/>
+			<nail x="-89" y="284"/>
+		</transition>
+		<transition id="id126">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-179" y="284">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-179" y="299">coin?</label>
+			<nail x="-149" y="284"/>
+			<nail x="-89" y="284"/>
+		</transition>
+		<transition id="id127">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-332" y="131">true</label>
+			<label kind="synchronisation" x="-332" y="146">i_new?</label>
+			<nail x="-302" y="131"/>
+			<nail x="-242" y="131"/>
+		</transition>
+		<transition id="id128">
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-332" y="131">true</label>
+			<label kind="synchronisation" x="-332" y="146">coin?</label>
+			<nail x="-302" y="131"/>
+			<nail x="-242" y="131"/>
+		</transition>
+		<transition id="id129">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">quo_new&gt;0</label>
+			<label kind="synchronisation" x="339" y="-108">grant?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id130">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">quo_new&gt;0</label>
+			<label kind="synchronisation" x="339" y="-108">patent?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id131">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">quo_new&gt;0</label>
+			<label kind="synchronisation" x="339" y="-108">i_new?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id132">
+			<source ref="id10"/>
+			<target ref="id10"/>
+			<label kind="guard" x="339" y="-123">quo_new&gt;0</label>
+			<label kind="synchronisation" x="339" y="-108">coin?</label>
+			<nail x="369" y="-123"/>
+			<nail x="429" y="-123"/>
+		</transition>
+		<transition id="id133">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-315" y="-166">(u&gt;20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;-18 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-315" y="-151">grant?</label>
+			<nail x="-285" y="-166"/>
+			<nail x="-225" y="-166"/>
+		</transition>
+		<transition id="id134">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-315" y="-166">(u&lt;=20 &amp;&amp; z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; u-z&lt;=20 &amp;&amp; u-quo_new&lt;=20 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-315" y="-151">i_new?</label>
+			<nail x="-285" y="-166"/>
+			<nail x="-225" y="-166"/>
+		</transition>
+		<transition id="id135">
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-315" y="-166">(z&lt;=2 &amp;&amp; z-u&lt;=2 &amp;&amp; z-quo_new&lt;=2)</label>
+			<label kind="synchronisation" x="-315" y="-151">coin?</label>
+			<nail x="-285" y="-166"/>
+			<nail x="-225" y="-166"/>
+		</transition>
+	</template>
+	<system>system SpecDIVAdministration;</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
 </nta>

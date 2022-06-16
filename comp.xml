@@ -1,238 +1,418 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
 <nta>
-  <declaration>chan cof; chan pub; chan coin; chan tea;</declaration>
-  <template>
-    <name>Machine | Researcher</name>
-    <declaration>clock y; clock x;</declaration>
-    <location id="L5L6" x="0" y="0">
-      <name>L5L6</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L5L7" x="0" y="0">
-      <name>L5L7</name>
-      <label kind="invariant">(x&lt;=8 &amp;&amp; x-y&lt;=8)</label>
-    </location>
-    <location id="L5U0" x="0" y="0">
-      <name>L5U0</name>
-      <label kind="invariant">true</label>
-    </location>
-    <location id="L4L9" x="0" y="0">
-      <name>L4L9</name>
-      <label kind="invariant">(y&lt;=6 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=4 &amp;&amp; y-x&lt;=6)</label>
-    </location>
-    <location id="L4L7" x="0" y="0">
-      <name>L4L7</name>
-      <label kind="invariant">(y&lt;=6 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=8 &amp;&amp; y-x&lt;=6)</label>
-    </location>
-    <location id="L4U0" x="0" y="0">
-      <name>L4U0</name>
-      <label kind="invariant">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
-    </location>
-    <location id="L4L6" x="0" y="0">
-      <name>L4L6</name>
-      <label kind="invariant">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
-    </location>
-    <location id="L5L9" x="0" y="0">
-      <name>L5L9</name>
-      <label kind="invariant">(x&lt;=4 &amp;&amp; x-y&lt;=4)</label>
-    </location>
-    <init ref="L5L6" />
-    <transition>
-      <source ref="L5L6" />
-      <target ref="L4L6" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">y = 0</label>
-    </transition>
-    <transition>
-      <source ref="L5L9" />
-      <target ref="L4L9" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">y = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L5L9" />
-      <target ref="L5L9" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(y&gt;=2 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=2)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L9" />
-      <target ref="L5L9" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(x&lt;=4 &amp;&amp; x-y&lt;=4)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L4L6" />
-      <target ref="L4L6" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L4U0" />
-      <target ref="L4U0" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L4L7" />
-      <target ref="L4L7" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L9" />
-      <target ref="L5L9" />
-      <label kind="synchronisation">cof!</label>
-      <label kind="guard">(y&gt;=4 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=0)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L5L6" />
-      <target ref="L5L7" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(y&gt;=2 &amp;&amp; x&lt;=15 &amp;&amp; x-y&lt;=13)</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L7" />
-      <target ref="L5L7" />
-      <label kind="synchronisation">cof!</label>
-      <label kind="guard">(y&gt;=4 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=4)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L5L7" />
-      <target ref="L5L6" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">x&gt;=4</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4U0" />
-      <target ref="L5U0" />
-      <label kind="synchronisation">cof!</label>
-      <label kind="guard">y&gt;=4</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L9" />
-      <target ref="L4L6" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">x&gt;=2</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L6" />
-      <target ref="L5U0" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">x&gt;15</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L5L9" />
-      <target ref="L5L6" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">x&gt;=2</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L7" />
-      <target ref="L4L6" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">x&gt;=4</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L7" />
-      <target ref="L5L7" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(x&lt;=8 &amp;&amp; x-y&lt;=8)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L4U0" />
-      <target ref="L4U0" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L5L7" />
-      <target ref="L5L7" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(y&gt;=2 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=6)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L5L7" />
-      <target ref="L4L7" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">y = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L6" />
-      <target ref="L5L9" />
-      <label kind="synchronisation">cof!</label>
-      <label kind="guard">y&gt;=4</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L5L6" />
-      <target ref="L5U0" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(y&gt;=2 &amp;&amp; x&gt;15)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L5U0" />
-      <target ref="L4U0" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">true</label>
-      <label kind="assignment">y = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L5U0" />
-      <target ref="L5U0" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">y&gt;=2</label>
-      <label kind="assignment" />
-    </transition>
-    <transition>
-      <source ref="L4L9" />
-      <target ref="L4L9" />
-      <label kind="synchronisation">coin?</label>
-      <label kind="guard">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L4L6" />
-      <target ref="L5L7" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">(x&lt;=15 &amp;&amp; x-y&lt;=15)</label>
-      <label kind="assignment">x = 0</label>
-    </transition>
-    <transition controllable="false">
-      <source ref="L4U0" />
-      <target ref="L5U0" />
-      <label kind="synchronisation">tea!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-    <transition controllable="false">
-      <source ref="L5U0" />
-      <target ref="L5U0" />
-      <label kind="synchronisation">pub!</label>
-      <label kind="guard">true</label>
-      <label kind="assignment" />
-    </transition>
-  </template>
-  <system>system Machine | Researcher;</system>
+	<declaration>chan cof; chan pub; chan coin; chan tea; chan i_new; chan grant; chan patent;</declaration>
+	<template>
+		<name>Machine | Researcher</name>
+		<declaration>clock y; clock x;</declaration>
+		<location id="id0" x="8" y="-153">
+			<name x="-2" y="-183">L5L6</name>
+			<label kind="invariant" x="-2" y="-138">true</label>
+		</location>
+		<location id="id1" x="-110" y="-8">
+			<name x="-120" y="-38">L5L7</name>
+			<label kind="invariant" x="-120" y="7">(x&lt;=8 &amp;&amp; x-y&lt;=8)</label>
+		</location>
+		<location id="id2" x="255" y="-144">
+			<name x="245" y="-174">L5U0</name>
+			<label kind="invariant" x="245" y="-129">true</label>
+		</location>
+		<location id="id3" x="272" y="144">
+			<name x="262" y="114">L4L9</name>
+			<label kind="invariant" x="262" y="159">(y&lt;=6 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=4 &amp;&amp; y-x&lt;=6)</label>
+		</location>
+		<location id="id4" x="-153" y="85">
+			<name x="-163" y="55">L4L7</name>
+			<label kind="invariant" x="-163" y="100">(y&lt;=6 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=8 &amp;&amp; y-x&lt;=6)</label>
+		</location>
+		<location id="id5" x="391" y="-144">
+			<name x="381" y="-174">L4U0</name>
+			<label kind="invariant" x="381" y="-129">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+		</location>
+		<location id="id6" x="280" y="8">
+			<name x="270" y="-22">L4L6</name>
+			<label kind="invariant" x="289" y="8">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+		</location>
+		<location id="id7" x="-17" y="153">
+			<name x="-27" y="123">L5L9</name>
+			<label kind="invariant" x="-27" y="168">(x&lt;=4 &amp;&amp; x-y&lt;=4)</label>
+		</location>
+		<init ref="id0"/>
+		<transition id="id8">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="369" y="-140">patent?</label>
+			<nail x="348" y="-102"/>
+			<nail x="331" y="-127"/>
+		</transition>
+		<transition id="id9">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="255" y="-186">patent?</label>
+			<nail x="255" y="-195"/>
+			<nail x="204" y="-204"/>
+		</transition>
+		<transition id="id10">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="298" y="-17">patent?</label>
+			<nail x="357" y="-8"/>
+			<nail x="357" y="51"/>
+		</transition>
+		<transition id="id11">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="284" y="130">patent?</label>
+			<nail x="331" y="127"/>
+			<nail x="331" y="153"/>
+		</transition>
+		<transition id="id12">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-25" y="157">patent?</label>
+			<nail x="17" y="187"/>
+			<nail x="-34" y="195"/>
+		</transition>
+		<transition id="id13">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-136" y="97">patent?</label>
+			<nail x="-119" y="144"/>
+			<nail x="-153" y="144"/>
+		</transition>
+		<transition id="id14">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-177" y="-38">patent?</label>
+			<nail x="-195" y="-34"/>
+			<nail x="-161" y="-51"/>
+		</transition>
+		<transition id="id15">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-75" y="-161">patent?</label>
+			<nail x="-93" y="-136"/>
+			<nail x="-51" y="-221"/>
+		</transition>
+		<transition id="id16">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="408" y="-131">grant?</label>
+			<nail x="425" y="-85"/>
+			<nail x="391" y="-93"/>
+		</transition>
+		<transition id="id17">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="171" y="-119">grant?</label>
+			<nail x="246" y="-102"/>
+			<nail x="153" y="-102"/>
+		</transition>
+		<transition id="id18">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="271" y="21">grant?</label>
+			<nail x="263" y="68"/>
+			<nail x="221" y="59"/>
+		</transition>
+		<transition id="id19">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="213" y="140">grant?</label>
+			<nail x="238" y="178"/>
+			<nail x="195" y="170"/>
+		</transition>
+		<transition id="id20">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-75" y="131">grant?</label>
+			<nail x="-59" y="178"/>
+			<nail x="-93" y="144"/>
+		</transition>
+		<transition id="id21">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-203" y="76">grant?</label>
+			<nail x="-178" y="136"/>
+			<nail x="-221" y="102"/>
+		</transition>
+		<transition id="id22">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-127" y="-55">grant?</label>
+			<nail x="-144" y="-68"/>
+			<nail x="-85" y="-68"/>
+		</transition>
+		<transition id="id23">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-67" y="-165">grant?</label>
+			<nail x="-85" y="-144"/>
+			<nail x="-51" y="-204"/>
+		</transition>
+		<transition id="id24">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="403" y="-153">i_new?</label>
+			<nail x="442" y="-153"/>
+			<nail x="442" y="-136"/>
+		</transition>
+		<transition id="id25">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="238" y="-140">i_new?</label>
+			<nail x="221" y="-102"/>
+			<nail x="204" y="-119"/>
+		</transition>
+		<transition id="id26">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="271" y="12">i_new?</label>
+			<nail x="263" y="51"/>
+			<nail x="246" y="42"/>
+		</transition>
+		<transition id="id27">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="233" y="147">i_new?</label>
+			<nail x="246" y="170"/>
+			<nail x="221" y="161"/>
+		</transition>
+		<transition id="id28">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-64" y="152">i_new?</label>
+			<nail x="-51" y="178"/>
+			<nail x="-76" y="161"/>
+		</transition>
+		<transition id="id29">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-192" y="92">i_new?</label>
+			<nail x="-178" y="119"/>
+			<nail x="-204" y="110"/>
+		</transition>
+		<transition id="id30">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-118" y="-46">i_new?</label>
+			<nail x="-127" y="-51"/>
+			<nail x="-102" y="-51"/>
+		</transition>
+		<transition id="id31">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-50" y="-170">i_new?</label>
+			<nail x="-68" y="-153"/>
+			<nail x="-51" y="-187"/>
+		</transition>
+		<transition id="id32">
+			<source ref="id0"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+			<label kind="assignment" x="-60" y="0">y = 0</label>
+		</transition>
+		<transition id="id33">
+			<source ref="id7"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+			<label kind="assignment" x="-60" y="0">y = 0</label>
+		</transition>
+		<transition id="id34" controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-77" y="123">(y&gt;=2 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=2)</label>
+			<label kind="synchronisation" x="-77" y="138">tea!</label>
+			<nail x="-47" y="123"/>
+			<nail x="13" y="123"/>
+		</transition>
+		<transition id="id35" controllable="false">
+			<source ref="id3"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-60" y="-30">(x&lt;=4 &amp;&amp; x-y&lt;=4)</label>
+			<label kind="synchronisation" x="-60" y="-15">tea!</label>
+		</transition>
+		<transition id="id36">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="guard" x="220" y="-22">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+			<label kind="synchronisation" x="220" y="-7">coin?</label>
+			<nail x="250" y="-22"/>
+			<nail x="310" y="-22"/>
+		</transition>
+		<transition id="id37">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="331" y="-174">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+			<label kind="synchronisation" x="331" y="-159">coin?</label>
+			<nail x="361" y="-174"/>
+			<nail x="421" y="-174"/>
+		</transition>
+		<transition id="id38">
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-213" y="55">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+			<label kind="synchronisation" x="-213" y="70">coin?</label>
+			<nail x="-183" y="55"/>
+			<nail x="-123" y="55"/>
+		</transition>
+		<transition id="id39" controllable="false">
+			<source ref="id3"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-60" y="-30">(y&gt;=4 &amp;&amp; x&lt;=4 &amp;&amp; x-y&lt;=0)</label>
+			<label kind="synchronisation" x="-60" y="-15">cof!</label>
+		</transition>
+		<transition id="id40" controllable="false">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-382" y="-136">(y&gt;=2 &amp;&amp; x&lt;=15 &amp;&amp; x-y&lt;=13)</label>
+			<label kind="synchronisation" x="-60" y="-15">tea!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id41" controllable="false">
+			<source ref="id4"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-60" y="-30">(y&gt;=4 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=4)</label>
+			<label kind="synchronisation" x="-60" y="-15">cof!</label>
+		</transition>
+		<transition id="id42" controllable="false">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-60" y="-30">x&gt;=4</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id43" controllable="false">
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-60" y="-30">y&gt;=4</label>
+			<label kind="synchronisation" x="-60" y="-15">cof!</label>
+		</transition>
+		<transition id="id44" controllable="false">
+			<source ref="id3"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-60" y="-30">x&gt;=2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id45" controllable="false">
+			<source ref="id6"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-60" y="-30">x&gt;15</label>
+			<label kind="synchronisation" x="-60" y="-15">tea!</label>
+		</transition>
+		<transition id="id46" controllable="false">
+			<source ref="id7"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-60" y="-30">x&gt;=2</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id47" controllable="false">
+			<source ref="id4"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-60" y="-30">x&gt;=4</label>
+			<label kind="synchronisation" x="-60" y="-15">pub!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id48" controllable="false">
+			<source ref="id4"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-60" y="-30">(x&lt;=8 &amp;&amp; x-y&lt;=8)</label>
+			<label kind="synchronisation" x="-60" y="-15">tea!</label>
+		</transition>
+		<transition id="id49" controllable="false">
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="331" y="-174">true</label>
+			<label kind="synchronisation" x="331" y="-159">pub!</label>
+			<nail x="361" y="-174"/>
+			<nail x="421" y="-174"/>
+		</transition>
+		<transition id="id50" controllable="false">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-433" y="0">(y&gt;=2 &amp;&amp; x&lt;=8 &amp;&amp; x-y&lt;=6)</label>
+			<label kind="synchronisation" x="-314" y="17">tea!</label>
+			<nail x="-272" y="-17"/>
+			<nail x="-267" y="34"/>
+		</transition>
+		<transition id="id51">
+			<source ref="id1"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-60" y="-30">true</label>
+			<label kind="synchronisation" x="-60" y="-15">coin?</label>
+			<label kind="assignment" x="-60" y="0">y = 0</label>
+		</transition>
+		<transition id="id52" controllable="false">
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-60" y="-30">y&gt;=4</label>
+			<label kind="synchronisation" x="-60" y="-15">cof!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id53" controllable="false">
+			<source ref="id0"/>
+			<target ref="id2"/>
+			<label kind="guard" x="68" y="-178">(y&gt;=2 &amp;&amp; x&gt;15)</label>
+			<label kind="synchronisation" x="110" y="-161">tea!</label>
+			<nail x="136" y="-136"/>
+		</transition>
+		<transition id="id54">
+			<source ref="id2"/>
+			<target ref="id5"/>
+			<label kind="guard" x="280" y="-212">true</label>
+			<label kind="synchronisation" x="340" y="-212">coin?</label>
+			<label kind="assignment" x="306" y="-221">y = 0</label>
+			<nail x="323" y="-204"/>
+		</transition>
+		<transition id="id55" controllable="false">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="guard" x="195" y="-174">y&gt;=2</label>
+			<label kind="synchronisation" x="195" y="-159">tea!</label>
+			<nail x="225" y="-174"/>
+			<nail x="285" y="-174"/>
+		</transition>
+		<transition id="id56">
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="212" y="114">(y&lt;=6 &amp;&amp; y-x&lt;=6)</label>
+			<label kind="synchronisation" x="212" y="129">coin?</label>
+			<nail x="242" y="114"/>
+			<nail x="302" y="114"/>
+		</transition>
+		<transition id="id57" controllable="false">
+			<source ref="id6"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-60" y="-30">(x&lt;=15 &amp;&amp; x-y&lt;=15)</label>
+			<label kind="synchronisation" x="-60" y="-15">tea!</label>
+			<label kind="assignment" x="-60" y="0">x = 0</label>
+		</transition>
+		<transition id="id58" controllable="false">
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="guard" x="314" y="-93">true</label>
+			<label kind="synchronisation" x="348" y="-76">tea!</label>
+			<nail x="357" y="-85"/>
+			<nail x="306" y="-102"/>
+		</transition>
+		<transition id="id59" controllable="false">
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="guard" x="195" y="-174">true</label>
+			<label kind="synchronisation" x="195" y="-159">pub!</label>
+			<nail x="225" y="-174"/>
+			<nail x="285" y="-174"/>
+		</transition>
+	</template>
+	<system>system Machine | Researcher;</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
 </nta>

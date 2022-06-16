@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
+<nta>
+	<declaration>chan b;</declaration>
+	<template>
+		<name x="5" y="5">Univ</name>
+		<declaration>// Place local declarations here.
+clock x;</declaration>
+		<location id="id0" x="0" y="0">
+			<name x="25" y="-8">Right</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id1">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="1" y="-76">b?</label>
+			<nail x="-34" y="-51"/>
+			<nail x="25" y="-51"/>
+		</transition>
+	</template>
+	<system>system Univ;
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>
