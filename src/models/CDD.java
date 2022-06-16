@@ -589,6 +589,20 @@ public class CDD {
         else return false;
     }
 
+    public Federation toFederation() // TODO: does not in any way take care of BDD parts (might run endless for BCDDs?)
+    {
+        List<Zone> zoneList = new ArrayList<>();
+        CDD copy = new CDD(this.pointer);
+        while (!copy.isTerminal()) {
+            copy = copy.reduce().removeNegative();
+            CddExtractionResult res = copy.extractBddAndDbm();
+            copy = res.getCddPart().reduce().removeNegative();
+            Zone z = new Zone(res.getDbm());
+            zoneList.add(z);
+        }
+        Federation fed = new Federation(zoneList);
+        return fed;
+    }
 
     public static boolean isSubset(CDD A, CDD B) { // A (= B
 //        System.out.println("A : " + CDD.toGuardList(A,clocks));

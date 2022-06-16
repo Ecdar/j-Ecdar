@@ -85,9 +85,10 @@ public class Refinement {
         // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
         // with the exception that the left side is allowed to have more outputs
 
-        // inputs on the left must be equal to inputs on the right side
+        // inputs on the right must contain all inputs on the left side
         if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
+            errMsg.append(inputs2 + " <--> " + inputs1 + "\n");
             errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
         }
 
@@ -199,7 +200,7 @@ public class Refinement {
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
-                assert(false); // assuming everything is input enabled
+                //assert(false); // assuming everything is input enabled
                 System.out.println("Input violation");
                 CDD.done();
                 return false;
@@ -224,7 +225,7 @@ public class Refinement {
     private boolean checkDelay(State leftState, State rightState)
     {
         assert (leftState.getCDD().equiv(rightState.getCDD()));
-        CDD currentStateCDD = leftState.getCDD();
+        CDD currentStateCDD = new CDD(leftState.getCDD().getPointer()); //TODO: is the explicit new needed?
         currentStateCDD=currentStateCDD.delay();
 
         CDD leftPart = currentStateCDD.conjunction(leftState.getInvarCDDDirectlyFromInvariants());
@@ -313,7 +314,7 @@ public class Refinement {
 //            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
             System.out.println(leftCDD);
             System.out.println(rightCDD);
-            System.out.println(leftCDD.minus(rightCDD));
+            System.out.println(rightCDD.minus(leftCDD));
             return false;
         }
 
@@ -322,17 +323,20 @@ public class Refinement {
                 StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null) {
                     pairFound = true;
-                    if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)  ) {
 
-                        waiting.add(pair);
-                        if (RET_REF) {
-                            currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
-                        }
-                    } else {
-                        if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
-                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), (pair.getLeft().getCDD()));
-                            currNode.addSuccessor(edge);
-                            supersetNode.addPredecessor(edge);
+                    //if (!pair.getRight().getLocation().getIsUniversal())
+                    {
+                        if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
+                            waiting.add(pair);
+                            if (RET_REF) {
+                                currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
+                            }
+                        } else {
+                            if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
+                                GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), (pair.getLeft().getCDD()));
+                                currNode.addSuccessor(edge);
+                                supersetNode.addPredecessor(edge);
+                            }
                         }
                     }
                 }
@@ -402,12 +406,22 @@ public class Refinement {
 
     private boolean passedContainsStatePair(StatePair pair) {
         LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
-
+        System.out.println("-" + pair.toString().substring(0,pair.toString().indexOf(")")));
         if (passed.containsKey(locPair)) {
+            System.out.println("+");
             if (CDD.isSubset(pair.getRight().getCDD(),passed.get(locPair).getRight().getCDD()))
                 return true;
             if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
                 assert(false); // left and right side are supposed to be identical at all times, so this should not be reachable
+            /*if (pair.getRight().getCDD().toFederation().isSubset(passed.get(locPair).getRight().getCDD().toFederation()))
+            {
+                assert(false);
+            }*/
+        }
+
+        if (pair.toString().contains("L=([L5, L0], [L16, L6])")) {
+            System.out.println("NEW STATE IN PASSED");
+            System.out.println(pair.getLeft());
         }
         return false;
     }
@@ -434,6 +448,10 @@ public class Refinement {
                         CDD.isSubset(currRight.getCDD(),passedRight.getCDD())) {
                     supersetNode = state.getNode();
                     return true;
+                }
+                if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
+                {
+                    assert(false);
                 }
             }
         }

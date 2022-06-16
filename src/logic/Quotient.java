@@ -26,6 +26,8 @@ public class Quotient extends TransitionSystem {
     private final Channel newChan;
     private Clock newClock;
     private boolean printComments = false;
+    SymbolicLocation univ = new UniversalLocation();
+    SymbolicLocation inc = new InconsistentLocation();
 
     public Quotient(TransitionSystem left, TransitionSystem right) {
         this.left = left;
@@ -59,12 +61,13 @@ public class Quotient extends TransitionSystem {
         outputs.removeAll(outputsOfComp);
         outputs.addAll(inputsOfCompMinusInputsOfSpec);
 
+        printComments =true;
         if (printComments)
             System.out.println("ts1.in = " + left.getInputs() + ", ts1.out = " + left.getOutputs());
         if (printComments)
             System.out.println("ts2.in = " + right.getInputs() + ", ts2.out = " + right.getOutputs());
         if (printComments) System.out.println("quotient.in = " + inputs + ", quotioent.out = " + outputs);
-
+        printComments =false;
     }
 
     @Override
@@ -238,7 +241,7 @@ public class Quotient extends TransitionSystem {
 
                     System.out.println("RULE 6");
                     // Rule 6 "edge to inconsistent for common outputs blocked in spec"
-                    Set<Channel> combinedOutputs = right.getOutputs();
+                    Set<Channel> combinedOutputs = new HashSet<>(right.getOutputs());
                     combinedOutputs.retainAll(left.getOutputs());
                     for (Channel c : combinedOutputs) {
                         if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
@@ -412,7 +415,7 @@ public class Quotient extends TransitionSystem {
                 oldBVs.add(bv);
             }
         }
-        newClock = new Clock("quo_new");
+        //newClock = new Clock("quo_new");
         oldClocks.add(newClock);
         newClocks.add(newClock);
         List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),newClocks, oldClocks,newBVs,oldBVs);
@@ -510,7 +513,7 @@ public class Quotient extends TransitionSystem {
 
 
             // rule 7
-            Move newMoveRule7 = new Move(location, new InconsistentLocation(), new ArrayList<>());
+            Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
             // invariant is negation of invariant of left conjuncted with invariant of right
             CDD negatedInvar = locLeft.getInvariantCDD().negation();
             CDD combined = negatedInvar.conjunction(locRight.getInvariantCDD());
@@ -520,7 +523,7 @@ public class Quotient extends TransitionSystem {
 
             // rule 5
             if (getActions().contains(channel)) {
-                Move newMoveRule5 = new Move(location, new UniversalLocation(), new ArrayList<>());
+                Move newMoveRule5 = new Move(location, univ, new ArrayList<>());
                 // negate invariant of ts2
                 newMoveRule5.setGuards(locRight.getInvariantCDD().negation());
                 newMoveRule5.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
@@ -543,7 +546,7 @@ public class Quotient extends TransitionSystem {
 
 
                 for (Move move : movesFromRight) {
-                    Move newMoveRule6 = new Move(location, new InconsistentLocation(), new ArrayList<>());
+                    Move newMoveRule6 = new Move(location, inc, new ArrayList<>());
                     newMoveRule6.setGuards(move.getEnabledPart().conjunction(negated));
                     newMoveRule6.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                     resultMoves.add(newMoveRule6);
@@ -560,7 +563,7 @@ public class Quotient extends TransitionSystem {
                 }
                 CDDFromMovesFromRight = CDDFromMovesFromRight.negation().removeNegative();
 
-                Move newMove4 = new Move(location, new UniversalLocation(), new ArrayList<>());
+                Move newMove4 = new Move(location, univ, new ArrayList<>());
                 newMove4.setGuards(CDDFromMovesFromRight);
                 resultMoves.add(newMove4);
             }
@@ -584,14 +587,14 @@ public class Quotient extends TransitionSystem {
             // Rule 10
         } else if (location instanceof InconsistentLocation) {
             if (getInputs().contains(channel)) {
-                Move newMove = new Move(location, new InconsistentLocation(), new ArrayList<>());
+                Move newMove = new Move(location, inc, new ArrayList<>());
                 newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove);
             }
             // Rule 9
         } else if (location instanceof UniversalLocation) {
             if (getActions().contains(channel)) {
-                Move newMove = new Move(location, new UniversalLocation(), new ArrayList<>());
+                Move newMove = new Move(location, univ, new ArrayList<>());
                 resultMoves.add(newMove);
             }
         }
