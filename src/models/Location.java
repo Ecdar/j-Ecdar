@@ -3,6 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Location {
 
@@ -160,5 +161,10 @@ public class Location {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isInitial, isUrgent, isUniversal, isInconsistent, name, invariant);
     }
 }

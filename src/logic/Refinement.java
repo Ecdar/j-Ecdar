@@ -130,10 +130,8 @@ public class Refinement {
         }
 
         while (!waiting.isEmpty()) {
-
             StatePair curr = waiting.pop();
 
-            System.out.println("Current state: " + curr.prettyPrint());
             if (RET_REF)
                 currNode = curr.getNode();
 
@@ -232,8 +230,6 @@ public class Refinement {
        // if ( target1.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
        //     assert(false);
         State target2 = new State(t2.getTarget().getLocation(), target1.getInvarCDD());
-        if (target1.getLocation().getName().contains("DIV"))
-            System.out.println(target1.getLocation().getName());
         return new StatePair(target1, target2);
     }
 
@@ -314,10 +310,16 @@ public class Refinement {
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
                     followerTransitions = new ArrayList<>();
-                    Transition loop = new Transition(state2, state2.getInvarCDD());
-                    followerTransitions.add(loop);
-                }
+                    if (isInput) {
+                        Transition loop = new Transition(state1, state1.getInvarCDD());
+                        followerTransitions.add(loop);
+                    }
+                    else {
+                        Transition loop = new Transition(state2, state2.getInvarCDD());
+                        followerTransitions.add(loop);
+                    }
 
+                }
 
 
                 if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions) : createNewStatePairs(leaderTransitions, followerTransitions))) {
