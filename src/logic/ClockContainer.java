@@ -4,6 +4,7 @@ import models.Clock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ClockContainer {
@@ -53,5 +54,18 @@ public class ClockContainer {
         for (Clock clock: clocks) {
             add(clock);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClockContainer container = (ClockContainer) o;
+        return Objects.equals(clocks, container.clocks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clocks);
     }
 }

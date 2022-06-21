@@ -18,11 +18,7 @@ public class Clock {
     }
 
     public Clock(Clock copy){
-        String s = copy.name;
-//        while (allClockNames.contains(s))
-//            s+="_";
-//        allClockNames.add(s);
-        this.name = s;
+        this.name = copy.name;
         this.uniqueName = copy.uniqueName;
         this.ownerName = copy.ownerName;
     }
