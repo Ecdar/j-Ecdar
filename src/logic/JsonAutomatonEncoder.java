@@ -194,10 +194,10 @@ public class JsonAutomatonEncoder {
                 if (u1 instanceof ClockUpdate) {
                     ClockUpdate u = (ClockUpdate) u1;
                     if (i == 0) {
-                        updateString += u.getClock().getName();
+                        updateString += u.getClock().getOriginalName();
                         updateString += " = " + u.getValue();
                     } else
-                        updateString += ", " + u.getClock().getName() + " = " + u.getValue();
+                        updateString += ", " + u.getClock().getOriginalName() + " = " + u.getValue();
                     i++;
                 }
                 else
@@ -225,7 +225,7 @@ public class JsonAutomatonEncoder {
         String localDecString="";
         for (Clock c : aut.getClocks())
         {
-            localDecString+= "clock " + c.getName() + "; ";
+            localDecString+= "clock " + c.getOriginalName() + "; ";
         }
 
         for (BoolVar bv : aut.getBVs())

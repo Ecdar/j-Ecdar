@@ -264,7 +264,7 @@ public class XMLParser {
 
     private static Clock findClock(List<Clock> clocks, String name) {
         for (Clock clock : clocks)
-            if (clock.getName().equals(name))
+            if (clock.getOriginalName().equals(name))
                 return clock;
 
         return null;

@@ -53,7 +53,7 @@ public class ClockOwnerTest {
         Conjunction con = new Conjunction(new TransitionSystem[]{t1, t2});
 
         assertEquals(1, t1.getClocks().size());
-        assertEquals("x",t1.getClocks().get(0).getName());
+        assertEquals("x",t1.getClocks().get(0).getOriginalName());
 
         assertEquals(2, con.getClocks().size());
         assertEquals("x",con.getClocks().get(0).getUniqueName());
@@ -67,8 +67,8 @@ public class ClockOwnerTest {
     public void conjunctionUniqueName(){
         Conjunction con = new Conjunction(new TransitionSystem[]{t1, t4});
 
-        assertEquals("x",t1.getClocks().get(0).getName());
-        assertEquals("x",t4.getClocks().get(0).getName());
+        assertEquals("x",t1.getClocks().get(0).getOriginalName());
+        assertEquals("x",t4.getClocks().get(0).getOriginalName());
 
         assertEquals(2, con.getClocks().size());
         assertEquals("Test1.x", con.getClocks().get(0).getUniqueName());
@@ -80,8 +80,8 @@ public class ClockOwnerTest {
     public void compositionUniqueName(){
         Composition comp = new Composition(new TransitionSystem[]{machine, adm});
 
-        assertEquals("y",machine.getClocks().get(0).getName());
-        assertEquals("y",adm.getClocks().get(1).getName());
+        assertEquals("y",machine.getClocks().get(0).getOriginalName());
+        assertEquals("y",adm.getClocks().get(1).getOriginalName());
 
         assertEquals(3, comp.getClocks().size());
         assertEquals("Machine.y", comp.getClocks().get(0).getUniqueName());
@@ -95,7 +95,7 @@ public class ClockOwnerTest {
         Composition comp2 = new Composition(new TransitionSystem[]{machine, researcher});
         Conjunction conj = new Conjunction(new TransitionSystem[]{comp1, comp2});
 
-        assertEquals("x",t1.getClocks().get(0).getName());
+        assertEquals("x",t1.getClocks().get(0).getOriginalName());
 
         List<String> names = conj.getClocks().stream().map(Clock::getUniqueName).collect(Collectors.toList());
         assertEquals(5, names.size());
@@ -111,8 +111,8 @@ public class ClockOwnerTest {
     public void quotientUniqueName(){
         Quotient quotient = new Quotient(t1,t4);
 
-        assertEquals("x",t1.getClocks().get(0).getName());
-        assertEquals("x",t4.getClocks().get(0).getName());
+        assertEquals("x",t1.getClocks().get(0).getOriginalName());
+        assertEquals("x",t4.getClocks().get(0).getOriginalName());
 
         assertEquals(3, quotient.getClocks().size());
         assertEquals("Test1.x", quotient.getClocks().get(1).getUniqueName());
@@ -124,7 +124,7 @@ public class ClockOwnerTest {
     public void quotientUniqueName2(){
         Quotient quotient = new Quotient(t1,t1);
 
-        assertEquals("x",t1.getClocks().get(0).getName());
+        assertEquals("x",t1.getClocks().get(0).getOriginalName());
 
         assertEquals(3, quotient.getClocks().size());
         assertEquals("Test1.1.x", quotient.getClocks().get(1).getUniqueName());
@@ -136,7 +136,7 @@ public class ClockOwnerTest {
     public void clockOwnerTest3(){
         Conjunction con = new Conjunction(new TransitionSystem[]{t1, t1});
 
-        assertEquals("x",t1.getClocks().get(0).getName());
+        assertEquals("x",t1.getClocks().get(0).getOriginalName());
 
         assertEquals(2, con.getClocks().size());
         assertEquals("Test1.1.x", con.getClocks().get(0).getUniqueName());

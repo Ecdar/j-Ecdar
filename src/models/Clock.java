@@ -7,24 +7,24 @@ import java.util.Objects;
 import logic.TransitionSystem;
 
 public class Clock {
-    private String name;
     private String uniqueName;
+    private String originalName;
     private String ownerName;
 
     public Clock(String name, String ownerName) {
-        this.name = name;
         this.uniqueName = name;
+        this.originalName = name;
         this.ownerName = ownerName;
     }
 
     public Clock(Clock copy){
-        this.name = copy.name;
-        this.uniqueName = copy.uniqueName;
+        this.uniqueName = copy.originalName;
+        this.originalName = copy.originalName;
         this.ownerName = copy.ownerName;
     }
 
-    public String getName() {
-        return name;
+    public String getOriginalName() {
+        return originalName;
     }
 
     public String getUniqueName(){
@@ -36,25 +36,25 @@ public class Clock {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Clock clock = (Clock) o;
-        return name.equals(clock.getName());
+        return Objects.equals(originalName, clock.originalName) && ownerName.equals(clock.ownerName);
     }
 
     @Override
     public String toString() {
         return "Clock{" +
-                "name='" + name + '\'' +
+                "name='" + uniqueName + '\'' +
                 '}';
     }
 
     public void setUniqueName(int index) {
         if(ownerName != null){
-            uniqueName = ownerName + "." + index + "." + name;
+            uniqueName = ownerName + "." + index + "." + originalName;
         }
     }
 
     public void setUniqueName() {
         if(ownerName != null){
-            uniqueName = ownerName + "." + name;
+            uniqueName = ownerName + "." + originalName;
         }
     }
 
@@ -64,6 +64,6 @@ public class Clock {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, ownerName);
+        return Objects.hash(originalName, ownerName);
     }
 }

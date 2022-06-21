@@ -19,19 +19,19 @@ public class ClockContainer {
     }
 
     public void add(Clock clock) {
-        Clock newClock = new Clock(clock); // todo: do not make a copy
+        Clock newClock = new Clock(clock);
 
         List<Clock> sameName = clocks.stream()
                 .filter(c -> sameName(c, clock))
                 .collect(Collectors.toList());
         if (sameName.size() != 0){
             List<Clock> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(clock.getOwnerName())).collect(Collectors.toList());
-            if(sameOwner.size() != 0){
+            if(sameOwner.size() != 0){          // Same name, same owner
                 for(int i = 0; i < sameOwner.size(); i++){
                     sameOwner.get(i).setUniqueName(i+1);
                 }
                 newClock.setUniqueName(sameOwner.size()+1);
-            }else{
+            }else{                              // Same name, different owner
                 for(int i = 0; i < sameName.size(); i++){
                     sameName.get(i).setUniqueName();
                 }
@@ -43,7 +43,7 @@ public class ClockContainer {
     }
 
     private boolean sameName(Clock clock1, Clock clock2){
-        return clock1.getName().equals(clock2.getName());
+        return clock1.getOriginalName().equals(clock2.getOriginalName());
     }
 
     public List<Clock> getClocks() {

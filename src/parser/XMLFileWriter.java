@@ -119,7 +119,7 @@ public class XMLFileWriter {
         String localDecString="";
         for (Clock c : automaton.getClocks())
         {
-            localDecString+= "clock " + c.getName() + "; ";
+            localDecString+= "clock " + c.getOriginalName() + "; ";
         }
 
         for (BoolVar bv : automaton.getBVs())
@@ -304,10 +304,10 @@ public class XMLFileWriter {
                 {
 
                     if (i == 0) {
-                        updateString += ((ClockUpdate) u).getClock().getName();
+                        updateString += ((ClockUpdate) u).getClock().getOriginalName();
                         updateString += " = " + ((ClockUpdate) u).getValue();
                     } else
-                        updateString += ", " + ((ClockUpdate) u).getClock().getName() + " = " + ((ClockUpdate) u).getValue();
+                        updateString += ", " + ((ClockUpdate) u).getClock().getOriginalName() + " = " + ((ClockUpdate) u).getValue();
                     i++;
                 }
             }

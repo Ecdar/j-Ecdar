@@ -21,7 +21,7 @@ public class GuardParser {
 
     private static Clock findClock(String clockName) {
         for (Clock clock : clocks)
-            if (clock.getName().equals(clockName)) return clock;
+            if (clock.getOriginalName().equals(clockName)) return clock;
 
         throw new ClockNotFoundException("Clock: " + clockName + " was not found");
     }

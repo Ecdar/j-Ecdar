@@ -20,7 +20,7 @@ public class UpdateParserTest {
         List<Update> updates = UpdateParser.parse("z=2", clocks, BVs);
 
         assertEquals(2, ((ClockUpdate)updates.get(0)).getValue());
-        assertEquals("z", ((ClockUpdate)updates.get(0)).getClock().getName());
+        assertEquals("z", ((ClockUpdate)updates.get(0)).getClock().getOriginalName());
     }
 
     @Test
@@ -31,8 +31,8 @@ public class UpdateParserTest {
         List<Update> updates = UpdateParser.parse("x=6, y=1", clocks, BVs);
 
         assertEquals(6, ((ClockUpdate)updates.get(0)).getValue());
-        assertEquals("x", ((ClockUpdate)updates.get(0)).getClock().getName());
+        assertEquals("x", ((ClockUpdate)updates.get(0)).getClock().getOriginalName());
         assertEquals(1, ((ClockUpdate)updates.get(1)).getValue());
-        assertEquals("y", ((ClockUpdate)updates.get(1)).getClock().getName());
+        assertEquals("y", ((ClockUpdate)updates.get(1)).getClock().getOriginalName());
     }
 }

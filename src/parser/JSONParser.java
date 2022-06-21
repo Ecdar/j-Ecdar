@@ -231,7 +231,7 @@ public class JSONParser {
 
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
-            if (clock.getName().equals(clockName)) return clock;
+            if (clock.getOriginalName().equals(clockName)) return clock;
 
         return null;
     }
