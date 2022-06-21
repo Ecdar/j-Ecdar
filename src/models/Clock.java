@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import logic.TransitionSystem;
 
@@ -63,5 +64,10 @@ public class Clock {
 
     public String getOwnerName() {
         return ownerName;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, ownerName);
     }
 }
