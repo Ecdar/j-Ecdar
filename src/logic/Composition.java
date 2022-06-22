@@ -5,6 +5,8 @@ import models.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static logic.Helpers.randomString;
+
 public class Composition extends TransitionSystem {
     private final TransitionSystem[] systems;
     private final Set<Channel> inputs, outputs, syncs;
@@ -69,15 +71,6 @@ public class Composition extends TransitionSystem {
             outputs.addAll(outputsOfI);
             setMaxBounds();
         }
-/*
-        String combinedName = "";
-        for (int i = 0; i < systems.length; i++) {
-            combinedName += systems[i].getSystems().get(0).getName();
-        }
-
-        Automaton resAut = new Automaton(combinedName, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, false);
-        SimpleTransitionSystem st = new SimpleTransitionSystem(resAut);
-        st.toXML("isThisAComposition"); */
     }
 
     public Set<Channel> getInputs() {
@@ -105,19 +98,65 @@ public class Composition extends TransitionSystem {
     }
 
 
-    private int[] maxBounds;
+    private HashMap<Clock,Integer> maxBounds;
     public void setMaxBounds() {
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
+        HashMap<Clock,Integer> res = new HashMap<>();
         for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
-            res.addAll(sys.getMaxBounds());
+            res.putAll(sys.getMaxBounds());
 
-        maxBounds = res.stream().mapToInt(i -> i).toArray();
+        maxBounds = res;
     }
+
 
     public Automaton createComposition(List<Automaton> autList)
     {
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
+        CDD.addBddvar(BVs);
         String name="";
+        // Renaming the clocks and BVs if there has been a name clash
+        List<Clock> newClocks = new ArrayList<>();
+        List<Clock> oldClocks = new ArrayList<>();
+        List<BoolVar> newBVs = new ArrayList<>();
+        List<BoolVar> oldBVs = new ArrayList<>();
+        for (Automaton aut : autList)
+        {
+            for (Clock c: aut.getClocks())
+            {
+                Clock newClock;
+                if (newClocks.stream().filter(clk->clk.getName().equals(c.getName())).collect(Collectors.toList()).isEmpty())
+                {
+                    newClock = new Clock(c.getName());
+                }
+                else {
+                    if (newClocks.stream().filter(clk->clk.getName().equals(aut.getName() + c.getName())).collect(Collectors.toList()).isEmpty())
+                        newClock = new Clock(aut.getName() + c.getName());
+                    else
+                        newClock = new Clock(aut.getName() + c.getName()+randomString());
+                }
+                newClocks.add(newClock);
+                oldClocks.add(c);
+            }
+            for (BoolVar bv: aut.getBVs())
+            {
+                BoolVar newBV;
+                if (newBVs.stream().filter(b->b.getName().equals(bv.getName())).collect(Collectors.toList()).isEmpty())
+                {
+                    newBV = new BoolVar(bv.getName(), bv.getInitialValue());
+                }
+                else {
+                    if (newBVs.stream().filter(b->b.getName().equals(aut.getName() + bv.getName())).collect(Collectors.toList()).isEmpty())
+                        newBV = new BoolVar(aut.getName() + bv.getName(), bv.getInitialValue());
+                    else
+                        newBV = new BoolVar(aut.getName() + bv.getName()+randomString(), bv.getInitialValue());
+                }
+                newBVs.add(newBV);
+                oldBVs.add(bv);
+            }
+        }
+
+
+
         Set<Edge> edgesSet = new HashSet<>();
         Set<Location> locationsSet = new HashSet<>();
         Map<String, Location> locMap = new HashMap<>();
@@ -150,9 +189,6 @@ public class Composition extends TransitionSystem {
             State currentState = (State)waiting.toArray()[0];
             waiting.remove(currentState);
             passed.add(currentState);
-            //System.out.println("Processing state " + currentState.getLocation().getName()) ;
-            //if (currentState.getLocation().getName().equals("L0L5L6"))
-            //    currentState.getInvFed().getZones().get(0).printDBM(true,true);
 
             for (Channel chan : all )
             {
@@ -166,7 +202,7 @@ public class Composition extends TransitionSystem {
                     boolean isUrgent = trans.getTarget().getLocation().getIsUrgent();
                     boolean isUniversal = trans.getTarget().getLocation().getIsUniversal();
                     boolean isInconsistent = trans.getTarget().getLocation().getIsInconsistent();
-                    List<List<Guard>> invariant = trans.getTarget().getInvariants();
+                    Guard invariant = trans.getTarget().getInvariants(clocks);
                     String sourceName = trans.getSource().getLocation().getName();
                     int x = trans.getTarget().getLocation().getX();
                     int y = trans.getTarget().getLocation().getX();
@@ -180,10 +216,10 @@ public class Composition extends TransitionSystem {
                     }
                     locationsSet.add(target);
                     if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
-                        trans.getTarget().extrapolateMaxBounds(maxBounds);
+                        trans.getTarget().extrapolateMaxBounds(maxBounds,clocks);
                         waiting.add(trans.getTarget());
                     }
-                    List<List<Guard>> guardList = trans.getGuards(); // TODO: Check!
+                    Guard guardList = trans.getGuards(clocks); // TODO: Check!
                     List<Update> updateList = trans.getUpdates();
                     boolean isInput = false;
                     if (inputs.contains(chan))
@@ -191,13 +227,13 @@ public class Composition extends TransitionSystem {
                     assert(locMap.get(sourceName)!=null);
                     assert(locMap.get(targetName)!=null);
 
-                    Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList.toArray(new Update[updateList.size()]));
+                    Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList);
                     boolean edgeAlreadyExists=false;
                     for (Edge otherE : edgesSet) {
-                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(e.getUpdates(),otherE.getUpdates()))
+                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(Arrays.stream(e.getUpdates().toArray()).toArray(), Arrays.stream(otherE.getUpdates().toArray()).toArray()))
                         {
 
-                            if (Federation.fedEqFed(e.getGuardFederation(clocks), otherE.getGuardFederation(clocks)));
+                            if (e.getGuardCDD().equiv(otherE.getGuardCDD()));
                             {
 
                                 edgeAlreadyExists = true;
@@ -215,8 +251,10 @@ public class Composition extends TransitionSystem {
 
         }
 
-
-        Automaton resAut = new Automaton(name, new ArrayList<Location>(locationsSet), new ArrayList<Edge>(edgesSet), clocks, false);
+        List <Location> locsWithNewClocks = updateClocksInLocs(locationsSet,newClocks, oldClocks,newBVs,oldBVs);
+        List <Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet,newClocks, oldClocks,newBVs,oldBVs);
+        Automaton resAut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, newClocks, newBVs, false);
+        CDD.done();
         return resAut;
 
     }
@@ -227,7 +265,7 @@ public class Composition extends TransitionSystem {
 
         for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
-            if (s.getInvFed().isSubset(st.getInvFed()))
+            if (CDD.isSubset(s.getCDD(),st.getCDD()))
                 contained = true;
         }
         return contained;
@@ -240,7 +278,7 @@ public class Composition extends TransitionSystem {
         for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
         {
 
-            if (s.getInvFed().isSubset(st.getInvFed())) {
+            if (CDD.isSubset(s.getCDD(),st.getCDD())) {
                 contained = true;
             }
         }
@@ -250,13 +288,9 @@ public class Composition extends TransitionSystem {
     public Location createLoc(List<Location> locList)
     {
         String name="";
-        List<List<Guard>> invariant = new ArrayList<>();
+        Guard invariant;
 
-        List<Zone> emptyZoneList = new ArrayList<>();
-        Zone emptyZone = new Zone(clocks.size() + 1, true);
-        emptyZone.init();
-        emptyZoneList.add(emptyZone);
-        Federation invarFed = new Federation(emptyZoneList);
+        CDD invarFed =CDD.getUnrestrainedCDD();
         boolean isInitial = true;
         boolean isUrgent = false;
         boolean isUniversal = false;
@@ -269,16 +303,16 @@ public class Composition extends TransitionSystem {
             else
                 name += "" + l.getName();
 
-            invarFed = l.getInvariantFederation(clocks).intersect(invarFed);
+            invarFed = l.getInvariantCDD().conjunction(invarFed);
             isInitial = isInitial && l.isInitial();
             isUrgent = isUrgent || l.isUrgent();
-            isUniversal = isUniversal || l.isUniversal();
+            isUniversal = isUniversal && l.isUniversal(); // TODO: double check this at some point.
             isInconsistent = isInconsistent || l.isInconsistent();
             x += l.getX();
             y += l.getY();
 
         }
-        invariant = invarFed.turnFederationToGuards(clocks);
+        invariant = CDD.toGuardList(invarFed, clocks);
 
         return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
 
@@ -301,6 +335,7 @@ public class Composition extends TransitionSystem {
 
     // build a list of transitions from a given state and a signal
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
+
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
         // these will store the locations of the target states and the corresponding transitions
@@ -344,7 +379,7 @@ public class Composition extends TransitionSystem {
             else
                 moveExisted = true;
 
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
+            resultMoves = moveProduct(resultMoves, moves, i == 1,false);
         }
 
         if (!moveExisted) return new ArrayList<>();

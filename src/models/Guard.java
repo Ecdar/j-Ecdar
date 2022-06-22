@@ -1,17 +1,30 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Guard {
+public abstract class Guard {
 
+    abstract int getMaxConstant();
+
+    //public enum type {DIAGONAL, CLOCKGUARD, BOOLGUARD, FALSE}
+/*
     private final Clock clock;
     private int upperBound, lowerBound;
     private boolean isStrict;
+    private boolean isFalse=false;
+
 
     public Guard(Clock clock, int value, boolean greater, boolean isStrict) {
+        this(clock,value,greater,isStrict,false);
+    }
+
+
+    public Guard(Clock clock, int value, boolean greater, boolean isStrict, boolean isFalse) {
         assert(clock!=null);
         this.clock = clock;
+        this.isFalse=isFalse;
         this.isStrict = isStrict;
 
         if (greater) {
@@ -23,18 +36,37 @@ public class Guard {
         }
     }
 
+
     public Guard(Clock clock, int upper, int lower, boolean isStrict) {
+        this(clock,upper,lower,isStrict,false);
+    }
+
+    public Guard(Clock clock, int upper, int lower, boolean isStrict, boolean isFalse) {
         this.clock = clock;
         this.isStrict = isStrict;
         this.upperBound = upper;
         this.lowerBound = lower;
+        this.isFalse=isFalse;
     }
 
     public Guard(Clock clock, int value) {
+        this(clock,value,false);
+    }
+
+    public Guard(Clock clock, int value, boolean isFalse) {
         this.clock = clock;
         this.isStrict = false;
         this.upperBound = value;
         this.lowerBound = value;
+        this.isFalse=isFalse;
+    }
+
+    public Guard(boolean isFalse) {
+        this.clock = null;
+        this.isStrict = false;
+        this.upperBound = 0;
+        this.lowerBound = 0;
+        this.isFalse=true;
     }
 
     // Copy constructor
@@ -43,6 +75,7 @@ public class Guard {
         this.isStrict = copy.isStrict;
         this.upperBound = copy.upperBound;
         this.lowerBound = copy.lowerBound;
+        this.isFalse = copy.isFalse;
     }
 
     public Clock getClock() {
@@ -100,4 +133,19 @@ public class Guard {
     public int hashCode() {
         return Objects.hash(clock, upperBound, lowerBound, isStrict);
     }
+
+    public void setIsFalse(boolean isFalse) {
+        this.isFalse = isFalse;
+    }
+    public boolean getIsFalse() {
+        return isFalse;
+    }
+*/
+    @Override
+    public abstract boolean equals(Object o) ;
+    @Override
+    public abstract String toString() ;
+
+    @Override
+    public abstract int hashCode() ;
 }

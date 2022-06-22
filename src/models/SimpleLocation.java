@@ -50,8 +50,9 @@ public class SimpleLocation extends SymbolicLocation {
         return location.getX();
     }
 
-    public List<List<Guard>> getInvariants() {
-        return location.getInvariant();
+    public CDD getInvariantCDD() {
+        CDD cdd = new CDD(location.getInvariant());
+        return cdd;
     }
 
     @Override

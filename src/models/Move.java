@@ -9,61 +9,36 @@ public class Move {
 
     private final SymbolicLocation source, target;
     private final List<Edge> edges;
-    private List<List<Guard>> guards;
+    private CDD guardCDD;
     private List<Update> updates;
 
-    public static List<List<Guard>> cartesianProduct(List<List<List<Guard>>> lists) {
-
-        List<List<Guard>> product = new ArrayList<List<Guard>>();
-
-        for (List<List<Guard>> list : lists) {
-
-            List<List<Guard>> newProduct = new ArrayList<List<Guard>>();
-
-            for (List<Guard> listElement : list) {
-
-                if (product.isEmpty()) {
-
-                    List<List<Guard>> newProductList = new ArrayList<List<Guard>>();
-                    newProductList.add(listElement);
-                    newProduct.addAll(newProductList);
-                } else {
-
-                    for (List<Guard> productList : product) {
-
-                        List<Guard> newProductList = new ArrayList<Guard>(productList);
-                        newProductList.addAll(listElement);
-                        newProduct.add(newProductList);
-                    }
-                }
-            }
-
-            product = newProduct;
-        }
-
-        return product;
-    }
-
     public Move(SymbolicLocation source, SymbolicLocation target, List<Edge> edges) {
+
         this.source = source;
         this.target = target;
         this.edges = edges;
-        List<List<List<Guard>>> guardListBig = new ArrayList<>();
-
-
-        for (Edge e : edges)
-        {
-            List<List<Guard>> guardWithDisj = e.getGuards();
-            if (!guardWithDisj.isEmpty())
-                guardListBig.add(guardWithDisj);
+        guardCDD = CDD.cddTrue();
+        this.updates = new ArrayList<>();
+        for (Edge e : edges) {
+            CDD guardCDD1 = e.getGuardCDD();
+            guardCDD = guardCDD.conjunction(guardCDD1);
+            updates.addAll(e.getUpdates());
         }
 
-        List<List<Guard>> allCombinations = cartesianProduct(guardListBig);
+    }
 
-        this.guards = allCombinations;
+    /**
+     * Return the enabled part of a move based on guard, source invariant and predated target invariant
+     **/
+    public CDD getEnabledPart() {
+        CDD sourceInvariant = getSource().getInvariantCDD();
+        CDD targetInvariant = getTarget().getInvariantCDD();
+        return getGuardCDD().conjunction(targetInvariant.transitionBack(this)).conjunction(sourceInvariant);
+    }
 
-//        this.guards = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getGuards).flatMap(List::stream).collect(Collectors.toList());
-        this.updates = edges.isEmpty() ? new ArrayList<>() : edges.stream().map(Edge::getUpdates).flatMap(Arrays::stream).collect(Collectors.toList());
+    public void conjunctCDD(CDD cdd)
+    {
+        guardCDD = guardCDD.conjunction(cdd);
     }
 
     public SymbolicLocation getSource() {
@@ -78,12 +53,17 @@ public class Move {
         return edges;
     }
 
-    public List<List<Guard>> getGuards() {
-        return guards;
+
+    public CDD getGuardCDD() {
+        return (guardCDD);
     }
 
-    public void setGuards(List<List<Guard>> guards) {
-        this.guards = guards;
+    public Guard getGuards(List <Clock> relevantClocks) {
+        return CDD.toGuardList(guardCDD, relevantClocks);
+    }
+
+    public void setGuards(CDD guardCDD) {
+        this.guardCDD = guardCDD;
     }
 
     public List<Update> getUpdates() {

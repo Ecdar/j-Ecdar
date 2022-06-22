@@ -1,5 +1,7 @@
 grammar QueryGrammar;
 
+import CommonLexerRules;
+
 @header {
 package QueryGrammar;
 }
@@ -36,18 +38,6 @@ system      : VARIABLE
 
 QUERY_TYPE      : 'get-component' | 'bisim-minim' | 'consistency' | 'implementation' | 'determinism' | 'prune' ;
 
-fragment DIGIT :   [0-9] ;
-INT            :   DIGIT+ ;
-
-fragment LOWERCASE : [a-z] ;
-fragment UPPERCASE : [A-Z] ;
-fragment SYMBOL    : ('.' | 'þ' | '€' | '_' | 'ð' | 'đ' | 'œ') ;
-
-fragment LETTER      : (LOWERCASE | UPPERCASE) ;
-VARIABLE             : LETTER (LETTER | DIGIT | SYMBOL)* ;
-
 CONJUNCTION          : '&&' ;
 COMPOSITION          : '||' ;
 QUOTIENT             : '\\\\' ;
-
-WS : [ \t\r\n]+ -> skip ;

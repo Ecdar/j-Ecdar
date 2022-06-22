@@ -52,3 +52,30 @@ dbm::fed_t helper_functions::javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize 
 
     return cFed;
 }
+
+jintArray helper_functions::cPointerToJavaArray(
+        JNIEnv *env, const int32_t *arrayPointer, jsize len) {
+
+        // convert updated array to jintArray
+        jintArray newT = env->NewIntArray(len);
+        if(newT == NULL){
+            return NULL; // out of memory error
+        }
+        jint arr[len];
+        for (int i = 0; i < len; i++) {
+            arr[i] = arrayPointer[i];
+        }
+        env->SetIntArrayRegion(newT, 0, len, arr);
+        return newT;
+}
+
+
+int32_t* helper_functions::jintToCIntArray(JNIEnv *env, jintArray dbm, jsize len) {
+    // build array to pass to library
+    int32_t *t = new int32_t[len];
+    jint *arr = env->GetIntArrayElements(dbm, 0);
+    for (int i = 0; i < len; i++)
+        t[i] = arr[i];
+    env->ReleaseIntArrayElements(dbm, arr, JNI_ABORT);
+    return t;
+}

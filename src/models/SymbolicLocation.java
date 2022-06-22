@@ -17,5 +17,5 @@ public abstract class SymbolicLocation {
 
     public abstract int getX();
 
-    public abstract List<List<Guard>> getInvariants();
+    public abstract CDD getInvariantCDD();
 }

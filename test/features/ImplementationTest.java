@@ -4,7 +4,8 @@ import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
-import models.Transition;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
@@ -17,9 +18,15 @@ public class ImplementationTest {
     static Automaton[] automata;
     private static TransitionSystem G7, G8, G13;
 
+    @After
+    public void afterEachTest(){
+
+    }
+
     @BeforeClass
     public static void setUpBeforeClass() {
         automata = XMLParser.parse("./samples/xml/ImplTests.xml", true);
+
         G7 = new SimpleTransitionSystem(automata[7]);
         G8 = new SimpleTransitionSystem(automata[8]);
         G13 = new SimpleTransitionSystem(automata[13]);
@@ -27,14 +34,14 @@ public class ImplementationTest {
 
     @Test
     public void testG1(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[1]);
+        TransitionSystem ts = new SimpleTransitionSystem((automata[1]));
 
         
         assertFalse(ts.isImplementation());
     }
     @Test
     public void testG2(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[2]);
+        TransitionSystem ts = new SimpleTransitionSystem((automata[2]));
 
         
         assertFalse(ts.isImplementation());
@@ -42,7 +49,7 @@ public class ImplementationTest {
 
     @Test
     public void testG3(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[3]);
+        TransitionSystem ts = new SimpleTransitionSystem((automata[3]));
 
         
         assertFalse(ts.isImplementation());
@@ -50,7 +57,7 @@ public class ImplementationTest {
 
     @Test
     public void testG4(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[4]);
+        TransitionSystem ts = new SimpleTransitionSystem((automata[4]));
 
         
         assertFalse(ts.isImplementation());
@@ -58,7 +65,7 @@ public class ImplementationTest {
 
     @Test
     public void testG5(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
+        TransitionSystem ts = new SimpleTransitionSystem((automata[5]));
 
         
         assertFalse(ts.isImplementation());
@@ -89,11 +96,13 @@ public class ImplementationTest {
 
     @Test
     public void testG7(){
+
         assertFalse(G7.isImplementation());
     }
 
     @Test
     public void testG8(){
+
         assertTrue(G8.isImplementation());
     }
 
@@ -124,9 +133,7 @@ public class ImplementationTest {
 
     @Test
     public void testG12(){
-        TransitionSystem ts = new SimpleTransitionSystem(automata[12]);
-
-        
+        TransitionSystem ts = new SimpleTransitionSystem((automata[12]));
         assertFalse(ts.isImplementation());
     }
 

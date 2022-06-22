@@ -3,8 +3,18 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public class Update {
+public abstract class Update {
 
+
+
+    @Override
+    public abstract boolean equals(Object o) ;
+    @Override
+    public abstract String toString() ;
+
+    @Override
+    public abstract int hashCode() ;
+    /*
     private final Clock clock;
     private final int value;
 
@@ -46,5 +56,5 @@ public class Update {
     @Override
     public int hashCode() {
         return Objects.hash(clock, value);
-    }
+    }*/
 }

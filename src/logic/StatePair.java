@@ -1,6 +1,4 @@
-package models;
-
-import logic.GraphNode;
+package logic;
 
 public class StatePair {
     private final State left, right;
@@ -30,16 +28,16 @@ public class StatePair {
     }
 
     public void setNode(GraphNode node) {
-       this.node = node;
+        this.node = node;
     }
 
     public String prettyPrint() {
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvFed();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getCDD() + " " + right.getCDD();
     }
 
     @Override
     public String toString() {
         //return "L=" + left + ", R=" + right;
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  Z=" + left.getInvFed() + "  " + right.getInvFed();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getCDD() + " " + right.getCDD();
     }
 }

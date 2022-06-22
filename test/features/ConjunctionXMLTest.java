@@ -2,15 +2,21 @@ package features;
 
 import logic.*;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class ConjunctionXMLTest {
     private static Automaton[] automata;
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -20,6 +26,7 @@ public class ConjunctionXMLTest {
     @Test
     public void P0ConjP1RefP2() {
         TransitionSystem ts = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(automata[1]), new SimpleTransitionSystem(automata[0])});
+        new SimpleTransitionSystem(ts.getAutomaton()).toXML("testOutput/what.xml");
         assertFalse(new Refinement(ts, new SimpleTransitionSystem(automata[2])).check());
     }
     @Test

@@ -1,7 +1,9 @@
 package models;
 
-public class Clock {
+import java.util.ArrayList;
+import java.util.List;
 
+public class Clock {
     private final String name;
 
     public Clock(String name) {
@@ -9,7 +11,12 @@ public class Clock {
     }
 
     public Clock(Clock copy){
-        this.name = copy.name;
+        assert(false);
+        String s = copy.name;
+//        while (allClockNames.contains(s))
+//            s+="_";
+//        allClockNames.add(s);
+        this.name = s;
     }
 
     public String getName() {

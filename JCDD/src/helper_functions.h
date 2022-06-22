@@ -14,6 +14,10 @@ namespace helper_functions
     jobjectArray cFedtoJavaFed(JNIEnv *env, dbm::fed_t fed, jsize len);
 
     dbm::fed_t javaFedtoCFed(JNIEnv *env, jobjectArray fed, jsize size, jint dim);
+
+    jintArray cPointerToJavaArray(JNIEnv *env,  const int32_t *arrayPointer, jsize len);
+
+    int32_t* jintToCIntArray(JNIEnv *env, jintArray dbm, jsize len);
 }
 
 #endif

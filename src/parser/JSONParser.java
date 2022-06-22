@@ -23,6 +23,7 @@ public class JSONParser {
     private static ArrayList<JSONObject> objectList = new ArrayList<>();
     private static final ArrayList<Channel> globalChannels = new ArrayList<>();
     private static final List<Clock> componentClocks = new ArrayList<>();
+    private static final List<BoolVar> BVs = new ArrayList<>();
 
     public static Automaton[] parse(String folderPath, boolean makeInpEnabled) throws FileNotFoundException {
         File dir = new File(folderPath + "/Components");
@@ -59,7 +60,7 @@ public class JSONParser {
         obj.put("initial sp id", "" + refTree.getNodeId());
         obj.put("left", "" + refTree.getStatePair().getLeft().getLocation());
         obj.put("right", "" + refTree.getStatePair().getRight().getLocation());
-        obj.put("federation", "" + refTree.getStatePair().getLeft().getInvFed());
+        obj.put("federation", "" + refTree.getStatePair().getLeft().getCDD());
         obj.put("transitions", helper(children));
 
         System.out.println(obj.toJSONString());
@@ -76,7 +77,7 @@ public class JSONParser {
                 statePair.put("state pair id", "" + child.getTarget().getNodeId());
                 statePair.put("left", "" + child.getTarget().getStatePair().getLeft().getLocation());
                 statePair.put("right", "" + child.getTarget().getStatePair().getRight().getLocation());
-                statePair.put("federation", "" + child.getTarget().getStatePair().getLeft().getInvFed());
+                statePair.put("federation", "" + child.getTarget().getStatePair().getLeft().getCDD());
                 transition.put("source sp id", "" + child.getSource().getNodeId());
                 transition.put("target sp id", "" + child.getTarget().getNodeId());
                 transition.put("target sp", statePair);
@@ -111,15 +112,17 @@ public class JSONParser {
 
         return returnList;
     }
-
+    private static String automatonName;
     private static Automaton distrubuteObject(JSONObject obj, boolean makeInpEnabled){
+        automatonName= (String) obj.get("name");
         addDeclarations((String) obj.get("declarations"));
         JSONArray locationList = (JSONArray) obj.get("locations");
         List<Location> locations = addLocations(locationList);
         JSONArray edgeList = (JSONArray) obj.get("edges");
         List<Edge> edges = addEdges(edgeList, locations);
-        Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), makeInpEnabled);
+        Automaton automaton = new Automaton((String) obj.get("name"), locations, edges, new ArrayList<>(componentClocks), BVs, makeInpEnabled);
         componentClocks.clear();
+        BVs.clear();
         return automaton;
     }
 
@@ -165,6 +168,33 @@ public class JSONParser {
         }
     }
 
+    private static void addBVs(String declarations) {//add for typedefs
+        String[] firstList = declarations.split(";");
+
+        for (String line : firstList) {
+            boolean isBV = line.contains("bool");
+
+            if (isBV) {
+                if (line.contains("bool")) {
+                    String bools = line.replaceAll("//.*\n", "")
+                            .replaceFirst("bool", "");
+
+                    bools = bools.replaceAll("bool", ",")
+                            .replaceAll(";", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");
+
+                    String[] boolArr = bools.split(",");
+
+                    for (String bool : boolArr)
+                        if (bool.contains("="))
+                            BVs.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
+                        else BVs.add(new BoolVar(bool, false));
+                }
+            }
+        }
+    }
+
     private static List<Location> addLocations(JSONArray locationList) {
         ArrayList<Location> returnLocList = new ArrayList<>();
 
@@ -188,8 +218,8 @@ public class JSONParser {
 
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            List<List<Guard>> invariant = ("".equals(jsonObject.get("invariant").toString()) ? new ArrayList<>() :
-                    GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks));
+            Guard invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueGuard() :
+                    GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks, BVs));
             Location loc = new Location(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
 
@@ -205,6 +235,13 @@ public class JSONParser {
 
         return null;
     }
+    private static BoolVar findBV(String name) {
+        for (BoolVar bv : BVs)
+            if (bv.getName().equals(name))
+                return bv;
+
+        return null;
+    }
 
     private static List<Edge> addEdges(JSONArray edgeList, List<Location> locations) {
         ArrayList<Edge> edges = new ArrayList<>();
@@ -212,18 +249,31 @@ public class JSONParser {
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            List<List<Guard>> guards;
+            Guard guards;
+            List<ClockUpdate> clockUpdates = new ArrayList<>();
+            List<BoolUpdate> boolUpdates = new ArrayList<>();
+
             List<Update> updates;
 
             if (!jsonObject.get("guard").toString().equals("")) {
-                guards = GuardParser.parse((String) jsonObject.get("guard"), componentClocks);
+                guards = GuardParser.parse((String) jsonObject.get("guard"), componentClocks, BVs);
             } else
-                guards = new ArrayList<>();
+                guards = new TrueGuard();
 
             if (!jsonObject.get("update").toString().equals(""))
-                updates = UpdateParser.parse((String) jsonObject.get("update"), componentClocks);
+                updates = UpdateParser.parse((String) jsonObject.get("update"), componentClocks, BVs);
             else
                 updates = new ArrayList<>();
+
+            for (Update u: updates)
+                if (u instanceof  ClockUpdate)
+                    clockUpdates.add((ClockUpdate) u);
+                else
+                    boolUpdates.add((BoolUpdate) u);
+
+            List<Update> updatesList = new ArrayList<>();
+            updatesList.addAll(clockUpdates);
+            updatesList.addAll(boolUpdates);
 
             Location sourceLocation = findLoc(locations, (String) jsonObject.get("sourceLocation"));
             Location targetLocation = findLoc(locations, (String) jsonObject.get("targetLocation"));
@@ -232,7 +282,7 @@ public class JSONParser {
 
             Channel c = addChannel(jsonObject.get("sync").toString());
             if (c != null) {
-                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updates.toArray(new Update[0]));
+                Edge edge = new Edge(sourceLocation, targetLocation, c, isInput, guards, updatesList);
                 edges.add(edge);
             }
         }

@@ -1,17 +1,28 @@
 package features;
 
-import logic.*;
+
+import logic.JsonAutomatonEncoder;
+import logic.Pruning;
+import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.XMLParser;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class PruningTest {
     private static SimpleTransitionSystem compTimedReach, compTimedInc, compTimedInc1, compTimedInc2, compTimedInc3, compTimedInc4;
     private static SimpleTransitionSystem selfloopZeno, expectedOutputSelfloopZeno, selfloopNonZeno, expectedOutputSelfloopNonZeno, simple1, expectedOutputSimple1, simple2, expectedOutputSimple2, simple3, expectedOutputSimple3, simple4, expectedOutputSimple4 , simple4inpComp, expectedOutputSimple4inpComp;
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
+
     @BeforeClass
     public static void setUpBeforeClass() {
 
@@ -61,7 +72,8 @@ public class PruningTest {
         pruned.toXML("testOutput/selfloopZeno.xml");
         JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
         SimpleTransitionSystem exp = expectedOutputSelfloopZeno;
-
+        System.out.println("Ref1: " + new Refinement(pruned, exp).check());
+        System.out.println("Ref2: " +  new Refinement(exp, pruned).check());
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
 
     }

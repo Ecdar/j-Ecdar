@@ -1,16 +1,20 @@
 package features;
 
 import logic.Bisimilarity;
-import logic.Composition;
 import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.Test;
 import parser.XMLParser;
 
 import static org.junit.Assert.assertTrue;
 
 public class BisimilarityTest {
+
+    @After
+    public void afterEachTest(){
+    }
 
     @Test
     public void bisimilarityTest1() {
@@ -39,12 +43,13 @@ public class BisimilarityTest {
     @Test
     public void bisimilarityUntimedTestNotBisim() {
 
-
+        CDD.done();
 
         Automaton[] auts = XMLParser.parse("./samples/xml/quotient/example_critical_sections_final_versions_pruned.xml", false);
         Automaton aut = Bisimilarity.checkBisimilarity(auts[10]);
         SimpleTransitionSystem sys = new SimpleTransitionSystem(aut);
-        sys.toXML("testOutput/bisim3.xml");
+        // sys.toXML("testOutput/bisim3.xml");
+        System.out.println(aut.getLocations().size());
         assertTrue(aut.getLocations().size()==3);
     }
 

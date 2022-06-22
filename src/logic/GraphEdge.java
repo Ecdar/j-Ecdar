@@ -1,5 +1,6 @@
 package logic;
 
+import models.CDD;
 import models.Edge;
 import models.Federation;
 import models.Zone;
@@ -9,7 +10,7 @@ import java.util.List;
 public class GraphEdge {
     private GraphNode source, target;
     private List<Edge> edgesL, edgesR;
-    private Federation subsetFed;
+    private CDD subsetCDD;
 
     public GraphEdge(GraphNode source, GraphNode target, List<Edge> edgesL, List<Edge> edgesR) {
         this.source = source;
@@ -18,17 +19,17 @@ public class GraphEdge {
         this.edgesR = edgesR;
     }
 
-    public GraphEdge(GraphNode source, GraphNode target, List<Edge> edgesL, List<Edge> edgesR, Federation subsetFed) {
+    public GraphEdge(GraphNode source, GraphNode target, List<Edge> edgesL, List<Edge> edgesR, CDD subsetCDD) {
         this(source, target, edgesL, edgesR);
-        this.subsetFed = subsetFed.getCopy();
+        this.subsetCDD = new CDD(subsetCDD.getPointer());
     }
 
-    public Federation getSubsetZone() {
-        return subsetFed;
+    public CDD getSubsetZone() {
+        return subsetCDD;
     }
 
-    public void setSubsetFed(Federation subsetFed) {
-        this.subsetFed = subsetFed;
+    public void setSubsetFed(CDD subsetFed) {
+        this.subsetCDD= subsetFed;
     }
 
     public GraphNode getSource() {

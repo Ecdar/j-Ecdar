@@ -1,30 +1,27 @@
-package models;
+package logic;
+
+import models.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class Transition {
+public  class Transition {
     private State source, target;
     private final Move move;
-    private Federation guardFederation;
+    private CDD guardCDD;
 
     public Transition(State source, State target, Move move, int dim) {
         this.source = source;
         this.target = target;
         this.move = move;
-        Zone emptyZone = new Zone(dim, true);
-        ArrayList<Zone> zoneArrayList = new ArrayList<>();
-        zoneArrayList.add(emptyZone);
-        this.guardFederation = new Federation(zoneArrayList);
+        this.guardCDD = new CDD(move.getGuardCDD().getPointer());
     }
 
-    public Transition(State source, State target, Move move, Federation guardFederation) {
+    public Transition(State source, State target, Move move, CDD guardCDD) {
         this.source = source;
         this.target = target;
         this.move = move;
-        this.guardFederation = guardFederation.getCopy();
+        this.guardCDD = new CDD(guardCDD.getPointer());
     }
 
     // self loop
@@ -33,9 +30,9 @@ public class Transition {
     }
 
     // self loop
-    public Transition(State state, Federation guardFederation) {
+    public Transition(State state, CDD guardCDD) {
 
-        this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), guardFederation.getCopy());
+        this(state, state, new Move(state.getLocation(), state.getLocation(), new ArrayList<>()), new CDD(guardCDD.getPointer()));
 
 
 
@@ -53,16 +50,16 @@ public class Transition {
         return target;
     }
 
-    public Federation getGuardFed() {
-        return guardFederation;
+    public CDD getGuardCDD() {
+        return guardCDD;
     }
 
     public List<Edge> getEdges() {
         return move.getEdges();
     }
 
-    public List<List<Guard>> getGuards() {
-        return move.getGuards();
+    public Guard getGuards(List <Clock> relevantClocks ) {
+        return move.getGuards( relevantClocks);
     }
 
     public List<Update> getUpdates() {

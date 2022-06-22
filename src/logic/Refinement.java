@@ -8,14 +8,16 @@ import java.util.stream.Collectors;
 public class Refinement {
     private final TransitionSystem ts1, ts2;
     private final List<Clock> allClocks;
-    private final Map<LocationPair, List<StatePair>> passed;
+    private final List<BoolVar> allBVs;
+
+    private final Map<LocationPair, StatePair> passed;
     private final Deque<StatePair> waiting;
+
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
     private GraphNode refGraph;
     private GraphNode currNode;
     private GraphNode supersetNode;
-    private int treeSize;
-    private int[] maxBounds;
+    private HashMap<Clock,Integer> maxBounds;
     private static boolean RET_REF = false;
     public static int NODE_ID = 0;
     private StringBuilder errMsg = new StringBuilder();
@@ -28,9 +30,9 @@ public class Refinement {
 
         allClocks = new ArrayList<>(ts1.getClocks());
         allClocks.addAll(ts2.getClocks());
+        allBVs= new ArrayList<>(ts1.getBVs());
+        allBVs.addAll(ts2.getBVs());
 
-        // the first states we look at are the initial ones
-        waiting.push(getInitialStatePair());
 
         inputs1 = ts1.getInputs();
         inputs2 = ts2.getInputs();
@@ -48,7 +50,7 @@ public class Refinement {
         return errMsg.toString();
     }
 
-    public boolean check(boolean ret_ref) {
+    public boolean check(boolean ret_ref) { // TODO: test this.
         Refinement.NODE_ID = 0;
         Refinement.RET_REF = ret_ref;
         return checkRef();
@@ -80,86 +82,133 @@ public class Refinement {
                 }
             }
         }
-        //System.out.println("reached pre1 " + errMsg);
         // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
         // with the exception that the left side is allowed to have more outputs
 
-        // inputs on the left must be equal to inputs on the right side
-        if (!inputs1.equals(inputs2)) {
+        // inputs on the right must contain all inputs on the left side
+        if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
+            errMsg.append(inputs2 + " <--> " + inputs1 + "\n");
             errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
         }
-        //System.out.println("reached pre2");
+
         // the left side must contain all outputs from the right side
         if (!outputs1.containsAll(outputs2)) {
             precondMet = false;
-            errMsg.append("Not all outputs of the right side are present on the left side.\n OutoutsRight: " + outputs1 + " Outputs Left: " + outputs2 + "\n");
+            errMsg.append("Not all outputs of the right side are present on the left side.\n");
         }
-        //System.out.println("reached pre3");
+
+
+
+        Set<Channel> output1Copy = new HashSet<>(outputs1);
+        output1Copy.retainAll(inputs2);
+        // the left side must contain all outputs from the right side
+        if (!output1Copy.isEmpty()){
+            precondMet = false;
+            errMsg.append("Alphabet mismatch.\n");
+        }
+
+        Set<Channel> output2Copy = new HashSet<>(outputs2);
+        output1Copy.retainAll(inputs1);
+        // the left side must contain all outputs from the right side
+        if (!output1Copy.isEmpty()){
+            precondMet = false;
+            errMsg.append("Alphabet mismatch.\n");
+        }
+
+
         if (!ts1.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts1.getLastErr());
         }
 
-       // System.out.println("reached pre4" + errMsg);
         if (!ts2.isLeastConsistent()) {
             precondMet = false;
             errMsg.append(ts2.getLastErr());
         }
-       // System.out.println("reached pre5");
-        //System.out.println("Preconditions checked, error message is : " + errMsg);
         return precondMet;
     }
 
     public boolean checkRef() {
         // one or more of the preconditions failed, so fail refinement
-        //System.out.println("reached 0");
         if (!checkPreconditions())
             return false;
+
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(allClocks);
+        CDD.addBddvar(allBVs);
+
+        // the first states we look at are the initial ones
+        waiting.push(getInitialStatePair());
 
         if (RET_REF) {
             refGraph = new GraphNode(waiting.getFirst());
             currNode = refGraph;
-            treeSize++;
         }
-        //System.out.println("reached 1");
-        while (!waiting.isEmpty()) {
 
+
+        while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
-            //System.out.println("curr: " + curr.prettyPrint());
+
             if (RET_REF)
                 currNode = curr.getNode();
 
             State left = curr.getLeft();
             State right = curr.getRight();
-
             // need to make deep copy
             State newState1 = new State(left);
             State newState2 = new State(right);
             // mark the pair of states as visited
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
             StatePair pair = new StatePair(newState1, newState2, currNode);
-            if (passed.containsKey(locPair))
-                passed.get(locPair).add(pair);
+
+            if (!passed.containsKey(locPair)) {
+                for (LocationPair keyPair : passed.keySet())
+                    if (keyPair.equals(locPair)) {
+                        System.out.println("rest");
+                        assert (false);
+                    }
+            }
+
+
+            if (passed.containsKey(locPair)) {
+                passed.get(locPair).getLeft().disjunctCDD(pair.getLeft().getCDD());
+                passed.get(locPair).getRight().disjunctCDD(pair.getRight().getCDD());
+            }
             else
-                passed.put(locPair, new ArrayList<>(Collections.singletonList(pair)));
-          //  System.out.println("reached 2");
+                passed.put(locPair,pair);
+
+            // assert(passedContainsStatePair(curr));
+
+            // check that for every delay in TS 1 there is a corresponding delay in TS
+            boolean holds0 = checkDelay(left, right);
+            if (!holds0) {
+                System.out.println("Delay violation");
+                CDD.done();
+                return false;
+            }
 
             // check that for every output in TS 1 there is a corresponding output in TS 2
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
-                System.out.println("output error "  );
+
+                System.out.println("Output violation");
+                CDD.done();
                 return false;
             }
+
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
-                System.out.println("input error "  );
+                //assert(false); // assuming everything is input enabled
+                System.out.println("Input violation");
+                CDD.done();
                 return false;
             }
         }
 
         // if we got here it means refinement property holds
+        CDD.done();
         return true;
     }
 
@@ -173,106 +222,126 @@ public class Refinement {
         return result;
     }
 
-    private StatePair buildStatePair(Transition t1, Transition t2) {
-        State target1 = new State(t1.getTarget().getLocation(), t1.getGuardFed());
-        // TODO: Does this make copies of the invariant Federations? should it?
-        target1.applyGuards(t2.getGuards(), allClocks);
+    private boolean checkDelay(State leftState, State rightState)
+    {
+        assert (leftState.getCDD().equiv(rightState.getCDD()));
+        CDD currentStateCDD = new CDD(leftState.getCDD().getPointer()); //TODO: is the explicit new needed?
+        currentStateCDD=currentStateCDD.delay();
 
-        if (!target1.getInvFed().isValid()) {
-            //System.out.println("invarfed not valid");
+        CDD leftPart = currentStateCDD.conjunction(leftState.getInvarCDDDirectlyFromInvariants());
+        CDD rightPart = currentStateCDD.conjunction(rightState.getInvarCDDDirectlyFromInvariants());
+        if (CDD.isSubset(leftPart,rightPart))
+            return true;
+
+        System.out.println("left invariant: " + leftState.getInvarCDDDirectlyFromInvariants());
+        System.out.println("right invariant: " + rightState.getInvarCDDDirectlyFromInvariants());
+        System.out.println("left : " + leftState);
+        System.out.println("right : " + rightState);
+        return false;
+    }
+
+    private StatePair buildStatePair(Transition leaderTransition, Transition followerTransition) {
+        // this function will create the target states for each side.
+        // We start off with the guards of the leader transition, and then do forward exploration on the transition
+        State leaderTarget = new State(leaderTransition.getTarget().getLocation(), leaderTransition.getGuardCDD());
+
+        //forward exploration starts now
+
+        // check if there is a part of the CDD where both leader and follower are enabled, abort otherwise
+        leaderTarget.applyGuards(followerTransition.getGuardCDD());
+        if (leaderTarget.getCDD().isFalse()) {
             return null;
         }
-        target1.applyResets(t1.getUpdates(), allClocks);
-        target1.applyResets(t2.getUpdates(), allClocks);
 
-        target1.getInvFed().delay();
+        leaderTarget.applyResets(leaderTransition.getUpdates());
+        leaderTarget.applyResets(followerTransition.getUpdates());
 
-        target1.applyInvariants(target1.getInvariants(), allClocks);
-        //System.out.println(target1.getInvariants());
-        Federation invariantTest = target1.getInvFed().getCopy();
-        target1.applyInvariants(t2.getTarget().getInvariants(), allClocks);
-        //System.out.println(t2.getTarget().getInvariants());
-
-        // Check if the invariant of the other side does not cut solutions and if so, report failure
-        // This also happens to be a delay check
-        Federation fed = Federation.fedMinusFed(invariantTest, target1.getInvFed());
-        if (!fed.isEmpty()){
-
-            System.out.println("invarfed after substraction not empty");
+        // check target invariants to see if transitions are actually enabled
+        CDD leaderTargetInvariant = leaderTransition.getTarget().getInvarCDDDirectlyFromInvariants();
+        if (leaderTarget.getCDD().conjunction(leaderTargetInvariant).isFalse())
             return null;
-         }
+
+        CDD followerTargetInvariant = followerTransition.getTarget().getInvarCDDDirectlyFromInvariants();
+        if (leaderTarget.getCDD().conjunction(followerTargetInvariant).isFalse())
+            return null;
+
+        // forward explored both transitions, reaching the new target states
+
+        leaderTarget.delay();
+
+        leaderTarget.applyInvariants(leaderTransition.getTarget().getInvarCDDDirectlyFromInvariants());
+        leaderTarget.applyInvariants(followerTransition.getTarget().getInvarCDDDirectlyFromInvariants());
+
 
         // This line can never be triggered, because the transition will not even get constructed if the invariant breaks it
         // The exact same check will catch it but in TransitionSystem instead
-        //if (!target1.getInvZone().isValid()) return null;
+        //if (!leaderTarget.getInvZone().isValid()) return null;
 
-        target1.extrapolateMaxBounds(maxBounds);
-
-        State target2 = new State(t2.getTarget().getLocation(), target1.getInvFed());
-
-        return new StatePair(target1, target2);
+        leaderTarget.extrapolateMaxBounds(maxBounds,allClocks);
+        // if ( leaderTarget.getInvarCDD().equiv(CDD.getUnrestrainedCDD()))
+        //     assert(false);
+        State target2 = new State(followerTransition.getTarget().getLocation(), leaderTarget.getCDD());
+        return new StatePair(leaderTarget, target2);
     }
 
-    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
+    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2, boolean isInput) {
         boolean pairFound = false;
 
-        List<Federation> gzLeft = trans1.stream().map(Transition::getGuardFed).collect(Collectors.toList());
-        List<Federation> gzRight = trans2.stream().map(Transition::getGuardFed).collect(Collectors.toList());
 
-        List<Zone> leftZones = new ArrayList<>();
-        for (Federation f: gzLeft)
-            for (Zone z : f.getZones())
-                leftZones.add(z);
+        List<CDD> gzLeft = trans1.stream().map(Transition::getGuardCDD).collect(Collectors.toList());
+        List<CDD> gzRight = trans2.stream().map(Transition::getGuardCDD).collect(Collectors.toList());
 
-        List<Zone> rightZones = new ArrayList<>();
-        for (Federation f: gzRight)
-            for (Zone z : f.getZones())
-                rightZones.add(z);
+        CDD leftCDD = CDD.cddFalse();
+        for (CDD c: gzLeft)
+            leftCDD = leftCDD.disjunction(c);
 
+        CDD rightCDD = CDD.cddFalse();
+        for (CDD c: gzRight)
+            rightCDD = rightCDD.disjunction(c);
 
-        Federation fedL = new Federation(leftZones);
-        Federation fedR = new Federation(rightZones);
-
-        //fedL.getZones().get(0).printDBM(true,true);
-        //.getZones().get(0).printDBM(true,true);
-
-
-        //System.out.println(trans1.get(0).getSource() + " " + trans1.get(0).getTarget() + " " + trans2.get(0).getSource() + " "  + trans2.get(0).getTarget());
-
-        // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
-        if (!Federation.fedMinusFed(fedL, fedR).isEmpty()) {
-            Federation.fedMinusFed(fedL, fedR).getZones().get(0).printDBM(true,true);
-            System.out.println("trans2 does not satisfy all solution of trans2");
+        // If trans2 does not satisfy all solution of trans1, return empty list which should result in refinement failure
+        if (!isInput && leftCDD.minus(rightCDD).isNotFalse()) {
+            System.out.println("trans 2 does not satisfiy all solutions of trans 1");
+//            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            System.out.println(leftCDD);
+            System.out.println(rightCDD);
+            System.out.println(leftCDD.minus(rightCDD));
             return false;
         }
+
+        if (isInput && rightCDD.minus(leftCDD).isNotFalse()) {
+            System.out.println("trans 2 does not satisfiy all solutions of trans 1");
+//            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            System.out.println(leftCDD);
+            System.out.println(rightCDD);
+            System.out.println(rightCDD.minus(leftCDD));
+            return false;
+        }
+
         for (Transition transition1 : trans1) {
             for (Transition transition2 : trans2) {
                 StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null) {
                     pairFound = true;
-                    if (!passedContainsStatePair(pair) && !waitingContainsStatePair(pair)) {
-                        //if (transition1.getTarget().toString().contains("id7, [id0, id1]")) {
-                        //    System.out.println("reached the bad transition");
-                         //   transition1.getGuardFed().getZones().get(0).printDBM(true, true);
-                         //   transition1.getTarget().getInvFed().getZones().get(0).printDBM(true,true);
-                        //}
-                        waiting.add(pair);
-                        if (RET_REF) {
-                            currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
-                            treeSize++;
-                        }
-                    } else {
-                        if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
-                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), pair.getLeft().getInvFed());
-                            currNode.addSuccessor(edge);
-                            supersetNode.addPredecessor(edge);
+
+                    if (!pair.getRight().getLocation().getIsUniversal())
+                    {
+                        if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
+                            waiting.add(pair);
+                            if (RET_REF) {
+                                currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
+                            }
+                        } else {
+                            if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
+                                GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), (pair.getLeft().getCDD()));
+                                currNode.addSuccessor(edge);
+                                supersetNode.addPredecessor(edge);
+                            }
                         }
                     }
-                } //else System.out.println(pair);
+                }
             }
         }
-        //System.out.println("???" + pairFound);
-        //assert(pairFound==true);
         return pairFound;
     }
 
@@ -286,43 +355,66 @@ public class Refinement {
 
     private boolean checkActions(State state1, State state2, boolean isInput) {
         for (Channel action : (isInput ? inputs2 : outputs1)) {
-            List<Transition> transitions1 = isInput ? ts2.getNextTransitions(state2, action, allClocks)
+            List<Transition> leaderTransitions = isInput ? ts2.getNextTransitions(state2, action, allClocks)
                     : ts1.getNextTransitions(state1, action, allClocks);
 
-            if (!transitions1.isEmpty()) {
+            if (!leaderTransitions.isEmpty()) {
 
-                List<Transition> transitions2;
+                List<Transition> followerTransitions;
                 Set<Channel> toCheck = isInput ? inputs1 : outputs2;
                 if (toCheck.contains(action)) {
-                    transitions2 = isInput ? ts1.getNextTransitions(state1, action, allClocks)
+                    followerTransitions = isInput ? ts1.getNextTransitions(state1, action, allClocks)
                             : ts2.getNextTransitions(state2, action, allClocks);
 
-                    if (transitions2.isEmpty()) {
-                        System.out.println("trans 2 empty");
+                    if (followerTransitions.isEmpty()) {
+                        state2.getCDD().printDot();
+                        System.out.println("followerTransitions empty");
                         return false;
                     }
                 } else {
                     // if action is missing in TS1 (for inputs) or in TS2 (for outputs), add a self loop for that action
-                    transitions2 = new ArrayList<>();
-                    Transition loop = new Transition(state2, state2.getInvFed());
-                    transitions2.add(loop);
+                    followerTransitions = new ArrayList<>();
+                    if (isInput) {
+                        Transition loop = new Transition(state1, state1.getCDD());
+                        followerTransitions.add(loop);
+                    }
+                    else {
+                        Transition loop = new Transition(state2, state2.getCDD());
+                        followerTransitions.add(loop);
+                    }
+
                 }
 
-//                if (isInput && )
-
-                if(!(isInput ? createNewStatePairs(transitions2, transitions1) : createNewStatePairs(transitions1, transitions2)))
+                //System.out.println("Channel: " + action);
+                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput) : createNewStatePairs(leaderTransitions, followerTransitions, isInput))) {
+                    System.out.println(isInput);
+                    System.out.println("followerTransitions: " + followerTransitions.size());
+                    for (Transition t: followerTransitions)
+                        for (Edge e : t.getEdges())
+                            System.out.println(e);
+                    System.out.println("leaderTransitions: " + leaderTransitions.size());
+                    for (Transition t: leaderTransitions)
+                        for (Edge e : t.getEdges())
+                            System.out.println(e);
+                    System.out.println("create pairs failed");
                     return false;
+                }
             }
         }
-
         return true;
     }
 
     private boolean passedContainsStatePair(StatePair pair) {
-       LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
-
+        LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
         if (passed.containsKey(locPair)) {
-            return listContainsStatePair(pair, passed.get(locPair));
+            if (CDD.isSubset(pair.getRight().getCDD(),passed.get(locPair).getRight().getCDD()))
+                return true;
+            if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
+                assert(false); // left and right side are supposed to be identical at all times, so this should not be reachable
+            /*if (pair.getRight().getCDD().toFederation().isSubset(passed.get(locPair).getRight().getCDD().toFederation()))
+            {
+                assert(false);
+            }*/
         }
 
         return false;
@@ -336,6 +428,9 @@ public class Refinement {
         State currLeft = pair.getLeft();
         State currRight = pair.getRight();
 
+
+
+
         for (StatePair state : pairs) {
             // check for zone inclusion
             State passedLeft = state.getLeft();
@@ -343,10 +438,14 @@ public class Refinement {
 
             if (passedLeft.getLocation().equals(currLeft.getLocation()) &&
                     passedRight.getLocation().equals(currRight.getLocation())) {
-                if (currLeft.getInvFed().isSubset(passedLeft.getInvFed()) &&
-                        currRight.getInvFed().isSubset(passedRight.getInvFed())) {
+                if (CDD.isSubset(currLeft.getCDD(),passedLeft.getCDD()) &&
+                        CDD.isSubset(currRight.getCDD(),passedRight.getCDD())) {
                     supersetNode = state.getNode();
                     return true;
+                }
+                if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
+                {
+                    assert(false);
                 }
             }
         }
@@ -355,22 +454,22 @@ public class Refinement {
     }
 
     public StatePair getInitialStatePair() {
-        //System.out.println(ts1.getInitialLocation().getInvariants() + " // " + ts2.getInitialLocation().getInvariants());
-        //System.out.println(ts1.getInitialLocation().toString());
-        //assert(ts1.getInitialLocation().getInvariants().size()<=1 && ts2.getInitialLocation().getInvariants().size()<=1); // TODO: this just holds for testing until we have tests with disjunctions as input files
-        State left = ts1.getInitialStateRef(allClocks, ts2.getInitialLocation().getInvariants());
-        State right = ts2.getInitialStateRef(allClocks, ts1.getInitialLocation().getInvariants());
-
+        State left = ts1.getInitialStateRef( ts2.getInitialLocation().getInvariantCDD());
+        State right = ts2.getInitialStateRef(ts1.getInitialLocation().getInvariantCDD());
         return new StatePair(left, right);
     }
 
     public void setMaxBounds() {
-        List<Integer> res = new ArrayList<>();
-        res.add(0);
-        res.addAll(ts1.getMaxBounds());
-        res.addAll(ts2.getMaxBounds());
-System.out.println("here!" + res);
-
-        maxBounds = res.stream().mapToInt(i -> i).toArray();
+        HashMap<Clock,Integer> res = new HashMap<>();
+        res.putAll(ts1.getMaxBounds());
+        res.putAll(ts2.getMaxBounds());
+        System.out.println("BOUNDS: " + res);
+        maxBounds = res;
     }
+
+
+
+
+
+
 }

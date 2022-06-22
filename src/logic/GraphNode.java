@@ -1,7 +1,6 @@
 package logic;
 
 import models.Edge;
-import models.StatePair;
 
 import java.util.ArrayList;
 import java.util.List;

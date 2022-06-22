@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class InvalidQueryException extends Exception{
     public InvalidQueryException(String message) {

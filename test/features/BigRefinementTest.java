@@ -4,6 +4,9 @@ import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
@@ -14,6 +17,11 @@ import static org.junit.Assert.assertTrue;
 public class BigRefinementTest {
 
     private static TransitionSystem comp1, comp1Copy, ref1, ref1Copy;
+
+    @AfterClass
+    public static void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {

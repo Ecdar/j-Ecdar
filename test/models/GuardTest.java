@@ -13,28 +13,28 @@ public class GuardTest {
 
     @Test
     public void test1() {
-        Guard g = new Guard(x, 5, true, true);
+        ClockGuard g = new ClockGuard(x, 5, Relation.GREATER_THAN);
         assert g.getLowerBound() == 5;
         assert g.getUpperBound() == Integer.MAX_VALUE;
     }
 
     @Test
     public void test2() {
-        Guard g = new Guard(x, 5, false, true);
+        ClockGuard g = new ClockGuard(x, 5, Relation.LESS_THAN);
         assert g.getLowerBound() == 0;
         assert g.getUpperBound() == 5;
     }
 
     @Test
     public void test3() {
-        Guard g = new Guard(x, 5, true, false);
+        ClockGuard g = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
         assert g.getLowerBound() == 5;
         assert g.getUpperBound() == Integer.MAX_VALUE;
     }
 
     @Test
     public void test4() {
-        Guard g = new Guard(x, 5, false, false);
+        ClockGuard g = new ClockGuard(x, 5, Relation.LESS_EQUAL);
         assert g.getLowerBound() == 0;
         assert g.getUpperBound() == 5;
     }

@@ -1,12 +1,15 @@
 package dbm;
 
 import lib.DBMLib;
+import logic.State;
 import models.*;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -16,54 +19,57 @@ public class DBMTest {
     private static State state1, state2, state3, state4, state5;
     private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
+    private static Clock x,y,z;
+
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        Location l1 = new Location("L0", new ArrayList<>(), false, false, false, false);
+        Location l1 = new Location("L0", new TrueGuard(), false, false, false, false);
         SymbolicLocation sl1 = new SimpleLocation(l1);
 
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
-        Clock z = new Clock("z");
+        x = new Clock("x");
+        y = new Clock("y");
+        z = new Clock("z");
 
-        clockList.addAll(Arrays.asList(x, y, z));
-
+        clockList.addAll(Arrays.asList(x, y,z));
+        CDD.init(100,100,100);
+        CDD.addClocks(clockList);
         // STATES----------------------
         // From 0 to inf
-        Zone z1 = new Zone(new int[]{1, 1, DBM_INF, 1});
-        List<Zone> list1 = new ArrayList<>();
-        list1.add(z1);
-
-        state1 = new State(sl1, new Federation(list1));
+        Zone z1 = new Zone(new int[]{1, 1, 10, 20});
+        CDD cdd1 = CDD.allocateFromDbm(z1.getDbm(),clockList.size()+1);
+        state1 = new State(sl1, cdd1);
 
         // From 2 to inf
         Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
-        List<Zone> list2 = new ArrayList<>();
-        list2.add(z2);
-        state2 = new State(sl1, new Federation(list2));
+        CDD cdd2 = CDD.allocateFromDbm(z2.getDbm(),clockList.size()+1);
+        state2 = new State(sl1, cdd2);
 
         // From 0 to 5
         Zone z3 = new Zone(new int[]{1, 1, 11, 1});
-        List<Zone> list3 = new ArrayList<>();
-        list3.add(z3);
-        state3 = new State(sl1, new Federation(list3));
+        CDD cdd3 = CDD.allocateFromDbm(z3.getDbm(),clockList.size()+1);
+        state3 = new State(sl1, cdd3);
 
         // From 3 to 12
         Zone z4 = new Zone(new int[]{1, -5, 25, 1});
-        List<Zone> list4 = new ArrayList<>();
-        list4.add(z4);
-        state4 = new State(sl1, new Federation(list4));
+        CDD cdd4 = CDD.allocateFromDbm(z4.getDbm(),clockList.size()+1);
+        state4 = new State(sl1, cdd4);
 
 
         // GUARDS---------------------
-        g1 = new Guard(x, 5, true, false);
-        g2 = new Guard(x, 1, true, false);
-        g3 = new Guard(x, 7, false, false);
-        g4 = new Guard(x, 14, false, false);
+        g1 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
+        g2 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
+        g3 = new ClockGuard(x, 7, Relation.LESS_EQUAL);
+        g4 = new ClockGuard(x, 14, Relation.LESS_EQUAL);
 
-        g5 = new Guard(x, 505, true, false);
-        g6 = new Guard(y, 8, true, false);
-
+        g5 = new ClockGuard(x, 505, Relation.GREATER_EQUAL);
+        g6 = new ClockGuard(y, 8, Relation.GREATER_EQUAL);
+        CDD.done();
     }
 
     @Test
@@ -95,6 +101,71 @@ public class DBMTest {
     public void testRaw2Bound1() {
         assertEquals(0, DBMLib.raw2bound(1));
     }
+
+
+    @Test
+    public void testExtrapolate() {
+        CDD.init(100,100,100);
+        CDD.addClocks(clockList);
+        HashMap<Clock,Integer> map = new HashMap<>();
+        map.put(x,10);
+        map.put(y,30);
+        map.put(z,10);
+
+        Guard g1 = new ClockGuard(x, y, 40, Relation.LESS_THAN );  //x>4
+        List<Guard> disj1 = new ArrayList<>();
+        disj1.add(g1);
+        Guard dis1 = new AndGuard(disj1);
+
+        Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);
+        State state1 = new State(new SimpleLocation(l1),new CDD(dis1));
+        state1.delay();
+        System.out.println(state1);
+        state1.extrapolateMaxBounds(map,clockList);
+        System.out.println(state1);
+        assertEquals(state1.toString(), "{L1, (x>1 && y>2 && y-x<1)}");
+        CDD.done();
+    }
+
+    @Test
+    public void testExtrapolate1() {
+
+        int[] arr = new int[]{1,-24,1,-12,-7,-24,
+                117, 1 ,101,25 ,55 ,1,
+                17,-24 , 1,-12,-7,-24,
+                 93,-11,77,1,31,-11,
+                 88,-16,72,-4,1,-16,
+                121,9,105,33,59,1};
+        Zone z = new Zone(arr);
+        z= z.close();
+        z.printDBM(true,true);
+        System.out.println(z.isValid());
+        int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+    }
+
+    @Test
+    public void testExtrapolate2() {
+
+        int[] arr = new int[]{1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                1,1,1,1,1,1,
+                121,1,1,1,1,1,};
+        Zone z = new Zone(arr);
+        z.printDBM(true,true);
+        System.out.println(z.isValid());
+        int[] bounds = new int[] {0, 12, 31, 41, 41, 41};
+        z.extrapolateMaxBounds(bounds);
+        z.printDBM(true,true);
+    }
+
 
     @Test
     public void testRaw2Bound2() {
@@ -227,9 +298,6 @@ public class DBMTest {
         int[][] arr1 = DBMLib.dbm_minus_dbm(dbm1, dbm2, dim);
         Federation fed1 = new Federation(arr1);
 
-//        for (Zone zone : fed1.getZones()) {
-//            zone.printDBM(true, true);
-//        }
 
         int[] dbm3 = new int[]{1, 1, 1, DBM_INF, 1, DBM_INF, DBM_INF, DBM_INF, 1};
 
@@ -240,10 +308,6 @@ public class DBMTest {
 
         int[][] arr2 = DBMLib.fed_minus_dbm(arr1, dbm3, dim);
         Federation fed2 = new Federation(arr2);
-
-//        for (Zone zone : fed2.getZones()) {
-//            zone.printDBM(true, true);
-//        }
 
         assertEquals(fed1.size(), 4);
         assertEquals(fed2.size(), 5);

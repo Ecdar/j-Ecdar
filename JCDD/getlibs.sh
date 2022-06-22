@@ -46,10 +46,10 @@ cmake --build . --config Release
 cmake --install . --config Release
 
 cd $SOURCE_DIR/build/ext-libs/sources;
-wget https://github.com/UPPAALModelChecker/UCDD/archive/refs/tags/v0.2.1.tar.gz
-tar -xvf v0.2.1.tar.gz
-mkdir -p "$SOURCE_DIR/build/ext-libs/sources/UCDD-0.2.1/build"
-cd "$SOURCE_DIR/build/ext-libs/sources/UCDD-0.2.1"
+wget https://github.com/Ecdar/UCDD/archive/merge.tar.gz
+tar -xvf merge.tar.gz
+mkdir -p "$SOURCE_DIR/build/ext-libs/sources/UCDD-merge/build"
+cd "$SOURCE_DIR/build/ext-libs/sources/UCDD-merge"
 cd build
 cmake $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX="$SOURCE_DIR/build/ext-libs/UCDD" ..
 cmake --build . --config Release

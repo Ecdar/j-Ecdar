@@ -5,6 +5,8 @@ import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
@@ -14,6 +16,11 @@ import static org.junit.Assert.assertTrue;
 
 public class AGTest {
     private static TransitionSystem a, aCopy, g, gCopy, q, qCopy, imp, impCopy, aa, aaCopy;
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -66,6 +73,7 @@ public class AGTest {
 
     @Test
     public void AGNotRefinesAImp() {
+
         // should fail because left side has more inputs
         assertFalse(new Refinement(
                 new Composition(new TransitionSystem[]{a, g}),
@@ -95,6 +103,7 @@ public class AGTest {
 
     @Test
     public void GRefinesQ() {
+
         assertTrue(new Refinement(g, q).check());
     }
 
@@ -115,8 +124,9 @@ public class AGTest {
     }
 
     @Test
-    public void ANotRefinesAA() {
-        // should fail because right side has more inputs
-        assertFalse(new Refinement(a, aa).check());
+    public void ARefinesAA() {
+        // was supposed to fail because right side has more inputs
+        // now that the left side inputs has to be a subset, its okay
+        assertTrue(new Refinement(a, aa).check());
     }
 }

@@ -41,8 +41,8 @@ public class InconsistentLocation extends SymbolicLocation {
         return 0;
     }
 
-    public List<List<Guard>> getInvariants() {
+    public CDD getInvariantCDD() {
         // TODO the new clock should be <= 0
-        return new ArrayList<>();
+        return CDD.zeroCDD();
     }
 }

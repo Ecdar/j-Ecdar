@@ -5,13 +5,17 @@ import models.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static models.CDD.getIndexOfBV;
+
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
     final List<Clock> clocks;
+    final List <BoolVar> BVs;
     private StringBuilder lastErr = new StringBuilder();
 
     TransitionSystem() {
         this.clocks = new ArrayList<>();
+        this.BVs = new ArrayList<>();
     }
 
     public abstract Automaton getAutomaton();
@@ -20,27 +24,46 @@ public abstract class TransitionSystem {
         return clocks;
     }
 
+    public List<BoolVar> getBVs() {
+        return BVs;
+    };
+
+
     public State getInitialState() {
-        //System.out.println("clocks " + clocks);
-        Zone zone = new Zone(clocks.size() + 1, true);
-        List<Zone> zoneList = new ArrayList<>();
-        zoneList.add(zone);
-        Federation initFed = new Federation(zoneList);
-        State state = new State(getInitialLocation(), initFed);
-        state.applyInvariants(clocks);
-        //System.out.println("Initial Zone size first " + state.getInvFed().size() + " " + initFed.size());
+        CDD initCDD = CDD.zeroCDDDelayed();
+        CDD bddPart = CDD.cddTrue();
+        for (BoolVar bv : BVs)
+        {
+            if (bv.getInitialValue())
+                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+            else {
+
+                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+
+            }
+        }
+
+        State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
+        state.applyInvariants();
         return state;
     }
 
-    public State getInitialStateRef(List<Clock> allClocks, List<List<Guard>> invs) {
-        Zone zone = new Zone(allClocks.size() + 1, true);
-        List<Zone> zoneList = new ArrayList<>();
-        zoneList.add(zone);
-        Federation initFed = new Federation(zoneList);
-        State state = new State(getInitialLocation(), initFed);
-        state.applyInvariants(allClocks);
-        state.applyGuards(invs, allClocks);
-        //System.out.println("Initial Zone size second" + initFed.size());
+    public State getInitialStateRef( CDD invs) {
+
+        CDD initCDD = CDD.zeroCDDDelayed();
+        CDD bddPart = CDD.cddTrue();
+        for (BoolVar bv : CDD.BVs)
+        {
+            if (bv.getInitialValue())
+                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+            else
+                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+        }
+
+        State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
+
+        state.applyInvariants();
+        state.applyGuards(invs);
 
         return state;
     }
@@ -54,45 +77,28 @@ public abstract class TransitionSystem {
 
     List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
         List<Transition> transitions = new ArrayList<>();
-        //System.out.println(currentState + " " + moves.size());
         // loop through moves
         for (Move move : moves) {
+            State targetState = new State(move.getTarget(), currentState.getCDD());
+            targetState.applyGuards(move.getGuardCDD());
 
-            // gather all the guards and resets of one move
-            List<List<Guard>> guards = move.getGuards();
-            List<Update> updates = move.getUpdates();
-            //System.out.println("reached createNewTransitions1");
-            // TODO: just turned zones into feds, need to check whether there is some special behaviour.
-            // need to make a copy of the zone. Arrival zone of target state is invalid right now
+            if (targetState.getCDD().isFalse())
+            {
+                continue;
+            }
 
-            State targetState = new State(move.getTarget(), currentState.getInvFed());
-            //System.out.println("************************************************************************************************"+currentState.getInvFed().getZones().size());
-           // currentState.getInvFed().getZones().get(0).printDBM(true,true);
-            if (!guards.isEmpty()) targetState.applyGuards(guards, allClocks);
-            //System.out.println("reached createNewTransitions8");
-            //System.out.println(move.getGuards());
-            //System.out.println(move.getEdges().get(0));
-           // currentState.getInvFed().getZones().get(0).printDBM(true,true);
-            //targetState.getInvFed().getZones().get(0).printDBM(true,true);
-            if (!targetState.getInvFed().isValid()) continue;
-            //System.out.println("reached createNewTransitions9");
+            CDD guardCDD = new CDD(targetState.getCDD().getPointer());
 
-            Federation guardFed = new Federation(targetState.getInvFed().getZones());
-            //System.out.println(guardFed.getZones().size());
-            if (!updates.isEmpty()) targetState.applyResets(updates, allClocks);
-            //System.out.println("reached createNewTransitions2");
-            //System.out.println(guardFed.getZones().size());
-            targetState.getInvFed().delay();
-            //System.out.println("reached createNewTransitions5");
-            targetState.applyInvariants(allClocks);
-            //System.out.println("reached createNewTransitions3");
-            if (!targetState.getInvFed().isValid()) continue;
-            //System.out.println("reached createNewTransitions4");
+            targetState.applyResets(move.getUpdates());
+            targetState.delay();
+            targetState.applyInvariants();
 
-            assert(guardFed.getZones().size()!=0);
-            transitions.add(new Transition(currentState, targetState, move, guardFed));
+            if (targetState.getCDD().isFalse())
+            {
+                continue;
+            }
+            transitions.add(new Transition(currentState, targetState, move, guardCDD));
         }
-        //System.out.println(transitions.size());
         return transitions;
     }
 
@@ -124,13 +130,19 @@ public abstract class TransitionSystem {
 
 
     public boolean isDeterministic(){
-       // System.out.println("reached isdeterm1");
+        if (!CDD.isCddIsRunning())
+        {
+            CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+            CDD.addClocks(clocks);
+            CDD.addBddvar(BVs);
+
+        }
+
         boolean isDeterministic = true;
         List<String> nondetermTs = new ArrayList<>();
 
         List<SimpleTransitionSystem> systems = getSystems();
 
-        //System.out.println("reached isdeterm2");
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isDeterministicHelper()){
                 isDeterministic = false;
@@ -138,16 +150,15 @@ public abstract class TransitionSystem {
             }
         }
 
-        //System.out.println("reached isdeterm3");
         if(!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
 
-
+        CDD.done();
         return isDeterministic;
     }
 
     public boolean isLeastConsistent(){
-        //System.out.println("reached isleastcons1");
-        return isConsistent(true);
+        boolean result = isConsistent(true);
+        return result;
     }
 
     public boolean isFullyConsistent(){
@@ -157,23 +168,29 @@ public abstract class TransitionSystem {
     private boolean isConsistent(boolean canPrune) {
         boolean isDeterm = isDeterministic();
         boolean isConsistent = true;
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
+        CDD.addBddvar(BVs);
+
         List<String> inconsistentTs = new ArrayList<>();
-        //System.out.println("reached cons 0");
         List<SimpleTransitionSystem> systems = getSystems();
-        //System.out.println("reached cons 1");
         for (SimpleTransitionSystem ts : systems){
             if(!ts.isConsistentHelper(canPrune)) {
                 isConsistent = false;
                 inconsistentTs.add(ts.getName());
             }
         }
-
         if(!isConsistent) buildErrMessage(inconsistentTs, "inconsistent");
+
+        CDD.done();
         return isConsistent && isDeterm;
     }
 
     public boolean isImplementation(){
         boolean isCons = isFullyConsistent();
+        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+        CDD.addClocks(getClocks());
+        CDD.addBddvar(BVs);
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
@@ -183,16 +200,19 @@ public abstract class TransitionSystem {
                 isImpl = false;
             nonImpl.add(ts.getName());
         }
-        if(!isImpl) buildErrMessage(nonImpl, "not output urgent");
+        if(!isImpl) {
+            buildErrMessage(nonImpl, "not output urgent");
+        }
+        CDD.done();
         return isImpl && isCons;
     }
 
-    public List<Integer> getMaxBounds(){
+    public HashMap<Clock,Integer> getMaxBounds(){
         List<SimpleTransitionSystem> systems = getSystems();
-        List<Integer> res = new ArrayList<>();
+        HashMap<Clock,Integer> res = new HashMap<>();
 
         for (TransitionSystem ts : systems){
-            res.addAll(ts.getMaxBounds());
+            res.putAll(ts.getMaxBounds());
         }
         return res;
     }
@@ -205,9 +225,8 @@ public abstract class TransitionSystem {
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 
-    List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest) {
+    List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest, boolean removeTargetInvars) {
         List<Move> moves = new ArrayList<>();
-        //System.out.println("reached moveProduct");
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
 
@@ -216,6 +235,8 @@ public abstract class TransitionSystem {
                 if (toNest) {
                     source = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getSource(), move2.getSource())));
                     target = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getTarget(), move2.getTarget())));
+                    if (removeTargetInvars)
+                        ((ComplexLocation)target).removeInvariants();
                 } else {
                     List<SymbolicLocation> newSourceLoc = new ArrayList<>(((ComplexLocation) move1.getSource()).getLocations());
                     newSourceLoc.add(move2.getSource());
@@ -224,6 +245,8 @@ public abstract class TransitionSystem {
                     List<SymbolicLocation> newTargetLoc = new ArrayList<>(((ComplexLocation) move1.getTarget()).getLocations());
                     newTargetLoc.add(move2.getTarget());
                     target = new ComplexLocation(newTargetLoc);
+                    if (removeTargetInvars)
+                        ((ComplexLocation)target).removeInvariants();
                 }
 
                 List<Edge> edges = new ArrayList<>(move1.getEdges());
@@ -236,11 +259,33 @@ public abstract class TransitionSystem {
         return moves;
     }
 
+    public List<Location> updateClocksInLocs(Set<Location> locs, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs)
+    {
+        List<Location> result = new ArrayList<>();
+        for (Location loc: locs)
+        {
+            result.add(new Location(loc, newClocks, oldClocks,newBVs,oldBVs));
+        }
+        return result;
+    }
+
+    public List<Edge> updateClocksInEdges(Set<Edge> edges, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs)
+    {
+        List<Edge> result = new ArrayList<>();
+        for (Edge edge: edges)
+        {
+            result.add(new Edge(edge, newClocks, newBVs, edge.getSource(), edge.getTarget(), oldClocks,oldBVs));
+        }
+        return result;
+    }
+
     public void buildErrMessage(List<String> inc, String checkType) {
+        if (! (lastErr.length()==0))
+            lastErr.append(", ");
         if (inc.size() == 1) {
             lastErr.append("Automaton ");
             lastErr.append(inc.get(0));
-            lastErr.append(" is ").append(checkType).append(".\n");
+            lastErr.append(" is ").append(checkType).append(".");
         } else {
             lastErr.append("Automata ");
             for (int i = 0; i < inc.size(); i++) {
@@ -251,7 +296,7 @@ public abstract class TransitionSystem {
                     lastErr.append(", ");
                 }
             }
-            lastErr.append(" are ").append(checkType).append(".\n");
+            lastErr.append(" are ").append(checkType).append(".");
         }
     }
 

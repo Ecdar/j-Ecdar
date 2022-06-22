@@ -1,9 +1,10 @@
 package models;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class LocationPair {
-    private SymbolicLocation leftLocation, rightLocation;
+    public SymbolicLocation leftLocation, rightLocation;
 
     public LocationPair(SymbolicLocation leftLocation, SymbolicLocation rightLocation) {
         this.leftLocation = leftLocation;
@@ -15,6 +16,7 @@ public class LocationPair {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LocationPair that = (LocationPair) o;
+
         return leftLocation.equals(that.leftLocation) &&
                 rightLocation.equals(that.rightLocation);
     }
@@ -23,4 +25,6 @@ public class LocationPair {
     public int hashCode() {
         return Objects.hash(leftLocation, rightLocation);
     }
+
+
 }

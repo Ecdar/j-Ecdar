@@ -1,53 +1,30 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Location {
 
     private final String name;
-    private List<List<Guard>> invariant;
+    private Guard invariant;
     private int x,y;
 
-    public Federation getInconsistentPart() {
+
+
+    public CDD getInconsistentPart() {
         return inconsistentPart;
     }
 
-    public void setInconsistentPart(Federation inconsistentPart) {
+    public void setInconsistentPart(CDD inconsistentPart) {
         this.inconsistentPart = inconsistentPart;
     }
 
-    private int getIndexOfClock(Clock clock, List<Clock> clocks) {
-        for (int i = 0; i < clocks.size(); i++){
-            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
-        }
-        return 0;
-    }
 
-    public Federation getInvariantFederation(List<Clock> clocks)
+    public CDD getInvariantCDD()
     {
-        List<Zone> zoneList = new ArrayList<>();
-        for (List<Guard> list: invariant)
-        {
-            Zone z = new Zone(clocks.size() + 1, true);
-            z.init();
-            for (Guard g: list)
-            {
-                z.buildConstraintsForGuard(g, getIndexOfClock(g.getClock(),clocks));
-            }
-            zoneList.add(z);
-        }
-        if (invariant.isEmpty()) {
-            Zone z = new Zone(clocks.size() + 1, true);
-            z.init();
-            zoneList.add(z);
-        }
-        return new Federation(zoneList);
-
+        return new CDD(invariant);
     }
 
-    private Federation inconsistentPart;
+    private CDD inconsistentPart;
     private boolean isInitial;
 
     private  boolean isUrgent;
@@ -62,7 +39,7 @@ public class Location {
         return isInconsistent;
     }
 
-    public void setInvariant(List<List<Guard>> invariant) {
+    public void setInvariant(Guard invariant) {
         this.invariant = invariant;
     }
 
@@ -99,7 +76,7 @@ public class Location {
 
 
 
-    public Location(String name, List<List<Guard>> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
+    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
         this.name = name;
         this.invariant = invariant;
         this.isInitial = isInitial;
@@ -108,7 +85,7 @@ public class Location {
         this.isInconsistent = isInconsistent || this.getName().equals("inc");
         this.inconsistentPart = null;
     }
-    public Location(String name, List<List<Guard>> invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
+    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
         this.name = name;
         this.invariant = invariant;
         this.isInitial = isInitial;
@@ -120,17 +97,22 @@ public class Location {
         this.y=y;
     }
 
-    public Location(Location copy, List<Clock> clocks){
+    public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs){
         this.name = copy.name;
 
-        this.invariant = new ArrayList<>();
-        for (List<Guard> list : copy.invariant) {
-            List<Guard> interm = new ArrayList<Guard>();
-            for (Guard g : list) {
-                interm.add(new Guard(g, clocks));
-            }
-            this.invariant.add(interm);
-        }
+
+        if (copy.getInvariant() instanceof  ClockGuard)
+            invariant = (new ClockGuard((ClockGuard) copy.getInvariant(), newClocks,oldClocks));
+        if (copy.getInvariant() instanceof  BoolGuard)
+            invariant = (new BoolGuard((BoolGuard) copy.getInvariant(), newBVs,oldBVs));
+        if (copy.getInvariant() instanceof AndGuard)
+            invariant = (new AndGuard( (AndGuard) copy.getInvariant(), newClocks, oldClocks, newBVs, oldBVs));
+        if (copy.getInvariant() instanceof OrGuard)
+            invariant = (new OrGuard( (OrGuard) copy.getInvariant(), newClocks, oldClocks, newBVs, oldBVs));
+        if (copy.getInvariant() instanceof FalseGuard)
+            invariant = (new FalseGuard());
+        if (copy.getInvariant() instanceof TrueGuard)
+            invariant = (new TrueGuard());
 
         this.isInitial = copy.isInitial;
         this.isUrgent = copy.isUrgent;
@@ -138,11 +120,12 @@ public class Location {
         this.isInconsistent = copy.isInconsistent;
     }
 
+
     public String getName() {
         return name;
     }
 
-    public List<List<Guard>> getInvariant() {
+    public Guard getInvariant() {
         return invariant;
     }
 
@@ -156,15 +139,7 @@ public class Location {
 
     public int getMaxConstant(Clock clock){
         int constant = 0;
-
-        for (List<Guard> list : invariant) {
-            for(Guard guard : list) {
-                if (clock.equals(guard.getClock())) {
-                    if (guard.getActiveBound() > constant) constant = guard.getActiveBound();
-                }
-            }
-        }
-
+        constant = invariant.getMaxConstant();
         return constant;
     }
 
@@ -173,27 +148,23 @@ public class Location {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Location location = (Location) o;
-        boolean invarsMatch = true;
-        if (invariant.size()!=location.invariant.size())
-            invarsMatch = false;
-        else
-            for (int i=0; i<invariant.size();i++)
-            {
-                invarsMatch = invarsMatch && Arrays.equals(invariant.get(i).toArray(), location.invariant.get(i).toArray());
-            }
-        assert(invarsMatch ==
-                Arrays.equals(invariant.toArray(), location.invariant.toArray()) );
-
         return isInitial == location.isInitial &&
                 isUrgent == location.isUrgent &&
                 isUniversal == location.isUniversal &&
                 isInconsistent == location.isInconsistent &&
                 name.equals(location.name) &&
-                invarsMatch;
+                invariant.equals(location.invariant);
     }
 
     @Override
     public String toString() {
         return name;
     }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isInitial, isUrgent, isUniversal, isInconsistent, name, invariant);
+    }
+
 }

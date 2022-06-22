@@ -1,10 +1,11 @@
 package parser;
 
-import EdgeGrammar.EdgeGrammarParser;
-import EdgeGrammar.EdgeGrammarLexer;
-import EdgeGrammar.EdgeGrammarBaseVisitor;
-import models.Clock;
-import models.Guard;
+import GuardGrammar.GuardGrammarParser;
+import GuardGrammar.GuardGrammarLexer;
+import GuardGrammar.GuardGrammarBaseVisitor;
+import exceptions.BooleanVariableNotFoundException;
+import exceptions.ClockNotFoundException;
+import models.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,99 +17,85 @@ import java.util.List;
 public class GuardParser {
 
     private static List<Clock> clocks;
+    private static List<BoolVar> BVs;
 
-    public static List<List<Guard>> parse(String guardString, List<Clock> clockList){
+    private static Clock findClock(String clockName) {
+        for (Clock clock : clocks)
+            if (clock.getName().equals(clockName)) return clock;
+
+        throw new ClockNotFoundException("Clock: " + clockName + " was not found");
+    }
+
+    private static BoolVar findBV(String name) {
+        for (BoolVar bv : BVs)
+            if (bv.getName().equals(name))
+                return bv;
+
+        throw new BooleanVariableNotFoundException("Boolean variable: " + name + " was not found");
+    }
+
+    public static Guard parse(String guardString, List<Clock> clockList, List<BoolVar> BVList) {
         clocks = clockList;
+        BVs = BVList;
         CharStream charStream = CharStreams.fromString(guardString);
-        EdgeGrammarLexer lexer = new EdgeGrammarLexer(charStream);
+        GuardGrammarLexer lexer = new GuardGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
         TokenStream tokens = new CommonTokenStream(lexer);
-        EdgeGrammarParser parser = new EdgeGrammarParser(tokens);
+        GuardGrammarParser parser = new GuardGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
 
-        OrVisitor orVisitor = new OrVisitor();
-        return orVisitor.visit(parser.guard());
+        GuardVisitor guardVisitor = new GuardVisitor();
+        return guardVisitor.visit(parser.guard());
     }
 
-    private static class OrVisitor extends EdgeGrammarBaseVisitor<List<List<Guard>>>{
-
-        private List<List<Guard>> guardList;
-
-        public OrVisitor() {
-            guardList = new ArrayList<>();
-        }
+    private static class GuardVisitor extends  GuardGrammarBaseVisitor<Guard>{
 
         @Override
-        public List<List<Guard>> visitGuard(EdgeGrammarParser.GuardContext ctx) {
-            if(ctx.or() != null){
-                return visit(ctx.or());
-            }else{
-                return null;
+        public Guard visitOr(GuardGrammarParser.OrContext ctx) {
+            List<Guard> orGuards = new ArrayList<>();
+            for(GuardGrammarParser.OrExpressionContext orExpression: ctx.orExpression()){
+                orGuards.add(visit(orExpression));
             }
+
+            return new OrGuard(orGuards);
+        }
+
+        public Guard visitAnd(GuardGrammarParser.AndContext ctx) {
+            List<Guard> guards = new ArrayList<>();
+            for (GuardGrammarParser.ExpressionContext expression: ctx.expression()) {
+                guards.add(visit(expression));
+            }
+            return new AndGuard(guards);
         }
 
         @Override
-        public List<List<Guard>> visitOr(EdgeGrammarParser.OrContext ctx) {
-            AndVisitor andVisitor = new AndVisitor();
-            guardList.add(andVisitor.visit(ctx.and()));
-
-            if(ctx.or() != null)
-                visit(ctx.or());
-
-            return guardList;
-        }
-    }
-
-    private static class AndVisitor extends EdgeGrammarBaseVisitor<List<Guard>>{
-
-        private List<Guard> guards;
-
-        public AndVisitor() {
-            guards = new ArrayList<>();
+        public Guard visitExpression(GuardGrammarParser.ExpressionContext ctx) {
+            if(ctx.BOOLEAN() != null) {
+                boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
+                return value ? new TrueGuard() : new FalseGuard();
+            }else if(ctx.guard() != null){
+                return visit(ctx.guard());
+            }
+            return visitChildren(ctx);
         }
 
         @Override
-        public List<Guard> visitAnd(EdgeGrammarParser.AndContext ctx) {
-            ExpressionVisitor expressionVisitor = new ExpressionVisitor();
-            Guard guard = expressionVisitor.visit(ctx.compareExpr());
-            guards.add(guard);
-
-            if(ctx.and() != null)
-                visit(ctx.and());
-
-            return guards;
-        }
-    }
-
-    private static class ExpressionVisitor extends EdgeGrammarBaseVisitor<Guard> {
-         private Clock findClock(String clockName) {
-            for (Clock clock : clocks)
-                if (clock.getName().equals(clockName)) return clock;
-
-            return null;
-        }
-
-        @Override
-        public Guard visitCompareExpr(EdgeGrammarParser.CompareExprContext ctx) {
-            int value = Integer.parseInt(ctx.TERM(1).getText());
+        public Guard visitClockExpr(GuardGrammarParser.ClockExprContext ctx) {
+            int value = Integer.parseInt(ctx.INT().getText());
             String operator = ctx.OPERATOR().getText();
-            Clock clock = findClock(ctx.TERM(0).getText());
-            Guard guard;
+            Clock clock = findClock(ctx.VARIABLE().getText());
 
-            if(operator.equals("==")){
-                guard = new Guard(clock, value);
-            }else {
-                boolean isStrict = false, greater = false;
-                if(operator.startsWith(">")){
-                    greater = true;
-                }
-                if(operator.length() == 1){
-                    isStrict = true;
-                }
-                guard = new Guard(clock, value, greater, isStrict);
-            }
+            Relation relation = Relation.fromString(operator);
+            return new ClockGuard(clock, value, relation);
+        }
 
-            return guard;
+        @Override
+        public Guard visitBoolExpr(GuardGrammarParser.BoolExprContext ctx) {
+            boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
+            String operator = ctx.OPERATOR().getText();
+            BoolVar bv = findBV(ctx.VARIABLE().getText());
+
+            return new BoolGuard(bv, operator, value);
         }
     }
 }

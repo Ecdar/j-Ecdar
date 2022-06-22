@@ -5,6 +5,8 @@ import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
+import models.CDD;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
@@ -13,6 +15,11 @@ import parser.XMLParser;
 import static org.junit.Assert.assertTrue;
 
 public class CompositionTest {
+
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
             machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy;
@@ -52,7 +59,6 @@ public class CompositionTest {
 
     @Test
     public void testCompposition() {
-
         Composition comp = new Composition(new TransitionSystem[]{ machine, researcher});
         Automaton aut = comp.getAutomaton();
         SimpleTransitionSystem s = new SimpleTransitionSystem(aut);
@@ -62,7 +68,6 @@ public class CompositionTest {
 
     @Test
     public void testCompposition1() {
-
         Composition comp = new Composition(new TransitionSystem[]{ adm, machine, researcher });
         Automaton aut = comp.getAutomaton();
         SimpleTransitionSystem s = new SimpleTransitionSystem(aut);
@@ -74,15 +79,13 @@ public class CompositionTest {
     public void selfloopTest() {
 
         Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);
+        Automaton copy = new Automaton(aut1[0]);
         SimpleTransitionSystem selfloop = new SimpleTransitionSystem(aut1[0]);
-        SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(aut1[0]);
+        SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(copy);
         Refinement ref = new Refinement(selfloop,selfloop1);
-
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());
         assert (res==true);
-
-
     }
 
     @Test
@@ -105,7 +108,7 @@ public class CompositionTest {
         st.toXML("testOutput/aWeirdOutput.xml");
         SimpleTransitionSystem st2 = new SimpleTransitionSystem(comp.getAutomaton());
         st2.toXML("testOutput/aWeirdOutput2.xml");
-
+        assert(new Refinement(comp,spec).check());
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());

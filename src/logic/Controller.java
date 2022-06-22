@@ -8,13 +8,14 @@ import parser.QueryParser;
 import parser.XMLParser;
 
 import java.io.FileNotFoundException;
+import models.Clock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class Controller {
     private static List<SimpleTransitionSystem> transitionSystems = new ArrayList<>();
+    private static List<Clock> clocksInCurrentQuery = new ArrayList<>();
 
     public static List<Query> handleRequest(String location, String queryString, boolean trace) throws Exception {
         ArrayList<String> temp = new ArrayList<>(Arrays.asList(location.split(" ")));
@@ -72,9 +73,11 @@ public class Controller {
     // Finds and returns Automaton given the name of that component
     private static TransitionSystem findComponent(String str) {
         for (SimpleTransitionSystem ts : transitionSystems)
-            if (ts.getName().equalsIgnoreCase(str)) return ts;
+            if (ts.getName().equalsIgnoreCase(str)) {
+                clocksInCurrentQuery.addAll(ts.getAutomaton().getClocks());
+                return ts;
+            }
 
-        System.out.println("Automaton does not exist  " + str);
         return null;
     }
 }

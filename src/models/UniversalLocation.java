@@ -40,8 +40,8 @@ public class UniversalLocation extends SymbolicLocation {
         return 0;
     }
 
-    public List<List<Guard>> getInvariants() {
+    public CDD getInvariantCDD() {
         // should be true, so no invariants
-        return new ArrayList<>();
+        return CDD.cddTrue();
     }
 }

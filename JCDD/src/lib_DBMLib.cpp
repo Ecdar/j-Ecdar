@@ -237,7 +237,7 @@ JNIEXPORT jobjectArray JNICALL Java_lib_DBMLib_fed_1minus_1fed(JNIEnv *env, jcla
         auto convertedFed1 = helper_functions::javaFedtoCFed(env, fed1, len, dim);
         auto convertedFed2 = helper_functions::javaFedtoCFed(env, fed2, len, dim);
 
-        return convertedFed2 >= convertedFed1;
+        return convertedFed1.le(convertedFed2);
 
 
   }
@@ -298,6 +298,19 @@ JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBounds(JNIEnv *en
     auto converted = helper_functions::jintToC(env, dbm, len);
     auto convertedMax = helper_functions::jintToC(env, max, max_len);
     dbm_extrapolateMaxBounds(converted, dim, convertedMax);
+
+    return helper_functions::cToJint(env, converted, len);
+}
+
+
+
+JNIEXPORT jintArray JNICALL Java_lib_DBMLib_dbm_1extrapolateMaxBoundsDiag(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
+    jsize len = env->GetArrayLength(dbm);
+    jsize max_len = env->GetArrayLength(max);
+
+    auto converted = helper_functions::jintToC(env, dbm, len);
+    auto convertedMax = helper_functions::jintToC(env, max, max_len);
+    dbm_diagonalExtrapolateMaxBounds(converted, dim, convertedMax);
 
     return helper_functions::cToJint(env, converted, len);
 }

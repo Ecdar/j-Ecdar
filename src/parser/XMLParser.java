@@ -2,6 +2,7 @@ package parser;
 
 import models.*;
 import org.jdom2.Attribute;
+import org.jdom2.DataConversionException;
 import org.jdom2.Element;
 import org.jdom2.input.DOMBuilder;
 import org.w3c.dom.Document;
@@ -56,24 +57,27 @@ public class XMLParser {
 
         return automata.toArray(new Automaton[0]);
     }
-
+    private static String automatonName;
     private static Automaton buildAutomaton(Element element, boolean makeInpEnabled){
         // automaton name
         String name = element.getChildText("name");
-
+        automatonName=name;
         // clocks
         List<Clock> clocks = setClocks(element);
+
+        // clocks
+        List<BoolVar> BVs = setBVs(element);
 
         // initial location
         String initId = element.getChild("init").getAttributeValue("ref");
 
         // locations
-        List<Location> locations = setLocations(element, clocks, initId);
+        List<Location> locations = setLocations(element, clocks, BVs, initId);
 
         // edges
-        List<Edge> edges = setEdges(element, clocks, locations);
+        List<Edge> edges = setEdges(element, clocks, BVs, locations);
 
-        return new Automaton(name, locations, edges, clocks, makeInpEnabled);
+        return new Automaton(name, locations, edges, clocks, BVs, makeInpEnabled);
     }
 
     private static Document convertStringToDocument(String xmlStr) {
@@ -92,28 +96,65 @@ public class XMLParser {
 
     private static List<Clock> setClocks(Element el) {
         List<Clock> clockList = new ArrayList<>();
-
         String text = el.getChildText("declaration");
 
         if (text != null) {
-            String clocks = text.replaceAll("//.*\n", "")
-                    .replaceFirst("clock", "");
 
-            clocks = clocks.replaceAll("clock", ",")
-                    .replaceAll(";", "")
-                    .replaceAll(" ", "")
-                    .replaceAll("\n", "");
+            for (String line : text.split(";")) {
+                if (line.contains("clock"))
+                {
+                    String clocks = line.replaceAll("//.*\n", "")
+                            .replaceFirst("clock", "");
 
-            String[] clockArr = clocks.split(",");
+                    clocks = clocks.replaceAll("clock", ",")
+                            .replaceAll(";", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");
 
-            for (String clk : clockArr)
-                clockList.add(new Clock(clk));
+                    String[] clockArr = clocks.split(",");
+
+                    for (String clk : clockArr) {
+                        clockList.add(new Clock(clk));
+                    }
+                }
+            }
         }
         //System.out.println(clockList);
         return clockList;
     }
 
-    private static List<Location> setLocations(Element el, List<Clock> clocks, String initId) {
+
+
+    private static List<BoolVar> setBVs(Element el) {
+        List<BoolVar> boolList = new ArrayList<>();
+        String text = el.getChildText("declaration");
+
+        if (text != null) {
+
+            for (String line : text.split(";")) {
+                if (line.contains("bool")) {
+                    String bools = line.replaceAll("//.*\n", "")
+                            .replaceFirst("bool", "");
+
+                    bools = bools.replaceAll("bool", ",")
+                            .replaceAll(";", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");
+
+                    String[] boolArr = bools.split(",");
+
+                    for (String bool : boolArr)
+                        if (bool.contains("="))
+                            boolList.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
+                        else boolList.add(new BoolVar(bool, false));
+                }
+            }
+        }
+        return boolList;
+    }
+
+
+    private static List<Location> setLocations(Element el, List<Clock> clocks, List<BoolVar> BVs, String initId) {
         List<Location> locationList = new ArrayList<>();
 
         List<Element> locations = el.getChildren("location");
@@ -121,7 +162,7 @@ public class XMLParser {
             String locName = loc.getAttributeValue("id");
             boolean isInitial = locName.equals(initId);
             List<Element> labels = loc.getChildren("label");
-            List<List<Guard>> invariants = new ArrayList<>();
+            Guard invariants = new TrueGuard();
             int x=0,y=0;
             boolean xyDefined = false;
 
@@ -135,7 +176,9 @@ public class XMLParser {
             for (Element label : labels) {
                 if (label.getAttributeValue("kind").equals("invariant")) {
                     if (!label.getText().isEmpty())
-                        invariants = GuardParser.parse(label.getText(), clocks);
+                        invariants = GuardParser.parse(label.getText(), clocks, BVs);
+                    else
+                        invariants = new TrueGuard();
                 }
             }
 
@@ -164,7 +207,7 @@ public class XMLParser {
         return locationList;
     }
 
-    private static List<Edge> setEdges(Element el, List<Clock> clocks, List<Location> locations) {
+    private static List<Edge> setEdges(Element el, List<Clock> clocks, List<BoolVar> BVs, List<Location> locations) {
         List<Edge> edgeList = new ArrayList<>();
 
         List<Channel> channelList = new ArrayList<>();
@@ -173,14 +216,20 @@ public class XMLParser {
         for (Element edge : edges) {
             boolean isInput = true;
             for (Attribute o : edge.getAttributes()) {
-                if (o.getName().equals("controllable")) isInput = false;
+                try {
+                    if (o.getName().equals("controllable") && o.getBooleanValue()==false) isInput = false;
+                } catch (DataConversionException e) {
+                    System.err.println("Controllable flag contains non-boolean value");
+                    e.printStackTrace();
+                }
+
             }
 
             Location source = findLocations(locations, edge.getChild("source").getAttributeValue("ref"));
             Location target = findLocations(locations, edge.getChild("target").getAttributeValue("ref"));
 
             List<Element> labels = edge.getChildren("label");
-            List<List<Guard>> guards = new ArrayList<>();
+            Guard guards = new TrueGuard();
             List<Update> updates = new ArrayList<>();
             Channel chan = null;
 
@@ -190,8 +239,9 @@ public class XMLParser {
 
                 switch (kind) {
                     case "guard":
-                        if (!text.isEmpty())
-                            guards = GuardParser.parse(text, clocks);
+                        if (!text.isEmpty()) {
+                            guards = GuardParser.parse(text, clocks, BVs);
+                        }
                         break;
                     case "synchronisation":
                         String channel = text.replaceAll("\\?", "").replaceAll("!", "");
@@ -199,13 +249,14 @@ public class XMLParser {
                             chan = addChannel(channelList, channel);
                         break;
                     case "assignment":
-                        if (!text.isEmpty())
-                            updates = UpdateParser.parse(text, clocks);
+                        if (!text.isEmpty()) {
+                            updates = UpdateParser.parse(text, clocks, BVs);
+                        }
                         break;
                 }
             }
 
-            edgeList.add(new Edge(source, target, chan, isInput, guards, updates.toArray(new Update[0])));
+            edgeList.add(new Edge(source, target, chan, isInput, guards, updates));
         }
 
         return edgeList;
@@ -218,6 +269,15 @@ public class XMLParser {
 
         return null;
     }
+
+    private static BoolVar findBV(List<BoolVar> BVs, String name) {
+        for (BoolVar bv : BVs)
+            if (bv.getName().equals(name))
+                return bv;
+
+        return null;
+    }
+
 
     private static Location findLocations(List<Location> locations, String name) {
         for (Location loc : locations)

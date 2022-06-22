@@ -1,10 +1,21 @@
 package features;
 
+import exceptions.CddAlreadyRunningException;
+import exceptions.CddNotRunningException;
 import logic.*;
 import models.Automaton;
+import models.CDD;
+import models.Clock;
+import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import parser.JSONParser;
+import parser.XMLFileWriter;
+import parser.XMLParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,8 +25,14 @@ public class UniversityTest {
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
             machine3, machine3Copy, adm2, adm2Copy, half1, half1Copy, half2, half2Copy;
 
+    @After
+    public void afterEachTest(){
+        CDD.done();
+    }
+
+
     @BeforeClass
-    public static void setUpBeforeClass() {
+    public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
         String base = "./samples/json/EcdarUniversity/";
         String[] components = new String[]{"GlobalDeclarations.json",
                 "Components/Administration.json",
@@ -27,23 +44,51 @@ public class UniversityTest {
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
+        CDD.init(100,100,100);
+        List<Clock> clocks = new ArrayList<>();
+        clocks.addAll(machines[0].getClocks());
+        clocks.addAll(machines[1].getClocks());
+        clocks.addAll(machines[2].getClocks());
+        clocks.addAll(machines[3].getClocks());
+        clocks.addAll(machines[4].getClocks());
+        clocks.addAll(machines[5].getClocks());
+        clocks.addAll(machines[6].getClocks());
+        clocks.addAll(machines[7].getClocks());
+        CDD.addClocks(clocks);
 
-        adm = new SimpleTransitionSystem(machines[0]);
-        admCopy = new SimpleTransitionSystem(new Automaton(machines[0]));
-        machine = new SimpleTransitionSystem(machines[1]);
-        machineCopy = new SimpleTransitionSystem(new Automaton(machines[1]));
-        researcher = new SimpleTransitionSystem(machines[2]);
-        researcherCopy = new SimpleTransitionSystem(new Automaton(machines[2]));
-        spec = new SimpleTransitionSystem(machines[3]);
-        specCopy = new SimpleTransitionSystem(new Automaton(machines[3]));
-        machine3 = new SimpleTransitionSystem(machines[4]);
-        machine3Copy = new SimpleTransitionSystem(new Automaton(machines[4]));
-        adm2 = new SimpleTransitionSystem(machines[5]);
-        adm2Copy = new SimpleTransitionSystem(new Automaton(machines[5]));
-        half1 = new SimpleTransitionSystem(machines[6]);
-        half1Copy = new SimpleTransitionSystem(new Automaton(machines[6]));
-        half2 = new SimpleTransitionSystem(machines[7]);
-        half2Copy = new SimpleTransitionSystem(new Automaton(machines[7]));
+        adm = new SimpleTransitionSystem((machines[0]));
+        admCopy = new SimpleTransitionSystem(new Automaton((machines[0])));
+        machine = new SimpleTransitionSystem((machines[1]));
+        machineCopy = new SimpleTransitionSystem(new Automaton((machines[1])));
+        researcher = new SimpleTransitionSystem((machines[2]));
+        researcherCopy = new SimpleTransitionSystem(new Automaton((machines[2])));
+        spec = new SimpleTransitionSystem((machines[3]));
+        specCopy = new SimpleTransitionSystem(new Automaton((machines[3])));
+        machine3 = new SimpleTransitionSystem((machines[4]));
+        machine3Copy = new SimpleTransitionSystem(new Automaton((machines[4])));
+        adm2 = new SimpleTransitionSystem((machines[5]));
+        adm2Copy = new SimpleTransitionSystem(new Automaton((machines[5])));
+        half1 = new SimpleTransitionSystem((machines[6]));
+        half1Copy = new SimpleTransitionSystem(new Automaton((machines[6])));
+        half2 = new SimpleTransitionSystem((machines[7]));
+        half2Copy = new SimpleTransitionSystem(new Automaton((machines[7])));
+        CDD.done();
+    }
+
+
+    @Test
+    public void specIsUniversal() {
+        Automaton[] auts = XMLParser.parse("samples/xml/university-universalSpec.xml",true);
+        SimpleTransitionSystem mach = new SimpleTransitionSystem(auts[0]);
+        SimpleTransitionSystem res = new SimpleTransitionSystem(auts[1]);
+        SimpleTransitionSystem specU = new SimpleTransitionSystem(auts[2]);
+        SimpleTransitionSystem uni = new SimpleTransitionSystem(auts[3]);
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{mach,res,uni}),specU ).check());
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{mach,res}), new Quotient(specU,uni)).check());
+
+        SimpleTransitionSystem specU1 = new SimpleTransitionSystem(auts[2]);
+        assertTrue(new Refinement(specU, specU1).check());
+
     }
 
     @Test
@@ -53,8 +98,217 @@ public class UniversityTest {
 
     @Test
     public void testHalf1RefinesSelf() {
+
         assertTrue(new Refinement(half1, half1Copy).check());
     }
+
+    @Test
+    public void newQuotientTest() {
+
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,adm2}), new Quotient(spec,researcher)).check());
+    }
+
+
+    @Test
+    public void newQuotientTestAutomaton() {
+
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,adm2}), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton())).check());
+    }
+
+
+    @Test
+    public void newQuotientTest1() {
+
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new Quotient(spec,researcher)).check());
+    }
+    @Test
+    public void quotientSelfAdm() {
+
+        Refinement ref = new Refinement(new Quotient(spec,adm),new Quotient(specCopy,admCopy));
+        boolean res= ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+
+         }
+    @Test
+    public void quotientSelfAdmAutomaton() {
+        Refinement ref = new Refinement( new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton()), new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton()));
+        boolean res= ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+
+    }
+
+    @Test
+    public void quotientEual() {
+        assertTrue(new Refinement(new Quotient(spec,adm),new Quotient(specCopy,admCopy)).check());
+        assertTrue(new Refinement( new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton())).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()),new Quotient(spec,researcher)).check());
+
+        Refinement ref= new Refinement(new Quotient(spec,researcher), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()));
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+        }
+
+
+    @Test
+    public void newQuotientTest1Automaton() {
+        assertTrue(new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton())).check());
+    }
+
+
+    @Test
+    public void newQuotientTest2() {
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
+    }
+
+    @Test
+    public void newQuotientTest2Automaton() {
+        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new SimpleTransitionSystem(new Quotient(spec,adm2).getAutomaton())).check());
+    }
+
+
+    @Test
+    public void newQuotientTest4A() {
+        Quotient q = new Quotient(spec,adm);
+        XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
+        XMLFileWriter.toXML("comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), q );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+    @Test
+    public void newQuotientTest4AAutomaton() {
+        Quotient q = new Quotient(spec,adm);
+        XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
+        XMLFileWriter.toXML("comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new SimpleTransitionSystem(q.getAutomaton()) );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+
+
+
+
+    @Test
+    public void newQuotientTest4B() {
+        Quotient q = new Quotient(spec,researcher);
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), q );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+    @Test
+    public void newQuotientTest4BAutomaton() {
+        Quotient q = new Quotient(spec,researcher);
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+
+    @Test
+    public void newQuotientTest4C() {
+        Quotient q = new Quotient(spec,machine);
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), q );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+
+    @Test
+    public void newQuotientTest4CAutomaton() {
+        Quotient q = new Quotient(spec,machine);
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+    @Test
+    public void newQuotientTest4D() {
+        Quotient q = new Quotient(spec,machine);
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), q );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+
+    @Test
+    public void newQuotientTest4DAutomaton() {
+        Quotient q = new Quotient(spec,machine);
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+    @Test
+    public void simpliversityTest1() {
+        Automaton[] auts = XMLParser.parse("samples/xml/simpliversity.xml", true);
+        Automaton autResearcher = auts[0];
+        Automaton autAdm = auts[1];
+        Automaton autSpec = auts[2];
+        SimpleTransitionSystem researcher = new SimpleTransitionSystem(autResearcher);
+        SimpleTransitionSystem adm = new SimpleTransitionSystem(autAdm);
+        SimpleTransitionSystem spec = new SimpleTransitionSystem(autSpec);
+
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), spec );
+        boolean result = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(result);
+    }
+
+    @Test
+    public void simpliversityTest2() {
+        Automaton[] auts = XMLParser.parse("samples/xml/simpliversity.xml", true);
+        Automaton autResearcher = auts[0];
+        Automaton autAdm = auts[1];
+        Automaton autSpec = auts[2];
+        SimpleTransitionSystem researcher = new SimpleTransitionSystem(autResearcher);
+        SimpleTransitionSystem adm = new SimpleTransitionSystem(autAdm);
+        SimpleTransitionSystem spec = new SimpleTransitionSystem(autSpec);
+
+        Refinement ref = new Refinement(researcher, new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton())  );
+        boolean result = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(result);
+    }
+
+    @Test
+    public void newQuotientTest5() {
+        Automaton quo = XMLParser.parse("samples/xml/staticSpecDIVAdm.xml",true)[0];
+        Automaton comp = XMLParser.parse("comp.xml",true)[0];
+        Refinement ref = new Refinement(new SimpleTransitionSystem(comp), new SimpleTransitionSystem(quo) );
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
+
+    @Test
+    public void newQuotientTest3() {
+        XMLFileWriter.toXML("adm2new.xml",new Automaton[]{adm2.getAutomaton()});
+        XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});
+
+
+        SimpleTransitionSystem st =  new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton());
+
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), st);
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
 
     @Test
     public void testHalf2RefinesSelf() {
@@ -80,7 +334,7 @@ public class UniversityTest {
 
     @Test
     public void testResRefinesSelf() {
-        assertTrue(new Refinement(researcher, researcherCopy).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem((researcher.getAutomaton())), new SimpleTransitionSystem((researcherCopy.getAutomaton()))).check());
     }
 
     @Test
@@ -196,11 +450,10 @@ public class UniversityTest {
 
     @Test
     public void testCompRefinesSpec() {
-
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
 
         //comp.getAutomaton();
-        Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
+        Refinement ref = new Refinement(comp, spec);
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());
 
@@ -224,14 +477,6 @@ public class UniversityTest {
     @Test
     public void testCompOfCompRefinesSpec() {
 
-        //Clock x = new Clock("x");
-        //List<Clock> l = new ArrayList<>();
-        //l.add(x);
-        //Zone z = new Zone(l.size()+1,true);
-        //Guard g = new Guard(x,5,true,true);
-        //Guard g = new Guard(x,1073741823,5,true);
-        //z.buildConstraintsForGuard(g,1);
-        //z.printDBM(true,true);
         Refinement ref = new Refinement(
                 new Composition(new TransitionSystem[]{adm,
                         new Composition(new TransitionSystem[]{machine, researcher})}),
@@ -245,10 +490,35 @@ public class UniversityTest {
 
     @Test
     public void testCompRefinesSelf() {
-        Refinement ref = new Refinement(
-                new Composition(new TransitionSystem[]{adm, machine, researcher}),
-                new Composition(new TransitionSystem[]{machineCopy, researcherCopy, admCopy}));
+        /*assertTrue(new Refinement(adm,admCopy).check());
+        assertTrue(new Refinement(admCopy,adm).check());
+        assertTrue(new Refinement(machineCopy,machine).check());
+        assertTrue(new Refinement(machine,machineCopy).check());
+        assertTrue(new Refinement(researcherCopy,researcher).check());
+        assertTrue(new Refinement(researcher,researcherCopy).check());*/
+
+        Automaton comp1 = new Composition(new TransitionSystem[]{adm, machine, researcher}).getAutomaton();
+        Automaton comp2 = new Composition(new TransitionSystem[]{admCopy, machineCopy, researcherCopy}).getAutomaton();
+
+        new SimpleTransitionSystem(comp1).toXML("testOutput/comp1.xml");
+        new SimpleTransitionSystem(comp2).toXML("testOutput/comp2.xml");
+
+        assertTrue(new Refinement(new SimpleTransitionSystem(comp1),new SimpleTransitionSystem(comp2)).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(comp2),new SimpleTransitionSystem(comp1)).check());
+        Refinement ref = new Refinement(new SimpleTransitionSystem(comp1), new SimpleTransitionSystem(comp2));
+
         assertTrue(ref.check());
+    }
+
+    @Test
+    public void testStored() {
+        Automaton[] aut = XMLParser.parse("samples/xml/test.xml", false);
+        Automaton[] aut1 = XMLParser.parse("samples/xml/test1.xml", false);
+        SimpleTransitionSystem comp0 = new SimpleTransitionSystem(aut[0]);
+        SimpleTransitionSystem comp1 = new SimpleTransitionSystem(aut1[0]);
+
+        assertTrue(new Refinement(comp1,comp0).check());
+        assertTrue(new Refinement(comp0,comp1).check());
     }
 
     @Test
