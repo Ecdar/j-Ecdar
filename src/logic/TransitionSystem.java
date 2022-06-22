@@ -34,7 +34,6 @@ public abstract class TransitionSystem {
         CDD bddPart = CDD.cddTrue();
         for (BoolVar bv : BVs)
         {
-            System.out.println(bv);
             if (bv.getInitialValue())
                 bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
             else {
@@ -55,13 +54,11 @@ public abstract class TransitionSystem {
         CDD bddPart = CDD.cddTrue();
         for (BoolVar bv : CDD.BVs)
         {
-            System.out.println(bv);
             if (bv.getInitialValue())
                 bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
             else
                 bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
         }
-        System.out.println("Init CDD created!!!!!!!!!!!!! " + initCDD.conjunction(bddPart));
 
         State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
 
@@ -139,7 +136,6 @@ public abstract class TransitionSystem {
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
 
-            System.out.println("allClocks " + clocks + " bddStartLevel " + CDD.bddStartLevel);
         }
 
         boolean isDeterministic = true;

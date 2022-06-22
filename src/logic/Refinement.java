@@ -324,7 +324,7 @@ public class Refinement {
                 if (pair != null) {
                     pairFound = true;
 
-                    //if (!pair.getRight().getLocation().getIsUniversal())
+                    if (!pair.getRight().getLocation().getIsUniversal())
                     {
                         if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
                             waiting.add(pair);
@@ -406,9 +406,7 @@ public class Refinement {
 
     private boolean passedContainsStatePair(StatePair pair) {
         LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
-        System.out.println("-" + pair.toString().substring(0,pair.toString().indexOf(")")));
         if (passed.containsKey(locPair)) {
-            System.out.println("+");
             if (CDD.isSubset(pair.getRight().getCDD(),passed.get(locPair).getRight().getCDD()))
                 return true;
             if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
@@ -419,10 +417,6 @@ public class Refinement {
             }*/
         }
 
-        if (pair.toString().contains("L=([L5, L0], [L16, L6])")) {
-            System.out.println("NEW STATE IN PASSED");
-            System.out.println(pair.getLeft());
-        }
         return false;
     }
 
