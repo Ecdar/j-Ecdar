@@ -6,10 +6,7 @@ import java.util.Objects;
 
 import logic.TransitionSystem;
 
-public class Clock {
-    private String uniqueName;
-    private String originalName;
-    private String ownerName;
+public class Clock extends UniqueNamed{
 
     public Clock(String name, String ownerName) {
         this.uniqueName = name;
@@ -21,14 +18,6 @@ public class Clock {
         this.uniqueName = copy.originalName;
         this.originalName = copy.originalName;
         this.ownerName = copy.ownerName;
-    }
-
-    public String getOriginalName() {
-        return originalName;
-    }
-
-    public String getUniqueName(){
-        return uniqueName;
     }
 
     @Override
@@ -46,24 +35,13 @@ public class Clock {
                 '}';
     }
 
-    public void setUniqueName(int index) {
-        if(ownerName != null){
-            uniqueName = ownerName + "." + index + "." + originalName;
-        }
-    }
-
-    public void setUniqueName() {
-        if(ownerName != null){
-            uniqueName = ownerName + "." + originalName;
-        }
-    }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(originalName, ownerName);
+    }
+
+    @Override
+    public UniqueNamed getCopy() {
+        return new Clock(this);
     }
 }

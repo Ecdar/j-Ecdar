@@ -9,30 +9,30 @@ import static models.CDD.getIndexOfBV;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
-    final ClockContainer clocks;
-    final List <BoolVar> BVs;
+    final UniqueNamedContainer<Clock> clocks;
+    final UniqueNamedContainer<BoolVar> BVs;
     private StringBuilder lastErr = new StringBuilder();
 
     TransitionSystem() {
-        this.clocks = new ClockContainer();
-        this.BVs = new ArrayList<>();
+        this.clocks = new UniqueNamedContainer<>();
+        this.BVs = new UniqueNamedContainer<>();
     }
 
     public abstract Automaton getAutomaton();
 
     public List<Clock> getClocks() {
-        return clocks.getClocks();
+        return clocks.getItems();
     }
 
     public List<BoolVar> getBVs() {
-        return BVs;
+        return BVs.getItems();
     };
 
 
     public State getInitialState() {
         CDD initCDD = CDD.zeroCDDDelayed();
         CDD bddPart = CDD.cddTrue();
-        for (BoolVar bv : BVs)
+        for (BoolVar bv : BVs.getItems())
         {
             System.out.println(bv);
             if (bv.getInitialValue())
@@ -138,8 +138,8 @@ public abstract class TransitionSystem {
         if (!CDD.isCddIsRunning())
         {
             CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-            CDD.addClocks(clocks.getClocks());
-            CDD.addBddvar(BVs);
+            CDD.addClocks(clocks.getItems());
+            CDD.addBddvar(BVs.getItems());
 
             System.out.println("allClocks " + clocks + " bddStartLevel " + CDD.bddStartLevel);
         }
@@ -176,7 +176,7 @@ public abstract class TransitionSystem {
         boolean isConsistent = true;
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs);
+        CDD.addBddvar(BVs.getItems());
 
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
@@ -196,7 +196,7 @@ public abstract class TransitionSystem {
         boolean isCons = isFullyConsistent();
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs);
+        CDD.addBddvar(BVs.getItems());
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
@@ -224,7 +224,7 @@ public abstract class TransitionSystem {
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel){
-        return getNextTransitions(currentState, channel, clocks.getClocks());
+        return getNextTransitions(currentState, channel, clocks.getItems());
     }
 
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);

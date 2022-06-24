@@ -1,22 +1,24 @@
 package models;
 
-public class BoolVar { // TODO: Later on make sure that states only store the values
+import java.util.Objects;
 
-    private String name;
+public class BoolVar extends UniqueNamed { // TODO: Later on make sure that states only store the values
+
     private boolean initialValue;
 
-    public BoolVar(String name, boolean initialValue)
+    public BoolVar(String name, String ownerName, boolean initialValue)
     {
-        this.name=name;
+        this.ownerName = ownerName;
+        this.originalName = name;
+        this.uniqueName = name;
         this.initialValue=initialValue;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public BoolVar(BoolVar bv) {
+        this.ownerName = bv.ownerName;
+        this.originalName = bv.originalName;
+        this.uniqueName = bv.originalName;
+        this.initialValue = bv.initialValue;
     }
 
     public boolean getInitialValue() {
@@ -32,7 +34,7 @@ public class BoolVar { // TODO: Later on make sure that states only store the va
         if (!(o instanceof BoolVar))
             return false;
         BoolVar other =  (BoolVar) o;
-        if (other.getName().equals(name) && initialValue == other.initialValue)
+        if (other.getOriginalName().equals(originalName) && initialValue == other.initialValue && Objects.equals(ownerName, other.ownerName))
             return true;
         return false;
 
@@ -40,6 +42,11 @@ public class BoolVar { // TODO: Later on make sure that states only store the va
 
     public String toString()
     {
-        return getName() + " = " + getInitialValue();
+        return getUniqueName() + " = " + getInitialValue();
+    }
+
+    @Override
+    public UniqueNamed getCopy() {
+        return new BoolVar(this);
     }
 }

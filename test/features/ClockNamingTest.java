@@ -1,18 +1,19 @@
-package models;
+package features;
 
 import logic.*;
+import models.Automaton;
+import models.Clock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ClockOwnerTest {
+public class ClockNamingTest {
 
     private static TransitionSystem t1, t2, t3, t4, machine, researcher, adm;
 
@@ -146,33 +147,33 @@ public class ClockOwnerTest {
 
     @Test
     public void clockContainerTest(){
-        ClockContainer container = new ClockContainer();
+        UniqueNamedContainer<Clock> container = new UniqueNamedContainer<>();
         container.add(t1.getClocks().get(0));
 
-        assertEquals(1, container.getClocks().size());
-        assertEquals("x", container.getClocks().get(0).getUniqueName());
+        assertEquals(1, container.getItems().size());
+        assertEquals("x", container.getItems().get(0).getUniqueName());
     }
 
 
     @Test
     public void clockContainerTestSameNameDifferentSystem(){
-        ClockContainer container = new ClockContainer();
+        UniqueNamedContainer<Clock> container = new UniqueNamedContainer<>();
         container.add(t1.getClocks().get(0));
         container.add(t4.getClocks().get(0));
 
-        assertEquals(2, container.getClocks().size());
-        assertEquals("Test1.x", container.getClocks().get(0).getUniqueName());
-        assertEquals("Test4.x", container.getClocks().get(1).getUniqueName());
+        assertEquals(2, container.getItems().size());
+        assertEquals("Test1.x", container.getItems().get(0).getUniqueName());
+        assertEquals("Test4.x", container.getItems().get(1).getUniqueName());
     }
 
     @Test
     public void clockContainerTestSameNameSameSystem(){
-        ClockContainer container = new ClockContainer();
+        UniqueNamedContainer<Clock> container = new UniqueNamedContainer<>();
         container.add(t1.getClocks().get(0));
         container.add(t1.getClocks().get(0));
 
-        assertEquals(2, container.getClocks().size());
-        assertEquals("Test1.1.x", container.getClocks().get(0).getUniqueName());
-        assertEquals("Test1.2.x", container.getClocks().get(1).getUniqueName());
+        assertEquals(2, container.getItems().size());
+        assertEquals("Test1.1.x", container.getItems().get(0).getUniqueName());
+        assertEquals("Test1.2.x", container.getItems().get(1).getUniqueName());
     }
 }

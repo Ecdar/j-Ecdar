@@ -206,10 +206,10 @@ public class JsonAutomatonEncoder {
                     {
                         BoolUpdate u = (BoolUpdate) u1;
                         if (i == 0) {
-                            updateString += u.getBV().getName();
+                            updateString += u.getBV().getOriginalName();
                             updateString += " = " + u.getValue();
                         } else
-                            updateString += ", " + u.getBV().getName() + " = " + u.getValue();
+                            updateString += ", " + u.getBV().getOriginalName() + " = " + u.getValue();
                         i++;
                     }
                 }
@@ -230,7 +230,7 @@ public class JsonAutomatonEncoder {
 
         for (BoolVar bv : aut.getBVs())
         {
-            localDecString+= "bool " + bv.getName() + "; ";
+            localDecString+= "bool " + bv.getOriginalName() + "; ";
         }
 
         JSONObject finalJSON = new JSONObject();

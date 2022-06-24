@@ -312,16 +312,16 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
         List<BoolVar> BVs = new ArrayList<>();
-        BVs.add(new BoolVar("a",true));
-        BVs.add(new BoolVar("b",true));
-        BVs.add(new BoolVar("d",true));
-        BVs.add(new BoolVar("c",true));
-        BVs.add(new BoolVar("e",true));
+        BVs.add(new BoolVar("a", "aut", true));
+        BVs.add(new BoolVar("b", "aut", true));
+        BVs.add(new BoolVar("d", "aut", true));
+        BVs.add(new BoolVar("c", "aut", true));
+        BVs.add(new BoolVar("e", "aut", true));
         int level = CDD.addBddvar(BVs);
         assertEquals(1, level);
         BVs.clear();
-        BVs.add(new BoolVar("f",true));
-        BVs.add(new BoolVar("g",true));
+        BVs.add(new BoolVar("f", "aut", true));
+        BVs.add(new BoolVar("g", "aut", true));
         level = CDD.addBddvar(BVs);
         assertEquals(6, level);
     }

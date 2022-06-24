@@ -188,8 +188,8 @@ public class JSONParser {
 
                     for (String bool : boolArr)
                         if (bool.contains("="))
-                            BVs.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
-                        else BVs.add(new BoolVar(bool, false));
+                            BVs.add(new BoolVar(bool.split("=")[0], automatonName, Boolean.parseBoolean(bool.split("=")[1])));
+                        else BVs.add(new BoolVar(bool,automatonName, false));
                 }
             }
         }
@@ -237,7 +237,7 @@ public class JSONParser {
     }
     private static BoolVar findBV(String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(name))
+            if (bv.getOriginalName().equals(name))
                 return bv;
 
         return null;

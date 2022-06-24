@@ -145,8 +145,8 @@ public class XMLParser {
 
                     for (String bool : boolArr)
                         if (bool.contains("="))
-                            boolList.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
-                        else boolList.add(new BoolVar(bool, false));
+                            boolList.add(new BoolVar(bool.split("=")[0],automatonName, Boolean.parseBoolean(bool.split("=")[1])));
+                        else boolList.add(new BoolVar(bool,automatonName, false));
                 }
             }
         }
@@ -272,7 +272,7 @@ public class XMLParser {
 
     private static BoolVar findBV(List<BoolVar> BVs, String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(name))
+            if (bv.getOriginalName().equals(name))
                 return bv;
 
         return null;

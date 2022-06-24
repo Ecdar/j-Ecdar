@@ -23,9 +23,9 @@ public class BoolTest {
     @Test
     public void testBoolArraySimple() {
 
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
-        BoolVar c = new BoolVar("c",true);
+        BoolVar a = new BoolVar("a", "aut", false);
+        BoolVar b = new BoolVar("b", "aut", true);
+        BoolVar c = new BoolVar("c", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b); BVs.add(c);
 
@@ -69,9 +69,9 @@ public class BoolTest {
     @Test
     public void testBoolArray() {
 
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
-        BoolVar c = new BoolVar("c",true);
+        BoolVar a = new BoolVar("a", "aut", false);
+        BoolVar b = new BoolVar("b", "aut", true);
+        BoolVar c = new BoolVar("c", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b); BVs.add(c);
         BoolGuard bg_a_false = new BoolGuard(a, "==",false);
@@ -102,9 +102,9 @@ public class BoolTest {
     @Test
     public void testBooleanSimplification() {
 
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
-        BoolVar c = new BoolVar("c",true);
+        BoolVar a = new BoolVar("a", "aut", false);
+        BoolVar b = new BoolVar("b", "aut", true);
+        BoolVar c = new BoolVar("c", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b); BVs.add(c);
         BoolGuard bg_a_false = new BoolGuard(a, "==",false);
@@ -130,8 +130,8 @@ public class BoolTest {
     public void testTwoEdgesWithDifferentBool() {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
+        BoolVar a = new BoolVar("a", "aut", false);
+        BoolVar b = new BoolVar("b", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b);
 
@@ -222,8 +222,8 @@ public class BoolTest {
     public void testOverlappingZonesWithDifferentBool() {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
+        BoolVar a = new BoolVar("a", "aut", false);
+        BoolVar b = new BoolVar("b", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b);
         List<Clock> clocks = new ArrayList<>();
@@ -326,8 +326,8 @@ public class BoolTest {
     public void sameButNowMakeInputEnabled() {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
-        BoolVar a = new BoolVar("a",false);
-        BoolVar b = new BoolVar("b",true);
+        BoolVar a = new BoolVar("a", "aut", false);
+        BoolVar b = new BoolVar("b","aut",true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b);
         List<Clock> clocks = new ArrayList<>();
@@ -430,7 +430,7 @@ public class BoolTest {
     {
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk", "Aut"));}});
-        BoolVar bv = new BoolVar("a",false);
+        BoolVar bv = new BoolVar("a","aut",false);
         CDD.addBddvar(new ArrayList<>(){{add(bv);}});
 
         CDD test = new CDD(CDDLib.cddNBddvar(bddStartLevel));
@@ -457,7 +457,7 @@ public class BoolTest {
 
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk", "Aut"));add(new Clock("testclk1", "Aut"));}});
-        BoolVar bv1 = new BoolVar("a",false);
+        BoolVar bv1 = new BoolVar("a","aut",false);
         CDD.addBddvar(new ArrayList<>(){{add(bv1);}});
 
         CDD test2 = new CDD(CDDLib.cddNBddvar(bddStartLevel));
@@ -595,7 +595,7 @@ public class BoolTest {
     {
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>() {{add(new Clock("clk", "Aut"));}});
-        BoolVar a = new BoolVar("a",false);
+        BoolVar a = new BoolVar("a","aut",false);
         CDD.addBddvar(new ArrayList<>(){{add(a);}});
 
         CDD state = CDD.allocateInterval(1,0,0,true,5,true);
@@ -614,8 +614,8 @@ public class BoolTest {
     public void testBoolSafeLoadXML() {
         Clock x = new Clock("exp_x", "Aut");
         Clock y = new Clock("exp_y", "Aut");
-        BoolVar a = new BoolVar("exp_a",false);
-        BoolVar b = new BoolVar("exp_b",true);
+        BoolVar a = new BoolVar("exp_a","aut",false);
+        BoolVar b = new BoolVar("exp_b","aut",true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b);
 

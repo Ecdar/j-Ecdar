@@ -28,7 +28,7 @@ public class GuardParser {
 
     private static BoolVar findBV(String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(name))
+            if (bv.getOriginalName().equals(name))
                 return bv;
 
         throw new BooleanVariableNotFoundException("Boolean variable: " + name + " was not found");

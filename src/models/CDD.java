@@ -52,7 +52,7 @@ public class CDD {
     public static int getIndexOfBV(BoolVar bv) {
 
         for (int i = 0; i < BVs.size(); i++){
-            if(bv.hashCode() == BVs.get(i).hashCode()) return i;
+            if(bv.equals(BVs.get(i))) return i;
         }
         assert(false);
         return 0;

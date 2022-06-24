@@ -105,7 +105,7 @@ public class UniversityTest {
         assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
     }
 
-    @Test
+    @Ignore
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
         XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});

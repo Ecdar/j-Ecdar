@@ -3,7 +3,6 @@ package logic;
 import models.*;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static logic.Helpers.randomString;
@@ -92,8 +91,8 @@ public class Quotient extends TransitionSystem {
     public SimpleTransitionSystem calculateQuotientAutomaton(boolean prepareForBisimilarityReduction) {
 
         CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-        CDD.addClocks(clocks.getClocks());
-        CDD.addBddvar(BVs);
+        CDD.addClocks(clocks.getItems());
+        CDD.addBddvar(BVs.getItems());
         String name = ts_spec.getSystems().get(0).getName() + "DIV" + ts_comp.getSystems().get(0).getName();
 
         // Lists of edges and locations for the newly built automaton
@@ -177,7 +176,7 @@ public class Quotient extends TransitionSystem {
                                     updatesList.addAll(e_comp.getUpdates());
 
                                     boolean isInput = inputs.contains(e_comp.getChan());
-                                    Edge resultE = new Edge(loc, target, c, isInput, CDD.toGuardList(guard, clocks.getClocks()), updatesList);
+                                    Edge resultE = new Edge(loc, target, c, isInput, CDD.toGuardList(guard, clocks.getItems()), updatesList);
                                     edges.add(resultE);
                                 }
                             }
@@ -204,7 +203,7 @@ public class Quotient extends TransitionSystem {
                                     targetInvar = targetInvar.conjunction(l_comp.getInvariantCDD());
                                     targetInvar = targetInvar.conjunction(l_spec.getInvariantCDD());
                                     boolean isInput = inputs.contains(e_comp.getChan());
-                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getClocks()), e_comp.getUpdates()));
+                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getItems()), e_comp.getUpdates()));
                                 }
                             }
                         }
@@ -224,7 +223,7 @@ public class Quotient extends TransitionSystem {
 
                         // if guards have been collected
                         if (negated.isNotFalse())
-                            edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(negated, clocks.getClocks()), new ArrayList<>()));
+                            edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(negated, clocks.getItems()), new ArrayList<>()));
                     }
 
                     System.out.println("RULE 5");
@@ -234,7 +233,7 @@ public class Quotient extends TransitionSystem {
                         CDD l_comp_invar_negated = l_comp.getInvariantCDD().negation().removeNegative();
                         for (Channel c : allChans) {
                             boolean isInput = inputs.contains(c);
-                            edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(l_comp_invar_negated, clocks.getClocks()), new ArrayList<>()));
+                            edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(l_comp_invar_negated, clocks.getItems()), new ArrayList<>()));
                         }
                     }
 
@@ -261,7 +260,7 @@ public class Quotient extends TransitionSystem {
                                     List<Update> updates = new ArrayList<Update>() {{
                                         add(new ClockUpdate(newClock, 0));
                                     }};
-                                    edges.add(new Edge(loc, inc, c, true, CDD.toGuardList(targetState, clocks.getClocks()), updates));
+                                    edges.add(new Edge(loc, inc, c, true, CDD.toGuardList(targetState, clocks.getItems()), updates));
                                 }
                             }
                         }
@@ -278,7 +277,7 @@ public class Quotient extends TransitionSystem {
                         List<Update> updates = new ArrayList<Update>() {{
                             add(new ClockUpdate(newClock, 0));
                         }};
-                        edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(combined, clocks.getClocks()), updates));
+                        edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(combined, clocks.getItems()), updates));
                     }
 
 
@@ -302,7 +301,7 @@ public class Quotient extends TransitionSystem {
                                     targetInvar = targetInvar.conjunction(l_comp.getInvariantCDD());
 
                                     boolean isInput = inputs.contains(c);
-                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getClocks()), e_spec.getUpdates()));
+                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getItems()), e_spec.getUpdates()));
                                 }
                             }
                         }
@@ -374,39 +373,12 @@ public class Quotient extends TransitionSystem {
             edges.add(e);
         }
 
-        // Renaming the clocks and BVs if there has been a name clash
-        ClockContainer newClocks = new ClockContainer();
-        List<Clock> oldClocks = new ArrayList<>();
-        List<BoolVar> newBVs = new ArrayList<>();
-        List<BoolVar> oldBVs = new ArrayList<>();
-        for (Automaton aut : new ArrayList<Automaton>() {{add(spec); add(comp);}})
-        {
-            newClocks.addAll(aut.getClocks());
-            oldClocks.addAll(aut.getClocks());
-            for (BoolVar bv: aut.getBVs())
-            {
-                BoolVar newBV;
-                if (newBVs.stream().filter(b->b.getName().equals(bv.getName())).collect(Collectors.toList()).isEmpty())
-                {
-                    newBV = new BoolVar(bv.getName(), bv.getInitialValue());
-                }
-                else {
-                    if (newBVs.stream().filter(b->b.getName().equals(aut.getName() + bv.getName())).collect(Collectors.toList()).isEmpty())
-                        newBV = new BoolVar(aut.getName() + bv.getName(), bv.getInitialValue());
-                    else
-                        newBV = new BoolVar(aut.getName() + bv.getName()+randomString(), bv.getInitialValue());
-                }
-                newBVs.add(newBV);
-                oldBVs.add(bv);
-            }
-        }
         newClock = new Clock("quo_new", "quo");
-        oldClocks.add(newClock);
-        newClocks.add(newClock);
-        List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),newClocks.getClocks(), oldClocks,newBVs,oldBVs);
-        List <Edge> edgesWithNewClocks = updateClocksInEdges(new HashSet<>(edges),newClocks.getClocks(), oldClocks,newBVs,oldBVs);
+        clocks.add(newClock);
+        List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
+        List <Edge> edgesWithNewClocks = updateClocksInEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
         CDD.done();
-        Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, newClocks.getClocks(), newBVs, true);
+        Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), true);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);
 
