@@ -7,7 +7,7 @@ INT            :   DIGIT+ ;
 
 fragment LOWERCASE : [a-z] ;
 fragment UPPERCASE : [A-Z] ;
-fragment SYMBOL    : ('.' | 'þ' | '€' | '_' | 'ð' | 'đ' | 'œ' | '-') ;
+fragment SYMBOL    : ('.' | 'þ' | '€' | '_' | 'ð' | 'đ' | 'œ' ) ;
 fragment LETTER        : (LOWERCASE | UPPERCASE) ;
 
 VARIABLE    : LETTER (LETTER | DIGIT | SYMBOL)* ;

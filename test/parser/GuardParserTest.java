@@ -84,4 +84,15 @@ public class GuardParserTest {
         assertThat(andGuard.getGuards().get(0), instanceOf(OrGuard.class));
         assertThat(andGuard.getGuards().get(1), instanceOf(OrGuard.class));
     }
+
+    @Test
+    public void testGuardParserDiagionalClock(){
+        List<BoolVar> BVs = new ArrayList<>();
+        ArrayList<Clock> clocks = new ArrayList<>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ClockGuard clockGuard = (ClockGuard) GuardParser.parse("x-y<3", clocks, BVs);
+
+        assertEquals("x" ,clockGuard.getClock_i().getName());
+        assertEquals("y" ,clockGuard.getClock_j().getName());
+        assertEquals(3, clockGuard.getUpperBound());
+    }
 }
