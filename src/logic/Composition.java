@@ -264,7 +264,7 @@ public class Composition extends TransitionSystem {
             invarFed = l.getInvariantCDD().conjunction(invarFed);
             isInitial = isInitial && l.isInitial();
             isUrgent = isUrgent || l.isUrgent();
-            isUniversal = isUniversal || l.isUniversal();
+            isUniversal = isUniversal && l.isUniversal(); // TODO: double check this at some point.
             isInconsistent = isInconsistent || l.isInconsistent();
             x += l.getX();
             y += l.getY();
@@ -337,7 +337,7 @@ public class Composition extends TransitionSystem {
             else
                 moveExisted = true;
 
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
+            resultMoves = moveProduct(resultMoves, moves, i == 1,false);
         }
 
         if (!moveExisted) return new ArrayList<>();

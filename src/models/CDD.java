@@ -116,7 +116,8 @@ public class CDD {
         }
         if (copy.isTrue()) // special case for guards
         {
-            System.out.println("to true guard --> why did I not go into the first one??");
+            assert(false);
+            //System.out.println("to true guard --> why did I not go into the first one??");
             return new TrueGuard();
         }
         if (copy.isBDD())
@@ -392,7 +393,6 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
-        System.out.println(guard + " " + update + " " + clockResets.length + " " + boolResets.length);
         return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
     }
 
@@ -589,6 +589,20 @@ public class CDD {
         else return false;
     }
 
+    public Federation toFederation() // TODO: does not in any way take care of BDD parts (might run endless for BCDDs?)
+    {
+        List<Zone> zoneList = new ArrayList<>();
+        CDD copy = new CDD(this.pointer);
+        while (!copy.isTerminal()) {
+            copy = copy.reduce().removeNegative();
+            CddExtractionResult res = copy.extractBddAndDbm();
+            copy = res.getCddPart().reduce().removeNegative();
+            Zone z = new Zone(res.getDbm());
+            zoneList.add(z);
+        }
+        Federation fed = new Federation(zoneList);
+        return fed;
+    }
 
     public static boolean isSubset(CDD A, CDD B) { // A (= B
 //        System.out.println("A : " + CDD.toGuardList(A,clocks));
@@ -656,7 +670,6 @@ public class CDD {
     {
         if (e.getUpdates().size()==0)
         {
-            System.out.println("returned because no update ");
             return this.conjunction(e.getGuardCDD());
         }
         int numBools = 0;
@@ -710,6 +723,7 @@ public class CDD {
 
 
     public CDD transitionBack(Move e) {
+        // TODO: check that this is up to date compared to the othter TransitionBack
         if (e.getUpdates().size()==0)
         {
             return this.conjunction(e.getGuardCDD());

@@ -56,13 +56,10 @@ public class Automaton {
             CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
             CDD.addClocks(clocks);
             CDD.addBddvar(BVs);
-            System.out.println("adding target invariants");
             addTargetInvariantToEdges();
 
-            System.out.println("making input enabled");
             makeInputEnabled();
 
-            System.out.println("Automaton processed");
             CDD.done();
         }
     }
@@ -84,7 +81,6 @@ public class Automaton {
             this.locations.add(new Location(loc, clocks, origin.clocks, BVs, origin.BVs));
             if (loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
         }
-        System.out.println(this.BVs +" " + origin.getBVs());
         this.edges = new ArrayList<>();
         for (Edge e : origin.edges) {
             int sourceIndex = origin.locations.indexOf(e.getSource());
@@ -262,9 +258,7 @@ public class Automaton {
     public void addTargetInvariantToEdges() {
         for (Edge edge : getEdges()) {
             CDD targetCDD = edge.getTarget().getInvariantCDD();
-            System.out.println("collected a target invariant");
             CDD past = targetCDD.transitionBack(edge);
-            System.out.println("transitioned back");
             if (!past.equiv(CDD.cddTrue()))
                 edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
         }

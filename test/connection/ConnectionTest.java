@@ -4,6 +4,7 @@ import logic.Controller;
 import logic.query.Query;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;

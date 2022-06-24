@@ -1,11 +1,17 @@
 package connection;
 
-import logic.Controller;
+import logic.*;
 import logic.query.Query;
+import models.Automaton;
+import models.CDD;
+import models.Clock;
 import org.apache.commons.cli.*;
+import parser.JSONParser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 
 public class Main {
@@ -39,7 +45,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-
         options.addOption(proto);
         options.addOption(outputFolder);
         options.addOption(inputFolder);

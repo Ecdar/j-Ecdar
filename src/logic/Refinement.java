@@ -9,13 +9,14 @@ public class Refinement {
     private final TransitionSystem ts1, ts2;
     private final List<Clock> allClocks;
     private final List<BoolVar> allBVs;
-    private final Map<LocationPair, List<StatePair>> passed;
+
+    private final Map<LocationPair, StatePair> passed;
     private final Deque<StatePair> waiting;
+
     private final Set<Channel> inputs1, inputs2, outputs1, outputs2;
     private GraphNode refGraph;
     private GraphNode currNode;
     private GraphNode supersetNode;
-    private int treeSize;
     private HashMap<Clock,Integer> maxBounds;
     private static boolean RET_REF = false;
     public static int NODE_ID = 0;
@@ -84,9 +85,10 @@ public class Refinement {
         // signature check, precondition of refinement: inputs and outputs must be the same on both sides,
         // with the exception that the left side is allowed to have more outputs
 
-        // inputs on the left must be equal to inputs on the right side
+        // inputs on the right must contain all inputs on the left side
         if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
+            errMsg.append(inputs2 + " <--> " + inputs1 + "\n");
             errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
         }
 
@@ -142,7 +144,6 @@ public class Refinement {
         if (RET_REF) {
             refGraph = new GraphNode(waiting.getFirst());
             currNode = refGraph;
-            treeSize++;
         }
 
 
@@ -170,10 +171,12 @@ public class Refinement {
             }
 
 
-            if (passed.containsKey(locPair))
-                passed.get(locPair).add(pair);
+            if (passed.containsKey(locPair)) {
+                passed.get(locPair).getLeft().disjunctCDD(pair.getLeft().getCDD());
+                passed.get(locPair).getRight().disjunctCDD(pair.getRight().getCDD());
+            }
             else
-                passed.put(locPair, new ArrayList<>(Collections.singletonList(pair)));
+                passed.put(locPair,pair);
 
             // assert(passedContainsStatePair(curr));
 
@@ -197,7 +200,7 @@ public class Refinement {
             // check that for every input in TS 2 there is a corresponding input in TS 1
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
-                assert(false); // assuming everything is input enabled
+                //assert(false); // assuming everything is input enabled
                 System.out.println("Input violation");
                 CDD.done();
                 return false;
@@ -222,13 +225,18 @@ public class Refinement {
     private boolean checkDelay(State leftState, State rightState)
     {
         assert (leftState.getCDD().equiv(rightState.getCDD()));
-        CDD currentStateCDD = leftState.getCDD();
+        CDD currentStateCDD = new CDD(leftState.getCDD().getPointer()); //TODO: is the explicit new needed?
         currentStateCDD=currentStateCDD.delay();
 
         CDD leftPart = currentStateCDD.conjunction(leftState.getInvarCDDDirectlyFromInvariants());
         CDD rightPart = currentStateCDD.conjunction(rightState.getInvarCDDDirectlyFromInvariants());
         if (CDD.isSubset(leftPart,rightPart))
             return true;
+
+        System.out.println("left invariant: " + leftState.getInvarCDDDirectlyFromInvariants());
+        System.out.println("right invariant: " + rightState.getInvarCDDDirectlyFromInvariants());
+        System.out.println("left : " + leftState);
+        System.out.println("right : " + rightState);
         return false;
     }
 
@@ -276,7 +284,7 @@ public class Refinement {
         return new StatePair(leaderTarget, target2);
     }
 
-    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2) {
+    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2, boolean isInput) {
         boolean pairFound = false;
 
 
@@ -291,34 +299,44 @@ public class Refinement {
         for (CDD c: gzRight)
             rightCDD = rightCDD.disjunction(c);
 
-        // If trans2 does not satisfy all solution of trans2, return empty list which should result in refinement failure
-        if (leftCDD.minus(rightCDD).isNotFalse()) {
-            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+        // If trans2 does not satisfy all solution of trans1, return empty list which should result in refinement failure
+        if (!isInput && leftCDD.minus(rightCDD).isNotFalse()) {
+            System.out.println("trans 2 does not satisfiy all solutions of trans 1");
+//            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
             System.out.println(leftCDD);
             System.out.println(rightCDD);
             System.out.println(leftCDD.minus(rightCDD));
             return false;
         }
 
-
+        if (isInput && rightCDD.minus(leftCDD).isNotFalse()) {
+            System.out.println("trans 2 does not satisfiy all solutions of trans 1");
+//            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            System.out.println(leftCDD);
+            System.out.println(rightCDD);
+            System.out.println(rightCDD.minus(leftCDD));
+            return false;
+        }
 
         for (Transition transition1 : trans1) {
             for (Transition transition2 : trans2) {
                 StatePair pair = buildStatePair(transition1, transition2);
                 if (pair != null) {
                     pairFound = true;
-                    if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)  ) {
 
-                        waiting.add(pair);
-                        if (RET_REF) {
-                            currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
-                            treeSize++;
-                        }
-                    } else {
-                        if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
-                            GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), (pair.getLeft().getCDD()));
-                            currNode.addSuccessor(edge);
-                            supersetNode.addPredecessor(edge);
+                    if (!pair.getRight().getLocation().getIsUniversal())
+                    {
+                        if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
+                            waiting.add(pair);
+                            if (RET_REF) {
+                                currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
+                            }
+                        } else {
+                            if (RET_REF && supersetNode != null && !currNode.equals(supersetNode)) {
+                                GraphEdge edge = new GraphEdge(currNode, supersetNode, transition1.getEdges(), transition2.getEdges(), (pair.getLeft().getCDD()));
+                                currNode.addSuccessor(edge);
+                                supersetNode.addPredecessor(edge);
+                            }
                         }
                     }
                 }
@@ -367,8 +385,8 @@ public class Refinement {
 
                 }
 
-
-                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions) : createNewStatePairs(leaderTransitions, followerTransitions))) {
+                //System.out.println("Channel: " + action);
+                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput) : createNewStatePairs(leaderTransitions, followerTransitions, isInput))) {
                     System.out.println(isInput);
                     System.out.println("followerTransitions: " + followerTransitions.size());
                     for (Transition t: followerTransitions)
@@ -388,11 +406,17 @@ public class Refinement {
 
     private boolean passedContainsStatePair(StatePair pair) {
         LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
-
         if (passed.containsKey(locPair)) {
-            boolean res = listContainsStatePair(pair, passed.get(locPair));
-            return res ;
+            if (CDD.isSubset(pair.getRight().getCDD(),passed.get(locPair).getRight().getCDD()))
+                return true;
+            if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
+                assert(false); // left and right side are supposed to be identical at all times, so this should not be reachable
+            /*if (pair.getRight().getCDD().toFederation().isSubset(passed.get(locPair).getRight().getCDD().toFederation()))
+            {
+                assert(false);
+            }*/
         }
+
         return false;
     }
 
@@ -418,6 +442,10 @@ public class Refinement {
                         CDD.isSubset(currRight.getCDD(),passedRight.getCDD())) {
                     supersetNode = state.getNode();
                     return true;
+                }
+                if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
+                {
+                    assert(false);
                 }
             }
         }

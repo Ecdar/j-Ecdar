@@ -17,15 +17,28 @@ public class Move {
         this.source = source;
         this.target = target;
         this.edges = edges;
-        guardCDD= CDD.cddTrue();
-        this.updates= new ArrayList<>();
-        for (Edge e : edges)
-        {
+        guardCDD = CDD.cddTrue();
+        this.updates = new ArrayList<>();
+        for (Edge e : edges) {
             CDD guardCDD1 = e.getGuardCDD();
-           guardCDD = guardCDD.conjunction(guardCDD1);
-           updates.addAll(e.getUpdates());
+            guardCDD = guardCDD.conjunction(guardCDD1);
+            updates.addAll(e.getUpdates());
         }
 
+    }
+
+    /**
+     * Return the enabled part of a move based on guard, source invariant and predated target invariant
+     **/
+    public CDD getEnabledPart() {
+        CDD sourceInvariant = getSource().getInvariantCDD();
+        CDD targetInvariant = getTarget().getInvariantCDD();
+        return getGuardCDD().conjunction(targetInvariant.transitionBack(this)).conjunction(sourceInvariant);
+    }
+
+    public void conjunctCDD(CDD cdd)
+    {
+        guardCDD = guardCDD.conjunction(cdd);
     }
 
     public SymbolicLocation getSource() {

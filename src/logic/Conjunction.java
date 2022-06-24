@@ -215,7 +215,7 @@ public class Conjunction extends TransitionSystem {
             invarFed = l.getInvariantCDD().conjunction(invarFed);
             isInitial = isInitial && l.isInitial();
             isUrgent = isUrgent || l.isUrgent();
-            isUniversal = isUniversal || l.isUniversal();
+            isUniversal = isUniversal && l.isUniversal(); // todo: double check at some point
             isInconsistent = isInconsistent || l.isInconsistent();
             x += l.getX();
             y += l.getY();
@@ -273,7 +273,7 @@ public class Conjunction extends TransitionSystem {
             if (moves.isEmpty())
                 return new ArrayList<>();
 
-            resultMoves = moveProduct(resultMoves, moves, i == 1);
+            resultMoves = moveProduct(resultMoves, moves, i == 1, false);
         }
 
         return resultMoves;
