@@ -71,7 +71,7 @@ public class QueryParserTest {
         Field field = QueryParser.class.getDeclaredField("transitionSystems");
         field.setAccessible(true);
         field.set(null, transitionSystems);
-        return visitor.visitSystem(parser.queries().query(0).saveSystem().system());
+        return visitor.visit(parser.queries().query(0).saveSystem().expression());
     }
 
     @Test
@@ -226,7 +226,7 @@ public class QueryParserTest {
     }
     @Test
     public void testDetermOne() throws Exception {
-       assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:HalfAdm1", false).get(0).getResult(), true);
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "determinism:HalfAdm1", false).get(0).getResult(), true);
     }
     @Test
     public void testDetermConj() throws Exception {
