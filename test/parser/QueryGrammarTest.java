@@ -67,9 +67,9 @@ public class QueryGrammarTest {
 
         QueryGrammarParser.QueryContext ctx = parser.queries().query(0);
         assertEquals("get-component", ctx.QUERY_TYPE().getText());
-        assertEquals("A", ctx.saveSystem().system().system(0).system(0).VARIABLE().getText());
-        assertEquals("||", ctx.saveSystem().system().COMPOSITION().getText());
-        assertEquals("F", ctx.saveSystem().system().system(1).VARIABLE().getText());
+        assertEquals("A", ctx.saveSystem().expression().conjunction().conjunctionExpression(0).system().VARIABLE().getText());
+        assertEquals("||", ctx.saveSystem().expression().conjunction().conjunctionExpression(1).composition().COMPOSITION(0).getText());
+        assertEquals("F", ctx.saveSystem().expression().conjunction().conjunctionExpression(1).composition().compositionExpression(1).system().VARIABLE().getText());
     }
 
     @Test
@@ -77,9 +77,9 @@ public class QueryGrammarTest {
         QueryGrammarParser parser = createParserNoError(getTokensFromText("refinement: A <= B \\\\ (A || Q)"));
 
         QueryGrammarParser.QueryContext ctx = parser.queries().query(0);
-        assertEquals("A", ctx.refinement().system(0).VARIABLE().getText());
-        assertEquals("\\\\", ctx.refinement().system(1).QUOTIENT().getText());
-        assertEquals("B", ctx.refinement().system(1).system(0).getText());
+        assertEquals("A", ctx.refinement().expression(0).system().VARIABLE().getText());
+        assertEquals("\\\\", ctx.refinement().expression(1).quotient().QUOTIENT().getText());
+        assertEquals("B", ctx.refinement().expression(1).quotient().system(0).VARIABLE().getText());
     }
 
     @Test
@@ -89,9 +89,9 @@ public class QueryGrammarTest {
         QueryGrammarParser.QueriesContext queriesContext = parser.queries();
         QueryGrammarParser.RefinementContext refinementCtx =queriesContext.query(0).refinement();
         QueryGrammarParser.QueryContext getComponentCtx = queriesContext.query(1);
-        assertEquals("A", refinementCtx.system(0).VARIABLE().getText());
-        assertEquals("B", refinementCtx.system(1).VARIABLE().getText());
-        assertEquals("C", getComponentCtx.saveSystem().system().VARIABLE().getText());
+        assertEquals("A", refinementCtx.expression(0).system().VARIABLE().getText());
+        assertEquals("B", refinementCtx.expression(1).system().VARIABLE().getText());
+        assertEquals("C", getComponentCtx.saveSystem().expression().system().VARIABLE().getText());
         assertEquals("D", getComponentCtx.saveSystem().VARIABLE().getText());
     }
 }

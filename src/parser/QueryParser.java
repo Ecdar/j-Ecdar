@@ -87,8 +87,8 @@ public class QueryParser {
             SystemVisitor systemVisitor = new SystemVisitor();
             return builder
                     .queryType(Query.QueryType.REFINEMENT)
-                    .system1(systemVisitor.visit(ctx.system(0)))
-                    .system2(systemVisitor.visit(ctx.system(1)));
+                    .system1(systemVisitor.visit(ctx.expression(0)))
+                    .system2(systemVisitor.visit(ctx.expression(1)));
         }
 
 
@@ -102,7 +102,7 @@ public class QueryParser {
             }
 
             SystemVisitor systemVisitor = new SystemVisitor();
-            return builder.system1(systemVisitor.visit(ctx.system()));
+            return builder.system1(systemVisitor.visit(ctx.expression()));
         }
     }
 
@@ -117,26 +117,43 @@ public class QueryParser {
         }
 
         @Override
-        public TransitionSystem visitSystem(QueryGrammarParser.SystemContext ctx) {
-            if(ctx.system().size() == 2){
-                TransitionSystem system1 = visit(ctx.system(0));
-                TransitionSystem system2 = visit(ctx.system(1));
+        public TransitionSystem visitConjunction(QueryGrammarParser.ConjunctionContext ctx) {
+            int size = ctx.conjunctionExpression().size();
+            TransitionSystem[] systems = new TransitionSystem[size];
 
-                if(ctx.CONJUNCTION() != null){
-                    return new Conjunction(new TransitionSystem[]{system1, system2});
-                }else if(ctx.COMPOSITION() != null){
-                    return new Composition(new TransitionSystem[]{system1, system2});
-                }else if(ctx.QUOTIENT() != null){
-                    return new Quotient(system1, system2); // TODO: Check if correct
-                }else {
-                    throw new RuntimeException("Expected composition, conjunction or quotient");
-                }
+            for (int i = 0; i < size; i++) {
+                systems[i] = visit(ctx.conjunctionExpression(i));
             }
 
-            if(ctx.system().size() == 1){
-                return visit(ctx.system(0));
-            } else {
-               return findComponent(ctx.VARIABLE().getText());
+            return new Conjunction(systems);
+        }
+
+        @Override
+        public TransitionSystem visitComposition(QueryGrammarParser.CompositionContext ctx) {
+            int size = ctx.compositionExpression().size();
+            TransitionSystem[] systems = new TransitionSystem[size];
+
+            for (int i = 0; i < size; i++) {
+                systems[i] = visit(ctx.compositionExpression(i));
+            }
+
+            return new Composition(systems);
+        }
+
+        @Override
+        public TransitionSystem visitQuotient(QueryGrammarParser.QuotientContext ctx) {
+            TransitionSystem left = visit(ctx.system(0));
+            TransitionSystem right = visit(ctx.system(1));
+
+            return new Quotient(left, right);
+        }
+
+        @Override
+        public TransitionSystem visitSystem(QueryGrammarParser.SystemContext ctx) {
+            if(ctx.expression() != null){
+                return visit(ctx.expression());
+            }else{
+                return findComponent(ctx.VARIABLE().getText());
             }
         }
     }
