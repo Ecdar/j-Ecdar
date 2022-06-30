@@ -42,7 +42,7 @@ public class VariousTest {
 
     @Test
     public void next() {
-        Clock y = new Clock("y");
+        Clock y = new Clock("y", "Aut");
         List<Clock> clocks = new ArrayList<>(Arrays.asList(y));
         Zone z1 = new Zone(clocks.size()+1,true);
         z1.init();
@@ -73,8 +73,8 @@ public class VariousTest {
 
     @Test
     public void testDiagonalConstraints() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
 
         ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
         ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
@@ -108,8 +108,8 @@ public class VariousTest {
 
     @Test
     public void testClockReset() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
 
         ClockGuard g1 = new ClockGuard(x, 10, Relation.GREATER_EQUAL);
         ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
@@ -158,8 +158,8 @@ public class VariousTest {
     public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException
     {
         CDD.init(100,100,100);
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x","Aut");
+        Clock y = new Clock("y", "Aut");
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);clocks.add(y);
         CDD.addClocks(clocks);

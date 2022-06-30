@@ -15,7 +15,7 @@ public class GuardParserTest {
     @Test
     public void testGuardParser(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x"));}};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x", "Aut"));}};
         ClockGuard guard = (ClockGuard) GuardParser.parse("x>5", clocks, BVs);
 
         assertThat(guard, instanceOf(ClockGuard.class));
@@ -26,7 +26,7 @@ public class GuardParserTest {
     @Test
     public void testGuardParserAnd(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x", "Aut")); add(new Clock("y", "Aut")); }};
         AndGuard AndGuard = (AndGuard)GuardParser.parse("x>=5 && y<6", clocks, BVs);
 
         ClockGuard guard = (ClockGuard)AndGuard.getGuards().get(0);
@@ -41,7 +41,7 @@ public class GuardParserTest {
     @Test
     public void testGuardParserOr(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x", "Aut")); add(new Clock("y", "Aut")); }};
         OrGuard orGuard = (OrGuard) GuardParser.parse("x>2 || y<5", clocks, BVs);
 
         ClockGuard guard = (ClockGuard)orGuard.getGuards().get(0);
@@ -56,7 +56,7 @@ public class GuardParserTest {
     @Test
     public void testGuardParserOuterAnd(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x", "Aut")); add(new Clock("y", "Aut")); }};
         AndGuard andGuard = (AndGuard) GuardParser.parse("(x>2 || y<5) && x>=1", clocks, BVs);
 
         assertThat(andGuard.getGuards().get(0), instanceOf(OrGuard.class));
@@ -78,10 +78,21 @@ public class GuardParserTest {
     @Test
     public void testGuardParserOuterAnd2(){
         List<BoolVar> BVs = new ArrayList<>();
-        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ArrayList<Clock> clocks = new ArrayList<Clock>() {{add(new Clock("x", "Aut")); add(new Clock("y", "Aut")); }};
         AndGuard andGuard = (AndGuard) GuardParser.parse("(x>2 || y<5) && (x>3 || y<6))", clocks, BVs);
 
         assertThat(andGuard.getGuards().get(0), instanceOf(OrGuard.class));
         assertThat(andGuard.getGuards().get(1), instanceOf(OrGuard.class));
+    }
+
+    @Test
+    public void testGuardParserDiagionalClock(){
+        List<BoolVar> BVs = new ArrayList<>();
+        ArrayList<Clock> clocks = new ArrayList<>() {{add(new Clock("x")); add(new Clock("y")); }};
+        ClockGuard clockGuard = (ClockGuard) GuardParser.parse("x-y<3", clocks, BVs);
+
+        assertEquals("x" ,clockGuard.getClock_i().getName());
+        assertEquals("y" ,clockGuard.getClock_j().getName());
+        assertEquals(3, clockGuard.getUpperBound());
     }
 }

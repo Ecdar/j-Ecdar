@@ -194,10 +194,10 @@ public class JsonAutomatonEncoder {
                 if (u1 instanceof ClockUpdate) {
                     ClockUpdate u = (ClockUpdate) u1;
                     if (i == 0) {
-                        updateString += u.getClock().getName();
+                        updateString += u.getClock().getOriginalName();
                         updateString += " = " + u.getValue();
                     } else
-                        updateString += ", " + u.getClock().getName() + " = " + u.getValue();
+                        updateString += ", " + u.getClock().getOriginalName() + " = " + u.getValue();
                     i++;
                 }
                 else
@@ -206,10 +206,10 @@ public class JsonAutomatonEncoder {
                     {
                         BoolUpdate u = (BoolUpdate) u1;
                         if (i == 0) {
-                            updateString += u.getBV().getName();
+                            updateString += u.getBV().getOriginalName();
                             updateString += " = " + u.getValue();
                         } else
-                            updateString += ", " + u.getBV().getName() + " = " + u.getValue();
+                            updateString += ", " + u.getBV().getOriginalName() + " = " + u.getValue();
                         i++;
                     }
                 }
@@ -225,12 +225,12 @@ public class JsonAutomatonEncoder {
         String localDecString="";
         for (Clock c : aut.getClocks())
         {
-            localDecString+= "clock " + c.getName() + "; ";
+            localDecString+= "clock " + c.getOriginalName() + "; ";
         }
 
         for (BoolVar bv : aut.getBVs())
         {
-            localDecString+= "bool " + bv.getName() + "; ";
+            localDecString+= "bool " + bv.getOriginalName() + "; ";
         }
 
         JSONObject finalJSON = new JSONObject();

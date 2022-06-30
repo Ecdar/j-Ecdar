@@ -98,13 +98,12 @@ public class EcdarServiceTest {
                 .build();
         blockingStub.updateComponents(request);
 
-        QueryProtos.Query query = QueryProtos.Query.newBuilder().setQuery("get-component: Test1 save-as SavedComponent").build();
+        QueryProtos.Query query = QueryProtos.Query.newBuilder().setQuery("get-component: Test1 save-as Test1").build();
         QueryProtos.QueryResponse queryResponse = blockingStub.sendQuery(query);
         shutdown();
 
         Automaton expected = JSONParser.parseJsonString(jsonTest1, false);
         Automaton actual = JSONParser.parseJsonString(queryResponse.getComponent().getComponent().getJson(), false);
-        actual.setName("Test1");
         assertEquals(expected, actual);
     }
 

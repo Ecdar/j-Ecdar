@@ -8,7 +8,7 @@ public class GuardTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        x = new Clock("x");
+        x = new Clock("x", "Aut");
     }
 
     @Test

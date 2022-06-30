@@ -14,7 +14,6 @@ public class Conjunction extends TransitionSystem {
     private List<State> waiting = new ArrayList<>();
     private HashMap<Clock,Integer> maxBounds;
 
-
     public void setMaxBounds() {
         HashMap<Clock,Integer> res = new HashMap<>();
         for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
@@ -22,8 +21,6 @@ public class Conjunction extends TransitionSystem {
 
         maxBounds = res;
     }
-
-
 
     public Conjunction(TransitionSystem[] systems) {
         this.systems = systems;
@@ -91,7 +88,7 @@ public class Conjunction extends TransitionSystem {
     {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs);
+        CDD.addBddvar(BVs.getItems());
 
         String name="";
         Set<Edge> edgesSet = new HashSet<>();
@@ -99,47 +96,6 @@ public class Conjunction extends TransitionSystem {
         Map<String, Location> locMap = new HashMap<>();
         passed = new ArrayList<>();
         waiting = new ArrayList<>();
-
-        // Renaming the clocks and BVs if there has been a name clash
-        List<Clock> newClocks = new ArrayList<>();
-        List<Clock> oldClocks = new ArrayList<>();
-        List<BoolVar> newBVs = new ArrayList<>();
-        List<BoolVar> oldBVs = new ArrayList<>();
-        for (Automaton aut : autList)
-        {
-            for (Clock c: aut.getClocks())
-            {
-                Clock newClock;
-                if (newClocks.stream().filter(clk->clk.getName().equals(c.getName())).collect(Collectors.toList()).isEmpty())
-                {
-                    newClock = new Clock(c.getName());
-                }
-                else {
-                    if (newClocks.stream().filter(clk->clk.getName().equals(aut.getName() + c.getName())).collect(Collectors.toList()).isEmpty())
-                        newClock = new Clock(aut.getName() + c.getName());
-                    else
-                        newClock = new Clock(aut.getName() + c.getName()+randomString());
-                }
-                newClocks.add(newClock);
-                oldClocks.add(c);
-            }
-            for (BoolVar bv: aut.getBVs())
-            {
-                BoolVar newBV;
-                if (newBVs.stream().filter(b->b.getName().equals(bv.getName())).collect(Collectors.toList()).isEmpty())
-                {
-                    newBV = new BoolVar(bv.getName(), bv.getInitialValue());
-                }
-                else {
-                    if (newBVs.stream().filter(b->b.getName().equals(aut.getName() + bv.getName())).collect(Collectors.toList()).isEmpty())
-                        newBV = new BoolVar(aut.getName() + bv.getName(), bv.getInitialValue());
-                    else
-                        newBV = new BoolVar(aut.getName() + bv.getName()+randomString(), bv.getInitialValue());
-                }
-                newBVs.add(newBV);
-                oldBVs.add(bv);
-            }
-        }
 
         List<Location> initLoc = new ArrayList<>();
         for (Automaton aut : autList) {
@@ -175,7 +131,7 @@ public class Conjunction extends TransitionSystem {
             for (Channel chan : all )
             {
 
-                List<Transition> transList = getNextTransitions(currentState, chan, clocks);
+                List<Transition> transList = getNextTransitions(currentState, chan, clocks.getItems());
                 for (Transition trans : transList)
                 {
 
@@ -185,7 +141,7 @@ public class Conjunction extends TransitionSystem {
                     boolean isUrgent = trans.getTarget().getLocation().getIsUrgent();
                     boolean isUniversal = trans.getTarget().getLocation().getIsUniversal();
                     boolean isInconsistent = trans.getTarget().getLocation().getIsInconsistent();
-                    Guard invariant = trans.getTarget().getInvariants(clocks);
+                    Guard invariant = trans.getTarget().getInvariants(clocks.getItems());
                     String sourceName = trans.getSource().getLocation().getName();
                     int x = trans.getTarget().getLocation().getX();
                     int y = trans.getTarget().getLocation().getX();
@@ -198,10 +154,10 @@ public class Conjunction extends TransitionSystem {
                     }
                     locationsSet.add(target);
                     if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
-                        trans.getTarget().extrapolateMaxBounds(maxBounds, clocks);
+                        trans.getTarget().extrapolateMaxBounds(maxBounds, clocks.getItems());
                         waiting.add(trans.getTarget());
                     }
-                    Guard guardList = trans.getGuards(clocks); // TODO: Check!
+                    Guard guardList = trans.getGuards(clocks.getItems()); // TODO: Check!
                     List<Update> updateList = trans.getUpdates();
                     boolean isInput = false;
                     if (getInputs().contains(chan))
@@ -217,7 +173,6 @@ public class Conjunction extends TransitionSystem {
 
                             if (e.getGuardCDD().equiv( otherE.getGuardCDD()));
                             {
-
                                 edgeAlreadyExists = true;
                             }
                         }
@@ -226,17 +181,12 @@ public class Conjunction extends TransitionSystem {
                         edgesSet.add(e);
 
                 }
-
-
-
             }
-
         }
 
-
-        List <Location> locsWithNewClocks = updateClocksInLocs(locationsSet,newClocks, oldClocks,newBVs,oldBVs);
-        List <Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet,newClocks, oldClocks,newBVs,oldBVs);
-        Automaton resAut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, newClocks, newBVs, false);
+        List <Location> locsWithNewClocks = updateClocksInLocs(locationsSet,clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
+        List <Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet,clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
+        Automaton resAut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
         CDD.done();
         return resAut;
 

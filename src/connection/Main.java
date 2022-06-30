@@ -118,5 +118,4 @@ public class Main {
         formatter.printHelp("-i path/to/folder [OPTIONS] [\"QUERIES\"]", options);
     }
 
-
 }

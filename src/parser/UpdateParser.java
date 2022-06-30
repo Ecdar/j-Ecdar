@@ -50,14 +50,14 @@ public class UpdateParser {
     private static class AssignmentVisitor extends UpdateGrammarBaseVisitor<Update>{
         private Clock findClock(String clockName) {
             for (Clock clock : clocks)
-                if (clock.getName().equals(clockName)) return clock;
+                if (clock.getOriginalName().equals(clockName)) return clock;
 
             return null;
         }
 
         private static BoolVar findBV(String name) {
             for (BoolVar bv : BVs)
-                if (bv.getName().equals(name))
+                if (bv.getOriginalName().equals(name))
                     return bv;
 
             return null;

@@ -21,14 +21,14 @@ public class GuardParser {
 
     private static Clock findClock(String clockName) {
         for (Clock clock : clocks)
-            if (clock.getName().equals(clockName)) return clock;
+            if (clock.getOriginalName().equals(clockName)) return clock;
 
         throw new ClockNotFoundException("Clock: " + clockName + " was not found");
     }
 
     private static BoolVar findBV(String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(name))
+            if (bv.getOriginalName().equals(name))
                 return bv;
 
         throw new BooleanVariableNotFoundException("Boolean variable: " + name + " was not found");
@@ -83,10 +83,15 @@ public class GuardParser {
         public Guard visitClockExpr(GuardGrammarParser.ClockExprContext ctx) {
             int value = Integer.parseInt(ctx.INT().getText());
             String operator = ctx.OPERATOR().getText();
-            Clock clock = findClock(ctx.VARIABLE().getText());
-
+            Clock clock_i = findClock(ctx.VARIABLE(0).getText());
             Relation relation = Relation.fromString(operator);
-            return new ClockGuard(clock, value, relation);
+
+            if(ctx.VARIABLE().size() > 1){
+                Clock clock_j = findClock(ctx.VARIABLE(1).getText());
+                return new ClockGuard(clock_i, clock_j, value, relation);
+            }else {
+                return new ClockGuard(clock_i, value, relation);
+            }
         }
 
         @Override

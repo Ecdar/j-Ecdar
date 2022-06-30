@@ -12,7 +12,7 @@ public class BoolVal { // TODO: Later on make sure that states only store the va
     }
 
     public String getName() {
-        return var.getName();
+        return var.getOriginalName();
     }
 
     public BoolVar getVar() {

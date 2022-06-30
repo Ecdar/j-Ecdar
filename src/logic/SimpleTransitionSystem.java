@@ -76,7 +76,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             State toStore = new State(currState);
 
 
-            toStore.extrapolateMaxBounds(this.getMaxBounds(),clocks);
+            toStore.extrapolateMaxBounds(this.getMaxBounds(),clocks.getItems());
             passed.add(toStore);
 
             for (Channel action : actions) {
@@ -93,7 +93,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s) && !waitingContainsState(s)).collect(Collectors.toList()); // TODO I added waitingConstainsState... Okay??
-                toAdd.forEach(e->e.extrapolateMaxBounds(getMaxBounds(),clocks));
+                toAdd.forEach(e->e.extrapolateMaxBounds(getMaxBounds(),clocks.getItems()));
 
                 waiting.addAll(toAdd);
             }
@@ -159,7 +159,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         State toStore = new State(currState);
 
-        toStore.extrapolateMaxBounds(getMaxBounds(),clocks);
+        toStore.extrapolateMaxBounds(getMaxBounds(),clocks.getItems());
         passed.add(toStore);
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
@@ -219,7 +219,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
             State toStore = new State(currState);
 
-            toStore.extrapolateMaxBounds(getMaxBounds(),clocks);
+            toStore.extrapolateMaxBounds(getMaxBounds(),clocks.getItems());
             passed.add(toStore);
 
 
@@ -234,7 +234,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<State> toAdd = tempTrans.stream().map(Transition::getTarget).
                         filter(s -> !passedContainsState(s)).collect(Collectors.toList());
 
-                toAdd.forEach(s -> s.extrapolateMaxBounds(getMaxBounds(),clocks));
+                toAdd.forEach(s -> s.extrapolateMaxBounds(getMaxBounds(),clocks.getItems()));
 
                 waiting.addAll(toAdd);
             }
@@ -258,7 +258,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     private boolean passedContainsState(State state1) {
        State state = new State(state1);
-        state.extrapolateMaxBounds(maxBounds, clocks);
+        state.extrapolateMaxBounds(maxBounds, clocks.getItems());
 
 
         for (State passedState : passed) {
@@ -275,7 +275,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     private boolean waitingContainsState(State state1) {
         State state = new State(state1);
-        state.extrapolateMaxBounds(maxBounds, clocks);
+        state.extrapolateMaxBounds(maxBounds, clocks.getItems());
 
         for (State passedState : waiting) {
             // check for zone inclusion
@@ -322,8 +322,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public SimpleTransitionSystem pruneReachTimed(){
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        CDD.addClocks(clocks.getItems());
+        CDD.addBddvar(BVs.getItems());
 
         //TODO: this function is not correct yet. // FIXED: 05.1.2021
         // In the while loop, we should collect all edges associated to transitions (not just all locations associated to states), and remove all that were never associated

@@ -32,9 +32,9 @@ public class DBMTest {
         Location l1 = new Location("L0", new TrueGuard(), false, false, false, false);
         SymbolicLocation sl1 = new SimpleLocation(l1);
 
-        x = new Clock("x");
-        y = new Clock("y");
-        z = new Clock("z");
+        x = new Clock("x", "AUT");
+        y = new Clock("y", "AUT");
+        z = new Clock("z", "AUT");
 
         clockList.addAll(Arrays.asList(x, y,z));
         CDD.init(100,100,100);

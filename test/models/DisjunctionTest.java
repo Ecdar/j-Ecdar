@@ -77,7 +77,7 @@ public class DisjunctionTest {
 
     @Test
     public void testGuardNegation() {
-        Clock x = new Clock("x");
+        Clock x = new Clock("x", "Aut");
         Guard g1 = new ClockGuard(x, null, 4, Relation.GREATER_THAN );  //x>4
         Guard g2 = new ClockGuard(x, null, 5, Relation.LESS_THAN); //x<5
         Guard g3 = new ClockGuard(x, null, 7,Relation.LESS_THAN); //x<7

@@ -17,18 +17,29 @@ query       : QUERY_TYPE ':' saveSystem
             | refinement
             ;
 
-refinement  : 'refinement:' system '<=' system
+refinement  : 'refinement:' expression '<=' expression
             ;
 
-saveSystem  : system
-            | system 'save-as' VARIABLE
+saveSystem  : expression
+            | expression 'save-as' VARIABLE
             ;
+
+expression  : conjunction
+            | composition
+            | quotient
+            | system
+            ;
+
+conjunction             : (conjunctionExpression CONJUNCTION)+ conjunctionExpression ;
+conjunctionExpression   : system | composition | quotient ;
+
+composition             : (compositionExpression COMPOSITION)+ compositionExpression ;
+compositionExpression   : system | quotient ;
+
+quotient                : system QUOTIENT system ;
 
 system      : VARIABLE
-            |  '(' system ')'
-            | system CONJUNCTION system
-            | system COMPOSITION system
-            | system QUOTIENT system
+            | '(' expression ')'
             ;
 
 

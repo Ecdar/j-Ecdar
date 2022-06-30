@@ -162,7 +162,7 @@ public class JSONParser {
                 String[] clockArr = clocks.split(",");
 
                 for (String s : clockArr) {
-                    componentClocks.add(new Clock(s));
+                    componentClocks.add(new Clock(s, automatonName));
                 }
             }
         }
@@ -188,8 +188,8 @@ public class JSONParser {
 
                     for (String bool : boolArr)
                         if (bool.contains("="))
-                            BVs.add(new BoolVar(bool.split("=")[0], Boolean.parseBoolean(bool.split("=")[1])));
-                        else BVs.add(new BoolVar(bool, false));
+                            BVs.add(new BoolVar(bool.split("=")[0], automatonName, Boolean.parseBoolean(bool.split("=")[1])));
+                        else BVs.add(new BoolVar(bool,automatonName, false));
                 }
             }
         }
@@ -231,13 +231,13 @@ public class JSONParser {
 
     private static Clock findClock(String clockName) {
         for (Clock clock : componentClocks)
-            if (clock.getName().equals(clockName)) return clock;
+            if (clock.getOriginalName().equals(clockName)) return clock;
 
         return null;
     }
     private static BoolVar findBV(String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(name))
+            if (bv.getOriginalName().equals(name))
                 return bv;
 
         return null;

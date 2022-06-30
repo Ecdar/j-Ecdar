@@ -45,9 +45,9 @@ public class XMLParserTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
-        Clock z = new Clock("z");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
+        Clock z = new Clock("z", "Aut");
         List<Clock> clocks = new ArrayList<>(Arrays.asList(x, y, z));
 
         Channel i = new Channel("i");
