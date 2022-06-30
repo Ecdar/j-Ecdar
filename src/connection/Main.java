@@ -117,4 +117,5 @@ public class Main {
     private static void printHelp(HelpFormatter formatter, Options options){
         formatter.printHelp("-i path/to/folder [OPTIONS] [\"QUERIES\"]", options);
     }
+
 }
