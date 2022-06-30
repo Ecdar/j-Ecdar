@@ -25,8 +25,8 @@ public class InputEnablednessTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
 
         System.out.println("started setup");
 

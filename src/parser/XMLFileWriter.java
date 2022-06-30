@@ -119,12 +119,12 @@ public class XMLFileWriter {
         String localDecString="";
         for (Clock c : automaton.getClocks())
         {
-            localDecString+= "clock " + c.getName() + "; ";
+            localDecString+= "clock " + c.getOriginalName() + "; ";
         }
 
         for (BoolVar bv : automaton.getBVs())
         {
-            localDecString+= "bool " + bv.getName() + "=" + bv.getInitialValue()+ "; ";
+            localDecString+= "bool " + bv.getOriginalName() + "=" + bv.getInitialValue()+ "; ";
         }
         localDeclaration.addContent(localDecString);
 
@@ -294,20 +294,20 @@ public class XMLFileWriter {
                 if (u instanceof BoolUpdate)
                 {
                     if (i == 0) {
-                        updateString += ((BoolUpdate) u).getBV().getName();
+                        updateString += ((BoolUpdate) u).getBV().getOriginalName();
                         updateString += " = " + ((BoolUpdate) u).getValue();
                     } else
-                        updateString += ", " + ((BoolUpdate) u).getBV().getName() + " = " + ((BoolUpdate) u).getValue();
+                        updateString += ", " + ((BoolUpdate) u).getBV().getOriginalName() + " = " + ((BoolUpdate) u).getValue();
                     i++;
                 }
                 if (u instanceof ClockUpdate)
                 {
 
                     if (i == 0) {
-                        updateString += ((ClockUpdate) u).getClock().getName();
+                        updateString += ((ClockUpdate) u).getClock().getOriginalName();
                         updateString += " = " + ((ClockUpdate) u).getValue();
                     } else
-                        updateString += ", " + ((ClockUpdate) u).getClock().getName() + " = " + ((ClockUpdate) u).getValue();
+                        updateString += ", " + ((ClockUpdate) u).getClock().getOriginalName() + " = " + ((ClockUpdate) u).getValue();
                     i++;
                 }
             }

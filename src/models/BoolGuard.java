@@ -70,7 +70,7 @@ public class BoolGuard extends Guard {
     @Override
     public String toString() {
         return "(" +
-                var.getName() +
+                var.getOriginalName() +
                 comperator +
                 value +
                 ')';

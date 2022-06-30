@@ -21,14 +21,14 @@ public class GuardParser {
 
     private static Clock findClock(String clockName) {
         for (Clock clock : clocks)
-            if (clock.getName().equals(clockName)) return clock;
+            if (clock.getOriginalName().equals(clockName)) return clock;
 
         throw new ClockNotFoundException("Clock: " + clockName + " was not found");
     }
 
     private static BoolVar findBV(String name) {
         for (BoolVar bv : BVs)
-            if (bv.getName().equals(name))
+            if (bv.getOriginalName().equals(name))
                 return bv;
 
         throw new BooleanVariableNotFoundException("Boolean variable: " + name + " was not found");

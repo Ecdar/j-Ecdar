@@ -137,14 +137,14 @@ public class ClockGuard extends Guard {
     public String toString() {
         if (isDiagonal())
         {
-            String res = clock_i.getName() + "-" + clock_j.getName();
+            String res = clock_i.getUniqueName() + "-" + clock_j.getUniqueName();
             res += rel.toString();
             res += bound;
             return res;
 
         }
         else {
-            String res = clock_i.getName();
+            String res = clock_i.getUniqueName();
             res += rel.toString();
             res += bound;
             return res;

@@ -62,10 +62,10 @@ public class JSONParserTest {
         Edge t15 = new Edge(l1, l1, bad, false, new TrueGuard(), emptyUpdates);
         Edge t16 = new Edge(l0, l1, button2, true, new TrueGuard(), emptyUpdates);
 
-        Clock a = new Clock("a");
-        Clock b = new Clock("b");
-        Clock z = new Clock("z");
-        Clock m = new Clock("m");
+        Clock a = new Clock("a", "Aut");
+        Clock b = new Clock("b", "Aut");
+        Clock z = new Clock("z", "Aut");
+        Clock m = new Clock("m", "Aut");
         List<Clock> clocksOfA = new ArrayList<>(Arrays.asList(a, b, z, m));
         List<BoolVar> BVs = new ArrayList<>();
 
@@ -80,8 +80,8 @@ public class JSONParserTest {
         components = new String[]{"GlobalDeclarations.json", "Components/Ref1.json"};
         machines2 = JSONParser.parse(base, components, false);
 
-        Clock x = new Clock("x");
-        Clock y = new Clock("y");
+        Clock x = new Clock("x", "Aut");
+        Clock y = new Clock("y", "Aut");
 
         models.ClockGuard g_l12_l17 = new ClockGuard(x, 15,  Relation.LESS_EQUAL);
         models.ClockGuard g_l12_l14 = new ClockGuard(x, 20,  Relation.LESS_THAN);

@@ -80,7 +80,7 @@ public class DeterminismTest {
 
     @Test
     public void testG1NotEqualsClock(){
-        assertNotEquals(G1, new Clock("wierd test"));
+        assertNotEquals(G1, new Clock("wierd test", "Aut"));
     }
 
     @Test
