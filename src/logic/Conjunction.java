@@ -5,8 +5,6 @@ import models.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static logic.Helpers.randomString;
-
 public class Conjunction extends TransitionSystem {
     private final TransitionSystem[] systems;
 
@@ -26,6 +24,7 @@ public class Conjunction extends TransitionSystem {
         this.systems = systems;
         setMaxBounds();
         clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
+        BVs.addAll(Arrays.stream(systems).map(TransitionSystem::getBVs).flatMap(List::stream).collect(Collectors.toList()));
     }
 
     public Set<Channel> getInputs() {
@@ -84,7 +83,7 @@ public class Conjunction extends TransitionSystem {
 
 
 
-    public Automaton createComposition(List<Automaton> autList)
+    public Automaton createConjunction(List<Automaton> autList)
     {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
@@ -235,7 +234,7 @@ public class Conjunction extends TransitionSystem {
         List<Automaton> autList = new ArrayList<>();
         for (int i=0; i<systems.length;i++)
             autList.add(systems[i].getAutomaton());
-        Automaton resAut = createComposition(autList);
+        Automaton resAut = createConjunction(autList);
 
         return resAut;
 

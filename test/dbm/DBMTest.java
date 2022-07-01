@@ -106,24 +106,25 @@ public class DBMTest {
     @Test
     public void testExtrapolate() {
         CDD.init(100,100,100);
+        List<Clock> clockList = new ArrayList<>();
+        clockList.add(x);
+        clockList.add(y);
         CDD.addClocks(clockList);
         HashMap<Clock,Integer> map = new HashMap<>();
-        map.put(x,10);
-        map.put(y,30);
-        map.put(z,10);
+        map.put(x,12);
+        map.put(y,10);
 
-        Guard g1 = new ClockGuard(x, y, 40, Relation.LESS_THAN );  //x>4
-        List<Guard> disj1 = new ArrayList<>();
-        disj1.add(g1);
-        Guard dis1 = new AndGuard(disj1);
+        Guard g2 = new ClockGuard(x,null, 20,Relation.LESS_EQUAL);
+        Guard g3 = new ClockGuard(y,null, 2,Relation.LESS_EQUAL);
+        Guard initialZone = new AndGuard(g2,g3);
 
         Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);
-        State state1 = new State(new SimpleLocation(l1),new CDD(dis1));
-        state1.delay();
+        State state1 = new State(new SimpleLocation(l1),new CDD(initialZone));
+        //state1.delay();
         System.out.println(state1);
         state1.extrapolateMaxBounds(map,clockList);
         System.out.println(state1);
-        assertEquals(state1.toString(), "{L1, (x>1 && y>2 && y-x<1)}");
+        assertEquals("{L1, (y<=2 && y-x<=2)}", state1.toString());
         CDD.done();
     }
 
@@ -142,11 +143,13 @@ public class DBMTest {
         System.out.println(z.isValid());
         int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
         z.extrapolateMaxBounds(bounds);
+        Zone copy = new Zone(z);
         z.printDBM(true,true);
         z.extrapolateMaxBounds(bounds);
         z.printDBM(true,true);
         z.extrapolateMaxBounds(bounds);
         z.printDBM(true,true);
+        assert(z.equals(copy));
     }
 
     @Test

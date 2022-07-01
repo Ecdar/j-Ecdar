@@ -8,41 +8,20 @@ import java.util.stream.Collectors;
 public class Pruning {
 
     private static boolean printComments = true;
-    private Automaton aut;
-    List<Clock> clocks;
-    List<BoolVar> BVs;
-    List<Edge> edges;
-    List<Location> locations;
-    //Map<Location, Location> locMap;
-    Set<Location> inc;
-    Map<Location, CDD> passedPairs;
 
 
-    public Pruning(SimpleTransitionSystem st) {
-        aut = new Automaton(st.getAutomaton());
-        clocks = aut.getClocks();
-        BVs = aut.getBVs();
-        edges = aut.getEdges();
-        locations = aut.getLocations();
-        //locMap = new HashMap<>();
 
+    public static SimpleTransitionSystem adversarialPruning(TransitionSystem ts) {
 
-    }
+        Automaton aut = new Automaton(ts.getAutomaton());
+        List<Clock> clocks = aut.getClocks();
+        List<BoolVar> BVs = aut.getBVs();
+        List<Edge> edges = aut.getEdges();
+        List<Location> locations = aut.getLocations();
 
-    private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
-        for (int i = 0; i < clocks.size(); i++) {
-            if (clock.hashCode() == clocks.get(i).hashCode()) return i + 1;
-        }
-        return 0;
-    }
+        Set<Location> inconsistentLocations;
+        Map<Location, CDD> passedInconsistentStates;
 
-
-    public static SimpleTransitionSystem pruneIncTimed(SimpleTransitionSystem st) {
-        Pruning pr = new Pruning(st);
-        return pr.prune();
-    }
-
-    public SimpleTransitionSystem prune() {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
         CDD.addBddvar(BVs);
@@ -51,44 +30,32 @@ public class Pruning {
         for (Location l : locations)
             l.setInconsistentPart(CDD.cddFalse());
 
-/*
-        // Creating the sets of locations and transitions that will form the new automaton.
-        for (Location l : aut.getLocations()) {
+        // Create a set of inconsistent locations, that we can loop through
+        inconsistentLocations = getInitiallyInconsistentLocations(locations);
 
-            Location lNew = new Location(l.getName(), l.getInvariant(), l.isInitial(), l.isUrgent(), l.isUniversal(), l.isInconsistent(), l.getX(), l.getY());
-            locations.add(lNew);
-            locMap.put(l, lNew);
-        }
-        for (Edge e : aut.getEdges()) {
-            // TODO: Make sure that guards and such things are deepcopied
-            // TODO: Move this to a seperate function for deepcopying an automaton
-            edges.add(new Edge(locMap.get(e.getSource()), locMap.get(e.getTarget()), e.getChannel(), e.isInput(), e.getGuards(), e.getUpdates()));
-        }
-*/
-        // Create a list of inconsistent locations, that we can loop through
-        inc = new HashSet<>(locations.stream().filter(l -> l.isInconsistent()).collect(Collectors.toList()));
+        setInconsistentCDDs(inconsistentLocations);
 
-        for (Location l : inc) // TODO 05.02.21: would be nicer if I could do this while parsing
-            l.setInconsistentPart(CDD.getUnrestrainedCDD());
 
-        // TODO: make sure the passedPairs check is actually working as inteded
-        passedPairs = new HashMap<Location, CDD>();
-        for (Location l : inc) {
-            passedPairs.put(l, CDD.getUnrestrainedCDD());
+        // TODO: make sure the passedInconsistentStates check is actually working as intended
+        passedInconsistentStates = new HashMap<Location, CDD>();
+        for (Location l : inconsistentLocations) {
+            passedInconsistentStates.put(l, l.getInconsistentPart());
         }
 
-        boolean initIsInconsistent =false;
+        boolean initialStateIsInconsistent =false;
+
+        Queue<Location> inconsistentQueue = new ArrayDeque<>(inconsistentLocations);
         // continue while there is still unprocessed inconsistent locations
-        while (!inc.isEmpty()) {
+        while (!inconsistentQueue.isEmpty()) {
             // select the first inconsistent location in the set.
-            Location targetLoc = inc.iterator().next(); // TODO: speed optimization: start with the ones that are fully inconsistent
+            Location targetLoc = inconsistentQueue.remove();
 
             if (targetLoc.isInitial())
             {
                 CDD initial = CDD.zeroCDD();
                 if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
                 {
-                    initIsInconsistent=true;
+                    initialStateIsInconsistent=true;
                     break;
                 }
             }
@@ -101,24 +68,25 @@ public class Pruning {
                 if (printComments)
                     System.out.println("Processing new Edge with guard " + e.getGuards());
                 if (e.isInput()) {
-                    handleInput(targetLoc, e);
+                    handleInput(targetLoc, e, edges,passedInconsistentStates,inconsistentQueue);
                 } else
-                    handleOutput(targetLoc, e);
-                inc.remove(targetLoc);
+                    handleOutput(targetLoc, e, edges, clocks, passedInconsistentStates, inconsistentQueue);
+
+
             }
         }
         if (printComments)
             System.out.println("no more inconsistent locations");
 
-        addInconsistentPartsToInvariants();
+        addInconsistentPartsToInvariants(locations,clocks);
         if (printComments)
             System.out.println("inconsistent parts integrated into invariants");
 
-        addInvariantsToGuards();
+        addInvariantsToGuards(edges,clocks);
         if (printComments)
             System.out.println("invariants integrated into guards");
 
-        if (initIsInconsistent) {
+        if (initialStateIsInconsistent) {
             locations = new ArrayList<>();
             locations.add(new Location("inc", new TrueGuard(), true, false, false, true));
             edges = new ArrayList<>();
@@ -129,8 +97,27 @@ public class Pruning {
 
     }
 
+    /**
+     * Set the inconsistent part of each initially inconsistent location to true
+     * @param inconsistentLocations all initially inconsistent locations
+     */
+    private static void setInconsistentCDDs(Set<Location> inconsistentLocations) {
+        for (Location l : inconsistentLocations)
+            l.setInconsistentPart(CDD.getUnrestrainedCDD());
+    }
 
-    public void addInconsistentPartsToInvariants() {
+    /**
+     * Finds and returns all inconsistent locations
+     * @param locations The list of all locations
+     * @return The list of inconsistent locations
+     */
+    private static Set<Location> getInitiallyInconsistentLocations(List<Location> locations) {
+        HashSet<Location> inconsistentLocations = new HashSet<>(locations.stream().filter(l -> l.isInconsistent()).collect(Collectors.toList()));
+        return  inconsistentLocations;
+    }
+
+
+    public static void addInconsistentPartsToInvariants(List<Location> locations, List<Clock> clocks) {
         for (Location l : locations) {
             if (l.isInconsistent()) {
                 CDD incCDD = l.getInconsistentPart();
@@ -145,7 +132,7 @@ public class Pruning {
         }
     }
 
-    public void addInvariantsToGuards() {
+    public static void addInvariantsToGuards(List<Edge> edges, List<Clock> clocks) {
         for (Edge e : edges) {
             if (!(e.getTarget().getInvariant() instanceof TrueGuard)) {
                 CDD target = e.getTarget().getInvariantCDD();
@@ -156,7 +143,7 @@ public class Pruning {
 
     }
 
-    public void handleOutput(Location targetLoc, Edge e) {
+    public static void handleOutput(Location targetLoc, Edge e, List<Edge>edges, List<Clock> clocks,  Map<Location, CDD> passedPairs, Queue<Location> inconsistentQueue ) {
 
         if (printComments)
             System.out.println("Handling an output to inc.");
@@ -193,7 +180,7 @@ public class Pruning {
                 System.out.println("Source has no invariant, nothing more to do");
         } else {
             if (printComments)
-                System.out.println("Processing source location to put it on the inc. stack");
+                System.out.println("Processing source location to put it on the inconsistentLocationList. stack");
 
             // build the federation of all transitions that could save us (= the consistent part of all output transitions) // TODO: Shoudl this be done with PREDT???
             List<Zone> emptyZoneList = new ArrayList<>();
@@ -237,7 +224,7 @@ public class Pruning {
                 System.out.println("Coming to the subtraction");
 
             CDD newIncPart = e.getSource().getInvariantCDD().minus(cddThatSavesUs);
-            processSourceLocation(e,  newIncPart);
+            processSourceLocation(e,  newIncPart,passedPairs, inconsistentQueue);
 
 
         }
@@ -248,13 +235,13 @@ public class Pruning {
         for (Edge e_i : edges.stream().filter(e_i -> e_i.getSource().equals(e.getSource()) && e_i.isInput() && e_i.getTarget().isInconsistent()).collect(Collectors.toList())) {
             if (printComments)
                 System.out.println("Adding outputs that leave the source location back to the stack, as they might not be safed anymore");
-            inc.add(e_i.getTarget());
+            inconsistentQueue.add(e_i.getTarget());
 
         }
 
     }
 
-    public void handleInput(Location targetLoc, Edge e) { // treating inputs now
+    public static void handleInput(Location targetLoc, Edge e, List<Edge> edges, Map<Location, CDD> passedPairs, Queue<Location> inconsistentQueue ) { // treating inputs now
 
         if (printComments)
             System.out.println("Handling an input to inc.");
@@ -305,7 +292,7 @@ public class Pruning {
             // we keep a copy of the inc. Federation, so we can do comparison to it later
             CDD save =  new CDD(incCDD.getPointer());
 
-            incCDD= predtOfAllOutputs(e, incCDD);
+            incCDD= predtOfAllOutputs(e, incCDD, edges);
             // for each "good" transition, we remove its zone from the zone leading to inc. via the predt function
 
              // if the bad federation was not restricted via any good transition (i.e., its the same as before)
@@ -322,10 +309,10 @@ public class Pruning {
 
 
             // Now we have the federation that can lead to inc.
-            processSourceLocation(e,  incCDD);
+            processSourceLocation(e,  incCDD, passedPairs, inconsistentQueue);
         }
 
-        removeTransitionIfUnsat(e, incCDD);
+        removeTransitionIfUnsat(e, incCDD, edges);
 
 
     }
@@ -353,7 +340,7 @@ public class Pruning {
         return incCDD;
     }
 
-    public void removeTransitionIfUnsat(Edge e,  CDD incFederation)
+    public static void removeTransitionIfUnsat(Edge e,  CDD incCDD, List<Edge> edges)
     {
         if (printComments)
             System.out.println("Removing transition if its not satisfiable anymore");
@@ -390,7 +377,7 @@ public class Pruning {
     }
 
 
-    public void processSourceLocation(Edge e, CDD incCDD)
+    public static void processSourceLocation(Edge e, CDD incCDD, Map<Location, CDD> passedPairs, Queue<Location> inconsistentQueue )
     {
         // If that federation is unsatisfiable, we can just ignore the transition to inc, and be done,
         // so we check for that, zone by zone. Only one zone needs to be sat.
@@ -421,7 +408,7 @@ public class Pruning {
                 if (printComments)
                     System.out.println("New inc location added to the stack");
                 passedPairs.put(e.getSource(), incCDD);
-                inc.add(e.getSource());
+                inconsistentQueue.add(e.getSource());
             }
 
 
@@ -434,7 +421,7 @@ public class Pruning {
     }
 
 
-    public CDD predtOfAllOutputs(Edge e, CDD incCDD)
+    public static CDD predtOfAllOutputs(Edge e, CDD incCDD, List<Edge> edges)
     {
         for (Edge otherEdge : edges.stream().filter(o -> o.getSource().equals(e.getSource()) && !o.isInput()).collect(Collectors.toList())) {
             if (printComments)

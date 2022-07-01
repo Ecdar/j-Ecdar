@@ -345,7 +345,7 @@ public class QueryParserTest {
         QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine&&Machine3))<=Spec", transitionSystems);
     }
 
-    @Test
+    @Test (expected = IllegalArgumentException.class)
     public void testQueryValid5() {
         QueryParser.parse("refinement:((HalfAdm1&&(HalfAdm1||HalfAdm2))||Researcher||(Machine&&Machine3))<=Spec", transitionSystems);
     }

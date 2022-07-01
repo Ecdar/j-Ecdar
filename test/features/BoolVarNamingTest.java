@@ -22,10 +22,13 @@ public class BoolVarNamingTest {
         Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
         Conjunction conjunction = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(auts[2]), new SimpleTransitionSystem(auts[1])});
 
+        System.out.println("new SimpleTransitionSystem(auts[2])" + new SimpleTransitionSystem(auts[2]).getBVs().size());
+        System.out.println(conjunction.getBVs().size());
         List<String> names = conjunction.getBVs().stream().map(BoolVar::getUniqueName).collect(Collectors.toList());
 
         assertEquals(2, names.size());
-        assertTrue("Template.a", names.contains("Template.a"));
+        System.out.println(names);
+        assertTrue("IsImplementation.a", names.contains("isImplementation.a"));
         assertTrue("Template1.a", names.contains("Template1.a"));
     }
 }

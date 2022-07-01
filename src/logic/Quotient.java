@@ -301,7 +301,11 @@ public class Quotient extends TransitionSystem {
                                     CDD targetInvar = e_spec.getTarget().getInvariantCDD();
                                     targetInvar = targetInvar.transitionBack(e_spec);
                                     targetInvar = targetInvar.conjunction(l_comp.getInvariantCDD());
+                                    targetInvar = targetInvar.conjunction(l_spec.getInvariantCDD());
 
+
+                                    if (c.getName().equals("patent"))
+                                        System.out.println("HERE " + targetInvar);
                                     boolean isInput = inputs.contains(c);
                                     edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getItems()), e_spec.getUpdates()));
                                 }

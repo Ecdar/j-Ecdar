@@ -514,7 +514,7 @@ public class BoolTest {
     }
 
     @Test
-    public void testBoolQuotient()
+    public void testBoolQuotient() // TODO: check and make an assert statement
     {
         CDD.done();
         Automaton auts[] = XMLParser.parse("samples/xml/BoolQuotient.xml",true);

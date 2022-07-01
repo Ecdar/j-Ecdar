@@ -149,9 +149,11 @@ public class Refinement {
 
         while (!waiting.isEmpty()) {
             StatePair curr = waiting.pop();
-
-            if (RET_REF)
+            if (RET_REF) {
+                currNode.wasLast=false;
                 currNode = curr.getNode();
+                currNode.wasLast = true;
+            }
 
             State left = curr.getLeft();
             State right = curr.getRight();
@@ -389,14 +391,29 @@ public class Refinement {
                 if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput) : createNewStatePairs(leaderTransitions, followerTransitions, isInput))) {
                     System.out.println(isInput);
                     System.out.println("followerTransitions: " + followerTransitions.size());
+                    ArrayList<Edge> followerEdges = new ArrayList<>();
                     for (Transition t: followerTransitions)
                         for (Edge e : t.getEdges())
+                        {
+                            followerEdges.add(e);
                             System.out.println(e);
+                        }
                     System.out.println("leaderTransitions: " + leaderTransitions.size());
+                    ArrayList<Edge> leaderEdges = new ArrayList<>();
                     for (Transition t: leaderTransitions)
                         for (Edge e : t.getEdges())
+                        {
+                            leaderEdges.add(e);
                             System.out.println(e);
+                        }
                     System.out.println("create pairs failed");
+                    if (RET_REF)
+                    {
+                        SymbolicLocation ll = new InconsistentLocation();
+                        SymbolicLocation rl = new InconsistentLocation();
+                        StatePair refViolationStates = new StatePair(new State(ll,CDD.cddTrue()), new State(rl, CDD.cddTrue()));
+                        currNode.constructSuccessor(refViolationStates, leaderEdges, followerEdges);
+                    }
                     return false;
                 }
             }

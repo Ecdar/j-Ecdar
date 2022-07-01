@@ -21,6 +21,7 @@ public class Composition extends TransitionSystem {
         this.systems = systems;
 
         clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
+        BVs.addAll(Arrays.stream(systems).map(TransitionSystem::getBVs).flatMap(List::stream).collect(Collectors.toList()));
 
         // initialize inputs, outputs and syncs
         inputs = new HashSet<>();

@@ -88,28 +88,55 @@ public class Bisimilarity {
         List<Edge> finalEdges = new ArrayList<>();
 
 
-        for (Location l: locs) // now we merge all the edges that have a similar source location, action and target
+        for (Location l: locs) // now we merge all the edges that have a similar source location, action, target and update
         {
             for (Channel c : copy.getActions())
             {
                 for (Location targetLoc : locs) {
-                    CDD allCDDs = CDD.cddFalse();
-                    boolean thereWasAnEdge= false;
-                    for (Edge e : edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc)).collect(Collectors.toList())) {
-                        thereWasAnEdge=true;
-                        CDD targetFedAfterReset = e.getTarget().getInvariantCDD();
-                        targetFedAfterReset = CDD.applyReset(targetFedAfterReset,e.getUpdates());
 
-                        allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
+                    boolean thereWasAnEdge= false;
+                    if (!edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc) ).collect(Collectors.toList()).isEmpty()) {
+                        thereWasAnEdge=true;
                     }
 
 
                     if (thereWasAnEdge) {
                         List<Edge> allEdges =edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc)).collect(Collectors.toList());
-                        List<Update> updates = allEdges.get(0).getUpdates();
-                        for (Edge e : allEdges)
-                            assert(Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
-                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuardList(allCDDs, copy.getClocks()), allEdges.get(0).getUpdates()));
+
+                        List<List<Edge>> edgesWithSimilarUpdates = new ArrayList<>();
+                        for (Edge e: allEdges)
+                        {
+                            boolean foundAListWithSameUpdate = false;
+                            for (List<Edge> edgeList : edgesWithSimilarUpdates)
+                            {
+                                if (!edgeList.isEmpty() && Arrays.equals(edgeList.get(0).getUpdates().toArray(),e.getUpdates().toArray()))
+                                {
+                                    edgeList.add(e);
+                                    foundAListWithSameUpdate=true;
+                                }
+                            }
+                            if (!foundAListWithSameUpdate) {
+                                List<Edge> newEdgeList = new ArrayList<>() {{
+                                    add(e);
+                                }};
+                                edgesWithSimilarUpdates.add(newEdgeList);
+                            }
+
+                        }
+
+                        for (List<Edge> edgeList : edgesWithSimilarUpdates) {
+                            List<Update> updates = edgeList.get(0).getUpdates();
+                            CDD allCDDs = CDD.cddFalse();
+                            for (Edge e : edgeList) {
+                                CDD targetFedAfterReset = e.getTarget().getInvariantCDD();
+                                targetFedAfterReset = CDD.applyReset(targetFedAfterReset,e.getUpdates());
+                                allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
+
+                                assert (Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
+                            }
+                            finalEdges.add(new Edge(l, targetLoc, c,  edgeList.get(0).isInput(), CDD.toGuardList(allCDDs, copy.getClocks()), allEdges.get(0).getUpdates()));
+                        }
+
                     }
 
                 }

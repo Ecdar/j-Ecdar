@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class PruningTest {
     private static SimpleTransitionSystem compTimedReach, compTimedInc, compTimedInc1, compTimedInc2, compTimedInc3, compTimedInc4;
-    private static SimpleTransitionSystem selfloopZeno, expectedOutputSelfloopZeno, selfloopNonZeno, expectedOutputSelfloopNonZeno, simple1, expectedOutputSimple1, simple2, expectedOutputSimple2, simple3, expectedOutputSimple3, simple4, expectedOutputSimple4 , simple4inpComp, expectedOutputSimple4inpComp;
+    private static SimpleTransitionSystem selfloopZeno, expectedOutputSelfloopZeno, selfloopNonZeno, expectedOutputSelfloopNonZeno, simple1, expectedOutputSimple1, simple2, expectedOutputSimple2, simple3, expectedOutputSimple3, simple3Invar, expectedOutputSimple3Invar, simple4, expectedOutputSimple4 , simple4inpComp, expectedOutputSimple4inpComp;
 
     @After
     public void afterEachTest(){
@@ -52,6 +52,8 @@ public class PruningTest {
         expectedOutputSimple4 = new SimpleTransitionSystem(aut3[11]);
         simple4inpComp = new SimpleTransitionSystem(aut3[12]);
         expectedOutputSimple4inpComp = new SimpleTransitionSystem(aut3[13]);
+        simple3Invar = new SimpleTransitionSystem(aut3[14]);
+        expectedOutputSimple3Invar = new SimpleTransitionSystem(aut3[15]);
 
 
 
@@ -68,7 +70,7 @@ public class PruningTest {
     @Test
     public void SelfloopZenoPruning() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopZeno);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(selfloopZeno);
         pruned.toXML("testOutput/selfloopZeno.xml");
         JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
         SimpleTransitionSystem exp = expectedOutputSelfloopZeno;
@@ -80,7 +82,7 @@ public class PruningTest {
     @Test
     public void SelfloopNonZenoPruning() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(selfloopNonZeno);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(selfloopNonZeno);
         pruned.toXML("testOutput/selfloopNonZeno.xml");
         SimpleTransitionSystem exp = expectedOutputSelfloopNonZeno;
 
@@ -92,7 +94,7 @@ public class PruningTest {
     @Test
     public void SelfloopSimple1() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple1);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(simple1);
         pruned.toXML("testOutput/simple1.xml");
         SimpleTransitionSystem exp = expectedOutputSimple1;
 
@@ -103,7 +105,7 @@ public class PruningTest {
     @Test
     public void SelfloopSimple2() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple2);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(simple2);
         pruned.toXML("testOutput/simple2.xml");
         SimpleTransitionSystem exp = expectedOutputSimple2;
 
@@ -114,8 +116,30 @@ public class PruningTest {
     @Test
     public void SelfloopSimple3() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple3);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(simple3);
         pruned.toXML("testOutput/simple3.xml");
+        SimpleTransitionSystem exp = expectedOutputSimple3;
+
+        assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
+
+    }
+
+
+    @Test
+    public void SelfloopSimple3Invar() {
+
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(simple3Invar);
+        pruned.toXML("testOutput/simple3.xml");
+        SimpleTransitionSystem exp = expectedOutputSimple3Invar;
+
+        assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
+
+    }
+
+    @Test
+    public void SelfloopSimple3RemovedDiagonal() {
+
+        SimpleTransitionSystem pruned = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/simple3NoDiagonal.xml", false)[0]);
         SimpleTransitionSystem exp = expectedOutputSimple3;
 
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
@@ -125,7 +149,7 @@ public class PruningTest {
     @Test
     public void SelfloopSimple4() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple4);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(simple4);
         pruned.toXML("testOutput/simple4.xml");
         SimpleTransitionSystem exp = expectedOutputSimple4;
 
@@ -137,7 +161,7 @@ public class PruningTest {
     @Test
     public void SelfloopSimple4InpComp() {
 
-        SimpleTransitionSystem pruned = Pruning.pruneIncTimed(simple4inpComp);
+        SimpleTransitionSystem pruned = Pruning.adversarialPruning(simple4inpComp);
         pruned.toXML("testOutput/simple4inpComp.xml");
         SimpleTransitionSystem exp = expectedOutputSimple4inpComp;
 

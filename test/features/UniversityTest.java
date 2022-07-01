@@ -140,14 +140,16 @@ public class UniversityTest {
     }
 
     @Test
-    public void quotientEual() {
-        assertTrue(new Refinement(new Quotient(spec,adm),new Quotient(specCopy,admCopy)).check());
-        assertTrue(new Refinement( new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton())).check());
-        assertTrue(new Refinement(new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()),new Quotient(spec,researcher)).check());
-
-        Refinement ref= new Refinement(new Quotient(spec,researcher), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()));
-        boolean res = ref.check();
+    public void quotientEqual() {
+        //assertTrue(new Refinement(new Quotient(spec,adm),new Quotient(specCopy,admCopy)).check());
+        //assertTrue(new Refinement( new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton())).check());
+        //assertTrue(new Refinement(new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()),new Quotient(specCopy,researcherCopy)).check());
+        //Refinement ref= new Refinement(new Quotient(spec,researcher), new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()));
+        XMLFileWriter.toXML("testOutput/quotient.xml",new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()));
+        Refinement ref= new Refinement(new SimpleTransitionSystem(new Quotient(spec,researcher).getAutomaton()),new Quotient(specCopy,researcherCopy));
+        boolean res = ref.check(true);
         System.out.println(ref.getErrMsg());
+        System.out.println(ref.getTree().toDot());
         assertTrue(res);
         }
 
@@ -282,16 +284,6 @@ public class UniversityTest {
         boolean result = ref.check();
         System.out.println(ref.getErrMsg());
         assertTrue(result);
-    }
-
-    @Test
-    public void newQuotientTest5() {
-        Automaton quo = XMLParser.parse("samples/xml/staticSpecDIVAdm.xml",true)[0];
-        Automaton comp = XMLParser.parse("comp.xml",true)[0];
-        Refinement ref = new Refinement(new SimpleTransitionSystem(comp), new SimpleTransitionSystem(quo) );
-        boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
-        assertTrue(res);
     }
 
 

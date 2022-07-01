@@ -473,6 +473,8 @@ public class CDD {
 
     public static CDD applyReset(CDD state, List<Update> list)
     {
+        if (state.isFalse())
+            return state;
         if (list.size()==0)
         {
             return state;
