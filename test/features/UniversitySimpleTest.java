@@ -8,6 +8,7 @@ import models.CDD;
 import models.Clock;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import parser.JSONParser;
 import parser.XMLFileWriter;

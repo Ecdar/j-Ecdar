@@ -174,8 +174,8 @@ public class UniversityTest {
     @Test
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
-        XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
-        XMLFileWriter.toXML("comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/specDIVadm.xml", new Automaton[]{q.getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), q );
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());
@@ -183,10 +183,11 @@ public class UniversityTest {
     }
 
     @Test
+
     public void newQuotientTest4AAutomaton() {
         Quotient q = new Quotient(spec,adm);
-        XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
-        XMLFileWriter.toXML("comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/specDIVadm.xml", new Automaton[]{q.getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());
@@ -207,6 +208,7 @@ public class UniversityTest {
     }
 
     @Test
+
     public void newQuotientTest4BAutomaton() {
         Quotient q = new Quotient(spec,researcher);
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
@@ -289,8 +291,8 @@ public class UniversityTest {
 
     @Test
     public void newQuotientTest3() {
-        XMLFileWriter.toXML("adm2new.xml",new Automaton[]{adm2.getAutomaton()});
-        XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/adm2new.xml",new Automaton[]{adm2.getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/admnew.xml",new Automaton[]{adm.getAutomaton()});
 
 
         SimpleTransitionSystem st =  new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton());

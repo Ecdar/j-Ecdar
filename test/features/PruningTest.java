@@ -72,7 +72,7 @@ public class PruningTest {
 
         SimpleTransitionSystem pruned = Pruning.adversarialPruning(selfloopZeno);
         pruned.toXML("testOutput/selfloopZeno.xml");
-        JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"C:/tools/j-Ecdar-master/j-Ecdar-master/testjsonoutput/p1");
+        JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"./testjsonoutput/p1");
         SimpleTransitionSystem exp = expectedOutputSelfloopZeno;
         System.out.println("Ref1: " + new Refinement(pruned, exp).check());
         System.out.println("Ref2: " +  new Refinement(exp, pruned).check());
