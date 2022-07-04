@@ -188,6 +188,7 @@ public class PruningTest {
         XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning2.xml",pruned1);
         assertTrue(new Refinement(pruned1, exp1).check()  &&  new Refinement(exp1, pruned1).check() ) ;
 
+
     }
 
     @Test
