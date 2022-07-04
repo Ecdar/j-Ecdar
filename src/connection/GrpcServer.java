@@ -28,7 +28,7 @@ public class GrpcServer {
             try {
                 port = Integer.parseInt(arr[1]);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         } else {
             host = address;

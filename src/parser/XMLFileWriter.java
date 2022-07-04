@@ -58,7 +58,7 @@ public class XMLFileWriter {
         try {
             outter.output(doc, new FileWriter(new File(filename)));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 
@@ -97,7 +97,7 @@ public class XMLFileWriter {
             file.getParentFile().mkdirs();
             outter.output(doc, new FileWriter(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
