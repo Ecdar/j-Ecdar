@@ -50,39 +50,32 @@ public class Pruning {
             // select the first inconsistent location in the set.
             Location targetLoc = inconsistentQueue.remove();
 
-            if (targetLoc.isInitial())
-            {
-                CDD initial = CDD.zeroCDD();
-                if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
-                {
-                    initialStateIsInconsistent=true;
-                    break;
-                }
-            }
+            initialStateIsInconsistent = checkInitialState(targetLoc);
+            if (initialStateIsInconsistent)
+                break;
 
             if (printComments)
                 System.out.println("Handling the new location " + targetLoc);
 
             // for all incoming transitions // TODO: is this really supposed to include selfloops
             for (Edge e : edges.stream().filter(e -> e.getTarget().equals(targetLoc)).collect(Collectors.toList())) { // && !e.getSource().equals(targetLoc)).collect(Collectors.toList())) {
-                if (printComments)
-                    System.out.println("Processing new Edge with guard " + e.getGuards());
                 if (e.isInput()) {
                     handleInput(targetLoc, e, edges,passedInconsistentStates,inconsistentQueue);
                 } else
                     handleOutput(targetLoc, e, edges, clocks, passedInconsistentStates, inconsistentQueue);
-
-
             }
         }
+
         if (printComments)
             System.out.println("no more inconsistent locations");
 
         addInconsistentPartsToInvariants(locations,clocks);
+
         if (printComments)
             System.out.println("inconsistent parts integrated into invariants");
 
         addInvariantsToGuards(edges,clocks);
+
         if (printComments)
             System.out.println("invariants integrated into guards");
 
@@ -91,10 +84,26 @@ public class Pruning {
             locations.add(new Location("inc", new TrueGuard(), true, false, false, true));
             edges = new ArrayList<>();
         }
-        Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), false);
         CDD.done();
+        Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), true);
         return new SimpleTransitionSystem(resAut);
+    }
 
+    /**
+     * Checks if the current location is the initial one, and if it is inconsistent without delaying.
+     * @param targetLoc the current location to be checked
+     * @return true if the location is initial and inconsistent
+     */
+    private static boolean checkInitialState(Location targetLoc) {
+        if (targetLoc.isInitial())
+        {
+            CDD initial = CDD.zeroCDD();
+            if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -116,13 +125,17 @@ public class Pruning {
         return  inconsistentLocations;
     }
 
-
+    /**
+     *  Iterates through all locations, and modifies the invariants to exclude all inconsistent parts
+     * @param locations List of all locations
+     * @param clocks List of all clocks
+     */
     public static void addInconsistentPartsToInvariants(List<Location> locations, List<Clock> clocks) {
         for (Location l : locations) {
             if (l.isInconsistent()) {
                 CDD incCDD = l.getInconsistentPart();
                 if (incCDD.isUnrestrained()) {
-                    l.setInvariant(new FalseGuard());                     // TODO: 04.02.21 how to treat a completely inconsistent location here?
+                    l.setInvariant(new FalseGuard());
                 }
                 else {
                     CDD invarMinusIncCDD = l.getInvariantCDD().minus(l.getInconsistentPart());
@@ -132,17 +145,32 @@ public class Pruning {
         }
     }
 
+    /**
+     * Adds all invariants to the guards, just as input enabling does.
+     * @param edges List of all edges
+     * @param clocks List of all clocks
+     */
     public static void addInvariantsToGuards(List<Edge> edges, List<Clock> clocks) {
         for (Edge e : edges) {
             if (!(e.getTarget().getInvariant() instanceof TrueGuard)) {
-                CDD target = e.getTarget().getInvariantCDD();
-                CDD cddBeforeEdge = target.transitionBack(e);
-                e.setGuards(CDD.toGuardList(cddBeforeEdge,clocks));
+                if (!(e.getTarget().getInvariant() instanceof FalseGuard)) {
+                    CDD target = e.getTarget().getInvariantCDD();
+                    CDD cddBeforeEdge = target.transitionBack(e);
+                    e.setGuards(CDD.toGuardList(cddBeforeEdge.conjunction(e.getSource().getInvariantCDD()), clocks));
+                }
             }
         }
-
     }
 
+    /**
+     * Handle an output towards an inconsistent location
+     * @param targetLoc the target location
+     * @param e the edge towards that location
+     * @param edges the set of all edges in the automaton
+     * @param clocks the set of all clocks
+     * @param passedPairs the list of passed inconsistent states
+     * @param inconsistentQueue the queue of inconsistent states to process
+     */
     public static void handleOutput(Location targetLoc, Edge e, List<Edge>edges, List<Clock> clocks,  Map<Location, CDD> passedPairs, Queue<Location> inconsistentQueue ) {
 
         if (printComments)
@@ -171,7 +199,7 @@ public class Pruning {
             e.setGuards(CDD.toGuardList(fedAfterRemovingInconsistentPart,clocks));
         }
 
-        // Removed the transition / strenthening the guards might have turned the source location inconsistent
+        // Removing the transition / strenthening the guards might have turned the source location inconsistent
         // This happens if there is an invariant, and part of the invariant cannot delay to enable an output anymore
 
         // if there is no invariant, there cannot be a deadlock, and we do not care about whether there is any input or outputs leaving
@@ -180,7 +208,7 @@ public class Pruning {
                 System.out.println("Source has no invariant, nothing more to do");
         } else {
             if (printComments)
-                System.out.println("Processing source location to put it on the inconsistentLocationList. stack");
+                System.out.println("Processing source location to put it on the inconsistent location queue");
 
             // build the federation of all transitions that could save us (= the consistent part of all output transitions) // TODO: Shoudl this be done with PREDT???
             List<Zone> emptyZoneList = new ArrayList<>();
@@ -196,11 +224,13 @@ public class Pruning {
                         CDD targetInvariantCDDOfTransThatSavesUs = otherE.getTarget().getInvariantCDD();
                         CDD goodPart = targetInvariantCDDOfTransThatSavesUs.minus(incPartOfTransThatSavesUs);
 
+                        CDD doubleCheck = goodPart.transitionBack(otherE);
                         goodPart = CDD.applyReset(goodPart,otherE.getUpdates());
 
                         // apply guards
                         CDD guardFed = otherE.getGuardCDD();
                         goodPart = guardFed.conjunction(goodPart);
+                        assert(otherE.equals(goodPart));
 
                         goodPart = goodPart.past(); // TODO 05.02.21: is it okay to do that?
                         goodPart = goodPart.conjunction(otherE.getSource().getInvariantCDD());
@@ -260,7 +290,7 @@ public class Pruning {
         // apply updates as guard
        //incCDD = CDD.applyReset(incCDD,e.getUpdates());
 
-        if (!incCDD.isNotFalse()) {
+        if (incCDD.isFalse()) {
             // Checking for satisfiability after clocks were reset (only a problem because target invariant might now be x>4)
             // if unsatisfiable => keep edge // todo: is return the right thing here?
             if (printComments)
