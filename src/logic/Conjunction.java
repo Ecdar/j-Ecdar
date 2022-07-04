@@ -20,7 +20,7 @@ public class Conjunction extends TransitionSystem {
         maxBounds = res;
     }
 
-    public Conjunction(TransitionSystem[] systems) {
+    public Conjunction(TransitionSystem... systems) {
         this.systems = systems;
         setMaxBounds();
         clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
