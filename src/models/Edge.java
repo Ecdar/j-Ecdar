@@ -155,26 +155,29 @@ public class Edge {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Edge)) return false;
-        Edge that = (Edge) o;
-        /*System.out.println(toString());
-        System.out.println(that.toString());
-        System.out.println(isInput == that.isInput);
-        System.out.println(source.equals(that.source));
-        System.out.println(target.equals(that.target));
-        System.out.println(chan.equals(that.chan));
-        System.out.println(Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()));
-        System.out.println(Arrays.equals(updates, that.updates));*/
-        return isInput == that.isInput &&
-                source.equals(that.source) &&
-                target.equals(that.target) &&
-                chan.equals(that.chan) &&
-                // TODO: did the stream thing work?
-                //that.getGuardCDD().equiv(getGuardCDD()) &&
-                guards.equals(that.guards) &&
-                Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(that.updates.toArray()).toArray());
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Edge)) return false;
+
+        Edge edge = (Edge) obj;
+        if (source == null && edge.source != null) {
+            return false;
+        }
+        if (target == null && edge.target != null) {
+            return false;
+        }
+        if (chan == null && edge.chan != null) {
+            return false;
+        }
+        if (guards == null && edge.guards != null) {
+            return false;
+        }
+        return isInput == edge.isInput &&
+                source != null && source.equals(edge.source) &&
+                target != null && target.equals(edge.target) &&
+                chan != null && chan.equals(edge.chan) &&
+                guards != null && guards.equals(edge.guards) &&
+                hasEqualUpdates(edge);
     }
 
     @Override
