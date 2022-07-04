@@ -473,7 +473,7 @@ public class Pruning {
                 // do predt.
 
                 CDD predtFed = CDD.predt(incCDD, goodCDD);
-                System.out.println("predtFed  " + predtFed + " " + incCDD + " " + goodCDD);
+                System.out.println("predtFed   " + predtFed + " " + incCDD + " " + goodCDD);
 
                 // add the inconsistent Federation to it, so in case both the transition to bad and the transition to good
                 // have the guard x>4, we still get the bad zone in the result // TODO: Check if this still holds if we dont mind including zeno behaviour to save us (according to group discussion on 6.1.2021)
