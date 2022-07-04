@@ -51,7 +51,7 @@ public  class Transition {
     }
 
     public CDD getGuardCDD() {
-        return guardCDD;
+        return guardCDD;// todo: why does this not work? .conjunction(target.getInvarCDDDirectlyFromInvariants());
     }
 
     public List<Edge> getEdges() {
