@@ -254,6 +254,12 @@ public class CDD {
         CDDLib.cddDone();
     }
 
+    public static void ensure_done(){
+        if (cddIsRunning) {
+            done();
+        }
+    }
+
     public static CDD zeroCDD()
     {
         Zone z = new Zone(numClocks,false);
