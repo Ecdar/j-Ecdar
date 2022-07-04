@@ -154,7 +154,15 @@ public class PruningTest {
         SimpleTransitionSystem pruned = Pruning.adversarialPruning(orig);
         SimpleTransitionSystem exp = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[1]);
         XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning.xml",pruned);
-        assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
+        Refinement ref1 = new Refinement(pruned, exp);
+        boolean res1= ref1.check();
+        System.out.println(ref1.getErrMsg());
+        assertTrue(res1);
+        Refinement ref2 = new Refinement(exp, pruned);
+        boolean res2= ref2.check();
+        System.out.println(ref2.getErrMsg());
+        assertTrue(res2);
+
 
     }
 
