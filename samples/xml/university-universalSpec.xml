@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+broadcast chan coin, cof, tea, pub, grant, patent;</declaration>
+	<template>
+		<name x="5" y="5">Machine</name>
+		<declaration>// Place local declarations here.
+clock y;</declaration>
+		<location id="id0" x="-256" y="-192">
+			<name x="-280" y="-224">Serving</name>
+			<label kind="invariant" x="-248" y="-184">y&lt;=6</label>
+		</location>
+		<location id="id1" x="-256" y="-288">
+			<name x="-266" y="-318">Idle</name>
+		</location>
+		<init ref="id1"/>
+		<transition id="id2" controllable="false">
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-168" y="-312">y&gt;=2</label>
+			<label kind="synchronisation" x="-160" y="-248">tea!</label>
+			<nail x="-128" y="-288"/>
+			<nail x="-128" y="-248"/>
+		</transition>
+		<transition id="id3">
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-296" y="-160">coin?</label>
+			<nail x="-296" y="-160"/>
+			<nail x="-264" y="-160"/>
+		</transition>
+		<transition id="id4" controllable="false">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-216" y="-216">tea!</label>
+			<nail x="-160" y="-192"/>
+		</transition>
+		<transition id="id5" controllable="false">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-336" y="-192">y&gt;=4</label>
+			<label kind="synchronisation" x="-328" y="-216">cof!</label>
+			<nail x="-352" y="-192"/>
+		</transition>
+		<transition id="id6">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-288" y="-256">coin?</label>
+			<label kind="assignment" x="-288" y="-240">y=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Researcher</name>
+		<declaration>clock x;</declaration>
+		<location id="id7" x="-152" y="-256">
+			<name x="-162" y="-286">Stuck</name>
+		</location>
+		<location id="id8" x="-192" y="-160">
+			<name x="-202" y="-190">Tea</name>
+			<label kind="invariant" x="-202" y="-145">x&lt;=8</label>
+		</location>
+		<location id="id9" x="-320" y="-160">
+			<name x="-330" y="-190">Coffee</name>
+			<label kind="invariant" x="-330" y="-145">x&lt;=4</label>
+		</location>
+		<location id="id10" x="-256" y="-256">
+			<name x="-266" y="-286">Idle</name>
+		</location>
+		<init ref="id10"/>
+		<transition id="id11" controllable="false">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-152" y="-224">pub!</label>
+			<nail x="-160" y="-224"/>
+			<nail x="-128" y="-224"/>
+		</transition>
+		<transition id="id12">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-104" y="-272">cof?</label>
+			<nail x="-112" y="-280"/>
+			<nail x="-112" y="-240"/>
+		</transition>
+		<transition id="id13">
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-160" y="-320">tea?</label>
+			<nail x="-160" y="-296"/>
+			<nail x="-136" y="-296"/>
+		</transition>
+		<transition id="id14">
+			<source ref="id10"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-240" y="-280">x&gt;15</label>
+			<label kind="synchronisation" x="-192" y="-280">tea?</label>
+		</transition>
+		<transition id="id15" controllable="false">
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-336" y="-240">x&gt;=2</label>
+			<label kind="synchronisation" x="-360" y="-216">pub!</label>
+			<label kind="assignment" x="-392" y="-192">x=0</label>
+			<nail x="-384" y="-160"/>
+		</transition>
+		<transition id="id16" controllable="false">
+			<source ref="id8"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-144" y="-160">x&gt;=4</label>
+			<label kind="synchronisation" x="-176" y="-200">pub!</label>
+			<label kind="assignment" x="-192" y="-224">x=0</label>
+			<nail x="-128" y="-160"/>
+			<nail x="-192" y="-208"/>
+		</transition>
+		<transition id="id17">
+			<source ref="id10"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-256" y="-232">x&lt;=15</label>
+			<label kind="synchronisation" x="-240" y="-208">tea?</label>
+			<label kind="assignment" x="-224" y="-184">x=0</label>
+		</transition>
+		<transition id="id18">
+			<source ref="id10"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-304" y="-208">cof?</label>
+			<label kind="assignment" x="-304" y="-184">x=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Spec</name>
+		<declaration>clock u;</declaration>
+		<location id="id19" x="-320" y="-96">
+			<name x="-320" y="-128">End</name>
+		</location>
+		<init ref="id19"/>
+		<transition id="id20" controllable="false">
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-392" y="-64">patent!</label>
+			<nail x="-360" y="-72"/>
+			<nail x="-328" y="-56"/>
+		</transition>
+		<transition id="id21">
+			<source ref="id19"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-392" y="-128">grant?</label>
+			<nail x="-336" y="-128"/>
+			<nail x="-352" y="-104"/>
+		</transition>
+	</template>
+	<template>
+		<name>University</name>
+		<declaration>clock z;</declaration>
+		<location id="id22" x="-192" y="0">
+			<name x="-202" y="-30">D</name>
+			<label kind="invariant" x="-232" y="0">z&lt;=2</label>
+		</location>
+		<location id="id23" x="-64" y="0">
+			<name x="-74" y="-30">C</name>
+		</location>
+		<location id="id24" x="-64" y="-96">
+			<name x="-74" y="-126">B</name>
+			<label kind="invariant" x="-48" y="-112">z&lt;=2</label>
+		</location>
+		<location id="id25" x="-192" y="-96">
+			<name x="-202" y="-126">A</name>
+		</location>
+		<init ref="id25"/>
+		<transition id="id26">
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-264" y="-32">pub?</label>
+			<nail x="-216" y="-32"/>
+			<nail x="-232" y="-8"/>
+		</transition>
+		<transition id="id27">
+			<source ref="id22"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-200" y="40">grant?</label>
+			<nail x="-176" y="40"/>
+			<nail x="-208" y="40"/>
+		</transition>
+		<transition id="id28">
+			<source ref="id24"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-16" y="-80">pub?</label>
+			<nail x="-16" y="-72"/>
+			<nail x="-40" y="-72"/>
+		</transition>
+		<transition id="id29">
+			<source ref="id23"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-56" y="24">grant?</label>
+			<nail x="-32" y="24"/>
+			<nail x="-72" y="32"/>
+		</transition>
+		<transition id="id30">
+			<source ref="id24"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-72" y="-160">grant?</label>
+			<nail x="-40" y="-136"/>
+			<nail x="-72" y="-136"/>
+		</transition>
+		<transition id="id31" controllable="false">
+			<source ref="id22"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-184" y="-56">patent!</label>
+		</transition>
+		<transition id="id32">
+			<source ref="id23"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-128" y="-16">pub?</label>
+			<label kind="assignment" x="-168" y="-16">z=0</label>
+		</transition>
+		<transition id="id33" controllable="false">
+			<source ref="id24"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-96" y="-56">coin!</label>
+		</transition>
+		<transition id="id34">
+			<source ref="id25"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-160" y="-112">grant?</label>
+			<label kind="assignment" x="-104" y="-112">z=0</label>
+		</transition>
+	</template>
+	<system>system Machine, Researcher, Spec, University;
+
+IO Machine { cof!, tea!, coin? }
+IO Researcher { pub!, cof?, tea? }
+IO Spec { patent!, grant? }
+IO University { coin!, patent!, grant?, pub? }
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>
