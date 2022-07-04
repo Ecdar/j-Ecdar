@@ -230,7 +230,7 @@ public class Pruning {
                         // apply guards
                         CDD guardFed = otherE.getGuardCDD();
                         goodPart = guardFed.conjunction(goodPart);
-                        assert(otherE.equals(goodPart));
+                        assert(doubleCheck.equiv(goodPart));
 
                         goodPart = goodPart.past(); // TODO 05.02.21: is it okay to do that?
                         goodPart = goodPart.conjunction(otherE.getSource().getInvariantCDD());

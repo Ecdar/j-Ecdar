@@ -179,6 +179,20 @@ public class PruningTest {
 
     }
 
+
+
+    @Test
+    public void pruningWithOrTest2() {
+
+        SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[4]);
+        SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
+        SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[5]);
+        XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning2.xml",pruned1);
+        assertTrue(new Refinement(pruned1, exp1).check()  &&  new Refinement(exp1, pruned1).check() ) ;
+
+
+    }
+
     @Test
     public void SelfloopSimple4() {
 
