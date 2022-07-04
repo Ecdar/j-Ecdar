@@ -97,3 +97,19 @@ task submodulesUpdate(type:Exec) {
     commandLine 'git', 'submodule', 'update', '--init', '--recursive'
     group 'Build Setup'
 }
+
+task unpack_without_dll(type:Copy, dependsOn: 'distZip') {
+    def zipFile = file("$buildDir/distributions/j-Ecdar.zip")
+    def outputDir = file("$buildDir/distributions/unpacked")
+    from { zipTree(zipFile) }
+    into outputDir
+    group 'distribution'
+}
+
+task unpack_with_dll(type:Copy, dependsOn: 'unpack_without_dll') {
+    def dll = file("lib/JCDD.dll")
+    def outputDir = file("$buildDir/distributions/unpacked/j-Ecdar/bin")
+    from dll
+    into outputDir
+    group 'distribution'
+}
