@@ -69,7 +69,7 @@ clock x;</declaration>
 		</transition>
 	</template>
 	<template>
-		<name x="5" y="5">Original</name>
+		<name x="5" y="5">Original1</name>
 		<declaration>// Place local declarations here.
 clock x;</declaration>
 		<location id="id14" x="102" y="-144">
@@ -121,6 +121,64 @@ clock x;</declaration>
 		<transition id="id25" controllable="false">
 			<source ref="id22"/>
 			<target ref="id23"/>
+			<label kind="synchronisation" x="-76" y="-85">o!</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Original2</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id26" x="102" y="-144">
+		</location>
+		<location id="id27" x="-136" y="-51">
+		</location>
+		<location id="id28" x="8" y="-51">
+		</location>
+		<location id="id29" x="93" y="34" color="#ff0000">
+			<name x="83" y="0">inc</name>
+		</location>
+		<init ref="id27"/>
+		<transition id="id30" controllable="false">
+			<source ref="id28"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-161" y="-144">a == true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id31" controllable="false">
+			<source ref="id27"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-76" y="-85">o!</label>
+		</transition>
+		<transition id="id32">
+			<source ref="id28"/>
+			<target ref="id29"/>
+			<label kind="guard" x="51" y="-51">b==false &amp;&amp; ((x&gt;4 &amp;&amp; x&lt;7) || (x&gt;8 &amp;&amp; x&lt;10))</label>
+			<label kind="synchronisation" x="59" y="-34">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Expected2</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id33" x="102" y="-144">
+		</location>
+		<location id="id34" x="-136" y="-51">
+		</location>
+		<location id="id35" x="8" y="-51">
+			<label kind="invariant" x="-68" y="-17">b==false or (a== true  &amp;&amp; ((x&lt;2) || (x&gt;=5 &amp;&amp; x&lt;7)))</label>
+		</location>
+		<init ref="id34"/>
+		<transition id="id36" controllable="false">
+			<source ref="id35"/>
+			<target ref="id33"/>
+			<label kind="guard" x="-161" y="-144">a== true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id37" controllable="false">
+			<source ref="id34"/>
+			<target ref="id35"/>
 			<label kind="synchronisation" x="-76" y="-85">o!</label>
 		</transition>
 	</template>
