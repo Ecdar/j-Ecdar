@@ -20,7 +20,6 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Ignore // FIXME: Missing "EcdarSampleUniversity1" from "./samples/json/"
 public class UniversitySimpleTest {
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,
@@ -109,8 +108,8 @@ public class UniversitySimpleTest {
     @Test
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
-        XMLFileWriter.toXML("specDIVadm.xml", new Automaton[]{q.getAutomaton()});
-        XMLFileWriter.toXML("comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/specDIVadm.xml", new Automaton[]{q.getAutomaton()});
+        XMLFileWriter.toXML("./testOutput/comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
         TransitionSystem comp = new SimpleTransitionSystem(new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton());
         Refinement ref = new Refinement(comp, new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
