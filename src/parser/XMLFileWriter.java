@@ -17,7 +17,9 @@ import java.util.Set;
 
 public class XMLFileWriter {
 
-
+    public static void toXML(String filename, Automaton automaton) {
+        toXML(filename, new Automaton[]{automaton});
+    }
 
     public static void toXML(String filename, Automaton[] auts) {
 

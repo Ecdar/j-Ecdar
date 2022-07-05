@@ -17,7 +17,7 @@ public class Composition extends TransitionSystem {
 
 
 
-    public Composition(TransitionSystem[] systems) {
+    public Composition(TransitionSystem... systems) {
         this.systems = systems;
 
         clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));

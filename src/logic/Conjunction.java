@@ -1,5 +1,6 @@
 package logic;
 
+import exceptions.CddAlreadyRunningException;
 import models.*;
 
 import java.util.*;
@@ -7,244 +8,91 @@ import java.util.stream.Collectors;
 
 public class Conjunction extends TransitionSystem {
     private final TransitionSystem[] systems;
+    private final HashMap<Clock, Integer> maxBounds = new HashMap<>();
 
-    private List<State> passed = new ArrayList<>();
-    private List<State> waiting = new ArrayList<>();
-    private HashMap<Clock,Integer> maxBounds;
+    private final HashSet<State> passed = new HashSet<>();
+    private final Queue<State> worklist = new ArrayDeque<>();
 
-    public void setMaxBounds() {
-        HashMap<Clock,Integer> res = new HashMap<>();
-        for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
-            res.putAll(sys.getMaxBounds());
+    private Automaton resultant = null;
 
-        maxBounds = res;
-    }
-
-    public Conjunction(TransitionSystem[] systems) {
-        this.systems = systems;
-        setMaxBounds();
-        clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
-        BVs.addAll(Arrays.stream(systems).map(TransitionSystem::getBVs).flatMap(List::stream).collect(Collectors.toList()));
-    }
-
-    public Set<Channel> getInputs() {
-        Set<Channel> inputs = new HashSet<>(systems[0].getInputs());
-
-        for (int i = 1; i < systems.length; i++) {
-            inputs.retainAll(systems[i].getInputs());
+    public Conjunction(TransitionSystem... systems)
+        throws IllegalArgumentException {
+        if (systems.length == 0) {
+            throw new IllegalArgumentException("Conjunction can only be done with one or more transition systems");
         }
 
+        this.systems = systems;
+
+        // Initialisation of the underlying TransitionSystem and its components
+        for (TransitionSystem system : systems) {
+            maxBounds.putAll(system.getMaxBounds());
+            clocks.addAll(system.getClocks());
+            BVs.addAll(system.getBVs());
+        }
+    }
+
+    @Override
+    public Set<Channel> getInputs() {
+        Set<Channel> inputs = new HashSet<>(systems[0].getInputs());
+        for (TransitionSystem system : systems) {
+            inputs.retainAll(system.getInputs());
+        }
         return inputs;
     }
 
+    @Override
     public Set<Channel> getOutputs() {
         Set<Channel> outputs = new HashSet<>(systems[0].getOutputs());
-
-        for (int i = 1; i < systems.length; i++) {
-            outputs.retainAll(systems[i].getOutputs());
+        for (TransitionSystem system : systems) {
+            outputs.retainAll(system.getOutputs());
         }
-
         return outputs;
     }
 
-    public List<SimpleTransitionSystem> getSystems(){
+    @Override
+    public List<SimpleTransitionSystem> getSystems() {
         List<SimpleTransitionSystem> result = new ArrayList<>();
-        for(TransitionSystem ts : systems){
-            result.addAll(ts.getSystems());
+        for (TransitionSystem system : systems) {
+            result.addAll(system.getSystems());
         }
         return result;
     }
 
-    public boolean passedContains(State s)
-    {
-        boolean contained = false;
-
-        for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
-        {
-            if (CDD.isSubset(s.getCDD(), st.getCDD()))
-                contained = true;
-        }
-        return contained;
-    }
-
-    public boolean waitingContains(State s)
-    {
-        boolean contained = false;
-
-        for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
-        {
-
-            if (CDD.isSubset(s.getCDD(),st.getCDD())) {
-                contained = true;
-            }
-        }
-        return contained;
-    }
-
-
-
-    public Automaton createConjunction(List<Automaton> autList)
-    {
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs.getItems());
-
-        String name="";
-        Set<Edge> edgesSet = new HashSet<>();
-        Set<Location> locationsSet = new HashSet<>();
-        Map<String, Location> locMap = new HashMap<>();
-        passed = new ArrayList<>();
-        waiting = new ArrayList<>();
-
-        List<Location> initLoc = new ArrayList<>();
-        for (Automaton aut : autList) {
-            initLoc.add(aut.getInitLoc());
-            if (name.isEmpty())
-                name = aut.getName();
-            else
-                name += " && " + aut.getName();
-        }
-
-        Location initL = createLoc(initLoc);
-        locationsSet.add(initL);
-
-        Set<Channel> all = new HashSet<>();
-        all.addAll(getInputs());
-        all.addAll(getOutputs());
-
-
-        locMap.put(initL.getName(),initL);
-
-        State initState = getInitialState();
-        waiting.add(initState);
-        while (!waiting.isEmpty())
-        {
-
-            State currentState = (State)waiting.toArray()[0];
-            waiting.remove(currentState);
-            passed.add(currentState);
-            //System.out.println("Processing state " + currentState.getLocation().getName()) ;
-            //if (currentState.getLocation().getName().equals("L0L5L6"))
-            //    currentState.getInvFed().getZones().get(0).printDBM(true,true);
-
-            for (Channel chan : all )
-            {
-
-                List<Transition> transList = getNextTransitions(currentState, chan, clocks.getItems());
-                for (Transition trans : transList)
-                {
-
-                    String targetName = trans.getTarget().getLocation().getName();
-
-                    boolean isInitial = trans.getTarget().getLocation().getIsInitial();
-                    boolean isUrgent = trans.getTarget().getLocation().getIsUrgent();
-                    boolean isUniversal = trans.getTarget().getLocation().getIsUniversal();
-                    boolean isInconsistent = trans.getTarget().getLocation().getIsInconsistent();
-                    Guard invariant = trans.getTarget().getInvariants(clocks.getItems());
-                    String sourceName = trans.getSource().getLocation().getName();
-                    int x = trans.getTarget().getLocation().getX();
-                    int y = trans.getTarget().getLocation().getX();
-                    Location target;
-                    if (locMap.containsKey(targetName))
-                        target = locMap.get(targetName);
-                    else {
-                        target = new Location(targetName, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
-                        locMap.put(targetName,target);
-                    }
-                    locationsSet.add(target);
-                    if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
-                        trans.getTarget().extrapolateMaxBounds(maxBounds, clocks.getItems());
-                        waiting.add(trans.getTarget());
-                    }
-                    Guard guardList = trans.getGuards(clocks.getItems()); // TODO: Check!
-                    List<Update> updateList = trans.getUpdates();
-                    boolean isInput = false;
-                    if (getInputs().contains(chan))
-                        isInput= true;
-                    assert(locMap.get(sourceName)!=null);
-                    assert(locMap.get(targetName)!=null);
-
-                    Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList);
-                    boolean edgeAlreadyExists=false;
-                    for (Edge otherE : edgesSet) {
-                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && e.getUpdates().equals(otherE.getUpdates())) // TODO: fix the comparison between updates
-                        {
-
-                            if (e.getGuardCDD().equiv( otherE.getGuardCDD()));
-                            {
-                                edgeAlreadyExists = true;
-                            }
-                        }
-                    }
-                    if (!edgeAlreadyExists)
-                        edgesSet.add(e);
-
-                }
-            }
-        }
-
-        List <Location> locsWithNewClocks = updateClocksInLocs(locationsSet,clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
-        List <Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet,clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
-        Automaton resAut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
-        CDD.done();
-        return resAut;
-
-    }
-
-
-
-    public Location createLoc(List<Location> locList)
-    {
-        String name="";
-        Guard invariant;
-
-        CDD invarFed = CDD.cddTrue(); //CDD.getUnrestrainedCDD();
-        boolean isInitial = true;
-        boolean isUrgent = false;
-        boolean isUniversal = false;
-        boolean isInconsistent = false;
-        int x=0, y=0;
-
-        for (Location l : locList) {
-            if (name.isEmpty())
-                name = l.getName();
-            else
-                name += "" + l.getName();
-
-            invarFed = l.getInvariantCDD().conjunction(invarFed);
-            isInitial = isInitial && l.isInitial();
-            isUrgent = isUrgent || l.isUrgent();
-            isUniversal = isUniversal && l.isUniversal(); // todo: double check at some point
-            isInconsistent = isInconsistent || l.isInconsistent();
-            x += l.getX();
-            y += l.getY();
-
-        }
-
-        invariant = CDD.toGuardList(invarFed, getClocks());
-        return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
-
-    }
-
-
     @Override
     public Automaton getAutomaton()
-    {
+            throws CddAlreadyRunningException {
+        // No need for recomputing the same conjunction.
+        if (resultant != null) {
+            return resultant;
+        }
 
-        List<Automaton> autList = new ArrayList<>();
-        for (int i=0; i<systems.length;i++)
-            autList.add(systems[i].getAutomaton());
-        Automaton resAut = createConjunction(autList);
+        /* Before creating the conjunction and thereby initialising the CDD.
+         *   We must ensure that the underlying operands (Transition systems),
+         *   have processed their automaton such that we won't start multiple
+         *   CDDs by invoking "GetAutomaton" on the underlying TransitionSystems*/
+        Automaton[] automata = new Automaton[systems.length];
+        for (int i = 0; i < systems.length; i++) {
+            automata[i] = systems[i].getAutomaton();
+        }
 
-        return resAut;
+        /* We utilise a try-finally such that we can correctly clean up whilst still immediately
+         *   rethrow the exceptions as we can't handle a failure (most likely from the CDD).
+         *   This especially helps increase the meaning of failing tests */
+        try {
+            resultant = conjoin(automata);
+        } finally {
+            CDD.done();
+        }
 
-
+        return resultant;
     }
 
+    @Override
     public SymbolicLocation getInitialLocation() {
         return getInitialLocation(systems);
     }
 
+    @Override
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         List<SymbolicLocation> locations = ((ComplexLocation) currentState.getLocation()).getLocations();
 
@@ -254,24 +102,228 @@ public class Conjunction extends TransitionSystem {
         return createNewTransitions(currentState, resultMoves, allClocks);
     }
 
-    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
-        List<SymbolicLocation> symLocs = ((ComplexLocation) symLocation).getLocations();
+    private boolean havePassed(State element) {
+        for (State state : passed) {
+            if (element.getLocation().getName().equals(state.getLocation().getName()) &&
+                    CDD.isSubset(element.getCDD(), state.getCDD())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-        return computeResultMoves(symLocs, channel);
+    private boolean isWaitingFor(State element) {
+        for (State state : worklist) {
+            if (element.getLocation().getName().equals(state.getLocation().getName()) &&
+                    CDD.isSubset(element.getCDD(), state.getCDD())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsEdge(Set<Edge> set, Edge edge) {
+        for (Edge other : set) {
+            if (other.equals(edge) &&
+                    other.getGuardCDD().equals(edge.getGuardCDD())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String conjoinedAutomataName(Automaton[] automata)
+            throws IllegalArgumentException {
+        if (automata.length == 0) {
+            throw new IllegalArgumentException("Requires at least one automaton to get a conjoined automaton name");
+        }
+        return String.join(
+                " && ",
+                Arrays.stream(automata)
+                        .map(Automaton::getName)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private String conjoinedLocationsName(Collection<Location> locations)
+            throws IllegalArgumentException {
+        if (locations.size() == 0) {
+            throw new IllegalArgumentException("Requires at least one location to get a conjoined location name");
+        }
+        return String.join(
+                "",
+                locations.stream()
+                        .map(Location::getName)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private List<Location> initialLocations(Automaton[] automata)
+            throws IllegalArgumentException {
+        if (automata.length == 0) {
+            throw new IllegalArgumentException("Requires at least one automaton to get a initial location for the conjunction");
+        }
+        return Arrays.stream(automata)
+                .map(Automaton::getInitLoc)
+                .collect(Collectors.toList());
+    }
+
+    private Automaton conjoin(Automaton[] automata)
+            throws CddAlreadyRunningException, IllegalArgumentException {
+        if (automata.length == 0) {
+            throw new IllegalArgumentException("At least a single automaton must be provided for the conjunction");
+        }
+
+        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
+        CDD.addClocks(getClocks());
+        CDD.addBddvar(getBVs());
+
+        Set<Edge> edgesSet = new HashSet<>();
+        Set<Location> locationsSet = new HashSet<>();
+        Map<String, Location> locationMap = new HashMap<>();
+
+        String name = conjoinedAutomataName(automata);
+
+        // Create the conjunction of all initial locations
+        List<Location> initialLocations = initialLocations(automata);
+        Location conjoinInitialLocation = conjoinLocation(initialLocations);
+        locationsSet.add(conjoinInitialLocation);
+        locationMap.put(conjoinInitialLocation.getName(), conjoinInitialLocation);
+
+        Set<Channel> channels = new HashSet<>();
+        channels.addAll(getInputs());
+        channels.addAll(getOutputs());
+
+        // Initialisation of the worklist with the initial state of the TS
+        State initState = getInitialState();
+        worklist.add(initState);
+
+        while (!worklist.isEmpty()) {
+            State currentState = worklist.remove();
+            passed.add(currentState);
+
+            for (Channel channel : channels) {
+                List<Transition> transitions = getNextTransitions(currentState, channel, getClocks());
+
+                for (Transition transition : transitions) {
+                    /* Get the state following the transition and then extrapolate. If we have not
+                     *   already visited the location, this is equivalent to simulating the arrival
+                     *   at that location following this transition with the current "channel". */
+                    State targetState = transition.getTarget();
+                    if (!havePassed(targetState) && !isWaitingFor(targetState)) {
+                        targetState.extrapolateMaxBounds(maxBounds, getClocks());
+                        worklist.add(targetState);
+                    }
+
+                    /* If we don't already have the "targetState" location added
+                     *   To the set of locations for the conjunction then add it. */
+                    String targetName = targetState.getLocation().getName();
+                    locationMap.computeIfAbsent(
+                            targetName, key -> {
+                                Location newLocation = createLocationFromTargetState(targetState);
+                                locationsSet.add(newLocation);
+                                return newLocation;
+                            }
+                    );
+
+
+                    // Create and add the edge connecting the conjoined locations
+                    String sourceName = transition.getSource().getLocation().getName();
+
+                    assert locationMap.containsKey(sourceName);
+                    assert locationMap.containsKey(targetName);
+
+                    Edge edge = createEdgeFromTransition(
+                            transition,
+                            locationMap.get(sourceName),
+                            locationMap.get(targetName),
+                            channel
+                    );
+                    if (!containsEdge(edgesSet, edge)) {
+                        edgesSet.add(edge);
+                    }
+                }
+            }
+        }
+
+        List<Location> updatedLocations = updateClocksInLocs(
+                locationsSet, getClocks(), getClocks(), getBVs(), getBVs()
+        );
+        List<Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet, clocks.getItems(), clocks.getItems(), BVs.getItems(), BVs.getItems());
+        Automaton resAut = new Automaton(name, updatedLocations, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
+        CDD.done();
+        return resAut;
+    }
+
+    private Location createLocationFromTargetState(State target) {
+        String name = target.getLocation().getName();
+        boolean isInitial = target.getLocation().getIsInitial();
+        boolean isUrgent = target.getLocation().getIsUrgent();
+        boolean isUniversal = target.getLocation().getIsUniversal();
+        boolean isInconsistent = target.getLocation().getIsInconsistent();
+        Guard invariant = target.getInvariants(clocks.getItems());
+        int x = target.getLocation().getX();
+        int y = target.getLocation().getX();
+        return new Location(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
+    }
+
+    private Edge createEdgeFromTransition(Transition transition, Location source, Location target, Channel channel) {
+        Guard guard = transition.getGuards(getClocks());
+        List<Update> updates = transition.getUpdates();
+        boolean isInput = getInputs().contains(channel);
+        return new Edge(source, target, channel, isInput, guard, updates);
+    }
+
+    private Location conjoinLocation(Collection<Location> locations)
+            throws IllegalArgumentException {
+        if (locations.size() == 0) {
+            throw new IllegalArgumentException("At least a single location is required");
+        }
+
+        String name = conjoinedLocationsName(locations);
+
+        CDD invariantFederation = CDD.cddTrue();
+        boolean isInitial = true;
+        boolean isUrgent = false;
+        boolean isUniversal = true;
+        boolean isInconsistent = false;
+        int x = 0, y = 0;
+
+        for (Location location : locations) {
+            invariantFederation = location.getInvariantCDD().conjunction(invariantFederation);
+            isInitial = isInitial && location.isInitial();
+            isUrgent = isUrgent || location.isUrgent();
+            isUniversal = isUniversal && location.isUniversal();
+            isInconsistent = isInconsistent || location.isInconsistent();
+            x += location.getX();
+            y += location.getY();
+        }
+
+        // We use the average location coordinates
+        x /= locations.size();
+        y /= locations.size();
+
+        Guard invariant = CDD.toGuardList(invariantFederation, getClocks());
+        return new Location(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
+    }
+
+    public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+        List<SymbolicLocation> symbolicLocations = ((ComplexLocation) symLocation).getLocations();
+        return computeResultMoves(symbolicLocations, channel);
     }
 
     private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
         List<Move> resultMoves = systems[0].getNextMoves(locations.get(0), channel);
         // used when there are no moves for some TS
-        if (resultMoves.isEmpty())
+        if (resultMoves.isEmpty()) {
             return new ArrayList<>();
+        }
 
         for (int i = 1; i < systems.length; i++) {
             List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
-
-            if (moves.isEmpty())
+            if (moves.isEmpty()) {
                 return new ArrayList<>();
-
+            }
             resultMoves = moveProduct(resultMoves, moves, i == 1, false);
         }
 

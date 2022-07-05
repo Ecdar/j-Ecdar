@@ -47,6 +47,10 @@ public class JSONParser {
         return distrubuteObject(obj, makeInpEnabled);
     }
 
+    public static Automaton parse(String base, String component, boolean makeInputEnabled) {
+        return parse(base, new String[]{ component }, makeInputEnabled)[0];
+    }
+
     public static Automaton[] parse(String base, String[] components, boolean makeInpEnabled) {
         ArrayList<String> locations = Arrays.stream(components).map(c -> base + c).collect(Collectors.toCollection(ArrayList::new));
 

@@ -7,11 +7,11 @@ import java.util.Objects;
 
 public class Edge {
 
-    private  Location source, target;
-    private  Channel chan;
-    private  boolean isInput;
-    private  Guard guards;
-    private  List<Update> updates;
+    private Location source, target;
+    private Channel chan;
+    private boolean isInput;
+    private Guard guards;
+    private List<Update> updates;
 
     public void setSource(Location source) {
         this.source = source;
@@ -47,68 +47,59 @@ public class Edge {
         this.updates = updates;
     }
 
-    public Edge(Edge copy, List<Clock> clocks,  List<BoolVar> BVs, Location sourceR, Location targetR, List<Clock> oldClocks, List<BoolVar> oldBVs){
+    public Edge(Edge copy, List<Clock> clocks, List<BoolVar> BVs, Location sourceR, Location targetR, List<Clock> oldClocks, List<BoolVar> oldBVs) {
         this.source = sourceR;
         this.target = targetR;
         this.chan = copy.chan;
         this.isInput = copy.isInput;
 
         if (copy.guards instanceof ClockGuard)
-            this.guards =new ClockGuard((ClockGuard) copy.guards,  clocks,oldClocks);
+            this.guards = new ClockGuard((ClockGuard) copy.guards, clocks, oldClocks);
         if (copy.guards instanceof BoolGuard)
-            this.guards =new BoolGuard((BoolGuard) copy.guards, BVs, oldBVs);
+            this.guards = new BoolGuard((BoolGuard) copy.guards, BVs, oldBVs);
         if (copy.guards instanceof FalseGuard)
-            this.guards =new FalseGuard();
+            this.guards = new FalseGuard();
         if (copy.guards instanceof TrueGuard)
-            this.guards =new TrueGuard();
+            this.guards = new TrueGuard();
         if (copy.guards instanceof AndGuard)
-            this.guards =new AndGuard( (AndGuard) copy.guards, clocks, oldClocks, BVs, oldBVs);
+            this.guards = new AndGuard((AndGuard) copy.guards, clocks, oldClocks, BVs, oldBVs);
         if (copy.guards instanceof OrGuard)
-            this.guards =new OrGuard( (OrGuard) copy.guards, clocks, oldClocks, BVs, oldBVs);
+            this.guards = new OrGuard((OrGuard) copy.guards, clocks, oldClocks, BVs, oldBVs);
 
         List<Update> updates = new ArrayList<>();
-        for (Update update: copy.getUpdates())
-        {
-            if (update instanceof BoolUpdate)
-            {
+        for (Update update : copy.getUpdates()) {
+            if (update instanceof BoolUpdate) {
                 updates.add(new BoolUpdate((BoolUpdate) update, BVs, oldBVs));
-            }
-            else
-            {
+            } else {
                 updates.add(new ClockUpdate((ClockUpdate) update, clocks, oldClocks));
 
             }
 
         }
-        this.updates= updates;
+        this.updates = updates;
     }
 
 
-
-    public CDD getGuardCDD()
-    {
+    public CDD getGuardCDD() {
         CDD res = new CDD(guards);
         return res;
     }
 
 
-
-
-
-    public int getMaxConstant(Clock clock){
+    public int getMaxConstant(Clock clock) {
         int constant = 0;
         constant = guards.getMaxConstant();
         return constant;
     }
 
     // Used in determinism check to verify if two edges have exactly the same updates
-    public boolean hasEqualUpdates(Edge edge){
+    public boolean hasEqualUpdates(Edge edge) {
         // If the amount of updates on edges is not the same it means they cannot have equal updates
         for (Update thisU : getUpdates()) {
             boolean matched = false;
             for (Update thatU : edge.getUpdates())
                 if (thisU.equals(thatU))
-                    matched=true;
+                    matched = true;
             if (!matched)
                 return false;
         }
@@ -117,7 +108,7 @@ public class Edge {
             boolean matched = false;
             for (Update thisU : getUpdates())
                 if (thisU.equals(thatU))
-                    matched=true;
+                    matched = true;
             if (!matched)
                 return false;
         }
@@ -155,26 +146,29 @@ public class Edge {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Edge)) return false;
-        Edge that = (Edge) o;
-        /*System.out.println(toString());
-        System.out.println(that.toString());
-        System.out.println(isInput == that.isInput);
-        System.out.println(source.equals(that.source));
-        System.out.println(target.equals(that.target));
-        System.out.println(chan.equals(that.chan));
-        System.out.println(Arrays.equals(Arrays.stream(guards.toArray()).toArray(), Arrays.stream(that.guards.toArray()).toArray()));
-        System.out.println(Arrays.equals(updates, that.updates));*/
-        return isInput == that.isInput &&
-                source.equals(that.source) &&
-                target.equals(that.target) &&
-                chan.equals(that.chan) &&
-                // TODO: did the stream thing work?
-                //that.getGuardCDD().equiv(getGuardCDD()) &&
-                guards.equals(that.guards) &&
-                Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(that.updates.toArray()).toArray());
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Edge)) return false;
+
+        Edge edge = (Edge) obj;
+        if (source == null && edge.source != null) {
+            return false;
+        }
+        if (target == null && edge.target != null) {
+            return false;
+        }
+        if (chan == null && edge.chan != null) {
+            return false;
+        }
+        if (guards == null && edge.guards != null) {
+            return false;
+        }
+        return isInput == edge.isInput &&
+                source != null && source.equals(edge.source) &&
+                target != null && target.equals(edge.target) &&
+                chan != null && chan.equals(edge.chan) &&
+                guards != null && guards.equals(edge.guards) &&
+                hasEqualUpdates(edge);
     }
 
     @Override
@@ -182,10 +176,10 @@ public class Edge {
         return "(" +
                 source + " - " +
                 chan.getName() +
-                (isInput? "?":"!")  +" - " +
-                guards +" - " +
-                Arrays.toString(this.updates.toArray()) +" - " +
-                target  + ")\n";
+                (isInput ? "?" : "!") + " - " +
+                guards + " - " +
+                Arrays.toString(this.updates.toArray()) + " - " +
+                target + ")\n";
     }
 
     @Override
