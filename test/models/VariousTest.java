@@ -2,15 +2,14 @@ package models;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
-import logic.Composition;
-import logic.Refinement;
-import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
+import logic.*;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import parser.JSONParser;
 import parser.XMLParser;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -153,6 +152,23 @@ public class VariousTest {
         boolean included  =  (rawUpperBound & 1)==0 ? false : true;
         System.out.println(converted + " " + included);
     }
+
+    @Test
+    public void testFromFramework1() throws FileNotFoundException {
+        SimpleTransitionSystem A,A1,G,Q;
+        Automaton[] list = JSONParser.parse("samples/json/AG",true);
+        A = new SimpleTransitionSystem(list[0]);
+        A1 = new SimpleTransitionSystem(list[0]);
+        G = new SimpleTransitionSystem(list[2]);
+        Q = new SimpleTransitionSystem(list[4]);
+
+        // refinement: A <= ((A || G) \\\\ Q)
+        Refinement ref = new Refinement(A, new Quotient(new Composition(A1,G),Q));
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertTrue(res);
+    }
+
 
     @Test
     public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException
