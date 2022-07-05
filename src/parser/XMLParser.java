@@ -32,7 +32,7 @@ public class XMLParser {
                 automata.add(buildAutomaton(el, makeInpEnabled));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return automata.toArray(new Automaton[0]);
@@ -52,7 +52,7 @@ public class XMLParser {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return automata.toArray(new Automaton[0]);
@@ -89,9 +89,8 @@ public class XMLParser {
             Document doc = builder.parse( new InputSource( new StringReader( xmlStr ) ) );
             return doc;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     private static List<Clock> setClocks(Element el) {
@@ -220,7 +219,7 @@ public class XMLParser {
                     if (o.getName().equals("controllable") && o.getBooleanValue()==false) isInput = false;
                 } catch (DataConversionException e) {
                     System.err.println("Controllable flag contains non-boolean value");
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
 
             }

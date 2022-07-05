@@ -64,7 +64,7 @@ public class JsonAutomatonEncoder {
             globalDec.writeJSONString(writer);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 

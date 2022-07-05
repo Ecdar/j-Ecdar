@@ -111,7 +111,7 @@ public class JSONParser {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return returnList;
@@ -133,15 +133,12 @@ public class JSONParser {
     private static Automaton[] distrubuteObjects(ArrayList<JSONObject> objList, boolean makeInpEnabled) {
         ArrayList<Automaton> automata = new ArrayList<>();
 
-        try {
-            for (JSONObject obj : objList) {
-                if (!obj.get("name").toString().equals("Global Declarations")&&!obj.get("name").toString().equals("System Declarations")) {
-                    automata.add(distrubuteObject(obj, makeInpEnabled));
-                }
+        for (JSONObject obj : objList) {
+            if (!obj.get("name").toString().equals("Global Declarations")&&!obj.get("name").toString().equals("System Declarations")) {
+                automata.add(distrubuteObject(obj, makeInpEnabled));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
 
         return automata.toArray(new Automaton[0]);
     }

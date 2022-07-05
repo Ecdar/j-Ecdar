@@ -69,7 +69,7 @@ public class Main {
                     server.start();
                     server.blockUntilShutdown();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -99,7 +99,7 @@ public class Main {
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
 
             if(cmd.hasOption("save-to-disk")){
