@@ -15,7 +15,12 @@ public class Conjunction extends TransitionSystem {
 
     private Automaton resultant = null;
 
-    public Conjunction(TransitionSystem... systems) {
+    public Conjunction(TransitionSystem... systems)
+        throws IllegalArgumentException {
+        if (systems.length == 0) {
+            throw new IllegalArgumentException("Conjunction can only be done with one or more transition systems");
+        }
+
         this.systems = systems;
 
         // Initialisation of the underlying TransitionSystem and its components
@@ -79,7 +84,7 @@ public class Conjunction extends TransitionSystem {
             CDD.done();
         }
 
-        return  resultant;
+        return resultant;
     }
 
     @Override
@@ -127,7 +132,11 @@ public class Conjunction extends TransitionSystem {
         return false;
     }
 
-    private String conjoinedAutomataName(Automaton[] automata) {
+    private String conjoinedAutomataName(Automaton[] automata)
+            throws IllegalArgumentException {
+        if (automata.length == 0) {
+            throw new IllegalArgumentException("Requires at least one automaton to get a conjoined automaton name");
+        }
         return String.join(
                 " && ",
                 Arrays.stream(automata)
@@ -136,7 +145,11 @@ public class Conjunction extends TransitionSystem {
         );
     }
 
-    private String conjoinedLocationsName(Collection<Location> locations) {
+    private String conjoinedLocationsName(Collection<Location> locations)
+            throws IllegalArgumentException {
+        if (locations.size() == 0) {
+            throw new IllegalArgumentException("Requires at least one location to get a conjoined location name");
+        }
         return String.join(
                 "",
                 locations.stream()
@@ -145,14 +158,22 @@ public class Conjunction extends TransitionSystem {
         );
     }
 
-    private List<Location> initialLocations(Automaton[] automata) {
+    private List<Location> initialLocations(Automaton[] automata)
+            throws IllegalArgumentException {
+        if (automata.length == 0) {
+            throw new IllegalArgumentException("Requires at least one automaton to get a initial location for the conjunction");
+        }
         return Arrays.stream(automata)
                 .map(Automaton::getInitLoc)
                 .collect(Collectors.toList());
     }
 
     private Automaton conjoin(Automaton[] automata)
-            throws CddAlreadyRunningException {
+            throws CddAlreadyRunningException, IllegalArgumentException {
+        if (automata.length == 0) {
+            throw new IllegalArgumentException("At least a single automaton must be provided for the conjunction");
+        }
+
         CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
         CDD.addClocks(getClocks());
         CDD.addBddvar(getBVs());
@@ -254,7 +275,7 @@ public class Conjunction extends TransitionSystem {
     }
 
     private Location conjoinLocation(Collection<Location> locations)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         if (locations.size() == 0) {
             throw new IllegalArgumentException("At least a single location is required");
         }
