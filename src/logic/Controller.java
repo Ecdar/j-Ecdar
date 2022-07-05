@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Controller {
-    private static List<SimpleTransitionSystem> transitionSystems = new ArrayList<>();
+    private static List<Automaton> automata = new ArrayList<>();
     private static List<Clock> clocksInCurrentQuery = new ArrayList<>();
 
     public static List<Query> handleRequest(String location, String queryString, boolean trace) throws Exception {
@@ -24,44 +24,43 @@ public class Controller {
 
         parseComponents(folderLoc, isJson); // Parses components and adds them to local variable cmpt
 
-        return QueryParser.parse(queryString, transitionSystems);
+        return QueryParser.parse(queryString, automata);
     }
 
     public static Query handleRequest(String queryString) throws Exception {
-        List<Query> queries = QueryParser.parse(queryString, transitionSystems);
+        List<Query> queries = QueryParser.parse(queryString, automata);
         return queries.get(0);
     }
 
     public static void parseComponents(String folderLocation, boolean isJson) throws FileNotFoundException {
         Automaton[] cmpt = isJson ? JSONParser.parse(folderLocation, true) : XMLParser.parse(folderLocation, true);
         for (Automaton automaton : cmpt) {
-            transitionSystems.add(new SimpleTransitionSystem(automaton));
+            automata.add(automaton);
         }
     }
 
     public static void parseComponentJson(String json) throws ParseException {
         Automaton automaton = JSONParser.parseJsonString(json, true);
-        transitionSystems.add(new SimpleTransitionSystem(automaton));
+        automata.add(automaton);
     }
 
     public static void parseComponentXml(String xml) {
         Automaton[] automatons = XMLParser.parseXmlString(xml, true);
         for (Automaton automaton : automatons) {
-            transitionSystems.add(new SimpleTransitionSystem(automaton));
+            automata.add(automaton);
         }
     }
 
     public static void saveToDisk(String location){
-        for(TransitionSystem system : transitionSystems){
-            JsonAutomatonEncoder.writeToJson(system.getAutomaton(), location);
+        for(Automaton system : automata){
+            JsonAutomatonEncoder.writeToJson(system, location);
         }
     }
 
     public static void saveAutomaton(Automaton aut, String name){
         if(name != null){
             aut.setName(name);
-            SimpleTransitionSystem system = new SimpleTransitionSystem(aut);
-            transitionSystems.add(system);
+            automata.add(aut);
         }
     }
 
@@ -72,10 +71,10 @@ public class Controller {
 
     // Finds and returns Automaton given the name of that component
     private static TransitionSystem findComponent(String str) {
-        for (SimpleTransitionSystem ts : transitionSystems)
-            if (ts.getName().equalsIgnoreCase(str)) {
-                clocksInCurrentQuery.addAll(ts.getAutomaton().getClocks());
-                return ts;
+        for (Automaton aut : automata)
+            if (aut.getName().equalsIgnoreCase(str)) {
+                clocksInCurrentQuery.addAll(aut.getClocks());
+                return new SimpleTransitionSystem(aut);
             }
 
         return null;
