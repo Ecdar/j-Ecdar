@@ -1,9 +1,6 @@
 package features;
 
-import logic.Composition;
-import logic.Refinement;
-import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
+import logic.*;
 import models.Automaton;
 import models.CDD;
 import org.junit.After;
@@ -313,6 +310,13 @@ public class DelayRefinementTest {
     public void Z4RefinesSelf() {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[49]), new SimpleTransitionSystem(new Automaton(automata[49]))).check());
     }
+
+
+    @Test
+    public void Z2Z3Z4RefinesZ2() {
+        assertTrue(new Refinement(new Conjunction(new SimpleTransitionSystem(automata[47]),new SimpleTransitionSystem(automata[48]),new SimpleTransitionSystem(automata[49])), new SimpleTransitionSystem(new Automaton(automata[47]))).check());
+    }
+
 
     @Test
     public void Z5RefinesSelf() {

@@ -171,9 +171,9 @@ public class PruningTest {
     @Test
     public void pruningWithOrTest1() {
 
-        SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOrOnlyOne.xml", false)[0]);
+        SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[2]);
         SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
-        SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOrOnlyOne.xml", false)[1]);
+        SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[3]);
         XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning1.xml",pruned1);
         assertTrue(new Refinement(pruned1, exp1).check()  &&  new Refinement(exp1, pruned1).check() ) ;
 
@@ -188,6 +188,31 @@ public class PruningTest {
         SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
         SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[5]);
         XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning2.xml",pruned1);
+        assertTrue(new Refinement(pruned1, exp1).check()  &&  new Refinement(exp1, pruned1).check() ) ;
+
+
+    }
+
+    @Test
+    public void pruningWithOrTest3() {
+
+        SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[6]);
+        SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
+        SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[7]);
+        XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning3.xml",pruned1);
+        assertTrue(new Refinement(pruned1, exp1).check()  &&  new Refinement(exp1, pruned1).check() ) ;
+
+
+    }
+
+
+    @Test
+    public void pruningWithOrTest4() {
+
+        SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[8]);
+        SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
+        SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[9]);
+        XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning4.xml",pruned1);
         assertTrue(new Refinement(pruned1, exp1).check()  &&  new Refinement(exp1, pruned1).check() ) ;
 
 
