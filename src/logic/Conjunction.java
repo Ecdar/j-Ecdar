@@ -75,8 +75,8 @@ public class Conjunction extends TransitionSystem {
             automata[i] = systems[i].getAutomaton();
         }
 
-        /* We utilise a try-finally such that we can correctly clean up
-         *   whilst still immediately rethrow the exceptions as we can't.
+        /* We utilise a try-finally such that we can correctly clean up whilst still immediately
+         *   rethrow the exceptions as we can't handle a failure (most likely from the CDD).
          *   This especially helps increase the meaning of failing tests */
         try {
             resultant = conjoin(automata);
