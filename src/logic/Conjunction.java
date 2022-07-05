@@ -253,13 +253,18 @@ public class Conjunction extends TransitionSystem {
         return new Edge(source, target, channel, isInput, guard, updates);
     }
 
-    private Location conjoinLocation(Collection<Location> locations) {
+    private Location conjoinLocation(Collection<Location> locations)
+        throws IllegalArgumentException {
+        if (locations.size() == 0) {
+            throw new IllegalArgumentException("At least a single location is required");
+        }
+
         String name = conjoinedLocationsName(locations);
 
         CDD invariantFederation = CDD.cddTrue();
         boolean isInitial = true;
         boolean isUrgent = false;
-        boolean isUniversal = false;
+        boolean isUniversal = true;
         boolean isInconsistent = false;
         int x = 0, y = 0;
 
@@ -267,7 +272,6 @@ public class Conjunction extends TransitionSystem {
             invariantFederation = location.getInvariantCDD().conjunction(invariantFederation);
             isInitial = isInitial && location.isInitial();
             isUrgent = isUrgent || location.isUrgent();
-            // FIXME: isUniversal will always be false as it is initialised to false.
             isUniversal = isUniversal && location.isUniversal();
             isInconsistent = isInconsistent || location.isInconsistent();
             x += location.getX();
