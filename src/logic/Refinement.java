@@ -89,7 +89,7 @@ public class Refinement {
         if (!inputs2.containsAll(inputs1)) {
             precondMet = false;
             errMsg.append(inputs2 + " <--> " + inputs1 + "\n");
-            errMsg.append("Inputs on the left side are not equal to inputs on the right side.\n");
+            errMsg.append("Inputs on the left side are not included as inputs on the right side.\n");
         }
 
         // the left side must contain all outputs from the right side
@@ -100,20 +100,20 @@ public class Refinement {
 
 
 
+        // inputs on one side cannot be outputs on the other and vice versa
+
         Set<Channel> output1Copy = new HashSet<>(outputs1);
         output1Copy.retainAll(inputs2);
-        // the left side must contain all outputs from the right side
         if (!output1Copy.isEmpty()){
             precondMet = false;
-            errMsg.append("Alphabet mismatch.\n");
+            errMsg.append("There is an output of left side that is an input on the right.\n");
         }
 
-        Set<Channel> output2Copy = new HashSet<>(outputs2); // TODO: output2copy is never used, something is buggy here!
-        output1Copy.retainAll(inputs1);
-        // the left side must contain all outputs from the right side
-        if (!output1Copy.isEmpty()){
+        Set<Channel> output2Copy = new HashSet<>(outputs2);
+        output2Copy.retainAll(inputs1);
+        if (!output2Copy.isEmpty()){
             precondMet = false;
-            errMsg.append("Alphabet mismatch.\n");
+            errMsg.append("There is an output of right side that is an input on the left.\n");
         }
 
 
