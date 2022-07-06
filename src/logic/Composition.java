@@ -70,8 +70,8 @@ public class Composition extends TransitionSystem {
             // add inputs and outputs to the global lists
             inputs.addAll(inputsOfI);
             outputs.addAll(outputsOfI);
-            outputs.addAll(syncs);
-            syncs.clear();
+           // outputs.addAll(syncs);
+           // syncs.clear();
             System.out.println("outputs " +outputs);
             System.out.println("inputs " +inputs);
             System.out.println("internal " +syncs);
@@ -84,7 +84,10 @@ public class Composition extends TransitionSystem {
     }
 
     public Set<Channel> getOutputs() {
-        return outputs;
+        Set<Channel> result = new HashSet<>();
+        result.addAll(outputs);
+        result.addAll(syncs);
+        return result;
     }
 
     public Set<Channel> getSyncs() {
