@@ -5,7 +5,7 @@ import java.util.Objects;
 public class TrueGuard extends Guard{
 
     @Override
-    int getMaxConstant() {
+    int getMaxConstant(Clock clock) {
         return 0;
     }
 

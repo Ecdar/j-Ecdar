@@ -243,6 +243,10 @@ public class XMLParser {
                         }
                         break;
                     case "synchronisation":
+                        if (text.endsWith("?"))
+                            isInput = true;
+                        if (text.endsWith("!"))
+                            isInput = false;
                         String channel = text.replaceAll("\\?", "").replaceAll("!", "");
                         if (!text.isEmpty())
                             chan = addChannel(channelList, channel);

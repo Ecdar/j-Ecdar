@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public abstract class Guard {
 
-    abstract int getMaxConstant();
+    abstract int getMaxConstant(Clock clock);
 
     //public enum type {DIAGONAL, CLOCKGUARD, BOOLGUARD, FALSE}
 /*

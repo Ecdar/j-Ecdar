@@ -106,11 +106,16 @@ public class ClockGuard extends Guard {
     }
 
     @Override
-    int getMaxConstant() {
-        if (isDiagonal())
-            return bound; // TODO: supposed to be bound or 0?
-        else
+    int getMaxConstant(Clock clock) {
+        if (clock==null) {
+            assert(false);
+            return 0;
+        }
+        if (clock.equals(this.clock_i))
             return bound;
+        if (clock.equals(this.clock_j))
+            return bound;
+        return 0;
     }
 
     @Override

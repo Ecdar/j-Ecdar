@@ -53,7 +53,7 @@ public class BoolGuard extends Guard {
     }
 
     @Override
-    int getMaxConstant() {
+    int getMaxConstant(Clock clock) {
         return 0;
     }
 

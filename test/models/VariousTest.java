@@ -170,6 +170,19 @@ public class VariousTest {
     }
 
 
+
+    @Test
+    public void testFromFramework2() throws FileNotFoundException {
+        SimpleTransitionSystem Inf;
+        Automaton[] list = XMLParser.parse("C:\\tools\\ecdar-test\\Ecdar-test\\samples\\xml\\extrapolation_test.xml",false);
+        Inf = new SimpleTransitionSystem(list[0]);
+        // refinement: A <= ((A || G) \\\\ Q)
+        System.out.println(Inf.isDeterministic());
+        boolean res = Inf.isLeastConsistent();
+        System.out.println(Inf.getLastErr());
+        assertTrue(res);
+    }
+
     @Test
     public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException
     {

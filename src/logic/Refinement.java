@@ -108,7 +108,7 @@ public class Refinement {
             errMsg.append("Alphabet mismatch.\n");
         }
 
-        Set<Channel> output2Copy = new HashSet<>(outputs2);
+        Set<Channel> output2Copy = new HashSet<>(outputs2); // TODO: output2copy is never used, something is buggy here!
         output1Copy.retainAll(inputs1);
         // the left side must contain all outputs from the right side
         if (!output1Copy.isEmpty()){

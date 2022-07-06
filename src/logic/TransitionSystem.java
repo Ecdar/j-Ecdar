@@ -161,6 +161,8 @@ public abstract class TransitionSystem {
         return result;
     }
 
+    public abstract String getName();
+
     public boolean isFullyConsistent(){
         return isConsistent(false);
     }

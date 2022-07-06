@@ -196,6 +196,40 @@ public class UniversityTest {
         assertTrue(refines);
     }
 
+    @Test
+    public void testFromTestFramework() {
+        //  refinement: ((HalfAdm1 && HalfAdm2) || Machine) <= (((Adm2 && HalfAdm1) || Machine) && (Adm2 || Machine))
+
+        TransitionSystem right1=new Composition(new Conjunction(getAdm2(),getHalf1()),getMachine());
+        TransitionSystem right2=new Composition(getAdm2(),getMachine());
+
+        TransitionSystem left = new Composition(new Conjunction(getHalf1(),getHalf2()),getMachine());
+
+        TransitionSystem right = new Conjunction(right1, right2);
+
+        TransitionSystem rightAut = new Conjunction(new SimpleTransitionSystem(right1.getAutomaton()), new SimpleTransitionSystem(right2.getAutomaton()));
+
+        XMLFileWriter.toXML("testOutput/right.xml",right.getAutomaton());
+        XMLFileWriter.toXML("testOutput/right1.xml",right1.getAutomaton());
+        XMLFileWriter.toXML("testOutput/right2.xml",right2.getAutomaton());
+        XMLFileWriter.toXML("testOutput/rightAut.xml",rightAut.getAutomaton());
+
+        XMLFileWriter.toXML("testOutput/left.xml",left.getAutomaton());
+
+        Refinement refinement1 = new Refinement(left,rightAut);
+        boolean refines1 = refinement1.check(true);
+        //System.out.println(refinement1.getTree().toDot());
+        assertTrue(refines1);
+
+        Refinement refinement = new Refinement(left,right);
+        boolean refines = refinement.check(true);
+        //System.out.println(refinement.getTree().toDot());
+        assertTrue(refines);
+    }
+
+
+
+
 
     @Test
     @Ignore // FIXME: This test does not finish and thereby is ignored

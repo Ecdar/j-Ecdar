@@ -310,9 +310,9 @@ public class Composition extends TransitionSystem {
         // Check if action belongs to this TS at all before proceeding
         if (!outputs.contains(channel) && !inputs.contains(channel) && !syncs.contains(channel))
             return new ArrayList<>();
-        System.out.println(symLocation.toString());
-        System.out.println(systems[0].getAutomaton().getName());
-        System.out.println(systems[1].getAutomaton().getName());
+        //System.out.println(symLocation.toString());
+        //System.out.println(systems[0].getAutomaton().getName());
+        //System.out.println(systems[1].getAutomaton().getName());
         // If action is sync, then check if there is corresponding output in TS
         if (!checkForOutputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
 
@@ -362,6 +362,15 @@ public class Composition extends TransitionSystem {
             }
         }
         return true;
+    }
+    @Override
+    public String getName() {
+        String result = "";
+        for (TransitionSystem ts: systems)
+        {
+            result = result + ts.getName() + " || ";
+        }
+        return result.substring(0,result.length()-4);
     }
 
     private Set<Channel> setIntersection(Set<Channel> set1, Set<Channel> set2) {

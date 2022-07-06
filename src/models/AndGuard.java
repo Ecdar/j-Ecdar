@@ -86,12 +86,12 @@ public class AndGuard extends Guard{
 
 
     @Override
-    int getMaxConstant() {
+    int getMaxConstant(Clock clock) {
         int max = 0;
         for (Guard g: guards)
         {
-            if (g.getMaxConstant()>max)
-                max = g.getMaxConstant();
+            if (g.getMaxConstant(clock)>max)
+                max = g.getMaxConstant(clock);
         }
         return max;
     }

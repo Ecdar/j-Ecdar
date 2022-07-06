@@ -88,7 +88,7 @@ public class Edge {
 
     public int getMaxConstant(Clock clock) {
         int constant = 0;
-        constant = guards.getMaxConstant();
+        constant = guards.getMaxConstant(clock);
         return constant;
     }
 

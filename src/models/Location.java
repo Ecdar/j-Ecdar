@@ -139,7 +139,7 @@ public class Location {
 
     public int getMaxConstant(Clock clock){
         int constant = 0;
-        constant = invariant.getMaxConstant();
+        constant = invariant.getMaxConstant(clock);
         return constant;
     }
 

@@ -4,6 +4,7 @@ import models.*;
 import parser.XMLFileWriter;
 
 import java.util.*;
+import java.util.concurrent.DelayQueue;
 import java.util.stream.Collectors;
 
 public class SimpleTransitionSystem extends TransitionSystem{
@@ -148,6 +149,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         //if (!isDeterministic()) // TODO: this was commented out, I added it again
         //    return false;
         passed = new ArrayList<>();
+        waiting = new ArrayDeque<>();
         boolean result = checkConsistency(getInitialState(), getInputs(), getOutputs(), canPrune);
         return result;
     }
@@ -160,14 +162,19 @@ public class SimpleTransitionSystem extends TransitionSystem{
         State toStore = new State(currState);
 
         toStore.extrapolateMaxBounds(getMaxBounds(),clocks.getItems());
+        System.out.println(getMaxBounds());
+        //if (passedContainsState(toStore))
+        //    return true;
         passed.add(toStore);
         // Check if the target of every outgoing input edge ensures independent progress
         for (Channel channel : inputs) {
             List<Transition> tempTrans = getNextTransitions(currState, channel);
             for (Transition ts : tempTrans) {
                 boolean inputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
-                if (!inputConsistent)
+                if (!inputConsistent) {
+                    System.out.println("Input inconsistent");
                     return false;
+                }
             }
         }
         boolean outputExisted = false;

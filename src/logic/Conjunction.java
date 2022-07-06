@@ -59,6 +59,16 @@ public class Conjunction extends TransitionSystem {
     }
 
     @Override
+    public String getName() {
+        String result = "";
+        for (TransitionSystem ts: systems)
+        {
+            result = result + ts.getName() + " && ";
+        }
+        return result.substring(0,result.length()-4);
+    }
+
+    @Override
     public Automaton getAutomaton()
             throws CddAlreadyRunningException {
         // No need for recomputing the same conjunction.
@@ -309,7 +319,8 @@ public class Conjunction extends TransitionSystem {
 
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
         List<SymbolicLocation> symbolicLocations = ((ComplexLocation) symLocation).getLocations();
-        return computeResultMoves(symbolicLocations, channel);
+        List<Move> result = computeResultMoves(symbolicLocations, channel);
+        return result;
     }
 
     private List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
@@ -321,6 +332,10 @@ public class Conjunction extends TransitionSystem {
 
         for (int i = 1; i < systems.length; i++) {
             List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
+            if (channel.getName().contains("coin")) {
+                System.out.println(getName());
+                System.out.println("Location: " + locations.get(i) + " " + moves.size());
+            }
             if (moves.isEmpty()) {
                 return new ArrayList<>();
             }
