@@ -68,7 +68,7 @@ public class QueryParserTest {
         QueryGrammar.QueryGrammarParser parser = new QueryGrammar.QueryGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
         QueryParser.SystemVisitor visitor = new QueryParser.SystemVisitor();
-        Field field = QueryParser.class.getDeclaredField("transitionSystems");
+        Field field = QueryParser.class.getDeclaredField("automata");
         field.setAccessible(true);
         field.set(null, automataList);
         return visitor.visit(parser.queries().query(0).saveSystem().expression());
