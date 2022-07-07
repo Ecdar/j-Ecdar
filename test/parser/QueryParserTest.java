@@ -68,7 +68,7 @@ public class QueryParserTest {
         QueryGrammar.QueryGrammarParser parser = new QueryGrammar.QueryGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
         QueryParser.SystemVisitor visitor = new QueryParser.SystemVisitor();
-        Field field = QueryParser.class.getDeclaredField("transitionSystems");
+        Field field = QueryParser.class.getDeclaredField("automata");
         field.setAccessible(true);
         field.set(null, automataList);
         return visitor.visit(parser.queries().query(0).saveSystem().expression());
@@ -177,17 +177,17 @@ public class QueryParserTest {
 
     @Test
     public void testSpecNotRefinesSpec() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Spec)<=(Spec)", false).get(0).getResult(), false);
+        assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Spec)<=(Spec)", false).get(0).getResult());
     }
 
     @Test
     public void testMachNotRefinesMach() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0).getResult(), false);
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0).getResult(), true);
     }
 
     @Test
     public void testMach3NotRefinesMach3() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine3<=Machine3", false).get(0).getResult(), false);
+        assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine3<=Machine3", false).get(0).getResult());
     }
 
     @Test
@@ -217,7 +217,7 @@ public class QueryParserTest {
 
     @Test
     public void testCompNotRefinesComp() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)", false).get(0).getResult(), false);
+        assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)", false).get(0).getResult());
     }
 
     @Test
@@ -309,13 +309,15 @@ public class QueryParserTest {
     @Test
     public void testSeveralQueries1() throws Exception {
         List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Spec; refinement:Machine<=Machine", false);
-        assertTrue(!result.get(0).getResult() && !result.get(1).getResult());
+        assertTrue(result.get(0).getResult()); // refinement:Spec<=Spec
+        assertTrue(result.get(1).getResult()); // refinement:Spec<=Spec
     }
 
     @Test
     public void testSeveralQueries2() throws Exception {
         List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec; refinement:Machine3<=Machine3", false);
-        assertTrue(result.get(0).getResult() && !result.get(1).getResult());
+        assertTrue(result.get(0).getResult()); // refinement:(Administration||Machine||Researcher)<=Spec
+        assertTrue(result.get(1).getResult()); // refinement:Machine3<=Machine3
     }
 
     @Test
