@@ -48,6 +48,9 @@ public class Composition extends TransitionSystem {
 
                     // we need to fetch the outputs of I again, as they might have been modified in the process
                     Set<Channel> cleanOutputsOfI = new HashSet<>(systems[i].getOutputs());
+                    System.out.println("System names: " + systems[i].getName() + " -- " + systems[j].getName());
+                    System.out.println(cleanOutputsOfI);
+                    System.out.println(outputsOfJ);
                     // check if output actions overlap
                     Set<Channel> diff = setIntersection(cleanOutputsOfI, outputsOfJ);
                     if (!diff.isEmpty()) {

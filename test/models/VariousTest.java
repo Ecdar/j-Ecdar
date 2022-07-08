@@ -10,10 +10,12 @@ import parser.JSONParser;
 import parser.XMLParser;
 
 import java.io.FileNotFoundException;
+import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class VariousTest {
@@ -181,6 +183,34 @@ public class VariousTest {
         boolean res = Inf.isLeastConsistent();
         System.out.println(Inf.getLastErr());
         assertTrue(res);
+    }
+    @Test
+    public void testFromFramework3() throws FileNotFoundException {
+        SimpleTransitionSystem A2,A1,B;
+        Automaton[] list = JSONParser.parse("samples/json/DelayAdd",true);
+        A2 = new SimpleTransitionSystem(list[1]);
+        B = new SimpleTransitionSystem(list[2]);
+        A1 = new SimpleTransitionSystem(list[0]);
+
+        assertFalse(new Refinement(new Composition(A1,A2),B).check());
+
+        // refinement: A2 <= (B \\ A1)
+        Refinement ref = new Refinement(A2, new SimpleTransitionSystem(new Quotient(B,A1).getAutomaton()));
+        boolean res = ref.check();
+        System.out.println(ref.getErrMsg());
+        assertFalse(res);
+    }
+
+    @Test
+    public void testFromFramework4() throws FileNotFoundException {
+        SimpleTransitionSystem C1,C2;
+        Automaton[] list = JSONParser.parse("samples/json/DelayAdd",true);
+        C1 = new SimpleTransitionSystem(list[3]);
+        C2 = new SimpleTransitionSystem(list[4]);
+        System.out.println(C1.getName());
+        System.out.println(C2.getName());
+        assertFalse(new Refinement(C1,C2).check());
+
     }
 
     @Test

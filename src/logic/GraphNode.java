@@ -81,7 +81,11 @@ public class GraphNode {
             String ret = statePair.getLeft().getLocation().getName() + "" + statePair.getRight().getLocation().getName()
                     + "[shape=box, label=\"" + statePair.getLeft().getLocation().getName() + "" + statePair.getRight().getLocation().getName() + "\", style=filled, height=0.3, width=0.3, color = " + color + "];\n";
             for (GraphEdge e : successors) {
-                String label = e.getEdgesL().isEmpty() ? e.getEdgesR().get(0).getChan().toString() : e.getEdgesL().get(0).getChan().toString();
+                String label;
+                if (e.getEdgesL().isEmpty() && e.getEdgesR().isEmpty())
+                    label = "undefined";
+                else
+                    label = e.getEdgesL().isEmpty() ? e.getEdgesR().get(0).getChan().toString() : e.getEdgesL().get(0).getChan().toString();
                 if (e.getTarget().statePair.getRight().getLocation().getName() != null) {
                     ret += e.getTarget().toString();
                     ret += statePair.getLeft().getLocation().getName() + "" + statePair.getRight().getLocation().getName() + " -> " +

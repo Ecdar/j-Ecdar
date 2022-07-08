@@ -93,10 +93,6 @@ public class Quotient extends TransitionSystem {
 
     public SimpleTransitionSystem calculateQuotientAutomaton(boolean prepareForBisimilarityReduction) {
 
-        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-        CDD.addClocks(clocks.getItems());
-        CDD.addBddvar(BVs.getItems());
-        String name = left.getSystems().get(0).getName() + "DIV" + right.getSystems().get(0).getName();
 
         // Lists of edges and locations for the newly built automaton
         List<Edge> edges = new ArrayList<Edge>();
@@ -107,11 +103,19 @@ public class Quotient extends TransitionSystem {
 
         // just an easy way to access spec and comp from here on
         // TODO: check that there is only one automaton in each, maybe implement so that several automata can be explored at once
-        assert (left.getSystems().size() == 1);
-        assert (right.getSystems().size() == 1);
+  //      assert (left.getSystems().size() == 1);
+  //      assert (right.getSystems().size() == 1);
 
-        Automaton spec = left.getSystems().get(0).getAutomaton();
-        Automaton comp = right.getSystems().get(0).getAutomaton();
+  //      Automaton spec = left.getSystems().get(0).getAutomaton();
+  //      Automaton comp = right.getSystems().get(0).getAutomaton();
+
+        Automaton spec = left.getAutomaton();
+        Automaton comp = right.getAutomaton();
+
+        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
+        CDD.addClocks(clocks.getItems());
+        CDD.addBddvar(BVs.getItems());
+        String name = left.getSystems().get(0).getName() + "DIV" + right.getSystems().get(0).getName();
 
         // create product of locations
         for (Location l_spec : spec.getLocations()) {

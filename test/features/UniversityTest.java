@@ -6,6 +6,8 @@ import parser.*;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.sql.Ref;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -237,8 +239,83 @@ public class UniversityTest {
     }
 
 
+    @Test
+    public void testFromTestFramework1() {
+        // refinement: Machine <= ((((Adm2 && HalfAdm1) || Machine || Researcher) \\\\ (Adm2 && HalfAdm2)) \\\\ Researcher)
 
+        TransitionSystem left =getMachine();
+        TransitionSystem right1=new Conjunction(getAdm2(),getHalf1());
+        TransitionSystem right2=new Composition(right1,getMachine(),getResearcher());
+        TransitionSystem right3=new Conjunction(getAdm2(),getHalf2());
+//        TransitionSystem q1 = new SimpleTransitionSystem(new Quotient(right2,right3).getAutomaton());
+//        TransitionSystem q2 =new SimpleTransitionSystem(new Quotient(q1,getResearcher()).getAutomaton());
 
+        TransitionSystem q1 =new Quotient(right2,right3);
+        TransitionSystem q2 =new Quotient(q1,getResearcher());
+
+        Refinement ref1 = new Refinement(new Composition(left,getResearcher(),right3),right2);
+        assertTrue(ref1.check());
+        Refinement ref2 = new Refinement(new Composition(left,getResearcher()),new Quotient(right2,right3));
+        assertTrue(ref2.check());
+        Refinement ref3 = new Refinement(new Composition(left,right3),new Quotient(right2,getResearcher()));
+        assertTrue(ref3.check());
+        Refinement ref = new Refinement(left,q2);
+        boolean res = ref.check(true);
+        System.out.println(ref.getErrMsg());
+        //System.out.println(ref.getTree().toDot());
+        assertTrue(res);
+
+    }
+
+    @Test
+    public void doubleQuotientTest() {
+        // refinement: res <= spec \ adm2 \ machine
+        TransitionSystem lhs = getResearcher();
+        Quotient rhs1 = new Quotient(getSpec(), getAdm2());
+        Quotient rhs = new Quotient(rhs1,getMachine());
+        Refinement refinement = new Refinement(lhs, rhs);
+
+        boolean refines = refinement.check();
+
+        assertFalse(refines);
+    }
+    @Test
+    public void doubleQuotientTest1() {
+        // refinement: res <= spec \ adm2 \ machine
+        TransitionSystem lhs = getMachine();
+        Quotient rhs1 = new Quotient(getSpec(), getAdm2());
+        Quotient rhs = new Quotient(rhs1,getResearcher());
+        Refinement refinement = new Refinement(lhs, rhs);
+
+        boolean refines = refinement.check();
+
+        assertFalse(refines);
+    }
+
+    @Test
+    public void doubleQuotientTest2() {
+        // refinement: res <= spec \ adm2 \ machine
+        TransitionSystem lhs = getMachine();
+        Quotient rhs1 = new Quotient(getSpec(), getResearcher());
+        Quotient rhs = new Quotient(rhs1,getAdm2());
+        Refinement refinement = new Refinement(lhs, rhs);
+
+        boolean refines = refinement.check();
+
+        assertFalse(refines);
+    }
+    @Test
+    public void doubleQuotientTest3() {
+        // refinement: res <= spec \ adm2 \ machine
+        TransitionSystem lhs = getAdm2();
+        Quotient rhs1 = new Quotient(getSpec(), getMachine());
+        Quotient rhs = new Quotient(rhs1,getResearcher());
+        Refinement refinement = new Refinement(lhs, rhs);
+
+        boolean refines = refinement.check();
+
+        assertFalse(refines);
+    }
 
     @Test
     @Ignore // FIXME: This test does not finish and thereby is ignored

@@ -426,8 +426,8 @@ public class Refinement {
         if (passed.containsKey(locPair)) {
             if (CDD.isSubset(pair.getRight().getCDD(),passed.get(locPair).getRight().getCDD()))
                 return true;
-            if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
-                assert(false); // left and right side are supposed to be identical at all times, so this should not be reachable
+            //if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
+            //    assert(false); // left and right side are supposed to be identical at all times, so this should not be reachable
             /*if (pair.getRight().getCDD().toFederation().isSubset(passed.get(locPair).getRight().getCDD().toFederation()))
             {
                 assert(false);
@@ -460,10 +460,10 @@ public class Refinement {
                     supersetNode = state.getNode();
                     return true;
                 }
-                if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
-                {
-                    assert(false);
-                }
+               // if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
+               // {
+               //     assert(false);
+               // }
             }
         }
 

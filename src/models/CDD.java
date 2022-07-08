@@ -429,7 +429,7 @@ public class CDD {
         checkForNull();
         other.checkForNull();
         long resultPointer = CDDLib.conjunction(pointer, other.pointer);
-        return new CDD(resultPointer).reduce().removeNegative();
+        return new CDD(resultPointer);//.reduce().removeNegative();
     }
 
     public CDD disjunction(CDD other){
