@@ -1,0 +1,22 @@
+name: Continous integration
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gradle:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout
+    - name: Gradle setup
+      uses: gradle/gradle-build-action
+    - name: Build with Gradle
+      run: ./gradlew build --scan
+    - name: upload build reports
+      uses: actions/upload-artifact
+      with:
+        name: build-reports
+        path: build/reports/
