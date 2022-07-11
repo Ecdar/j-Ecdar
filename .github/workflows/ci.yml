@@ -68,10 +68,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-        # Runs tests through check and uploads scan
-      - name: Run check with Gradle
-        run: ./gradlew check --scan
-
         # Runs build and uploads scan
       - name: Run build with Gradle
         run: ./gradlew build --scan
