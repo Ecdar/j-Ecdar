@@ -186,7 +186,6 @@ public class VariousTest {
         assertTrue(res);
     }
     @Test
-    @Ignore
     public void testFromFramework3() throws FileNotFoundException {
         SimpleTransitionSystem A2,A1,B;
         Automaton[] list = JSONParser.parse("samples/json/DelayAdd",true);

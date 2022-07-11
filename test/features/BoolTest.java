@@ -533,7 +533,6 @@ public class BoolTest {
     }
 
     @Test
-    @Ignore
     public void testRefinementByNiels()
     {
         Automaton auts[] = XMLParser.parse("samples/xml/refinement_bool.xml",false);
@@ -613,7 +612,6 @@ public class BoolTest {
 
 
     @Test
-    @Ignore // FIXME: Fails
     public void testBoolSafeLoadXML() {
         Clock x = new Clock("exp_x", "Aut");
         Clock y = new Clock("exp_y", "Aut");

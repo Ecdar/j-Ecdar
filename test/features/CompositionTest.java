@@ -77,7 +77,6 @@ public class CompositionTest {
     }
 
     @Test
-    @Ignore
     public void selfloopTest() {
 
         Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);

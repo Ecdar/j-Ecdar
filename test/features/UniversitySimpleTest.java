@@ -106,7 +106,6 @@ public class UniversitySimpleTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
         XMLFileWriter.toXML("./testOutput/specDIVadm.xml", new Automaton[]{q.getAutomaton()});
@@ -189,7 +188,6 @@ public class UniversitySimpleTest {
     }
 
 
-    @Test @Ignore
     public void newQuotientTest3() {
         XMLFileWriter.toXML("adm2new.xml",new Automaton[]{adm2.getAutomaton()});
         XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});

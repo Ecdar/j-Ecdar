@@ -139,7 +139,6 @@ public class PruningTest {
     }
 
     @Test
-    @Ignore // FIXME: Fails
     public void SelfloopSimple3RemovedDiagonal() {
 
         SimpleTransitionSystem pruned = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/simple3NoDiagonal.xml", false)[0]);
