@@ -533,6 +533,7 @@ public class BoolTest {
     }
 
     @Test
+    @Ignore
     public void testRefinementByNiels()
     {
         Automaton auts[] = XMLParser.parse("samples/xml/refinement_bool.xml",false);

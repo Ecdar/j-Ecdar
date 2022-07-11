@@ -174,6 +174,7 @@ public class UniversityTest {
     }
 
     @Test
+    @Ignore
     public void quotientSelfAdmAutomaton() {
         // refinement: spec \ adm <= spec \ amd
         TransitionSystem lhs = new SimpleTransitionSystem(new Quotient(getSpec(), getAdm()).getAutomaton());
@@ -240,6 +241,7 @@ public class UniversityTest {
 
 
     @Test
+    @Ignore
     public void testFromTestFramework1() {
         // refinement: Machine <= ((((Adm2 && HalfAdm1) || Machine || Researcher) \\\\ (Adm2 && HalfAdm2)) \\\\ Researcher)
 
@@ -472,6 +474,7 @@ public class UniversityTest {
     }
 
     @Test
+    @Ignore
     public void simpliversityTest2() {
         // refinement: researcher <= spec \ adm
         TransitionSystem lhs = getSimpleResearcher();
