@@ -157,7 +157,6 @@ public class VariousTest {
     }
 
     @Test
-    @Ignore
     public void testFromFramework1() throws FileNotFoundException {
         SimpleTransitionSystem A,A1,G,Q;
         Automaton[] list = JSONParser.parse("samples/json/AG",true);
@@ -176,7 +175,6 @@ public class VariousTest {
 
 
     @Test
-    @Ignore
     public void testFromFramework2() throws FileNotFoundException {
         SimpleTransitionSystem Inf;
         Automaton[] list = XMLParser.parse("C:\\tools\\ecdar-test\\Ecdar-test\\samples\\xml\\extrapolation_test.xml",false);
