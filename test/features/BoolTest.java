@@ -612,7 +612,6 @@ public class BoolTest {
 
 
     @Test
-    @Ignore // FIXME: Fails
     public void testBoolSafeLoadXML() {
         Clock x = new Clock("exp_x", "Aut");
         Clock y = new Clock("exp_y", "Aut");
