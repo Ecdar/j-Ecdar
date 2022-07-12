@@ -6,6 +6,7 @@ import logic.*;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Ignore;
 import parser.JSONParser;
 import parser.XMLParser;
 
