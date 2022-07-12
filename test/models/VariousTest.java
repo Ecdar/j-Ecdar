@@ -213,6 +213,18 @@ public class VariousTest {
 
     }
 
+
+    @Test
+    public void testFromFramework5() throws FileNotFoundException {
+        SimpleTransitionSystem GuardParan;
+        Automaton[] list = XMLParser.parse("samples/xml/misc_test.xml",true);
+        GuardParan = new SimpleTransitionSystem(list[0]);
+        assertTrue(GuardParan.isLeastConsistent());
+        assertTrue(GuardParan.isFullyConsistent());
+
+    }
+
+
     @Test
     public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException
     {

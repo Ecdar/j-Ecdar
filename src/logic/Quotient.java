@@ -150,7 +150,7 @@ public class Quotient extends TransitionSystem {
 
                 // selfloops for the inc / univ state will be newly created, so we do not need to take care of them here
                 if (!l_spec.getName().equals("inc") && !l_spec.getName().equals("univ") && !l_comp.getName().equals("inc") && !l_comp.getName().equals("univ")) {
-
+                    System.out.println(loc.getName());
                     System.out.println("RULE1");
                     // rule 1 "cartesian product"
                     for (Channel c : allChans) {
@@ -250,8 +250,11 @@ public class Quotient extends TransitionSystem {
                             CDD guardsOfSpec = CDD.cddFalse();
                             for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c))
                                 guardsOfSpec = guardsOfSpec.disjunction(e_spec.getTarget().getInvariantCDD()).transitionBack(e_spec);
+                            System.out.println("guards of spec: " + guardsOfSpec);
+                            guardsOfSpec.printDot();
                             CDD negated = guardsOfSpec.negation();
-
+                            System.out.println("negated: " + negated);
+                            negated.printDot();
                             if (negated.isNotFalse())
                             {
                                 // for each c-transtion in comp, create a new transition with the negated guard
@@ -263,6 +266,7 @@ public class Quotient extends TransitionSystem {
                                     List<Update> updates = new ArrayList<Update>() {{
                                         add(new ClockUpdate(newClock, 0));
                                     }};
+                                    System.out.println("adding edge");
                                     edges.add(new Edge(loc, inc, c, true, CDD.toGuardList(targetState, clocks.getItems()), updates));
                                 }
                             }
@@ -274,12 +278,15 @@ public class Quotient extends TransitionSystem {
                     if (!l_spec.getInvariantCDD().isTrue()) {
                         // negate the spec. invariant
                         CDD invarNegated = l_spec.getInvariantCDD().negation();
+                        System.out.println(l_spec.getInvariantCDD());
+                        System.out.println(invarNegated);
 
                         // merge the negation with the invariant of the component, to create each new transition
                         CDD combined = l_comp.getInvariantCDD().conjunction(invarNegated);
                         List<Update> updates = new ArrayList<Update>() {{
                             add(new ClockUpdate(newClock, 0));
                         }};
+                        System.out.println("adding edge " + combined);
                         edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(combined, clocks.getItems()), updates));
                     }
 

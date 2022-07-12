@@ -478,10 +478,14 @@ public class UniversityTest {
     public void simpliversityTest2() {
         // refinement: researcher <= spec \ adm
         TransitionSystem lhs = getSimpleResearcher();
-        TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSimpleSpec(), getSimpleAdm()).getAutomaton());
-        Refinement refinement = new Refinement(lhs, rhs);
 
+        TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSimpleSpec(), getSimpleAdm()).getAutomaton());
+//        TransitionSystem rhs = new Quotient(getSimpleSpec(), getSimpleAdm());
+        XMLFileWriter.toXML("testOutput/simpleversityQuotient.xml",rhs.getAutomaton());
+        Refinement refinement = new Refinement(lhs, rhs);
+        assertTrue(new Refinement(new Composition(getSimpleAdm(),getSimpleResearcher()),getSimpleSpec()).check());
         boolean refines = refinement.check();
+        System.out.println(refinement.getErrMsg());
 
         assertTrue(refines);
     }
