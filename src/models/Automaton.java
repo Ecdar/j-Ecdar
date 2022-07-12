@@ -136,6 +136,8 @@ public class Automaton {
 
     public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
         List<Edge> resultEdges = getEdgesFromLocation(loc);
+        System.out.println(resultEdges);
+        System.out.println(resultEdges.size());
 
         return resultEdges.stream().filter(edge -> edge.getChannel().getName().equals(signal.getName())).collect(Collectors.toList());
     }
