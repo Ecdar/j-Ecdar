@@ -2,19 +2,17 @@ package models;
 
 import java.util.Iterator;
 
-public class SegementIterator implements Iterator<Segment> {
-
-    private CDDNode node;
+public class SegmentIterator implements Iterator<Segment> {
+    private final CDDNode node;
     private int index;
 
-    public SegementIterator(CDDNode node) {
+    public SegmentIterator(CDDNode node) {
         this.node = node;
     }
 
     @Override
     public boolean hasNext() {
-        boolean hasNext = !node.isEndOfSegments(index);
-        return hasNext;
+        return !node.isEndOfSegments(index);
     }
 
     @Override

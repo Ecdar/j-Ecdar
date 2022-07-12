@@ -1,11 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class InconsistentLocation extends SymbolicLocation {
-
-
     @Override
     public String getName() {
         return null;

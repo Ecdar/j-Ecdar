@@ -5,8 +5,6 @@ import models.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static logic.Helpers.randomString;
-
 public class Composition extends TransitionSystem {
     private final TransitionSystem[] systems;
     private final Set<Channel> inputs, outputs, syncs;
@@ -135,7 +133,7 @@ public class Composition extends TransitionSystem {
 
         List<Location> initLoc = new ArrayList<>();
         for (Automaton aut : autList) {
-            initLoc.add(aut.getInitLoc());
+            initLoc.add(aut.getInitial());
             if (name.isEmpty())
                 name = aut.getName();
             else

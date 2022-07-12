@@ -4,7 +4,6 @@ import models.*;
 import parser.XMLFileWriter;
 
 import java.util.*;
-import java.util.concurrent.DelayQueue;
 import java.util.stream.Collectors;
 
 public class SimpleTransitionSystem extends TransitionSystem{
@@ -35,7 +34,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     }
 
     public SymbolicLocation getInitialLocation() {
-        return new SimpleLocation(automaton.getInitLoc());
+        return new SimpleLocation(automaton.getInitial());
     }
 
     public List<SimpleTransitionSystem> getSystems() {

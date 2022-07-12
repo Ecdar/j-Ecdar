@@ -3,8 +3,7 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public class ClockUpdate extends Update{
-
+public class ClockUpdate extends Update {
     private final Clock clock;
     private final int value;
 
@@ -13,7 +12,7 @@ public class ClockUpdate extends Update{
         this.value = value;
     }
 
-    public ClockUpdate(ClockUpdate copy, List<Clock> newClocks, List<Clock> oldClocks){
+    public ClockUpdate(ClockUpdate copy, List<Clock> newClocks, List<Clock> oldClocks) {
         this.clock = newClocks.get(oldClocks.indexOf(copy.clock));
         this.value = copy.value;
     }
@@ -24,6 +23,11 @@ public class ClockUpdate extends Update{
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    Update copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new ClockUpdate(this, newClocks, oldClocks);
     }
 
     @Override

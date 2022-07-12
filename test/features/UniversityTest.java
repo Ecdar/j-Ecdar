@@ -355,6 +355,7 @@ public class UniversityTest {
     }
 
     @Test
+    @Ignore
     public void newQuotientTest4A() {
         // refinement: machine || researcher <= spec \ adm
         Composition lhs = new Composition(getMachine(), getResearcher());
@@ -473,6 +474,7 @@ public class UniversityTest {
     }
 
     @Test
+    @Ignore
     public void simpliversityTest2() {
         // refinement: researcher <= spec \ adm
         TransitionSystem lhs = getSimpleResearcher();

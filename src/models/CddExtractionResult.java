@@ -2,12 +2,13 @@ package models;
 
 import lib.CDDLib;
 
-public class CddExtractionResult {
+import java.util.Objects;
 
-    private long pointer;
-    private CDD cddPart;
-    private CDD bddPart;
-    private int[] dbm;
+public class CddExtractionResult {
+    private final long pointer;
+    private final CDD cddPart;
+    private final CDD bddPart;
+    private final int[] dbm;
 
     public CddExtractionResult(long pointer) {
         this.pointer = pointer;
@@ -16,9 +17,6 @@ public class CddExtractionResult {
         dbm = importDbm();
         CDDLib.deleteCDDExtractionResult(this.pointer);
     }
-
-
-
 
     public CDD getCddPart() {
         return cddPart;
@@ -30,43 +28,34 @@ public class CddExtractionResult {
 
     public int[] getDbm() {
         return dbm;
-
     }
 
-
-
-    public CDD importCddPart() {
+    public CDD importCddPart()
+            throws NullPointerException {
         checkForNull();
-
-        if(cddPart != null){
-            return cddPart;
-        }else{
-            return new CDD(CDDLib.getCddPartFromExtractionResult(pointer));
-        }
+        return Objects.requireNonNullElseGet(
+                cddPart, () -> new CDD(CDDLib.getCddPartFromExtractionResult(pointer))
+        );
     }
 
-    public CDD importBddPart() {
+    public CDD importBddPart()
+            throws NullPointerException {
         checkForNull();
-
-        if(bddPart != null){
-            return bddPart;
-        }else{
-            return new CDD(CDDLib.getBddPartFromExtractionResult(pointer));
-        }
+        return Objects.requireNonNullElseGet(
+                bddPart, () -> new CDD(CDDLib.getBddPartFromExtractionResult(pointer))
+        );
     }
 
-    public int[] importDbm() {
+    public int[] importDbm()
+            throws NullPointerException {
         checkForNull();
-
-        if(dbm != null){
-            return dbm;
-        }else{
-            return CDDLib.getDbmFromExtractionResult(pointer);
-        }
+        return Objects.requireNonNullElseGet(
+                dbm, () -> CDDLib.getDbmFromExtractionResult(pointer)
+        );
     }
 
-    private void checkForNull(){
-        if(pointer == 0){
+    private void checkForNull() {
+        if (pointer == 0) {
             throw new NullPointerException("CDD extraction result is null");
         }
     }

@@ -1,11 +1,11 @@
 package models;
 
-public abstract class UniqueNamed {
+public abstract class UniquelyNamed {
     protected String originalName;
     protected String uniqueName;
     protected String ownerName;
 
-    public abstract UniqueNamed getCopy();
+    public abstract UniquelyNamed getCopy();
 
     public String getOriginalName() {
         return originalName;

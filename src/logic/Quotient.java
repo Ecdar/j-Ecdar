@@ -3,9 +3,6 @@ package logic;
 import models.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static logic.Helpers.randomString;
 
 public class Quotient extends TransitionSystem {
 
@@ -372,7 +369,7 @@ public class Quotient extends TransitionSystem {
         for (Edge e : edges) {
                 if (e.getTarget().getName().equals("univ") & channelsThatOnlySelfLoopInSpec.contains(e.getChannel())) {
                     toRemove.add(e);
-                    toAdd.add(new Edge(e.getSource(), e.getSource(), e.getChannel(), e.isInput(), e.getGuards(), e.getUpdates()));
+                    toAdd.add(new Edge(e.getSource(), e.getSource(), e.getChannel(), e.isInput(), e.getGuard(), e.getUpdates()));
                 }
             }
 

@@ -1,14 +1,12 @@
 package models;
 
 public class BoolVal { // TODO: Later on make sure that states only store the values
-
     private BoolVar var;
     private boolean value;
 
-    public BoolVal(BoolVar var, boolean value)
-    {
-        this.var=var;
-        this.value=value;
+    public BoolVal(BoolVar var, boolean value) {
+        this.var = var;
+        this.value = value;
     }
 
     public String getName() {
@@ -32,18 +30,21 @@ public class BoolVal { // TODO: Later on make sure that states only store the va
     }
 
     @Override
-    public  boolean equals(Object o) {
-        if (!(o instanceof BoolVal))
-            return false;
-        BoolVal other =  (BoolVal) o;
-        if (other.getName().equals(getName()) && other.value == value)
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
-        return false;
+        }
+        if (!(obj instanceof BoolVal)) {
+            return false;
+        }
+
+        BoolVal other = (BoolVal) obj;
+        return other.getName().equals(getName())
+                && other.value == value;
 
     }
 
-    public String toString()
-    {
+    public String toString() {
         return getName() + " = " + getValue();
     }
 }

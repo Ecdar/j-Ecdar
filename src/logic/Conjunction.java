@@ -174,7 +174,7 @@ public class Conjunction extends TransitionSystem {
             throw new IllegalArgumentException("Requires at least one automaton to get a initial location for the conjunction");
         }
         return Arrays.stream(automata)
-                .map(Automaton::getInitLoc)
+                .map(Automaton::getInitial)
                 .collect(Collectors.toList());
     }
 

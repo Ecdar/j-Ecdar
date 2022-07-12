@@ -11,10 +11,8 @@ import org.junit.Test;
 import parser.XMLFileWriter;
 import parser.XMLParser;
 
-import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static models.CDD.*;
 
@@ -91,7 +89,7 @@ public class BoolTest {
         CDD cdd =new CDD(new AndGuard(l1));
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
         System.out.println(bddArr.getValues());
-        System.out.println(bddArr.getVars());
+        System.out.println(bddArr.getVariables());
 
         // A & !B & !C
         System.out.println("here too! " + cdd);
@@ -448,9 +446,9 @@ public class BoolTest {
         System.out.println(arr1);
         CDD.done();
 
-        assert(arr.getVars().get(0).get(0) ==1);
+        assert(arr.getVariables().get(0).get(0) ==1);
         assert(arr.getValues().get(0).get(0) ==0);
-        assert(arr1.getVars().get(0).get(0) ==1);
+        assert(arr1.getVariables().get(0).get(0) ==1);
         assert(arr1.getValues().get(0).get(0) ==1);
 
 
@@ -465,7 +463,7 @@ public class BoolTest {
         BDDArrays arr2 = new BDDArrays(CDDLib.bddToArray(test2.getPointer(),CDD.numBools));
         System.out.println(arr2);
 
-        assert(arr2.getVars().get(0).get(0) ==3);
+        assert(arr2.getVariables().get(0).get(0) ==3);
         assert(arr2.getValues().get(0).get(0) ==0);
 
         CDD.done();

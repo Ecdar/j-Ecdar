@@ -11,7 +11,6 @@ import parser.JSONParser;
 import parser.XMLParser;
 
 import java.io.FileNotFoundException;
-import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,11 +53,11 @@ public class VariousTest {
         ClockGuard g1 = new ClockGuard(y, 5,  Relation.GREATER_EQUAL);
         z1.buildConstraintsForGuard(g1,clocks);
 
-        z1.printDBM(true,true);
+        z1.prettyPrint(true,true);
         ClockGuard g2 = new ClockGuard(y, 6,  Relation.GREATER_EQUAL);
         System.out.println(g2);
         z2.buildConstraintsForGuard(g2,clocks);
-        z2.printDBM(true,true);
+        z2.prettyPrint(true,true);
 
         List<Zone> zoneList1 = new ArrayList<>();
         List<Zone> zoneList2 = new ArrayList<>();

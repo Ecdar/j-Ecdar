@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Channel {
     private final String name;
-    private int x=-999,y=-999;
+    private int x = -999, y = -999;
 
     public Channel(String name) {
         this.name = name;
@@ -20,11 +20,17 @@ public class Channel {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Channel)) return false;
-        Channel channel = (Channel) o;
-        return name.equals(channel.name);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Channel)) {
+            return false;
+        }
+
+        Channel other = (Channel) obj;
+        return name.equals(other.name);
     }
 
     @Override
@@ -37,6 +43,7 @@ public class Channel {
     public int getX() {
         return x;
     }
+
     public int getY() {
         return y;
     }

@@ -91,8 +91,8 @@ public class GuardParserTest {
         ArrayList<Clock> clocks = new ArrayList<>() {{add(new Clock("x", "Aut")); add(new Clock("y", "Aut")); }};
         ClockGuard clockGuard = (ClockGuard) GuardParser.parse("x-y<3", clocks, BVs);
 
-        assertEquals("x" ,clockGuard.getClock_i().getUniqueName());
-        assertEquals("y" ,clockGuard.getClock_j().getUniqueName());
+        assertEquals("x" ,clockGuard.getClock().getUniqueName());
+        assertEquals("y" ,clockGuard.getDiagonalClock().getUniqueName());
         assertEquals(3, clockGuard.getUpperBound());
     }
 }
