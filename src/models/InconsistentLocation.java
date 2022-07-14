@@ -8,7 +8,7 @@ public class InconsistentLocation extends SymbolicLocation {
 
     @Override
     public String getName() {
-        return null;
+        return "inc-loc";
     }
 
     @Override
