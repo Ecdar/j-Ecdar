@@ -88,7 +88,7 @@ public class Automaton {
         inputAct = automaton.inputAct;
         outputAct = automaton.outputAct;
         actions = automaton.actions;
-        initial = automaton.initial;
+        initial = new Location(automaton.initial, clocks, automaton.clocks, BVs, automaton.BVs);
     }
 
     public List<Location> getLocations() {
