@@ -1,0 +1,109 @@
+package log;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+
+public class Log {
+    private static Urgency urgency = Urgency.All;
+
+    public static void setUrgency(Urgency urgency) {
+        Log.urgency = urgency;
+    }
+
+    public static void fatal(String message) {
+        if (urgency.level >= Urgency.Fatal.level) {
+            out(format(message, Urgency.Fatal));
+        }
+    }
+
+    public static void error(String message) {
+        if (urgency.level >= Urgency.Error.level) {
+            out(format(message, Urgency.Error));
+        }
+    }
+
+    public static void warn(String message) {
+        if (urgency.level >= Urgency.Warn.level) {
+            out(format(message, Urgency.Warn));
+        }
+    }
+
+    public static void info(String message) {
+        if (urgency.level >= Urgency.Info.level) {
+            out(format(message, Urgency.Info));
+        }
+    }
+
+    public static void debug(String message) {
+        if (urgency.level >= Urgency.Debug.level) {
+            out(format(message, Urgency.Debug));
+        }
+    }
+
+    public static void trace(String message) {
+        if (urgency.level >= Urgency.Trace.level) {
+            out(format(message, Urgency.Trace));
+        }
+    }
+
+    private static StackTraceElement getCaller() {
+        // We ignore all elements until we are "outside" the Logger
+        // Start at "1" As we want to ignore the "Thread.currentThread().getStackTrace()" call
+        int index = 1;
+        StackTraceElement element = Thread.currentThread().getStackTrace()[index];
+        while (Objects.equals(element.getClassName(), Log.class.getName())) {
+            element = Thread.currentThread().getStackTrace()[index];
+            index++;
+        }
+
+        return Thread.currentThread().getStackTrace()[index - 1];
+    }
+
+    private static String colorize(String message, Urgency urgency)
+        throws IllegalArgumentException {
+        switch (urgency) {
+            case Fatal: return Ansi.colorize(Ansi.RED_BRIGHT, message);
+            case Error: return Ansi.colorize(Ansi.RED, message);
+            case Warn: return Ansi.colorize(Ansi.YELLOW, message);
+            case Info: return Ansi.colorize(Ansi.GREEN, message);
+            case Debug: return Ansi.colorize(Ansi.CYAN, message);
+            case Trace: return Ansi.colorize(Ansi.BLACK_BRIGHT, message);
+            default:
+                throw new IllegalArgumentException("Urgency is not supported");
+        }
+    }
+
+    private static String format(String message, Urgency urgency) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("[");
+
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        builder.append(
+                Ansi.colorize(Ansi.BLUE_BRIGHT, formatter.format(date))
+        );
+
+        builder.append(" ");
+
+        StackTraceElement caller = getCaller();
+        builder.append(caller.getFileName());
+        builder.append(":");
+        builder.append(caller.getLineNumber());
+
+        builder.append(" ");
+
+        builder.append(colorize(urgency.toString(), urgency));
+
+        builder.append("] - ");
+
+        builder.append(message);
+
+        return builder.toString();
+    }
+
+    private static void out(String message) {
+        System.out.println(message);
+    }
+}
