@@ -30,7 +30,7 @@ public abstract class TransitionSystem {
 
 
     public State getInitialState() {
-        CDD initCDD = CDD.zeroCDDDelayed();
+        CDD initCDD = CDD.cddZeroDelayed();
         CDD bddPart = CDD.cddTrue();
         for (BoolVar bv : BVs.getItems())
         {
@@ -50,7 +50,7 @@ public abstract class TransitionSystem {
 
     public State getInitialStateRef( CDD invs) {
 
-        CDD initCDD = CDD.zeroCDDDelayed();
+        CDD initCDD = CDD.cddZeroDelayed();
         CDD bddPart = CDD.cddTrue();
         for (BoolVar bv : CDD.BVs)
         {

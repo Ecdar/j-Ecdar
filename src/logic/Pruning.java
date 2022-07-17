@@ -97,7 +97,7 @@ public class Pruning {
     private static boolean checkInitialState(Location targetLoc) {
         if (targetLoc.isInitial())
         {
-            CDD initial = CDD.zeroCDD();
+            CDD initial = CDD.cddZero();
             if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
             {
                 return true;

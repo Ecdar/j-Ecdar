@@ -38,6 +38,6 @@ public class InconsistentLocation extends SymbolicLocation {
 
     public CDD getInvariantCDD() {
         // TODO the new clock should be <= 0
-        return CDD.zeroCDD();
+        return CDD.cddZero();
     }
 }
