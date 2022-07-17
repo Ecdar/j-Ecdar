@@ -6,7 +6,6 @@ import logic.*;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Ignore;
 import parser.JSONParser;
 import parser.XMLParser;
 
@@ -53,11 +52,11 @@ public class VariousTest {
         ClockGuard g1 = new ClockGuard(y, 5,  Relation.GREATER_EQUAL);
         z1.buildConstraintsForGuard(g1,clocks);
 
-        z1.prettyPrint(true,true);
+        z1.printDbm(true,true);
         ClockGuard g2 = new ClockGuard(y, 6,  Relation.GREATER_EQUAL);
         System.out.println(g2);
         z2.buildConstraintsForGuard(g2,clocks);
-        z2.prettyPrint(true,true);
+        z2.printDbm(true,true);
 
         List<Zone> zoneList1 = new ArrayList<>();
         List<Zone> zoneList2 = new ArrayList<>();

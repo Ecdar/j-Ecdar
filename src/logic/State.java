@@ -162,7 +162,7 @@ public class State {
                     System.out.println();
                 }
                 z.extrapolateMaxBoundsDiagonal(bounds);
-                if (print) z.prettyPrint(true,true);
+                if (print) z.printDbm(true,true);
                 CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
                 CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
                 resCDD = resCDD.disjunction(extrapolatedCDD);
