@@ -225,7 +225,7 @@ public class Pruning {
                         CDD goodPart = targetInvariantCDDOfTransThatSavesUs.minus(incPartOfTransThatSavesUs);
 
                         CDD doubleCheck = goodPart.transitionBack(otherE);
-                        goodPart = CDD.applyReset(goodPart,otherE.getUpdates());
+                        goodPart = goodPart.applyReset(otherE.getUpdates());
 
                         // apply guards
                         CDD guardFed = otherE.getGuardCDD();
@@ -385,7 +385,7 @@ public class Pruning {
         testForSatEdgeCDD = testForSatEdgeCDD.minus(e.getTarget().getInconsistentPart());
 
 
-        CDD.applyReset(testForSatEdgeCDD, e.getUpdates());
+        testForSatEdgeCDD.applyReset(e.getUpdates());
 
         // apply guards
         CDD guardCDD1 = e.getGuardCDD();

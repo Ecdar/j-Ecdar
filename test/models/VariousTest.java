@@ -136,7 +136,7 @@ public class VariousTest {
         Update clockUpdate = new ClockUpdate(x,0);
         List<Update>  list1 = new ArrayList<>();
         list1.add(clockUpdate);
-        origin1 = CDD.applyReset(origin1,list1);
+        origin1 = origin1.applyReset(list1);
 
         Guard origin2Guards = origin1.getGuard(clocks);
         System.out.println(origin2Guards);

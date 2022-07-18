@@ -129,7 +129,7 @@ public class Bisimilarity {
                             CDD allCDDs = CDD.cddFalse();
                             for (Edge e : edgeList) {
                                 CDD targetFedAfterReset = e.getTarget().getInvariantCDD();
-                                targetFedAfterReset = CDD.applyReset(targetFedAfterReset,e.getUpdates());
+                                targetFedAfterReset = targetFedAfterReset.applyReset(e.getUpdates());
                                 allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
 
                                 assert (Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));

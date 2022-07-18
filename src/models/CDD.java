@@ -719,13 +719,13 @@ public class CDD {
         cdd.pointer = 0;
     }
 
-    public static CDD applyReset(CDD state, List<Update> list) {
-        if (state.isFalse()) {
-            return state;
+    public CDD applyReset(List<Update> list) {
+        if (isFalse()) {
+            return this;
         }
 
         if (list.size() == 0) {
-            return state;
+            return this;
         }
 
         int numBools = 0;
@@ -754,7 +754,7 @@ public class CDD {
                 bl++;
             }
         }
-        return state.applyReset(clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
+        return applyReset(clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
     }
 
     private static void checkIfNotRunning() {

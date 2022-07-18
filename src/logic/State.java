@@ -57,7 +57,7 @@ public class State {
     }
 
     public void applyResets(List<Update> resets) {
-        invarCDD=CDD.applyReset(invarCDD, resets);
+        invarCDD=invarCDD.applyReset(resets);
     }
 
     public void extrapolateMaxBounds(HashMap<Clock,Integer> maxBounds, List<Clock> relevantClocks){
