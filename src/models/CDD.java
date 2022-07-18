@@ -63,28 +63,6 @@ public class CDD {
         this.pointer = cdd.pointer;
     }
 
-    public static CDD cddTrue()
-            throws CddAlreadyRunningException {
-        checkIfNotRunning();
-        return new CDD(CDDLib.cddTrue());
-    }
-
-    public static CDD cddFalse() {
-        checkIfNotRunning();
-        return new CDD(CDDLib.cddFalse());
-    }
-
-    public static CDD cddZero() {
-        Zone zone = new Zone(numClocks, false);
-        return CDD.allocateFromDbm(zone.getDbm(), numClocks);
-    }
-
-    public static CDD cddZeroDelayed() {
-        Zone zone = new Zone(numClocks, false);
-        zone.delay();
-        return CDD.allocateFromDbm(zone.getDbm(), numClocks);
-    }
-
     public long getPointer() {
         return pointer;
     }
@@ -199,15 +177,6 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         return new CDD(CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues)).removeNegative().reduce();
-    }
-
-    public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets)
-            throws NullPointerException, CddNotRunningException {
-        checkIfNotRunning();
-        checkForNull();
-        guard.checkForNull();
-        update.checkForNull();
-        return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
     }
 
     public CDD predt(CDD safe) {
@@ -348,6 +317,15 @@ public class CDD {
         return this.transition(e.getGuardCDD(), clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
     }
 
+    public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets)
+            throws NullPointerException, CddNotRunningException {
+        checkIfNotRunning();
+        checkForNull();
+        guard.checkForNull();
+        update.checkForNull();
+        return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
+    }
+
     private CDD transitionBack(CDD guard, List<Update> updates) {
         if (updates.size() == 0) {
             return this.conjunction(guard);
@@ -407,6 +385,28 @@ public class CDD {
     @Override
     public int hashCode() {
         return Objects.hash(pointer);
+    }
+
+    public static CDD cddTrue()
+            throws CddAlreadyRunningException {
+        checkIfNotRunning();
+        return new CDD(CDDLib.cddTrue());
+    }
+
+    public static CDD cddFalse() {
+        checkIfNotRunning();
+        return new CDD(CDDLib.cddFalse());
+    }
+
+    public static CDD cddZero() {
+        Zone zone = new Zone(numClocks, false);
+        return CDD.allocateFromDbm(zone.getDbm(), numClocks);
+    }
+
+    public static CDD cddZeroDelayed() {
+        Zone zone = new Zone(numClocks, false);
+        zone.delay();
+        return CDD.allocateFromDbm(zone.getDbm(), numClocks);
     }
 
     public static boolean isCddIsRunning() {
