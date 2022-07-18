@@ -24,7 +24,7 @@ public class Pruning {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
 
 
         for (Location l : locations)
@@ -112,7 +112,7 @@ public class Pruning {
      */
     private static void setInconsistentCDDs(Set<Location> inconsistentLocations) {
         for (Location l : inconsistentLocations)
-            l.setInconsistentPart(CDD.getUnrestrainedCDD());
+            l.setInconsistentPart(CDD.cddUnrestrained());
     }
 
     /**
@@ -375,7 +375,7 @@ public class Pruning {
         if (printComments)
             System.out.println("Removing transition if its not satisfiable anymore");
 
-        CDD testForSatEdgeCDD = CDD.getUnrestrainedCDD();
+        CDD testForSatEdgeCDD = CDD.cddUnrestrained();
 
 
         // apply target invariant

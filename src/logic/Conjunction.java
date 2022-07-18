@@ -186,7 +186,7 @@ public class Conjunction extends TransitionSystem {
 
         CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(getBVs());
+        CDD.addBooleans(getBVs());
 
         Set<Edge> edgesSet = new HashSet<>();
         Set<Location> locationsSet = new HashSet<>();

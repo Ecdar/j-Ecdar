@@ -53,7 +53,7 @@ public class Automaton {
         if (makeInputEnabled) {
             CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
             CDD.addClocks(clocks);
-            CDD.addBddvar(BVs);
+            CDD.addBooleans(BVs);
             addTargetInvariantToEdges();
 
             makeInputEnabled();

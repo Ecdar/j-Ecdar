@@ -6,7 +6,6 @@ import logic.Quotient;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import models.*;
-import org.junit.Ignore;
 import org.junit.Test;
 import parser.XMLFileWriter;
 import parser.XMLParser;
@@ -29,7 +28,7 @@ public class BoolTest {
         BVs.add(a); BVs.add(b); BVs.add(c);
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         CDD ba = CDD.createBddNode(0);
         CDD bb = CDD.createBddNode(1);
         CDD bc = CDD.createBddNode(2);
@@ -85,7 +84,7 @@ public class BoolTest {
         List<List<Guard>> list = new ArrayList();
         list.add(l1); //list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         CDD cdd =new CDD(new AndGuard(l1));
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
         System.out.println(bddArr.getValues());
@@ -116,7 +115,7 @@ public class BoolTest {
         Guard l2 = new AndGuard(bg_a_true,bg_b_true,bg_c_false);
         Guard l3 = new AndGuard(bg_a_false,bg_b_true,bg_c_false);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         System.out.println("or guard " + new OrGuard(l1,l2,l3));
         CDD cdd =new CDD(new OrGuard(l1,l2,l3));
         cdd.printDot();
@@ -201,7 +200,7 @@ public class BoolTest {
         bools.add(b);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         CDD origin1 = new CDD(new AndGuard(inner));
         CDD origin2 = new CDD(new AndGuard(inner1));
         CDD bothOrigins = origin1.disjunction(origin2);
@@ -284,7 +283,7 @@ public class BoolTest {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
 
 
@@ -388,7 +387,7 @@ public class BoolTest {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
 
 
@@ -430,7 +429,7 @@ public class BoolTest {
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk", "Aut"));}});
         BoolVar bv = new BoolVar("a","aut",false);
-        CDD.addBddvar(new ArrayList<>(){{add(bv);}});
+        CDD.addBooleans(new ArrayList<>(){{add(bv);}});
 
         CDD test = new CDD(CDDLib.cddNBddvar(bddStartLevel));
         test.printDot();
@@ -457,7 +456,7 @@ public class BoolTest {
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>() {{add(new Clock("testclk", "Aut"));add(new Clock("testclk1", "Aut"));}});
         BoolVar bv1 = new BoolVar("a","aut",false);
-        CDD.addBddvar(new ArrayList<>(){{add(bv1);}});
+        CDD.addBooleans(new ArrayList<>(){{add(bv1);}});
 
         CDD test2 = new CDD(CDDLib.cddNBddvar(bddStartLevel));
         BDDArrays arr2 = new BDDArrays(CDDLib.bddToArray(test2.getPointer(),CDD.numBools));
@@ -507,7 +506,7 @@ public class BoolTest {
 
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>(){{add(new Clock("x", "Aut"));}});
-        CDD.addBddvar(new ArrayList<>());
+        CDD.addBooleans(new ArrayList<>());
         System.out.println("found the bug: " + CDD.cddTrue().removeNegative().negation().removeNegative());
         CDD.done();
     }
@@ -595,7 +594,7 @@ public class BoolTest {
         CDD.init(100,100,100);
         CDD.addClocks(new ArrayList<>() {{add(new Clock("clk", "Aut"));}});
         BoolVar a = new BoolVar("a","aut",false);
-        CDD.addBddvar(new ArrayList<>(){{add(a);}});
+        CDD.addBooleans(new ArrayList<>(){{add(a);}});
 
         CDD state = CDD.allocateInterval(1,0,0,true,5,true);
         Update update = new BoolUpdate(a,true);

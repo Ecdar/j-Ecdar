@@ -317,12 +317,12 @@ public class CDDTest {
         BVs.add(new BoolVar("d", "aut", true));
         BVs.add(new BoolVar("c", "aut", true));
         BVs.add(new BoolVar("e", "aut", true));
-        int level = CDD.addBddvar(BVs);
+        int level = CDD.addBooleans(BVs);
         assertEquals(1, level);
         BVs.clear();
         BVs.add(new BoolVar("f", "aut", true));
         BVs.add(new BoolVar("g", "aut", true));
-        level = CDD.addBddvar(BVs);
+        level = CDD.addBooleans(BVs);
         assertEquals(6, level);
     }
 

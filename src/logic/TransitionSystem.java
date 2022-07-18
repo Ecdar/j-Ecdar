@@ -134,7 +134,7 @@ public abstract class TransitionSystem {
         {
             CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
             CDD.addClocks(clocks.getItems());
-            CDD.addBddvar(BVs.getItems());
+            CDD.addBooleans(BVs.getItems());
 
         }
 
@@ -172,7 +172,7 @@ public abstract class TransitionSystem {
         boolean isConsistent = true;
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs.getItems());
+        CDD.addBooleans(BVs.getItems());
 
         List<String> inconsistentTs = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();
@@ -192,7 +192,7 @@ public abstract class TransitionSystem {
         boolean isCons = isFullyConsistent();
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs.getItems());
+        CDD.addBooleans(BVs.getItems());
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
         List<SimpleTransitionSystem> systems = getSystems();

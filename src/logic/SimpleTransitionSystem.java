@@ -254,7 +254,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             State state = new State(ts.getSource());
             state.applyGuards(ts.getGuardCDD());
 
-            if(!CDD.isUrgent(state.getInvariant()))
+            if(!state.getInvariant().isUrgent())
                 return false;
         }
         return true;
@@ -329,7 +329,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     public SimpleTransitionSystem pruneReachTimed(){
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks.getItems());
-        CDD.addBddvar(BVs.getItems());
+        CDD.addBooleans(BVs.getItems());
 
         //TODO: this function is not correct yet. // FIXED: 05.1.2021
         // In the while loop, we should collect all edges associated to transitions (not just all locations associated to states), and remove all that were never associated

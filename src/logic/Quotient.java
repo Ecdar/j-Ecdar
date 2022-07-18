@@ -111,7 +111,7 @@ public class Quotient extends TransitionSystem {
 
         CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
         CDD.addClocks(clocks.getItems());
-        CDD.addBddvar(BVs.getItems());
+        CDD.addBooleans(BVs.getItems());
         String name = left.getSystems().get(0).getName() + "DIV" + right.getSystems().get(0).getName();
 
         // create product of locations

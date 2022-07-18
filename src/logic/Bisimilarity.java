@@ -27,7 +27,7 @@ public class Bisimilarity {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        CDD.addBooleans(BVs);
         thereWasAChange= true;
 
 

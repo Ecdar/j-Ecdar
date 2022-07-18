@@ -122,7 +122,7 @@ public class Composition extends TransitionSystem {
     {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(getClocks());
-        CDD.addBddvar(BVs.getItems());
+        CDD.addBooleans(BVs.getItems());
         String name="";
 
         Set<Edge> edgesSet = new HashSet<>();
@@ -258,7 +258,7 @@ public class Composition extends TransitionSystem {
         String name="";
         Guard invariant;
 
-        CDD invarFed =CDD.getUnrestrainedCDD();
+        CDD invarFed =CDD.cddUnrestrained();
         boolean isInitial = true;
         boolean isUrgent = false;
         boolean isUniversal = false;

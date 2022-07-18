@@ -5,6 +5,7 @@ import exceptions.CddNotRunningException;
 import lib.CDDLib;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -51,7 +52,7 @@ public class CDD {
             zone.buildConstraintsForGuard((ClockGuard) guard, clocks);
             cdd = CDD.allocateFromDbm(zone.getDbm(), numClocks);
         } else if (guard instanceof BoolGuard) {
-            cdd = fromBoolGuard((BoolGuard) guard);
+            cdd = create((BoolGuard) guard);
         } else if (guard instanceof AndGuard) {
             cdd = cddTrue();
             for (Guard g : ((AndGuard) guard).getGuards()) {
@@ -540,10 +541,21 @@ public class CDD {
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
                 BoolGuard bg = new BoolGuard(u.getBV(), Relation.EQUAL, u.getValue());
-                res = res.conjunction(CDD.fromBoolGuard(bg));
+                res = res.conjunction(CDD.create(bg));
             }
         }
         return res.removeNegative().reduce();
+    }
+
+    public static CDD create(BoolGuard guard) {
+        if (guard.getValue()) {
+            return createBddNode(bddStartLevel + indexOf(guard.getVar()));
+        }
+        return createNegatedBddNode(bddStartLevel + indexOf(guard.getVar()));
+    }
+
+    public static CDD cddUnrestrained() {
+        return CDD.cddTrue().removeNegative();
     }
 
     public static CDD cddTrue()
@@ -592,13 +604,6 @@ public class CDD {
         return -1;
     }
 
-    public static CDD fromBoolGuard(BoolGuard guard) {
-        if (guard.getValue()) {
-            return createBddNode(bddStartLevel + indexOf(guard.getVar()));
-        }
-        return createNegatedBddNode(bddStartLevel + indexOf(guard.getVar()));
-    }
-
     public static List<Clock> getClocks() {
         return clocks;
     }
@@ -636,9 +641,15 @@ public class CDD {
         numClocks = CDD.clocks.size() + 1;
         CDDLib.cddAddClocks(numClocks);
     }
+    
+    public static void addClocks(Clock... clocks) {
+        addClocks(
+                Arrays.asList(clocks)
+        );
+    }
 
     @SafeVarargs
-    public static int addBddvar(List<BoolVar>... BVs) {
+    public static void addBooleans(List<BoolVar>... BVs) {
         checkIfNotRunning();
         for (List<BoolVar> list : BVs) {
             CDD.BVs.addAll(list);
@@ -650,12 +661,12 @@ public class CDD {
         } else {
             bddStartLevel = 0;
         }
-        return bddStartLevel;
     }
 
-    public static CDD allocate() {
-        checkIfNotRunning();
-        return new CDD();
+    public static void addBooleans(BoolVar... BVs) {
+        addBooleans(
+                Arrays.asList(BVs)
+        );
     }
 
     public static CDD allocateInterval(int i, int j, int lower, boolean lower_included, int upper, boolean upper_included) {
@@ -770,21 +781,24 @@ public class CDD {
         return true;
     }
 
-    public static boolean isUrgent(CDD state) {
-        if (state.isTrue()) {
+    public boolean isUrgent() {
+        if (isTrue()) {
             return false;
         }
-        if (state.isFalse()) {
+        if (isFalse()) {
             return true;
         }
-        if (state.isBDD()) {
+        if (isBDD()) {
             return false;
         }
 
-        while (!state.isTerminal()) {
-            CddExtractionResult res = state.removeNegative().reduce().extractBddAndDbm();
+        // Required as we don't want to alter the pointer value of "this"
+        CDD copy = hardCopy();
+
+        while (!copy.isTerminal()) {
+            CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
             Zone zone = new Zone(res.getDbm());
-            state = res.getCddPart().removeNegative().reduce();
+            copy = res.getCddPart().removeNegative().reduce();
             if (!zone.isUrgent()) {
                 return false;
             }
@@ -799,9 +813,5 @@ public class CDD {
     public static boolean isSubset(CDD A, CDD B) {
         // TODO: check if correct
         return A.conjunction(B).equiv(A);
-    }
-
-    public static CDD getUnrestrainedCDD() {
-        return CDD.cddTrue().removeNegative();
     }
 }

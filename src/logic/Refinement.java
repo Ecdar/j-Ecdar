@@ -136,7 +136,7 @@ public class Refinement {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(allClocks);
-        CDD.addBddvar(allBVs);
+        CDD.addBooleans(allBVs);
 
         // the first states we look at are the initial ones
         waiting.push(getInitialStatePair());
