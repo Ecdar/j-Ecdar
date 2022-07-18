@@ -72,6 +72,7 @@ public class CDD {
     public Guard getGuard(List<Clock> relevantClocks) {
         if (isGuardDirty) {
             guard = CDD.toGuardList(this, relevantClocks);
+            isGuardDirty = false;
         }
 
         return guard;
