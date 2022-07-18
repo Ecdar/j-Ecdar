@@ -10,7 +10,7 @@ public class Edge {
     private Location source, target;
     private Channel chan;
     private boolean isInput;
-    private Guard guard;
+    private CDD guard;
     private List<Update> updates;
 
     public void setSource(Location source) {
@@ -34,7 +34,7 @@ public class Edge {
     }
 
     public void setGuard(Guard guard) {
-        this.guard = guard;
+        this.guard = new CDD(guard);
     }
 
     public Edge(Location source, Location target, Channel chan, boolean isInput, Guard guards, List<Update> updates) {
@@ -42,7 +42,7 @@ public class Edge {
         this.target = target;
         this.chan = chan;
         this.isInput = isInput;
-        this.guard = guards;
+        this.guard = new CDD(guards);
         this.updates = updates;
     }
 
@@ -52,7 +52,7 @@ public class Edge {
             targetR,
             copy.chan,
             copy.isInput,
-            copy.guard.copy(newClocks, oldClocks, newBVs, oldBVs),
+            copy.guard.getGuard().copy(newClocks, oldClocks, newBVs, oldBVs),
             copy.updates
                 .stream()
                 .map(update -> update.copy(
@@ -63,11 +63,11 @@ public class Edge {
     }
 
     public CDD getGuardCDD() {
-        return new CDD(guard);
+        return guard;
     }
 
     public int getMaxConstant(Clock clock) {
-        return guard.getMaxConstant(clock);
+        return guard.getGuard().getMaxConstant(clock);
     }
 
     // Used in determinism check to verify if two edges have exactly the same updates
@@ -94,7 +94,7 @@ public class Edge {
     }
 
     public Guard getGuard() {
-        return guard;
+        return guard.getGuard();
     }
 
     public List<Update> getUpdates() {
