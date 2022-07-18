@@ -313,13 +313,13 @@ public class CDD {
         for (Update up : e.getUpdates()) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = getIndexOfClock(u.getClock());
+                clockResets[cl] = indexOf(u.getClock());
                 clockValues[cl] = u.getValue();
                 cl++;
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
                 bl++;
             }
@@ -355,12 +355,12 @@ public class CDD {
         for (Update up : updates) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = getIndexOfClock(u.getClock());
+                clockResets[cl] = indexOf(u.getClock());
                 cl++;
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
                 bl++;
             }
         }
@@ -403,7 +403,7 @@ public class CDD {
         for (Update up : updates) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
+                res = res.conjunction(CDD.allocateInterval(indexOf(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
@@ -440,31 +440,31 @@ public class CDD {
         return cddIsRunning;
     }
 
-    public static int getIndexOfClock(Clock clock)
+    public static int indexOf(Clock clock)
             throws IllegalArgumentException {
         for (int i = 0; i < clocks.size(); i++) {
             if (clock.hashCode() == clocks.get(i).hashCode()) {
                 return i + 1;
             }
         }
-        throw new IllegalArgumentException("Clock not found in clocks set");
+        return -1;
     }
 
-    public static int getIndexOfBV(BoolVar bv)
+    public static int indexOf(BoolVar bv)
             throws IllegalArgumentException {
         for (int i = 0; i < BVs.size(); i++) {
             if (bv.equals(BVs.get(i))) {
                 return i;
             }
         }
-        throw new IllegalArgumentException("Boolean variable not found in boolean variables set");
+        return -1;
     }
 
     public static CDD fromBoolGuard(BoolGuard guard) {
         if (guard.getValue()) {
-            return createBddNode(bddStartLevel + getIndexOfBV(guard.getVar()));
+            return createBddNode(bddStartLevel + indexOf(guard.getVar()));
         }
-        return createNegatedBddNode(bddStartLevel + getIndexOfBV(guard.getVar()));
+        return createNegatedBddNode(bddStartLevel + indexOf(guard.getVar()));
     }
 
     public static Guard toGuardList(CDD state, List<Clock> relevantClocks) {
@@ -667,13 +667,13 @@ public class CDD {
         for (Update up : list) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = getIndexOfClock(u.getClock());
+                clockResets[cl] = indexOf(u.getClock());
                 clockValues[cl] = u.getValue();
                 cl++;
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + getIndexOfBV(u.getBV());
+                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
                 bl++;
             }

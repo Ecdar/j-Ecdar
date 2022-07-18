@@ -5,7 +5,7 @@ import models.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static models.CDD.getIndexOfBV;
+import static models.CDD.indexOf;
 
 // parent class for all TS's, so we can use it with regular TS's, composed TS's etc.
 public abstract class TransitionSystem {
@@ -35,10 +35,10 @@ public abstract class TransitionSystem {
         for (BoolVar bv : BVs.getItems())
         {
             if (bv.getInitialValue())
-                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + indexOf(bv)));
             else {
 
-                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + indexOf(bv)));
 
             }
         }
@@ -55,9 +55,9 @@ public abstract class TransitionSystem {
         for (BoolVar bv : CDD.BVs)
         {
             if (bv.getInitialValue())
-                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+                bddPart = bddPart.conjunction(CDD.createBddNode(CDD.bddStartLevel + indexOf(bv)));
             else
-                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + getIndexOfBV(bv)));
+                bddPart = bddPart.conjunction(CDD.createNegatedBddNode(CDD.bddStartLevel + indexOf(bv)));
         }
 
         State state = new State(getInitialLocation(), initCDD.conjunction(bddPart));
