@@ -536,34 +536,37 @@ public class CDD {
         if (e.getUpdates().size() == 0) {
             return this.conjunction(e.getGuardCDD());
         }
-        int numBools = 0;
-        int numClocks = 0;
-        for (Update up : e.getUpdates()) {
-            if (up instanceof ClockUpdate) numClocks++;
-            if (up instanceof BoolUpdate) numBools++;
-        }
-        int[] clockResets = new int[numClocks];
-        int[] clockValues = new int[numClocks];
-        int[] boolResets = new int[numBools];
-        int[] boolValues = new int[numBools];
-        int cl = 0;
-        int bl = 0;
-        for (Update up : e.getUpdates()) {
-            if (up instanceof ClockUpdate) {
-                ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = indexOf(u.getClock());
-                clockValues[cl] = u.getValue();
-                cl++;
-            }
-            if (up instanceof BoolUpdate) {
-                BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
-                boolValues[bl] = u.getValue() ? 1 : 0;
-                bl++;
+
+        List<Integer> clockResets = new ArrayList<>();
+        List<Integer> clockValues = new ArrayList<>();
+        List<Integer> boolResets = new ArrayList<>();
+        List<Integer> boolValues = new ArrayList<>();
+
+        // For each of the updates, then based on their instance type
+        //   we need to find its index and value and then add it to their collection
+        for (Update update : e.getUpdates()) {
+            if (update instanceof ClockUpdate) {
+                ClockUpdate clockUpdate = (ClockUpdate) update;
+                int clockIndex = indexOf(clockUpdate.getClock());
+                clockResets.add(clockIndex);
+                int clockValue = clockUpdate.getValue();
+                clockValues.add(clockValue);
+            } else if (update instanceof BoolUpdate) {
+                BoolUpdate boolUpdate = (BoolUpdate) update;
+                int boolIndex = bddStartLevel + indexOf(boolUpdate.getBV());
+                boolResets.add(boolIndex);
+                int boolValue = boolUpdate.getValue() ? 1 : 0;
+                boolValues.add(boolValue);
             }
         }
 
-        return this.transition(e.getGuardCDD(), clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
+        // transition requires int[] and not List<Integer> here we are converting
+        int[] arrClockResets = clockResets.stream().mapToInt(Integer::intValue).toArray();
+        int[] arrClockValues = clockValues.stream().mapToInt(Integer::intValue).toArray();
+        int[] arrBoolResets = boolResets.stream().mapToInt(Integer::intValue).toArray();
+        int[] arrBoolValues = boolValues.stream().mapToInt(Integer::intValue).toArray();
+
+        return transition(e.getGuardCDD(), arrClockResets, arrClockValues, arrBoolResets, arrBoolValues).removeNegative().reduce();
     }
 
     public CDD transitionBack(CDD guard, CDD update, int[] clockResets, int[] boolResets)
@@ -580,29 +583,28 @@ public class CDD {
             return this.conjunction(guard);
         }
 
-        int numBools = 0;
-        int numClocks = 0;
-        for (Update up : updates) {
-            if (up instanceof ClockUpdate) numClocks++;
-            if (up instanceof BoolUpdate) numBools++;
-        }
-        int[] clockResets = new int[numClocks];
-        int[] boolResets = new int[numBools];
-        int cl = 0;
-        int bl = 0;
-        for (Update up : updates) {
-            if (up instanceof ClockUpdate) {
-                ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = indexOf(u.getClock());
-                cl++;
-            }
-            if (up instanceof BoolUpdate) {
-                BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
-                bl++;
+        List<Integer> clockUpdates = new ArrayList<>();
+        List<Integer> boolUpdates = new ArrayList<>();
+
+        // For each of the updates, then based on their instance type
+        //   we need to find its index and then add it to their collection
+        for (Update update : updates) {
+            if (update instanceof ClockUpdate) {
+                ClockUpdate clockUpdate = (ClockUpdate) update;
+                int clockIndex = indexOf(clockUpdate.getClock());
+                clockUpdates.add(clockIndex);
+            } else if (update instanceof BoolUpdate) {
+                BoolUpdate boolUpdate = (BoolUpdate) update;
+                int boolIndex = bddStartLevel + indexOf(boolUpdate.getBV());
+                boolUpdates.add(boolIndex);
             }
         }
-        return this.transitionBack(guard, create(updates), clockResets, boolResets).removeNegative().reduce();
+
+        // transitionBack requires int[] and not List<Integer> here we are converting
+        int[] arrClockUpdates = clockUpdates.stream().mapToInt(Integer::intValue).toArray();
+        int[] arrBoolUpdates = boolUpdates.stream().mapToInt(Integer::intValue).toArray();
+
+        return transitionBack(guard, create(updates), arrClockUpdates, arrBoolUpdates).removeNegative().reduce();
     }
 
     public CDD transitionBack(Edge e) {
