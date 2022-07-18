@@ -231,6 +231,102 @@ public class CDD {
         return CDDLib.cddEquiv(this.pointer, cddTrue().pointer);
     }
 
+    public void free()
+            throws NullPointerException {
+        checkForNull();
+        CDDLib.freeCdd(pointer);
+        pointer = 0;
+    }
+
+    public CDD applyReset(List<Update> list) {
+        if (isFalse()) {
+            return this;
+        }
+
+        if (list.size() == 0) {
+            return this;
+        }
+
+        int numBools = 0;
+        int numClocks = 0;
+        for (Update up : list) {
+            if (up instanceof ClockUpdate) numClocks++;
+            if (up instanceof BoolUpdate) numBools++;
+        }
+        int[] clockResets = new int[numClocks];
+        int[] clockValues = new int[numClocks];
+        int[] boolResets = new int[numBools];
+        int[] boolValues = new int[numBools];
+        int cl = 0;
+        int bl = 0;
+        for (Update up : list) {
+            if (up instanceof ClockUpdate) {
+                ClockUpdate u = (ClockUpdate) up;
+                clockResets[cl] = indexOf(u.getClock());
+                clockValues[cl] = u.getValue();
+                cl++;
+            }
+            if (up instanceof BoolUpdate) {
+                BoolUpdate u = (BoolUpdate) up;
+                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
+                boolValues[bl] = u.getValue() ? 1 : 0;
+                bl++;
+            }
+        }
+        return applyReset(clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
+    }
+
+    public boolean canDelayIndefinitely() {
+        if (isTrue()) {
+            return true;
+        }
+        if (isFalse()) {
+            return false;
+        }
+        if (isBDD()) {
+            return true;
+        }
+
+        CDD copy = hardCopy();
+
+        while (!copy.isTerminal()) {
+            CddExtractionResult extraction = copy.removeNegative().reduce().extractBddAndDbm();
+            copy = extraction.getCddPart().removeNegative().reduce();
+            Zone zone = new Zone(extraction.getDbm());
+
+            if (!zone.canDelayIndefinitely()) {
+                return false;
+            }
+        }
+        // found no states that cannot delay indefinitely
+        return true;
+    }
+
+    public boolean isUrgent() {
+        if (isTrue()) {
+            return false;
+        }
+        if (isFalse()) {
+            return true;
+        }
+        if (isBDD()) {
+            return false;
+        }
+
+        // Required as we don't want to alter the pointer value of "this"
+        CDD copy = hardCopy();
+
+        while (!copy.isTerminal()) {
+            CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
+            Zone zone = new Zone(res.getDbm());
+            copy = res.getCddPart().removeNegative().reduce();
+            if (!zone.isUrgent()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Returns a new instance of this CDD but with the same pointer.
      * In contrast to {@link #copy()} this does not create a completely
@@ -713,51 +809,6 @@ public class CDD {
         return new CDD(CDDLib.cddNBddvar(level));
     }
 
-    public void free()
-        throws NullPointerException {
-        checkForNull();
-        CDDLib.freeCdd(pointer);
-        pointer = 0;
-    }
-
-    public CDD applyReset(List<Update> list) {
-        if (isFalse()) {
-            return this;
-        }
-
-        if (list.size() == 0) {
-            return this;
-        }
-
-        int numBools = 0;
-        int numClocks = 0;
-        for (Update up : list) {
-            if (up instanceof ClockUpdate) numClocks++;
-            if (up instanceof BoolUpdate) numBools++;
-        }
-        int[] clockResets = new int[numClocks];
-        int[] clockValues = new int[numClocks];
-        int[] boolResets = new int[numBools];
-        int[] boolValues = new int[numBools];
-        int cl = 0;
-        int bl = 0;
-        for (Update up : list) {
-            if (up instanceof ClockUpdate) {
-                ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = indexOf(u.getClock());
-                clockValues[cl] = u.getValue();
-                cl++;
-            }
-            if (up instanceof BoolUpdate) {
-                BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
-                boolValues[bl] = u.getValue() ? 1 : 0;
-                bl++;
-            }
-        }
-        return applyReset(clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
-    }
-
     private static void checkIfNotRunning() {
         if (!cddIsRunning) {
             throw new CddNotRunningException("CDD.init() has not been called");
@@ -769,57 +820,6 @@ public class CDD {
         A.checkForNull();
         B.checkForNull();
         return new CDD(CDDLib.predt(A.pointer, B.pointer));
-    }
-
-    public boolean canDelayIndefinitely() {
-        if (isTrue()) {
-            return true;
-        }
-        if (isFalse()) {
-            return false;
-        }
-        if (isBDD()) {
-            return true;
-        }
-
-        CDD copy = hardCopy();
-
-        while (!copy.isTerminal()) {
-            CddExtractionResult extraction = copy.removeNegative().reduce().extractBddAndDbm();
-            copy = extraction.getCddPart().removeNegative().reduce();
-            Zone zone = new Zone(extraction.getDbm());
-
-            if (!zone.canDelayIndefinitely()) {
-                return false;
-            }
-        }
-        // found no states that cannot delay indefinitely
-        return true;
-    }
-
-    public boolean isUrgent() {
-        if (isTrue()) {
-            return false;
-        }
-        if (isFalse()) {
-            return true;
-        }
-        if (isBDD()) {
-            return false;
-        }
-
-        // Required as we don't want to alter the pointer value of "this"
-        CDD copy = hardCopy();
-
-        while (!copy.isTerminal()) {
-            CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
-            Zone zone = new Zone(res.getDbm());
-            copy = res.getCddPart().removeNegative().reduce();
-            if (!zone.isUrgent()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static boolean intersects(CDD A, CDD B) {
