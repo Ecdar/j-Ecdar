@@ -196,20 +196,20 @@ public class Bisimilarity {
                     else
                         e2CDD = s2.conjunction(e2.getGuardCDD()).disjunction(e2CDD);
                 }
-                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
+                if (e1CDD.intersects(s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
                 {
                     return true;
                 }
 
 
-               if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+               if (e1CDD.intersects(s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
                     if (l1.getName().equals(l2.getName())) {
                     }
                     return true;
                 }
             }
-            if (!CDD.isSubset(e1CDD,e2CDD)) {
+            if (!e1CDD.isSubset(e2CDD)) {
                 return true;
             }
         }
@@ -236,7 +236,7 @@ public class Bisimilarity {
                         e1CDD = s1.conjunction(e1.getGuardCDD()).disjunction(e1CDD);
                 }
 
-                if (CDD.intersects(e2CDD,s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+                if (e2CDD.intersects(s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
 
                     return true;
@@ -244,7 +244,7 @@ public class Bisimilarity {
 
 
             }
-            if (!CDD.isSubset(e2CDD, e1CDD)) {
+            if (!e2CDD.isSubset(e1CDD)) {
                 return true;
             }
         }

@@ -422,15 +422,6 @@ public class CDD {
         return this;
     }
 
-    public CDD predt(CDD safe) {
-        checkIfNotRunning();
-        checkForNull();
-        safe.checkForNull();
-        pointer = CDDLib.predt(pointer, safe.pointer);
-        isGuardDirty = true;
-        return this;
-    }
-
     public CDD transitionBackPast(CDD guard, CDD update, int[] clockResets, int[] boolResets)
             throws NullPointerException, CddNotRunningException {
         checkIfNotRunning();
@@ -483,6 +474,24 @@ public class CDD {
         other.checkForNull();
         long resultPointer = CDDLib.disjunction(pointer, other.pointer);
         return new CDD(resultPointer);
+    }
+
+    public CDD predt(CDD safe) {
+        checkIfNotRunning();
+        checkForNull();
+        safe.checkForNull();
+        pointer = CDDLib.predt(pointer, safe.pointer);
+        isGuardDirty = true;
+        return this;
+    }
+
+    public boolean intersects(CDD other) {
+        return conjunction(other).isNotFalse();
+    }
+
+    public boolean isSubset(CDD other) {
+        CDD hardCopy = hardCopy();
+        return conjunction(other).equiv(hardCopy);
     }
 
     public boolean equiv(CDD that)
@@ -813,21 +822,5 @@ public class CDD {
         if (!cddIsRunning) {
             throw new CddNotRunningException("CDD.init() has not been called");
         }
-    }
-
-    public static CDD predt(CDD A, CDD B) {
-        checkIfNotRunning();
-        A.checkForNull();
-        B.checkForNull();
-        return new CDD(CDDLib.predt(A.pointer, B.pointer));
-    }
-
-    public static boolean intersects(CDD A, CDD B) {
-        return A.conjunction(B).isNotFalse();
-    }
-
-    public static boolean isSubset(CDD A, CDD B) {
-        // TODO: check if correct
-        return A.conjunction(B).equiv(A);
     }
 }

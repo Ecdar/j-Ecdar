@@ -98,7 +98,7 @@ public class Pruning {
         if (targetLoc.isInitial())
         {
             CDD initial = CDD.cddZero();
-            if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
+            if (targetLoc.getInconsistentPart().intersects(initial))
             {
                 return true;
             }
@@ -477,7 +477,7 @@ public class Pruning {
 
         // do predt.
 
-        CDD predtFed = CDD.predt(incCDD, allGoodCDDs);
+        CDD predtFed = incCDD.predt(allGoodCDDs);
         System.out.println("predtFed   " + predtFed + " " + incCDD + " " + allGoodCDDs);
 
         // add the inconsistent Federation to it, so in case both the transition to bad and the transition to good

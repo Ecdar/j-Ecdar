@@ -115,7 +115,7 @@ public class Conjunction extends TransitionSystem {
     private boolean havePassed(State element) {
         for (State state : passed) {
             if (element.getLocation().getName().equals(state.getLocation().getName()) &&
-                    CDD.isSubset(element.getInvariant(), state.getInvariant())) {
+                    element.getInvariant().isSubset(state.getInvariant())) {
                 return true;
             }
         }
@@ -125,7 +125,7 @@ public class Conjunction extends TransitionSystem {
     private boolean isWaitingFor(State element) {
         for (State state : worklist) {
             if (element.getLocation().getName().equals(state.getLocation().getName()) &&
-                    CDD.isSubset(element.getInvariant(), state.getInvariant())) {
+                    element.getInvariant().isSubset(state.getInvariant())) {
                 return true;
             }
         }

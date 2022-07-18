@@ -240,7 +240,7 @@ public class Refinement {
 
         CDD leftPart = currentStateCDD.conjunction(leftState.getLocationInvariant());
         CDD rightPart = currentStateCDD.conjunction(rightState.getLocationInvariant());
-        if (CDD.isSubset(leftPart,rightPart))
+        if (leftPart.isSubset(rightPart))
             return true;
 
         System.out.println("left invariant: " + leftState.getLocationInvariant());
@@ -433,7 +433,7 @@ public class Refinement {
     private boolean passedContainsStatePair(StatePair pair) {
         LocationPair locPair = new LocationPair(pair.getLeft().getLocation(), pair.getRight().getLocation());
         if (passed.containsKey(locPair)) {
-            if (CDD.isSubset(pair.getRight().getInvariant(),passed.get(locPair).getRight().getInvariant()))
+            if (pair.getRight().getInvariant().isSubset(passed.get(locPair).getRight().getInvariant()))
                 return true;
             //if (CDD.isSubset(pair.getLeft().getCDD(),passed.get(locPair).getLeft().getCDD()))
             //    assert(false); // left and right side are supposed to be identical at all times, so this should not be reachable
@@ -464,8 +464,8 @@ public class Refinement {
 
             if (passedLeft.getLocation().equals(currLeft.getLocation()) &&
                     passedRight.getLocation().equals(currRight.getLocation())) {
-                if (CDD.isSubset(currLeft.getInvariant(),passedLeft.getInvariant()) &&
-                        CDD.isSubset(currRight.getInvariant(),passedRight.getInvariant())) {
+                if (currLeft.getInvariant().isSubset(passedLeft.getInvariant()) &&
+                        currRight.getInvariant().isSubset(passedRight.getInvariant())) {
                     supersetNode = state.getNode();
                     return true;
                 }

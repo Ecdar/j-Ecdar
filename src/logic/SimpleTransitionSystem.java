@@ -123,7 +123,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
                 if (state1.getInvariant().isNotFalse() && state2.getInvariant().isNotFalse()) {
-                    if(CDD.intersects(state1.getInvariant(),state2.getInvariant())) {
+                    if(state1.getInvariant().intersects(state2.getInvariant())) {
                         /*System.out.println(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
                         System.out.println(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
                         System.out.println(trans.get(0).getEdges().get(0).getChannel());
@@ -270,7 +270,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         for (State passedState : passed) {
         //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    CDD.isSubset(state.getInvariant(),(passedState.getInvariant()))) {
+                    state.getInvariant().isSubset((passedState.getInvariant()))) {
                 return true;
             }
         }
@@ -286,7 +286,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         for (State passedState : waiting) {
             // check for zone inclusion
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    CDD.isSubset(state.getInvariant(),passedState.getInvariant())) {
+                    state.getInvariant().isSubset(passedState.getInvariant())) {
                 return true;
             }
         }
