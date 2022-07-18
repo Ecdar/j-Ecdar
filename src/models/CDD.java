@@ -101,7 +101,7 @@ public class CDD {
         List<Guard> orParts = new ArrayList<>();
         while (!copy.isTerminal()) {
             copy.reduce().removeNegative();
-            CddExtractionResult extraction = copy.extractBddAndDbm();
+            CddExtractionResult extraction = copy.extract();
             copy = extraction.getCddPart().reduce().removeNegative();
 
             Zone zone = new Zone(extraction.getDbm());
@@ -183,7 +183,7 @@ public class CDD {
         return new CDDNode(nodePointer);
     }
 
-    public CddExtractionResult extractBddAndDbm()
+    public CddExtractionResult extract()
             throws NullPointerException, CddNotRunningException {
         checkIfNotRunning();
         checkForNull();
@@ -290,7 +290,7 @@ public class CDD {
         CDD copy = hardCopy();
 
         while (!copy.isTerminal()) {
-            CddExtractionResult extraction = copy.removeNegative().reduce().extractBddAndDbm();
+            CddExtractionResult extraction = copy.removeNegative().reduce().extract();
             copy = extraction.getCddPart().removeNegative().reduce();
             Zone zone = new Zone(extraction.getDbm());
 
@@ -317,7 +317,7 @@ public class CDD {
         CDD copy = hardCopy();
 
         while (!copy.isTerminal()) {
-            CddExtractionResult res = copy.removeNegative().reduce().extractBddAndDbm();
+            CddExtractionResult res = copy.removeNegative().reduce().extract();
             Zone zone = new Zone(res.getDbm());
             copy = res.getCddPart().removeNegative().reduce();
             if (!zone.isUrgent()) {
@@ -525,7 +525,7 @@ public class CDD {
 
         while (!copy.isTerminal()) {
             copy.reduce().removeNegative();
-            CddExtractionResult extraction = copy.extractBddAndDbm();
+            CddExtractionResult extraction = copy.extract();
             copy = extraction.getCddPart().reduce().removeNegative();
             Zone zone = new Zone(extraction.getDbm());
             zoneList.add(zone);
