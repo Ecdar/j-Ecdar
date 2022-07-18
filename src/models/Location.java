@@ -6,7 +6,7 @@ public class Location {
     private final String name;
 
     private int x, y;
-    private Guard invariant;
+    private CDD invariant;
     private CDD inconsistentPart;
 
     // Must be final as Automaton expects it to be constant through the lifetime
@@ -17,7 +17,7 @@ public class Location {
 
     public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
         this.name = name;
-        this.invariant = invariant;
+        this.invariant = new CDD(invariant);
         this.isInitial = isInitial;
         this.isUrgent = isUrgent;
         this.isUniversal = isUniversal;
@@ -34,7 +34,7 @@ public class Location {
     public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         this(
             copy.name,
-            copy.invariant.copy(
+            copy.invariant.getGuard().copy(
                 newClocks, oldClocks, newBVs, oldBVs
             ),
             copy.isInitial,
@@ -59,11 +59,11 @@ public class Location {
     }
 
     public CDD getInvariantCDD() {
-        return new CDD(invariant);
+        return invariant;
     }
 
     public void setInvariant(Guard invariant) {
-        this.invariant = invariant;
+        this.invariant = new CDD(invariant);
     }
 
     public int getX() {
@@ -107,7 +107,7 @@ public class Location {
     }
 
     public Guard getInvariant() {
-        return invariant;
+        return invariant.getGuard();
     }
 
     public boolean isInitial() {
@@ -115,7 +115,7 @@ public class Location {
     }
 
     public int getMaxConstant(Clock clock) {
-        return invariant.getMaxConstant(clock);
+        return invariant.getGuard().getMaxConstant(clock);
     }
 
     @Override
