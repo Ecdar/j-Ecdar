@@ -88,6 +88,13 @@ public class CDD {
             throw new IllegalArgumentException("CDD is a BDD");
         }
 
+        if (isFalse()) {
+            return new FalseGuard();
+        }
+        if (isTrue()) {
+            return new TrueGuard();
+        }
+
         CDD copy = hardCopy();
 
         List<Guard> orParts = new ArrayList<>();
@@ -211,6 +218,12 @@ public class CDD {
         return CDDLib.cddEquiv(this.pointer, cddFalse().pointer);
     }
 
+    public boolean isNotTrue()
+            throws NullPointerException {
+        checkForNull();
+        return !isTrue();
+    }
+
     public boolean isTrue()
             throws NullPointerException {
         checkForNull();
@@ -219,11 +232,12 @@ public class CDD {
 
     /**
      * Returns a new instance of this CDD but with the same pointer.
-     *    In contrast to {@link #copy()} this does not create a completely
-     *    new CDD instance by invoking the {@link CDDLib#copy(long)}. The usefulness
-     *    of {@link #hardCopy()} is its lightweight nature and as the pointer
-     *    is a pass-by-value then immediate not oeprator invocations wont alter the pointer
-     *    value of the original (this.pointer) retrieved through {@link #getPointer()}.
+     * In contrast to {@link #copy()} this does not create a completely
+     * new CDD instance by invoking the {@link CDDLib#copy(long)}. The usefulness
+     * of {@link #hardCopy()} is its lightweight nature and as the pointer
+     * is a pass-by-value then immediate not oeprator invocations wont alter the pointer
+     * value of the original (this.pointer) retrieved through {@link #getPointer()}.
+     *
      * @return Returns a new CDD which is not created through {@link CDDLib#copy(long)} but with a pointer copy.
      */
     public CDD hardCopy() {
