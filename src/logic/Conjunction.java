@@ -313,7 +313,7 @@ public class Conjunction extends TransitionSystem {
         x /= locations.size();
         y /= locations.size();
 
-        Guard invariant = CDD.toGuardList(invariantFederation, getClocks());
+        Guard invariant = invariantFederation.getGuard(getClocks());
         return new Location(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
     }
 

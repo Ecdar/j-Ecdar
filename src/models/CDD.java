@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 public class CDD {
     private long pointer;
 
+    private Guard guard;
+    private boolean isGuardDirty;
+
     private static boolean cddIsRunning;
     private static List<Clock> clocks = new ArrayList<>();
 
@@ -27,10 +30,12 @@ public class CDD {
     public CDD() {
         checkIfNotRunning();
         this.pointer = CDDLib.allocateCdd();
+        this.isGuardDirty = true;
     }
 
     public CDD(long pointer) {
         this.pointer = pointer;
+        this.isGuardDirty = true;
     }
 
     public CDD(Guard guard)
@@ -61,6 +66,15 @@ public class CDD {
             throw new IllegalArgumentException("Guard instance is not supported");
         }
         this.pointer = cdd.pointer;
+        this.guard = guard;
+    }
+
+    public Guard getGuard(List<Clock> relevantClocks) {
+        if (isGuardDirty) {
+            guard = CDD.toGuardList(this, relevantClocks);
+        }
+
+        return guard;
     }
 
     public long getPointer() {
@@ -147,6 +161,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.delay(pointer);
+        isGuardDirty = true;
         return this;
     }
 
@@ -155,6 +170,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.delayInvar(pointer, invariant.pointer);
+        isGuardDirty = true;
         return this;
     }
 
@@ -163,6 +179,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.exist(pointer, levels, clocks);
+        isGuardDirty = true;
         return this;
     }
 
@@ -172,6 +189,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.past(pointer);
+        isGuardDirty = true;
         return this;
     }
 
@@ -180,6 +198,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.removeNegative(pointer);
+        isGuardDirty = true;
         return this;
     }
 
@@ -196,6 +215,7 @@ public class CDD {
 
         pointer = CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues);
         removeNegative().reduce();
+        isGuardDirty = true;
         return this;
     }
 
@@ -206,6 +226,7 @@ public class CDD {
         guard.checkForNull();
         pointer = CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues);
         removeNegative().reduce();
+        isGuardDirty = true;
         return this;
     }
 
@@ -214,6 +235,7 @@ public class CDD {
         checkForNull();
         safe.checkForNull();
         pointer = CDDLib.predt(pointer, safe.pointer);
+        isGuardDirty = true;
         return this;
     }
 
@@ -224,6 +246,7 @@ public class CDD {
         guard.checkForNull();
         update.checkForNull();
         pointer = CDDLib.transitionBackPast(pointer, guard.pointer, update.pointer, clockResets, boolResets);
+        isGuardDirty = true;
         return this;
     }
 
@@ -232,6 +255,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.reduce(pointer);
+        isGuardDirty = true;
         return this;
     }
 
