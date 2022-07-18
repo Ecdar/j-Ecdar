@@ -71,7 +71,7 @@ public class CDD {
 
     public Guard getGuard(List<Clock> relevantClocks) {
         if (isGuardDirty) {
-            guard = CDD.toGuardList(this, relevantClocks);
+            guard = isBDD() ? toBoolGuards() : toClockGuards(relevantClocks);
             isGuardDirty = false;
         }
 
@@ -80,6 +80,82 @@ public class CDD {
 
     public Guard getGuard() {
         return getGuard(clocks);
+    }
+
+    private Guard toClockGuards(List<Clock> relevantClocks)
+            throws IllegalArgumentException {
+        if (isBDD()) {
+            throw new IllegalArgumentException("CDD is a BDD");
+        }
+
+        CDD copy = hardCopy();
+
+        List<Guard> orParts = new ArrayList<>();
+        while (!copy.isTerminal()) {
+            copy.reduce().removeNegative();
+            CddExtractionResult extraction = copy.extractBddAndDbm();
+            copy = extraction.getCddPart().reduce().removeNegative();
+
+            Zone zone = new Zone(extraction.getDbm());
+            CDD bdd = extraction.getBddPart();
+
+            List<Guard> andParts = new ArrayList<>();
+            // Adds normal guards and diagonal constraints
+            andParts.add(
+                    zone.buildGuardsFromZone(clocks, relevantClocks)
+            );
+            // Adds boolean constraints (var == val)
+            andParts.add(
+                    bdd.toBoolGuards()
+            );
+            // Removes all TrueGuards
+            andParts = andParts.stream()
+                    .filter(guard -> !(guard instanceof TrueGuard))
+                    .collect(Collectors.toList());
+
+            orParts.add(
+                    new AndGuard(andParts)
+            );
+        }
+
+        return new OrGuard(orParts);
+    }
+
+    private Guard toBoolGuards()
+            throws IllegalArgumentException {
+        if (!isBDD()) {
+            throw new IllegalArgumentException("CDD is not a BDD");
+        }
+
+        if (isFalse()) {
+            return new FalseGuard();
+        }
+        if (isTrue()) {
+            return new TrueGuard();
+        }
+
+        long ptr = getPointer();
+        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr, numBools));
+
+        List<Guard> orParts = new ArrayList<>();
+        for (int i = 0; i < arrays.traceCount; i++) {
+
+            List<Guard> andParts = new ArrayList<>();
+            for (int j = 0; j < arrays.booleanCount; j++) {
+
+                int index = arrays.getVariables().get(i).get(j);
+                if (index >= 0) {
+                    BoolVar var = BVs.get(index - bddStartLevel);
+                    boolean val = arrays.getValues().get(i).get(j) == 1;
+                    BoolGuard bg = new BoolGuard(var, Relation.EQUAL, val);
+
+                    andParts.add(bg);
+                }
+            }
+
+            orParts.add(new AndGuard(andParts));
+        }
+        return new OrGuard(orParts);
     }
 
     public long getPointer() {
@@ -419,7 +495,7 @@ public class CDD {
 
     @Override
     public String toString() {
-        return CDD.toGuardList(this, clocks).toString();
+        return getGuard().toString();
     }
 
     @Override
@@ -507,94 +583,6 @@ public class CDD {
             return createBddNode(bddStartLevel + indexOf(guard.getVar()));
         }
         return createNegatedBddNode(bddStartLevel + indexOf(guard.getVar()));
-    }
-
-    public static Guard toGuardList(CDD state, List<Clock> relevantClocks) {
-        if (state.equiv(cddFalse())) {
-            return new FalseGuard();
-        }
-        if (state.equiv(cddTrue())) {
-            return new TrueGuard();
-        }
-
-        if (state.isBDD()) {
-            return CDD.toBoolGuards(state);
-        }
-        return CDD.toClockGuards(state, relevantClocks);
-    }
-
-    private static Guard toClockGuards(CDD cdd, List<Clock> relevantClocks)
-        throws IllegalArgumentException {
-        if (cdd.isBDD()) {
-            throw new IllegalArgumentException("CDD is a BDD");
-        }
-
-        List<Guard> orParts = new ArrayList<>();
-        while (!cdd.isTerminal()) {
-            cdd.reduce().removeNegative();
-            CddExtractionResult extraction = cdd.extractBddAndDbm();
-            cdd = extraction.getCddPart().reduce().removeNegative();
-
-            Zone zone = new Zone(extraction.getDbm());
-            CDD bdd = extraction.getBddPart();
-
-            List<Guard> andParts = new ArrayList<>();
-            // Adds normal guards and diagonal constraints
-            andParts.add(
-                    zone.buildGuardsFromZone(clocks, relevantClocks)
-            );
-            // Adds boolean constraints (var == val)
-            andParts.add(
-                    CDD.toBoolGuards(bdd)
-            );
-            // Removes all TrueGuards
-            andParts = andParts.stream()
-                    .filter(guard -> !(guard instanceof TrueGuard))
-                    .collect(Collectors.toList());
-
-            orParts.add(
-                    new AndGuard(andParts)
-            );
-        }
-
-        return new OrGuard(orParts);
-    }
-
-    private static Guard toBoolGuards(CDD bdd)
-            throws IllegalArgumentException {
-        if (!bdd.isBDD()) {
-            throw new IllegalArgumentException("CDD is not a BDD");
-        }
-
-        if (bdd.isFalse()) {
-            return new FalseGuard();
-        }
-        if (bdd.isTrue()) {
-            return new TrueGuard();
-        }
-
-        long ptr = bdd.getPointer();
-        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr, numBools));
-
-        List<Guard> orParts = new ArrayList<>();
-        for (int i = 0; i < arrays.traceCount; i++) {
-
-            List<Guard> andParts = new ArrayList<>();
-            for (int j = 0; j < arrays.booleanCount; j++) {
-
-                int index = arrays.getVariables().get(i).get(j);
-                if (index >= 0) {
-                    BoolVar var = BVs.get(index - bddStartLevel);
-                    boolean val = arrays.getValues().get(i).get(j) == 1;
-                    BoolGuard bg = new BoolGuard(var, Relation.EQUAL, val);
-
-                    andParts.add(bg);
-                }
-            }
-
-            orParts.add(new AndGuard(andParts));
-        }
-        return new OrGuard(orParts);
     }
 
     public static List<Clock> getClocks() {

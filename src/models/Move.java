@@ -53,7 +53,7 @@ public class Move {
     }
 
     public Guard getGuards(List<Clock> relevantClocks) {
-        return CDD.toGuardList(guardCDD, relevantClocks);
+        return guardCDD.getGuard(relevantClocks);
     }
 
     public void setGuards(CDD guardCDD) {

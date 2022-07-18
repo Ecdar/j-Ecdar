@@ -112,7 +112,7 @@ public class DisjunctionTest {
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis2));
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis3));
         CDD neg = disjunctedGuards.negation();
-        Guard out = CDD.toGuardList(neg, clocks);
+        Guard out = neg.getGuard(clocks);
 
 
         System.out.println(out);

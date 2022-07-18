@@ -295,7 +295,7 @@ public class BoolTest {
 
         Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
         Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
-        Edge e2 = new Edge(l0, l1, i1, true, CDD.toGuardList(compl,clocks), noUpdate);
+        Edge e2 = new Edge(l0, l1, i1, true, compl.getGuard(clocks), noUpdate);
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
@@ -399,7 +399,7 @@ public class BoolTest {
 
         Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
         Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
-        Edge e2 = new Edge(l0, l1, i1, true, CDD.toGuardList(compl,clocks), noUpdate);
+        Edge e2 = new Edge(l0, l1, i1, true, compl.getGuard(clocks), noUpdate);
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
