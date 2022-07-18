@@ -515,12 +515,20 @@ public class CDD {
         if (state.isBDD()) {
             return CDD.toBoolGuards(state);
         }
+        return CDD.toClockGuards(state, relevantClocks);
+    }
+
+    public static Guard toClockGuards(CDD cdd, List<Clock> relevantClocks)
+        throws IllegalArgumentException {
+        if (cdd.isBDD()) {
+            throw new IllegalArgumentException("CDD is a BDD");
+        }
 
         List<Guard> orParts = new ArrayList<>();
-        while (!state.isTerminal()) {
-            state.reduce().removeNegative();
-            CddExtractionResult extraction = state.extractBddAndDbm();
-            state = extraction.getCddPart().reduce().removeNegative();
+        while (!cdd.isTerminal()) {
+            cdd.reduce().removeNegative();
+            CddExtractionResult extraction = cdd.extractBddAndDbm();
+            cdd = extraction.getCddPart().reduce().removeNegative();
 
             Zone zone = new Zone(extraction.getDbm());
             CDD bdd = extraction.getBddPart();
