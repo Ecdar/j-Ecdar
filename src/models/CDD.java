@@ -518,15 +518,16 @@ public class CDD {
         }
     }
 
-    public Federation toFederation() {
+    public Federation getFederation() {
         // TODO: does not in any way take care of BDD parts (might run endless for BCDDs?)
         List<Zone> zoneList = new ArrayList<>();
-        CDD copy = new CDD(this.pointer);
+        CDD copy = hardCopy();
+
         while (!copy.isTerminal()) {
-            copy = copy.reduce().removeNegative();
-            CddExtractionResult res = copy.extractBddAndDbm();
-            copy = res.getCddPart().reduce().removeNegative();
-            Zone zone = new Zone(res.getDbm());
+            copy.reduce().removeNegative();
+            CddExtractionResult extraction = copy.extractBddAndDbm();
+            copy = extraction.getCddPart().reduce().removeNegative();
+            Zone zone = new Zone(extraction.getDbm());
             zoneList.add(zone);
         }
         return new Federation(zoneList);
