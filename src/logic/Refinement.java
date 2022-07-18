@@ -227,7 +227,12 @@ public class Refinement {
     private boolean checkDelay(State leftState, State rightState)
     {
         assert (leftState.getCDD().equiv(rightState.getCDD()));
-        CDD currentStateCDD = new CDD(leftState.getCDD().getPointer()); //TODO: is the explicit new needed?
+        // The explicit new CDD is required as it copies the value of the pointer
+        //   which is later altered by the .delay() invocation but only in the copy
+        //   as the long type is not a reference type and thereby the leftState CDD
+        //   is not altered by the .delay() and other calls.
+        //   The hardCopy() creates a new CDD with a copy of te leftState CDD pointer.
+        CDD currentStateCDD = leftState.getCDD().hardCopy();
         currentStateCDD=currentStateCDD.delay();
 
         CDD leftPart = currentStateCDD.conjunction(leftState.getInvarCDDDirectlyFromInvariants());
