@@ -364,7 +364,7 @@ public class CDD {
                 bl++;
             }
         }
-        return this.transitionBack(guard, turnUpdatesToCDD(updates), clockResets, boolResets).removeNegative().reduce();
+        return this.transitionBack(guard, create(updates), clockResets, boolResets).removeNegative().reduce();
     }
 
     public CDD transitionBack(Edge e) {
@@ -396,6 +396,22 @@ public class CDD {
     @Override
     public int hashCode() {
         return Objects.hash(pointer);
+    }
+
+    public static CDD create(List<Update> updates) {
+        CDD res = cddTrue();
+        for (Update up : updates) {
+            if (up instanceof ClockUpdate) {
+                ClockUpdate u = (ClockUpdate) up;
+                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
+            }
+            if (up instanceof BoolUpdate) {
+                BoolUpdate u = (BoolUpdate) up;
+                BoolGuard bg = new BoolGuard(u.getBV(), Relation.EQUAL, u.getValue());
+                res = res.conjunction(CDD.fromBoolGuard(bg));
+            }
+        }
+        return res.removeNegative().reduce();
     }
 
     public static CDD cddTrue()
@@ -735,21 +751,5 @@ public class CDD {
 
     public static CDD getUnrestrainedCDD() {
         return CDD.cddTrue().removeNegative();
-    }
-
-    public static CDD turnUpdatesToCDD(List<Update> updates) {
-        CDD res = cddTrue();
-        for (Update up : updates) {
-            if (up instanceof ClockUpdate) {
-                ClockUpdate u = (ClockUpdate) up;
-                res = res.conjunction(CDD.allocateInterval(getIndexOfClock(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
-            }
-            if (up instanceof BoolUpdate) {
-                BoolUpdate u = (BoolUpdate) up;
-                BoolGuard bg = new BoolGuard(u.getBV(), Relation.EQUAL, u.getValue());
-                res = res.conjunction(CDD.fromBoolGuard(bg));
-            }
-        }
-        return res.removeNegative().reduce();
     }
 }
