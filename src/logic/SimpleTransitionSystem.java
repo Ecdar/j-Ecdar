@@ -122,8 +122,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
 
-                if (state1.getCDD().isNotFalse() && state2.getCDD().isNotFalse()) {
-                    if(CDD.intersects(state1.getCDD(),state2.getCDD())) {
+                if (state1.getInvariant().isNotFalse() && state2.getInvariant().isNotFalse()) {
+                    if(CDD.intersects(state1.getInvariant(),state2.getInvariant())) {
                         /*System.out.println(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
                         System.out.println(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
                         System.out.println(trans.get(0).getEdges().get(0).getChannel());
@@ -178,7 +178,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         }
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (canPrune && CDD.canDelayIndefinitely(currState.getCDD())) {
+        if (canPrune && CDD.canDelayIndefinitely(currState.getInvariant())) {
             return true;
         }
             // Else if independent progress does not hold through delaying indefinitely,
@@ -199,7 +199,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                return CDD.canDelayIndefinitely(currState.getCDD());
+                return CDD.canDelayIndefinitely(currState.getInvariant());
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
@@ -254,7 +254,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             State state = new State(ts.getSource());
             state.applyGuards(ts.getGuardCDD());
 
-            if(!CDD.isUrgent(state.getCDD()))
+            if(!CDD.isUrgent(state.getInvariant()))
                 return false;
         }
         return true;
@@ -270,7 +270,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         for (State passedState : passed) {
         //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    CDD.isSubset(state.getCDD(),(passedState.getCDD()))) {
+                    CDD.isSubset(state.getInvariant(),(passedState.getInvariant()))) {
                 return true;
             }
         }
@@ -286,7 +286,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         for (State passedState : waiting) {
             // check for zone inclusion
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    CDD.isSubset(state.getCDD(),passedState.getCDD())) {
+                    CDD.isSubset(state.getInvariant(),passedState.getInvariant())) {
                 return true;
             }
         }

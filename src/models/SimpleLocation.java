@@ -49,7 +49,7 @@ public class SimpleLocation extends SymbolicLocation {
     }
 
     @Override
-    public CDD getInvariantCDD() {
+    public CDD getInvariant() {
         return new CDD(location.getInvariant());
     }
 

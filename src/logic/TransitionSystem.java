@@ -79,21 +79,21 @@ public abstract class TransitionSystem {
         List<Transition> transitions = new ArrayList<>();
         // loop through moves
         for (Move move : moves) {
-            State targetState = new State(move.getTarget(), currentState.getCDD());
+            State targetState = new State(move.getTarget(), currentState.getInvariant());
             targetState.applyGuards(move.getGuardCDD());
 
-            if (targetState.getCDD().isFalse())
+            if (targetState.getInvariant().isFalse())
             {
                 continue;
             }
 
-            CDD guardCDD = new CDD(targetState.getCDD().getPointer());
+            CDD guardCDD = new CDD(targetState.getInvariant().getPointer());
 
             targetState.applyResets(move.getUpdates());
             targetState.delay();
             targetState.applyInvariants();
 
-            if (targetState.getCDD().isFalse())
+            if (targetState.getInvariant().isFalse())
             {
                 continue;
             }

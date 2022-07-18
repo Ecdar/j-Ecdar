@@ -494,8 +494,8 @@ public class Quotient extends TransitionSystem {
             // rule 7
             Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
             // invariant is negation of invariant of left conjuncted with invariant of right
-            CDD negatedInvar = locLeft.getInvariantCDD().negation();
-            CDD combined = negatedInvar.conjunction(locRight.getInvariantCDD());
+            CDD negatedInvar = locLeft.getInvariant().negation();
+            CDD combined = negatedInvar.conjunction(locRight.getInvariant());
             newMoveRule7.setGuards(combined);
             newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
             resultMoves.add(newMoveRule7);
@@ -506,7 +506,7 @@ public class Quotient extends TransitionSystem {
                 System.out.println("Rule 5");
                 Move newMoveRule5 = new Move(location, univ, new ArrayList<>());
                 // negate invariant of ts2
-                newMoveRule5.setGuards(locRight.getInvariantCDD().negation());
+                newMoveRule5.setGuards(locRight.getInvariant().negation());
                 newMoveRule5.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMoveRule5);
             }
@@ -560,7 +560,7 @@ public class Quotient extends TransitionSystem {
                     SymbolicLocation newLoc = new ComplexLocation(new ArrayList<>(Arrays.asList(move.getTarget(), locRight)));
                     ((ComplexLocation) newLoc).removeInvariants();
                     Move newMove3 = new Move(location, newLoc, new ArrayList<>());
-                    CDD targetInvar = move.getTarget().getInvariantCDD();
+                    CDD targetInvar = move.getTarget().getInvariant();
                     targetInvar = targetInvar.transitionBack(move);
                     newMove3.setGuards(move.getGuardCDD().conjunction(targetInvar));
                     newMove3.setUpdates(move.getUpdates());

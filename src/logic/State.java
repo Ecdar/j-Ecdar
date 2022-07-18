@@ -18,24 +18,24 @@ public class State {
 
     public State(State oldState) {
         this.location = oldState.getLocation();
-        this.invarCDD = new CDD(oldState.getCDD().getPointer());
+        this.invarCDD = new CDD(oldState.getInvariant().getPointer());
     }
 
     public SymbolicLocation getLocation() {
         return location;
     }
 
-    public CDD getCDD() {
+    public CDD getInvariant() {
         return invarCDD;
     }
 
 
-    public CDD getInvarCDDDirectlyFromInvariants() {
-        return location.getInvariantCDD();
+    public CDD getLocationInvariant() {
+        return location.getInvariant();
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return CDD.toGuardList(location.getInvariantCDD(),relevantClocks);
+        return CDD.toGuardList(location.getInvariant(),relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -48,7 +48,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        CDD result = this.invarCDD.conjunction(location.getInvariantCDD());
+        CDD result = this.invarCDD.conjunction(location.getInvariant());
         this.invarCDD=result;
     }
 
