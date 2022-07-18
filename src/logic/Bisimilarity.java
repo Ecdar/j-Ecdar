@@ -134,7 +134,7 @@ public class Bisimilarity {
 
                                 assert (Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
                             }
-                            finalEdges.add(new Edge(l, targetLoc, c,  edgeList.get(0).isInput(), allCDDs.getGuard(), allEdges.get(0).getUpdates()));
+                            finalEdges.add(new Edge(l, targetLoc, c,  edgeList.get(0).isInput(), allCDDs.getGuard(copy.getClocks()), allEdges.get(0).getUpdates()));
                         }
 
                     }

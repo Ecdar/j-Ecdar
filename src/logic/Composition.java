@@ -280,7 +280,7 @@ public class Composition extends TransitionSystem {
             y += l.getY();
 
         }
-        invariant = invarFed.getGuard();
+        invariant = invarFed.getGuard(clocks.getItems());
 
         return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
 
