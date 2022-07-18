@@ -648,8 +648,14 @@ public class CDD {
         );
     }
 
+    public static void addClocks() {
+        addClocks(
+                new ArrayList<>()
+        );
+    }
+
     @SafeVarargs
-    public static void addBooleans(List<BoolVar>... BVs) {
+    public static int addBooleans(List<BoolVar>... BVs) {
         checkIfNotRunning();
         for (List<BoolVar> list : BVs) {
             CDD.BVs.addAll(list);
@@ -661,11 +667,18 @@ public class CDD {
         } else {
             bddStartLevel = 0;
         }
+        return bddStartLevel;
     }
 
-    public static void addBooleans(BoolVar... BVs) {
-        addBooleans(
+    public static int addBooleans(BoolVar... BVs) {
+        return addBooleans(
                 Arrays.asList(BVs)
+        );
+    }
+
+    public static int addBooleans() {
+        return addBooleans(
+                new ArrayList<>()
         );
     }
 
@@ -757,20 +770,22 @@ public class CDD {
         return new CDD(CDDLib.predt(A.pointer, B.pointer));
     }
 
-    public static boolean canDelayIndefinitely(CDD state) {
-        if (state.isTrue()) {
+    public boolean canDelayIndefinitely() {
+        if (isTrue()) {
             return true;
         }
-        if (state.isFalse()) {
+        if (isFalse()) {
             return false;
         }
-        if (state.isBDD()) {
+        if (isBDD()) {
             return true;
         }
 
-        while (!state.isTerminal()) {
-            CddExtractionResult extraction = state.removeNegative().reduce().extractBddAndDbm();
-            state = extraction.getCddPart().removeNegative().reduce();
+        CDD copy = hardCopy();
+
+        while (!copy.isTerminal()) {
+            CddExtractionResult extraction = copy.removeNegative().reduce().extractBddAndDbm();
+            copy = extraction.getCddPart().removeNegative().reduce();
             Zone zone = new Zone(extraction.getDbm());
 
             if (!zone.canDelayIndefinitely()) {

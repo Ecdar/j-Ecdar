@@ -178,7 +178,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         }
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (canPrune && CDD.canDelayIndefinitely(currState.getInvariant())) {
+        if (canPrune && currState.getInvariant().canDelayIndefinitely()) {
             return true;
         }
             // Else if independent progress does not hold through delaying indefinitely,
@@ -199,7 +199,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                return CDD.canDelayIndefinitely(currState.getInvariant());
+                return currState.getInvariant().canDelayIndefinitely();
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
