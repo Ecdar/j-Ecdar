@@ -83,7 +83,8 @@ public class CDD {
     public boolean isBDD()
             throws NullPointerException {
         checkForNull();
-        return CDDLib.isBDD(this.pointer);
+        // CDDLib.isBDD does not recognise cddFalse and cddTrue as BDDs
+        return CDDLib.isBDD(this.pointer) || isFalse() || isTrue();
     }
 
     public boolean isTerminal()
@@ -485,7 +486,7 @@ public class CDD {
 
     public static Guard toBoolGuards(CDD bdd)
             throws IllegalArgumentException {
-        if (bdd.isBDD()) {
+        if (!bdd.isBDD()) {
             throw new IllegalArgumentException("CDD is not a BDD");
         }
 
