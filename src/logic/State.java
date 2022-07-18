@@ -35,7 +35,7 @@ public class State {
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return location.getInvariant().getGuard(relevantClocks);
+        return location.getInvariant().getGuard();
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -120,7 +120,7 @@ public class State {
         if (copy.toString().contains("30"))
         {
             System.out.println("max bounds : " + maxBounds);
-            System.out.println(copy.getGuard(relevantClocks));
+            System.out.println(copy.getGuard());
             print = true;
         }
         if (copy.isBDD())
