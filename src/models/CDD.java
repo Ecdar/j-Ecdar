@@ -50,7 +50,7 @@ public class CDD {
             Zone zone = new Zone(numClocks, true);
             zone.init();
             zone.buildConstraintsForGuard((ClockGuard) guard, clocks);
-            cdd = CDD.allocateFromDbm(zone.getDbm(), numClocks);
+            cdd = CDD.createFromDbm(zone.getDbm(), numClocks);
         } else if (guard instanceof BoolGuard) {
             cdd = create((BoolGuard) guard);
         } else if (guard instanceof AndGuard) {
@@ -536,7 +536,7 @@ public class CDD {
         for (Update up : updates) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                res = res.conjunction(CDD.allocateInterval(indexOf(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
+                res = res.conjunction(CDD.createInterval(indexOf(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
@@ -571,13 +571,13 @@ public class CDD {
 
     public static CDD cddZero() {
         Zone zone = new Zone(numClocks, false);
-        return CDD.allocateFromDbm(zone.getDbm(), numClocks);
+        return CDD.createFromDbm(zone.getDbm(), numClocks);
     }
 
     public static CDD cddZeroDelayed() {
         Zone zone = new Zone(numClocks, false);
         zone.delay();
-        return CDD.allocateFromDbm(zone.getDbm(), numClocks);
+        return CDD.createFromDbm(zone.getDbm(), numClocks);
     }
 
     public static boolean isCddIsRunning() {
@@ -669,23 +669,23 @@ public class CDD {
         );
     }
 
-    public static CDD allocateInterval(int i, int j, int lower, boolean lower_included, int upper, boolean upper_included) {
+    public static CDD createInterval(int i, int j, int lower, boolean lower_included, int upper, boolean upper_included) {
         checkIfNotRunning();
         // TODO: Negation of lower strict should be moved to a new function allocate_interval function in the CDD library
         return new CDD(CDDLib.interval(i, j, lower, lower_included, upper, !upper_included)).removeNegative();
     }
 
-    public static CDD allocateFromDbm(int[] dbm, int dim) {
+    public static CDD createFromDbm(int[] dbm, int dim) {
         checkIfNotRunning();
         return new CDD(CDDLib.cddFromDbm(dbm, dim));
     }
 
-    public static CDD allocateLower(int i, int j, int lowerBound, boolean strict) {
+    public static CDD createLower(int i, int j, int lowerBound, boolean strict) {
         checkIfNotRunning();
         return new CDD(CDDLib.lower(i, j, lowerBound, strict)).removeNegative();
     }
 
-    public static CDD allocateUpper(int i, int j, int upperBound, boolean strict) {
+    public static CDD createUpper(int i, int j, int upperBound, boolean strict) {
         checkIfNotRunning();
         return new CDD(CDDLib.upper(i, j, upperBound, strict)).removeNegative();
     }

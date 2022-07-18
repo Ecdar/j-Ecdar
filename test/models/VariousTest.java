@@ -6,7 +6,6 @@ import logic.*;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Ignore;
 import parser.JSONParser;
 import parser.XMLParser;
 
@@ -234,7 +233,7 @@ public class VariousTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);clocks.add(y);
         CDD.addClocks(clocks);
-        CDD test = CDD.allocateInterval(1,0,2,true,3,true);
+        CDD test = CDD.createInterval(1,0,2,true,3,true);
         System.out.println(test.getGuard(clocks));
         test.printDot();
         assert(true);

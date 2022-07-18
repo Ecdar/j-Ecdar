@@ -36,8 +36,8 @@ public class CDDTest {
         clocks.add(a);
         clocks.add(b);
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(2,1,3, true,5, true);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,true,6, true);
+        CDD cdd1 = CDD.createInterval(2,1,3, true,5, true);
+        CDD cdd2 = CDD.createInterval(2,1,4,true,6, true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
         System.out.println(cdd2.getGuard(clocks));
@@ -69,8 +69,8 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         clocks.add(new Clock("b", "B"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(2,1,3, true,5,true);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,true,6,true);
+        CDD cdd1 = CDD.createInterval(2,1,3, true,5,true);
+        CDD cdd2 = CDD.createInterval(2,1,4,true,6,true);
 
         CDD cdd3 = cdd1.disjunction(cdd2);
         CDDNode node = cdd3.getRoot();
@@ -89,7 +89,7 @@ public class CDDTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(1,0,30, true,50,true);
+        CDD cdd1 = CDD.createInterval(1,0,30, true,50,true);
         CDDNode node = cdd1.getRoot();
         List<Segment> bounds = new ArrayList<>();
 
@@ -151,8 +151,8 @@ public class CDDTest {
         clocks.add(new Clock("b", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd1 = CDD.allocateInterval(2,1,3, true,5,true);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,true,6,true);
+        CDD cdd1 = CDD.createInterval(2,1,3, true,5,true);
+        CDD cdd2 = CDD.createInterval(2,1,4,true,6,true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
 
@@ -170,7 +170,7 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd1 = CDD.allocateFromDbm(new int[]{1, 0, 80, 1}, 2);
+        CDD cdd1 = CDD.createFromDbm(new int[]{1, 0, 80, 1}, 2);
         CDDNode node = cdd1.getRoot();
 
         cdd1.printDot();
@@ -204,7 +204,7 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
+        CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
         CDD.free(cdd);
 
         cdd = cdd.reduce();
@@ -218,7 +218,7 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
+        CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
         CDD.free(cdd);
 
         CDD.free(cdd);
@@ -231,7 +231,7 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateLower(1,0,3, true);
+        CDD cdd = CDD.createLower(1,0,3, true);
         CDDNode node = cdd.getRoot();
 
         cdd.printDot();
@@ -252,8 +252,8 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
         //CDD interval = CDD.allocateInterval(1,0,3, true,7, true);
-        CDD cdd = CDD.allocateUpper(1,0,6,true);
-        CDD cdd1 = CDD.allocateUpper(2,0,4,true);
+        CDD cdd = CDD.createUpper(1,0,6,true);
+        CDD cdd1 = CDD.createUpper(2,0,4,true);
         //CDD result = interval.conjunction(cdd);
         CDD result = cdd.conjunction(cdd1);
 
@@ -291,8 +291,8 @@ public class CDDTest {
         CDD res = new CDD(new OrGuard(g1));
         //res.printDot();
         CDD exp = CDD.cddTrue();
-        exp = exp.conjunction(CDD.allocateInterval(1, 0, 3, true, CDD_INF/2, false));
-        exp = exp.disjunction(CDD.allocateInterval(2, 0, 0,true, 5,true));
+        exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));
+        exp = exp.disjunction(CDD.createInterval(2, 0, 0,true, 5,true));
          System.out.println(exp.removeNegative().reduce().getGuard(clocks));
         System.out.println(res.removeNegative().reduce().getGuard(clocks));
         //exp.printDot();

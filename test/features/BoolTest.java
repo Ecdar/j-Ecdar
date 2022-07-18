@@ -53,8 +53,8 @@ public class BoolTest {
 
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
-        CDD ba = CDD.allocateInterval(1,0,3, true,5, true);
-        CDD bb = CDD.allocateInterval(2,0,2,true,8,true);
+        CDD ba = CDD.createInterval(1,0,3, true,5, true);
+        CDD bb = CDD.createInterval(2,0,2,true,8,true);
         CDD cdd =ba.disjunction(bb);
         System.out.println("size " + clocks.size());
 
@@ -596,7 +596,7 @@ public class BoolTest {
         BoolVar a = new BoolVar("a","aut",false);
         CDD.addBooleans(new ArrayList<>(){{add(a);}});
 
-        CDD state = CDD.allocateInterval(1,0,0,true,5,true);
+        CDD state = CDD.createInterval(1,0,0,true,5,true);
         Update update = new BoolUpdate(a,true);
         List<Update> updates = new ArrayList<>();
         updates.add(update);
