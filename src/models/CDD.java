@@ -713,10 +713,11 @@ public class CDD {
         return new CDD(CDDLib.cddNBddvar(level));
     }
 
-    public static void free(CDD cdd) {
-        cdd.checkForNull();
-        CDDLib.freeCdd(cdd.pointer);
-        cdd.pointer = 0;
+    public void free()
+        throws NullPointerException {
+        checkForNull();
+        CDDLib.freeCdd(pointer);
+        pointer = 0;
     }
 
     public CDD applyReset(List<Update> list) {

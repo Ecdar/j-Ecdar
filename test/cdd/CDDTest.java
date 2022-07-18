@@ -57,9 +57,9 @@ public class CDDTest {
         System.out.println(new CDD(new AndGuard(guardList)).getGuard(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
-        CDD.free(cdd1);
-        CDD.free(cdd2);
-        CDD.free(cdd3);
+        cdd1.free();
+        cdd2.free();
+        cdd3.free();
     }
 
     @Test
@@ -78,9 +78,9 @@ public class CDDTest {
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(CDD_INF>>1, node.getSegmentAtIndex(1).getUpperBound());
 
-        CDD.free(cdd1);
-        CDD.free(cdd2);
-        CDD.free(cdd3);
+        cdd1.free();
+        cdd2.free();
+        cdd3.free();
     }
 
     @Test
@@ -112,7 +112,7 @@ public class CDDTest {
 
         assertTrue(trueNode.getRoot().isTrueTerminal());
 
-        CDD.free(trueNode);
+        trueNode.free();
     }
 
     @Test
@@ -126,7 +126,7 @@ public class CDDTest {
 
         assertTrue(falseNode.getRoot().isFalseTerminal());
 
-        CDD.free(falseNode);
+        falseNode.free();
     }
 
     @Test
@@ -140,7 +140,7 @@ public class CDDTest {
 
         assertTrue(trueNode.isTerminal());
 
-        CDD.free(trueNode);
+        trueNode.free();
     }
 
     @Test
@@ -158,9 +158,9 @@ public class CDDTest {
 
         assertFalse(cdd3.isTerminal());
 
-        CDD.free(cdd1);
-        CDD.free(cdd2);
-        CDD.free(cdd3);
+        cdd1.free();
+        cdd2.free();
+        cdd3.free();
     }
 
     @Test
@@ -180,7 +180,7 @@ public class CDDTest {
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(40, node.getSegmentAtIndex(1).getUpperBound());
 
-        CDD.free(cdd1);
+        cdd1.free();
     }
 
     @Test(expected = CddNotRunningException.class)
@@ -205,7 +205,7 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
         CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
-        CDD.free(cdd);
+        cdd.free();
 
         cdd = cdd.reduce();
         cdd.isNotFalse();
@@ -219,9 +219,9 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
         CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
-        CDD.free(cdd);
+        cdd.free();
 
-        CDD.free(cdd);
+        cdd.free();
     }
 
     @Test
@@ -239,7 +239,7 @@ public class CDDTest {
         assertEquals(3, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(CDD_INF>>1, node.getSegmentAtIndex(1).getUpperBound());
 
-        CDD.free(cdd);
+        cdd.free();
 
     }
 
@@ -266,7 +266,7 @@ public class CDDTest {
         assertEquals(6, node.getSegmentAtIndex(1).getUpperBound());
         assertEquals(CDD_INF>>1, node.getSegmentAtIndex(2).getUpperBound());
 
-        CDD.free(cdd);
+        cdd.free();
     }
 
     @Test
