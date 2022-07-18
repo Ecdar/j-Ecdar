@@ -518,7 +518,7 @@ public class CDD {
         return CDD.toClockGuards(state, relevantClocks);
     }
 
-    public static Guard toClockGuards(CDD cdd, List<Clock> relevantClocks)
+    private static Guard toClockGuards(CDD cdd, List<Clock> relevantClocks)
         throws IllegalArgumentException {
         if (cdd.isBDD()) {
             throw new IllegalArgumentException("CDD is a BDD");
@@ -555,7 +555,7 @@ public class CDD {
         return new OrGuard(orParts);
     }
 
-    public static Guard toBoolGuards(CDD bdd)
+    private static Guard toBoolGuards(CDD bdd)
             throws IllegalArgumentException {
         if (!bdd.isBDD()) {
             throw new IllegalArgumentException("CDD is not a BDD");
