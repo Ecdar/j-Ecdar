@@ -77,6 +77,10 @@ public class CDD {
         return guard;
     }
 
+    public Guard getGuard() {
+        return getGuard(clocks);
+    }
+
     public long getPointer() {
         return pointer;
     }
