@@ -737,7 +737,7 @@ public class CDD {
         numClocks = CDD.clocks.size() + 1;
         CDDLib.cddAddClocks(numClocks);
     }
-    
+
     public static void addClocks(Clock... clocks) {
         addClocks(
                 Arrays.asList(clocks)
