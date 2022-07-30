@@ -34,12 +34,12 @@ public class CDD {
     public CDD() {
         checkIfNotRunning();
         this.pointer = CDDLib.allocateCdd();
-        this.isGuardDirty = true;
+        setDirty();
     }
 
     public CDD(long pointer) {
         this.pointer = pointer;
-        this.isGuardDirty = true;
+        setDirty();
     }
 
     public CDD(Guard guard)
