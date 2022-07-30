@@ -108,14 +108,9 @@ public abstract class TransitionSystem {
 
     public abstract List<SimpleTransitionSystem> getSystems();
 
-    public Set<Channel> getSyncs() {
-        return new HashSet<>();
-    }
-
     public Set<Channel> getActions() {
         Set<Channel> actions = new HashSet<>(getInputs());
         actions.addAll(getOutputs());
-        actions.addAll(getSyncs());
 
         return actions;
     }
@@ -226,6 +221,10 @@ public abstract class TransitionSystem {
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
 
     protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
+
+    protected boolean hasMove(SymbolicLocation location, Channel channel) {
+        return !getNextMoves(location, channel).isEmpty();
+    }
 
     List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest, boolean removeTargetInvars) {
         List<Move> moves = new ArrayList<>();

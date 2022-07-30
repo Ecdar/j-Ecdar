@@ -48,9 +48,7 @@ public class Quotient extends TransitionSystem {
         inputs.add(newChan);
 
         Set<Channel> outputsOfSpec = new HashSet<>(left.getOutputs());
-        outputsOfSpec.addAll(left.getSyncs());
         Set<Channel> outputsOfComp = new HashSet<>(right.getOutputs());
-        outputsOfComp.addAll(right.getSyncs());
 
         Set<Channel> inputsOfCompMinusInputsOfSpec = new HashSet<>(right.getInputs());
         inputsOfCompMinusInputsOfSpec.removeAll(left.getInputs());
@@ -190,7 +188,7 @@ public class Quotient extends TransitionSystem {
                     //Rule 2: "channels in comp not in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the spec alphabet
-                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c) && !left.getSyncs().contains(c)) {
+                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c)) {
                             // if the current location in comp has a transition with c
                             if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
@@ -296,7 +294,7 @@ public class Quotient extends TransitionSystem {
                     //Rule 8: "independent action in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the components alphabet
-                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c) && !right.getSyncs().contains(c)) {
+                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c)) {
                             // if the current location in spec has a transition with c
                             if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {

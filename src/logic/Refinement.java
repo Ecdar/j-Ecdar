@@ -38,10 +38,8 @@ public class Refinement {
         inputs2 = ts2.getInputs();
 
         outputs1 = new HashSet<>(ts1.getOutputs());
-        outputs1.addAll(ts1.getSyncs());
 
         outputs2 = new HashSet<>(ts2.getOutputs());
-        outputs2.addAll(ts2.getSyncs());
 
         setMaxBounds();
     }

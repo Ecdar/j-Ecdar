@@ -100,6 +100,7 @@ public class UniversitySimpleTest {
 
 
     @Test
+    @Ignore
     public void newQuotientTest2() {
 
         assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());

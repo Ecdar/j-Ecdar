@@ -7,76 +7,78 @@ import java.util.stream.Collectors;
 
 public class Composition extends TransitionSystem {
     private final TransitionSystem[] systems;
-    private final Set<Channel> inputs, outputs, syncs;
+    private Set<Channel> inputs, outputs;
+    private final HashMap<Clock, Integer> maxBounds;
     private List<State> passed = new ArrayList<>();
     private List<State> waiting = new ArrayList<>();
-
-
-
 
 
     public Composition(TransitionSystem... systems) {
         this.systems = systems;
 
-        clocks.addAll(Arrays.stream(systems).map(TransitionSystem::getClocks).flatMap(List::stream).collect(Collectors.toList()));
-        BVs.addAll(Arrays.stream(systems).map(TransitionSystem::getBVs).flatMap(List::stream).collect(Collectors.toList()));
-
-        // initialize inputs, outputs and syncs
+        maxBounds = new HashMap<>();
         inputs = new HashSet<>();
         outputs = new HashSet<>();
-        syncs = new HashSet<>();
+
+        // Get all the clocks from all the systems
+        clocks.addAll(Arrays.stream(systems)
+                .map(TransitionSystem::getClocks)
+                .flatMap(List::stream)
+                .collect(Collectors.toList())
+        );
+
+        // Get all the boolean variables from all the systems
+        BVs.addAll(Arrays.stream(systems)
+                .map(TransitionSystem::getBVs)
+                .flatMap(List::stream)
+                .collect(Collectors.toList())
+        );
+
+        /* Given a set of specifications we have a composition with:
+         * - The Locations is the cartesian product of all specifications
+         * - The initial location is the tuple of all initials of all specifications
+         * - The actions is the disjoint union of all input/output actions of the specifications
+         * - The transition system is later defined.
+         * For the composition to be created it must be that:
+         * - The intersection of all specification pairs output actions must be the empty set */
 
         // to compute inputs, outputs and syncs of composed TS, analyse all pairs of TS's
         for (int i = 0; i < systems.length; i++) {
-
-            // initialize inputs and outputs of TS at index i
-            Set<Channel> inputsOfI = new HashSet<>(systems[i].getInputs());
-            Set<Channel> outputsOfI = new HashSet<>(systems[i].getOutputs());
-
-            // add syncs of I to global sync list
-            syncs.addAll(systems[i].getSyncs());
-
             for (int j = 0; j < systems.length; j++) {
-                if (i != j) {
-
-                    // get inputs, outputs and syncs of TS at index j
-                    Set<Channel> inputsOfJ = new HashSet<>(systems[j].getInputs());
-                    Set<Channel> outputsOfJ = new HashSet<>(systems[j].getOutputs());
-                    Set<Channel> syncsOfJ = new HashSet<>(systems[j].getSyncs());
-
-                    // we need to fetch the outputs of I again, as they might have been modified in the process
-                    Set<Channel> cleanOutputsOfI = new HashSet<>(systems[i].getOutputs());
-                    System.out.println("System names: " + systems[i].getName() + " -- " + systems[j].getName());
-                    System.out.println(cleanOutputsOfI);
-                    System.out.println(outputsOfJ);
-                    // check if output actions overlap
-                    Set<Channel> diff = setIntersection(cleanOutputsOfI, outputsOfJ);
-                    if (!diff.isEmpty()) {
-                        throw new IllegalArgumentException("The automata cannot be composed");
-                    }
-
-                    // we need to fetch the inputs of I again, as they might have been modified in the process
-                    Set<Channel> cleanInputsOfI = new HashSet<>(systems[i].getInputs());
-                    // if some inputs of one automaton overlap with the outputs of another one, add those to the global sync list
-                    syncs.addAll(setIntersection(cleanInputsOfI, outputsOfJ));
-
-                    // apply changes to inputs and outputs of TS at index i
-                    inputsOfI.removeAll(outputsOfJ);
-                    inputsOfI.removeAll(syncsOfJ);
-                    outputsOfI.removeAll(inputsOfJ);
-                    outputsOfI.removeAll(syncsOfJ);
+                if (i == j) {
+                    continue;
                 }
-            }
 
-            // add inputs and outputs to the global lists
-            inputs.addAll(inputsOfI);
-            outputs.addAll(outputsOfI);
-           // outputs.addAll(syncs);
-           // syncs.clear();
-            System.out.println("outputs " +outputs);
-            System.out.println("inputs " +inputs);
-            System.out.println("internal " +syncs);
-            setMaxBounds();
+                TransitionSystem system_i = systems[i];
+                TransitionSystem system_j = systems[j];
+
+                // Same output actions check
+                Set<Channel> output_intersection = intersect(
+                        system_i.getOutputs(),
+                        system_j.getOutputs()
+                );
+                if (!output_intersection.isEmpty()) {
+                    throw new IllegalArgumentException("The output actions of all pairs of specifications must have an empty intersection");
+                }
+
+                // Act_o = Act_o^i U Act_o^j
+                outputs = union(
+                        outputs, system_j.getOutputs()
+                );
+
+                // Act_i = (Act_i^i \ Act_o^j) U (Act_i^j \ Act_o^i)
+                inputs = union(
+                        difference(inputs, system_j.getOutputs()),
+                        difference(system_j.getInputs(), outputs)
+                );
+            }
+        }
+
+        // Sets the max bounds
+        for (TransitionSystem system : systems) {
+            maxBounds.putAll(
+                    system.getMaxBounds()
+            );
         }
     }
 
@@ -85,14 +87,11 @@ public class Composition extends TransitionSystem {
     }
 
     public Set<Channel> getOutputs() {
-        Set<Channel> result = new HashSet<>();
-        result.addAll(outputs);
-        result.addAll(syncs);
-        return result;
+        return outputs;
     }
 
     public Set<Channel> getSyncs() {
-        return syncs;
+        return new HashSet<>();
     }
 
     public SymbolicLocation getInitialLocation() {
@@ -100,30 +99,17 @@ public class Composition extends TransitionSystem {
     }
 
     public List<SimpleTransitionSystem> getSystems() {
-        List<SimpleTransitionSystem> result = new ArrayList<>();
-        for (TransitionSystem ts : systems) {
-            result.addAll(ts.getSystems());
-        }
-        return result;
+        return Arrays.stream(systems)
+                .map(TransitionSystem::getSystems)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 
-
-    private HashMap<Clock,Integer> maxBounds;
-    public void setMaxBounds() {
-        HashMap<Clock,Integer> res = new HashMap<>();
-        for (TransitionSystem sys : Arrays.stream(systems).collect(Collectors.toList()))
-            res.putAll(sys.getMaxBounds());
-
-        maxBounds = res;
-    }
-
-
-    public Automaton createComposition(List<Automaton> autList)
-    {
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
+    public Automaton createComposition(List<Automaton> autList) {
+        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
         CDD.addClocks(getClocks());
         CDD.addBooleans(BVs.getItems());
-        String name="";
+        String name = "";
 
         Set<Edge> edgesSet = new HashSet<>();
         Set<Location> locationsSet = new HashSet<>();
@@ -144,26 +130,25 @@ public class Composition extends TransitionSystem {
         locationsSet.add(initL);
 
         Set<Channel> all = new HashSet<>();
-        all.addAll(syncs); all.addAll(outputs); all.addAll(inputs);
+        all.addAll(outputs);
+        all.addAll(inputs);
 
 
-        locMap.put(initL.getName(),initL);
+        locMap.put(initL.getName(), initL);
 
-        State initState = getInitialState();;
+        State initState = getInitialState();
+        ;
         waiting.add(initState);
 
-        while (!waiting.isEmpty())
-        {
-            State currentState = (State)waiting.toArray()[0];
+        while (!waiting.isEmpty()) {
+            State currentState = (State) waiting.toArray()[0];
             waiting.remove(currentState);
             passed.add(currentState);
 
-            for (Channel chan : all )
-            {
+            for (Channel chan : all) {
 
                 List<Transition> transList = getNextTransitions(currentState, chan, clocks.getItems());
-                for (Transition trans : transList)
-                {
+                for (Transition trans : transList) {
                     String targetName = trans.getTarget().getLocation().getName();
 
                     boolean isInitial = trans.getTarget().getLocation().getIsInitial();
@@ -180,28 +165,27 @@ public class Composition extends TransitionSystem {
                         target = locMap.get(targetName);
                     else {
                         target = new Location(targetName, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
-                        locMap.put(targetName,target);
+                        locMap.put(targetName, target);
                     }
                     locationsSet.add(target);
-                    if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget()) ) {
-                        trans.getTarget().extrapolateMaxBounds(maxBounds,clocks.getItems());
+                    if (!passedContains(trans.getTarget()) && !waitingContains(trans.getTarget())) {
+                        trans.getTarget().extrapolateMaxBounds(maxBounds, clocks.getItems());
                         waiting.add(trans.getTarget());
                     }
                     Guard guardList = trans.getGuards(clocks.getItems()); // TODO: Check!
                     List<Update> updateList = trans.getUpdates();
                     boolean isInput = false;
                     if (inputs.contains(chan))
-                        isInput= true;
-                    assert(locMap.get(sourceName)!=null);
-                    assert(locMap.get(targetName)!=null);
+                        isInput = true;
+                    assert (locMap.get(sourceName) != null);
+                    assert (locMap.get(targetName) != null);
 
                     Edge e = new Edge(locMap.get(sourceName), locMap.get(targetName), chan, isInput, guardList, updateList);
-                    boolean edgeAlreadyExists=false;
+                    boolean edgeAlreadyExists = false;
                     for (Edge otherE : edgesSet) {
-                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(Arrays.stream(e.getUpdates().toArray()).toArray(), Arrays.stream(otherE.getUpdates().toArray()).toArray()))
-                        {
+                        if (otherE.getSource().equals(e.getSource()) && otherE.getTarget().equals(e.getTarget()) && otherE.getChannel().equals(e.getChannel()) && e.isInput() == otherE.isInput() && Arrays.equals(Arrays.stream(e.getUpdates().toArray()).toArray(), Arrays.stream(otherE.getUpdates().toArray()).toArray())) {
 
-                            if (e.getGuardCDD().equiv(otherE.getGuardCDD()));
+                            if (e.getGuardCDD().equiv(otherE.getGuardCDD())) ;
                             {
 
                                 edgeAlreadyExists = true;
@@ -214,37 +198,32 @@ public class Composition extends TransitionSystem {
                 }
 
 
-
             }
 
         }
 
-        List <Location> locsWithNewClocks = updateClocksInLocs(locationsSet,clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
-        List <Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet,clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
+        List<Location> locsWithNewClocks = updateClocksInLocs(locationsSet, clocks.getItems(), clocks.getItems(), BVs.getItems(), BVs.getItems());
+        List<Edge> edgesWithNewClocks = updateClocksInEdges(edgesSet, clocks.getItems(), clocks.getItems(), BVs.getItems(), BVs.getItems());
         Automaton resAut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
         CDD.done();
         return resAut;
 
     }
 
-    public boolean passedContains(State s)
-    {
+    public boolean passedContains(State s) {
         boolean contained = false;
 
-        for (State st: passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
-        {
+        for (State st : passed.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList())) {
             if (s.getInvariant().isSubset(st.getInvariant()))
                 contained = true;
         }
         return contained;
     }
 
-    public boolean waitingContains(State s)
-    {
+    public boolean waitingContains(State s) {
         boolean contained = false;
 
-        for (State st: waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList()))
-        {
+        for (State st : waiting.stream().filter(st -> st.getLocation().getName().equals(s.getLocation().getName())).collect(Collectors.toList())) {
 
             if (s.getInvariant().isSubset(st.getInvariant())) {
                 contained = true;
@@ -253,17 +232,16 @@ public class Composition extends TransitionSystem {
         return contained;
     }
 
-    public Location createLoc(List<Location> locList)
-    {
-        String name="";
+    public Location createLoc(List<Location> locList) {
+        String name = "";
         Guard invariant;
 
-        CDD invarFed =CDD.cddUnrestrained();
+        CDD invarFed = CDD.cddUnrestrained();
         boolean isInitial = true;
         boolean isUrgent = false;
         boolean isUniversal = false;
         boolean isInconsistent = false;
-        int x=0, y=0;
+        int x = 0, y = 0;
 
         for (Location l : locList) {
             if (name.isEmpty())
@@ -282,17 +260,16 @@ public class Composition extends TransitionSystem {
         }
         invariant = invarFed.getGuard(clocks.getItems());
 
-        return new Location(name, invariant, isInitial,isUrgent,isUniversal,isInconsistent, x/locList.size(), y / locList.size());
+        return new Location(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, x / locList.size(), y / locList.size());
 
     }
 
 
     @Override
-    public Automaton getAutomaton()
-    {
+    public Automaton getAutomaton() {
 
         List<Automaton> autList = new ArrayList<>();
-        for (int i=0; i<systems.length;i++)
+        for (int i = 0; i < systems.length; i++)
             autList.add(systems[i].getAutomaton());
 
         Automaton resAut = createComposition(autList);
@@ -317,7 +294,7 @@ public class Composition extends TransitionSystem {
 
     public List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
         // Check if action belongs to this TS at all before proceeding
-        if (!outputs.contains(channel) && !inputs.contains(channel) && !syncs.contains(channel))
+        if (!outputs.contains(channel) && !inputs.contains(channel))
             return new ArrayList<>();
         //System.out.println(symLocation.toString());
         //System.out.println(systems[0].getAutomaton().getName());
@@ -349,7 +326,7 @@ public class Composition extends TransitionSystem {
             else
                 moveExisted = true;
 
-            resultMoves = moveProduct(resultMoves, moves, i == 1,false);
+            resultMoves = moveProduct(resultMoves, moves, i == 1, false);
         }
 
         if (!moveExisted) return new ArrayList<>();
@@ -357,35 +334,48 @@ public class Composition extends TransitionSystem {
     }
 
     private boolean checkForOutputs(Channel channel, List<SymbolicLocation> locations) {
-        // for syncs, we must make sure we have an output first
-        if (syncs.contains(channel)) {
-            // loop through all automata to find the one sending the output
-            for (int i = 0; i < systems.length; i++) {
-                if (systems[i].getOutputs().contains(channel) || systems[i].getSyncs().contains(channel)) {
-                    List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
-                    if (moves.isEmpty()) {
-                        // do not check for outputs if the state in the corresponding automaton does not send that output
-                        return false;
-                    }
-                }
+        // loop through all automata to find the one sending the output
+        for (int i = 0; i < systems.length; i++) {
+            /* Here "i" is not only the index of the system,
+             *   but the order of the locations must also follow
+             *   the one of the composition meaning that the i'th
+             *   location is also for the i'th system. */
+            TransitionSystem system = systems[i];
+            SymbolicLocation location = locations.get(i);
+
+            if (system.getOutputs().contains(channel) &&
+                    !system.hasMove(location, channel)) {
+                // do not check for outputs if the state in the corresponding automaton does not send that output
+                return false;
             }
         }
         return true;
     }
+
     @Override
     public String getName() {
         String result = "";
-        for (TransitionSystem ts: systems)
-        {
+        for (TransitionSystem ts : systems) {
             result = result + ts.getName() + " || ";
         }
-        return result.substring(0,result.length()-4);
+        return result.substring(0, result.length() - 4);
     }
 
-    private Set<Channel> setIntersection(Set<Channel> set1, Set<Channel> set2) {
+    private Set<Channel> intersect(Set<Channel> set1, Set<Channel> set2) {
         Set<Channel> intersection = new HashSet<>(set1);
         intersection.retainAll(set2);
-
         return intersection;
+    }
+
+    private Set<Channel> difference(Set<Channel> set1, Set<Channel> set2) {
+        Set<Channel> difference = new HashSet<>(set1);
+        difference.removeAll(set2);
+        return difference;
+    }
+
+    private Set<Channel> union(Set<Channel> set1, Set<Channel> set2) {
+        Set<Channel> union = new HashSet<>(set1);
+        union.addAll(set2);
+        return union;
     }
 }
