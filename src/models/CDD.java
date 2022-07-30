@@ -4,6 +4,7 @@ import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import lib.CDDLib;
 
+import javax.naming.ldap.ExtendedRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,9 @@ public class CDD {
 
     private Guard guard;
     private boolean isGuardDirty;
+
+    private CddExtractionResult extraction;
+    private boolean isExtractionDirty;
 
     private static boolean cddIsRunning;
     private static List<Clock> clocks = new ArrayList<>();
@@ -68,6 +72,11 @@ public class CDD {
         }
         this.pointer = cdd.pointer;
         this.guard = guard;
+    }
+
+    private void setDirty() {
+        isGuardDirty = true;
+        isExtractionDirty = true;
     }
 
     public Guard getGuard(List<Clock> relevantClocks) {
@@ -185,9 +194,16 @@ public class CDD {
 
     public CddExtractionResult extract()
             throws NullPointerException, CddNotRunningException {
-        checkIfNotRunning();
-        checkForNull();
-        return new CddExtractionResult(CDDLib.extractBddAndDbm(pointer));
+        if (isExtractionDirty) {
+            checkIfNotRunning();
+            checkForNull();
+            extraction = new CddExtractionResult(
+                    CDDLib.extractBddAndDbm(pointer)
+            );
+            isExtractionDirty = false;
+        }
+
+        return extraction;
     }
 
     public boolean isBDD()
@@ -353,7 +369,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.delay(pointer);
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -362,7 +378,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.delayInvar(pointer, invariant.pointer);
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -371,7 +387,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.exist(pointer, levels, clocks);
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -381,7 +397,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.past(pointer);
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -390,7 +406,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.removeNegative(pointer);
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -407,7 +423,7 @@ public class CDD {
 
         pointer = CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues);
         removeNegative().reduce();
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -418,7 +434,7 @@ public class CDD {
         guard.checkForNull();
         pointer = CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues);
         removeNegative().reduce();
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -429,7 +445,7 @@ public class CDD {
         guard.checkForNull();
         update.checkForNull();
         pointer = CDDLib.transitionBackPast(pointer, guard.pointer, update.pointer, clockResets, boolResets);
-        isGuardDirty = true;
+        setDirty();
         return this;
     }
 
@@ -438,7 +454,16 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         pointer = CDDLib.reduce(pointer);
-        isGuardDirty = true;
+        setDirty();
+        return this;
+    }
+
+    public CDD predt(CDD safe) {
+        checkIfNotRunning();
+        checkForNull();
+        safe.checkForNull();
+        pointer = CDDLib.predt(pointer, safe.pointer);
+        setDirty();
         return this;
     }
 
@@ -474,15 +499,6 @@ public class CDD {
         other.checkForNull();
         long resultPointer = CDDLib.disjunction(pointer, other.pointer);
         return new CDD(resultPointer);
-    }
-
-    public CDD predt(CDD safe) {
-        checkIfNotRunning();
-        checkForNull();
-        safe.checkForNull();
-        pointer = CDDLib.predt(pointer, safe.pointer);
-        isGuardDirty = true;
-        return this;
     }
 
     public boolean intersects(CDD other) {
