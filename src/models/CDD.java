@@ -4,7 +4,6 @@ import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import lib.CDDLib;
 
-import javax.naming.ldap.ExtendedRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
