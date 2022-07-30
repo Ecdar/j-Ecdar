@@ -276,24 +276,6 @@ public class CDD {
         return applyReset(clockResets, clockValues, boolResets, boolValues).removeNegative().reduce();
     }
 
-    private int[] getClockUpdateIndices(List<Update> updates) {
-        return updates.stream()
-                .filter(update -> update instanceof ClockUpdate)
-                .map(update -> (ClockUpdate) update)
-                .map(update -> indexOf(update.getClock()))
-                .mapToInt(Integer::intValue)
-                .toArray();
-    }
-
-    private int[] getBoolUpdateIndices(List<Update> updates) {
-        return updates.stream()
-                .filter(update -> update instanceof BoolUpdate)
-                .map(update -> (BoolUpdate) update)
-                .map(update -> indexOf(update.getBV()))
-                .mapToInt(Integer::intValue)
-                .toArray();
-    }
-
     public boolean canDelayIndefinitely() {
         if (isTrue()) {
             return true;

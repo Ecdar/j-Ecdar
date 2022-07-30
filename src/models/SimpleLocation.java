@@ -50,7 +50,7 @@ public class SimpleLocation extends SymbolicLocation {
 
     @Override
     public CDD getInvariant() {
-        return location.getInvariantCDD();
+        return new CDD(location.getInvariant());
     }
 
     @Override
