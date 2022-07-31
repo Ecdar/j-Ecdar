@@ -57,15 +57,6 @@ public abstract class TransitionSystem {
         return state;
     }
 
-    public abstract String getName();
-    public abstract Automaton getAutomaton();
-    protected abstract SymbolicLocation getInitialLocation();
-    public abstract List<SimpleTransitionSystem> getSystems();
-    public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
-    protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
-    public abstract Set<Channel> getInputs();
-    public abstract Set<Channel> getOutputs();
-
     public List<Transition> getNextTransitions(State currentState, Channel channel) {
         return getNextTransitions(currentState, channel, clocks.getItems());
     }
@@ -331,4 +322,14 @@ public abstract class TransitionSystem {
         TransitionSystem that = (TransitionSystem) o;
         return clocks.equals(that.clocks);
     }
+
+    public abstract String getName();
+    public abstract Automaton getAutomaton();
+    public abstract Set<Channel> getInputs();
+    public abstract Set<Channel> getOutputs();
+    public abstract List<SimpleTransitionSystem> getSystems();
+    protected abstract SymbolicLocation getInitialLocation();
+    public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
+
+    protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
 }
