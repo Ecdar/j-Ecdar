@@ -137,9 +137,13 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     private Automaton aggregate(Automaton[] automata) {
-        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-        CDD.addClocks(getClocks());
-        CDD.addBooleans(BVs.getItems());
+        boolean initialisedCdd = false;
+        if (!CDD.isRunning()) {
+            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
+            CDD.addClocks(getClocks());
+            CDD.addBooleans(BVs.getItems());
+            initialisedCdd = true;
+        }
 
         String name = getName();
 
@@ -210,12 +214,16 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
             }
         }
 
-        List<Location> updatedLocations = updateClocksInLocs(
+        List<Location> updatedLocations = updateLocations(
                 locations, getClocks(), getClocks(), getBVs(), getBVs()
         );
-        List<Edge> edgesWithNewClocks = updateClocksInEdges(edges, clocks.getItems(), clocks.getItems(), BVs.getItems(), BVs.getItems());
+        List<Edge> edgesWithNewClocks = updateEdges(edges, clocks.getItems(), clocks.getItems(), BVs.getItems(), BVs.getItems());
         Automaton resAut = new Automaton(name, updatedLocations, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
-        CDD.done();
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
+
         return resAut;
     }
 

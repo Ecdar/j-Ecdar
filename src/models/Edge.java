@@ -62,6 +62,10 @@ public class Edge {
         );
     }
 
+    public Edge(Edge copy, List<Clock> newClocks, List<BoolVar> newBVs, List<Clock> oldClocks, List<BoolVar> oldBVs) {
+        this(copy, newClocks, newBVs, copy.getSource(), copy.getTarget(), oldClocks, oldBVs);
+    }
+
     public CDD getGuardCDD() {
         return new CDD(guard);
     }

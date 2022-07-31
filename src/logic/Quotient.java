@@ -387,8 +387,8 @@ public class Quotient extends TransitionSystem {
 
         newClock = new Clock("quo_new", "quo");
         clocks.add(newClock);
-        List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
-        List <Edge> edgesWithNewClocks = updateClocksInEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
+        List <Location> locsWithNewClocks = updateLocations(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
+        List <Edge> edgesWithNewClocks = updateEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
         CDD.done();
         Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), true);
 

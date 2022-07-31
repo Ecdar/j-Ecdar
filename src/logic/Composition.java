@@ -42,7 +42,9 @@ public class Composition extends AggregatedTransitionSystem {
                         system_j.getOutputs()
                 );
                 if (!output_intersection.isEmpty()) {
-                    throw new IllegalArgumentException("The output actions of all pairs of specifications must have an empty intersection");
+                    throw new IllegalArgumentException(
+                            "The output actions of all pairs of specifications must have an empty intersection"
+                    );
                 }
 
                 // Act_o = Act_o^i U Act_o^j
