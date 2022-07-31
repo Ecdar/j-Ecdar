@@ -19,6 +19,10 @@ public class ComplexLocation extends SymbolicLocation {
         invariants = invar;
     }
 
+    public ComplexLocation(SymbolicLocation... locations) {
+        this(Arrays.asList(locations));
+    }
+
     public List<SymbolicLocation> getLocations() {
         return locations;
     }

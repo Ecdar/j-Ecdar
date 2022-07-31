@@ -21,6 +21,10 @@ public class Move {
         }
     }
 
+    public Move(SymbolicLocation source, SymbolicLocation target) {
+        this(source, target, new ArrayList<>());
+    }
+
     /**
      * Return the enabled part of a move based on guard, source invariant and predated target invariant
      **/
@@ -49,7 +53,7 @@ public class Move {
     }
 
     public CDD getGuardCDD() {
-        return (guardCDD);
+        return guardCDD;
     }
 
     public Guard getGuards(List<Clock> relevantClocks) {

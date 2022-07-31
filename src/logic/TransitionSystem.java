@@ -72,33 +72,66 @@ public abstract class TransitionSystem {
 
     SymbolicLocation getInitialLocation(TransitionSystem[] systems) {
         // build ComplexLocation with initial location from each TransitionSystem
-        return new ComplexLocation(Arrays.stream(systems).map(TransitionSystem::getInitialLocation).collect(Collectors.toList()));
+        List<SymbolicLocation> initials = Arrays
+                .stream(systems)
+                .map(TransitionSystem::getInitialLocation)
+                .collect(Collectors.toList());
+        return new ComplexLocation(initials);
+    }
+
+    Transition createNewTransition(State state, Move move) {
+        // Conjoined CDD of all edges in the move
+        CDD edgeGuard = move.getGuardCDD();
+
+        /* Simulate the move across the edge.
+         *   Init the invariant to false, as it might be
+         *   that the edge guard is false and thereby the conjunction
+         *   (Applying the edge guard) will result in a contradiction. */
+        CDD guardCDD = CDD.cddFalse();
+        if (!edgeGuard.isFalse()) {
+            guardCDD = state.getInvariant().conjunction(edgeGuard);
+        }
+
+        /* Now that we have simulated the traversal over the edge
+         *   the current state of the "invariant" is the guardCDD. */
+        CDD invariant = guardCDD.hardCopy();
+
+        invariant = invariant.applyReset(
+                move.getUpdates()
+        );
+        invariant = invariant.delay();
+        invariant = invariant.conjunction(
+                move.getTarget().getInvariant()
+        );
+
+        // Create the state after traversing the edge
+        State targetState = new State(
+                move.getTarget(), invariant
+        );
+
+        return new Transition(
+                state, targetState, move, guardCDD
+        );
     }
 
     List<Transition> createNewTransitions(State currentState, List<Move> moves, List<Clock> allClocks) {
         List<Transition> transitions = new ArrayList<>();
-        // loop through moves
+
         for (Move move : moves) {
-            State targetState = new State(move.getTarget(), currentState.getInvariant());
-            targetState.applyGuards(move.getGuardCDD());
+            Transition transition = createNewTransition(
+                    currentState, move
+            );
 
-            if (targetState.getInvariant().isFalse())
-            {
+            // Check if it is unreachable and if so then ignore it
+            if (transition.getTarget().getInvariant().isFalse()) {
                 continue;
             }
 
-            CDD guardCDD = new CDD(targetState.getInvariant().getPointer());
-
-            targetState.applyResets(move.getUpdates());
-            targetState.delay();
-            targetState.applyInvariants();
-
-            if (targetState.getInvariant().isFalse())
-            {
-                continue;
-            }
-            transitions.add(new Transition(currentState, targetState, move, guardCDD));
+            transitions.add(
+                    transition
+            );
         }
+
         return transitions;
     }
 
@@ -228,35 +261,52 @@ public abstract class TransitionSystem {
 
     List<Move> moveProduct(List<Move> moves1, List<Move> moves2, boolean toNest, boolean removeTargetInvars) {
         List<Move> moves = new ArrayList<>();
+
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
+                SymbolicLocation q1s = move1.getSource();
+                SymbolicLocation q1t = move1.getTarget();
+                SymbolicLocation q2s = move2.getSource();
+                SymbolicLocation q2t = move2.getTarget();
 
-                SymbolicLocation source, target;
+                List<SymbolicLocation> sources = new ArrayList<>();
+                List<SymbolicLocation> targets = new ArrayList<>();
+
+                /* Important!: The order of which the locations are added are important.
+                 *   First we add q1 and then q2. This is VERY important as the for aggregated
+                 *   systems the indices of complex locations and systems are not interchangeable. */
 
                 if (toNest) {
-                    source = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getSource(), move2.getSource())));
-                    target = new ComplexLocation(new ArrayList<>(Arrays.asList(move1.getTarget(), move2.getTarget())));
-                    if (removeTargetInvars)
-                        ((ComplexLocation)target).removeInvariants();
+                    sources.add(q1s);
+                    targets.add(q1t);
                 } else {
-                    List<SymbolicLocation> newSourceLoc = new ArrayList<>(((ComplexLocation) move1.getSource()).getLocations());
-                    newSourceLoc.add(move2.getSource());
-                    source = new ComplexLocation(newSourceLoc);
-
-                    List<SymbolicLocation> newTargetLoc = new ArrayList<>(((ComplexLocation) move1.getTarget()).getLocations());
-                    newTargetLoc.add(move2.getTarget());
-                    target = new ComplexLocation(newTargetLoc);
-                    if (removeTargetInvars)
-                        ((ComplexLocation)target).removeInvariants();
+                    sources.addAll(((ComplexLocation) q1s).getLocations());
+                    targets.addAll(((ComplexLocation) q1t).getLocations());
                 }
 
-                List<Edge> edges = new ArrayList<>(move1.getEdges());
+                // Always add q2 after q1
+                sources.add(q2s);
+                targets.add(q2t);
+
+                ComplexLocation source = new ComplexLocation(sources);
+                ComplexLocation target = new ComplexLocation(targets);
+
+                // If true then we remove the conjoined invariant created from all "targets"
+                if (removeTargetInvars) {
+                    target.removeInvariants();
+                }
+
+                List<Edge> edges = new ArrayList<>();
+                edges.addAll(move1.getEdges());
                 edges.addAll(move2.getEdges());
 
-                Move newMove = new Move(source, target, edges);
-                moves.add(newMove);
+                // (q1s, q2s) -...-> (q1t, q2t)
+                moves.add(
+                        new Move(source, target, edges)
+                );
             }
         }
+
         return moves;
     }
 
