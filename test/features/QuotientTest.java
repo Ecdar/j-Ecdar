@@ -13,7 +13,8 @@ import static org.junit.Assert.assertTrue;
 
 public class QuotientTest {
 
-    private static SimpleTransitionSystem comp0,  comp1, comp2, spec01, test1Comp0, test1Comp1, test1Spec,  test2Spec, outputTest,outputTest1;
+    private static SimpleTransitionSystem comp0,  comp1, comp2, spec01, test1Comp0, test1Comp1, test1Spec,  test2Spec, outputTest, outputTest1,
+            counterExampleT, counterExampleS, counterExampleX;
 
     @After
     public void afterEachTest(){
@@ -36,6 +37,10 @@ public class QuotientTest {
         Automaton[] aut4= XMLParser.parse("samples/xml/quotient/QuotientTestOutputs.xml", false);
         outputTest = new SimpleTransitionSystem(aut4[3]);
         outputTest1 = new SimpleTransitionSystem(aut4[2]);
+        Automaton[] aut5= XMLParser.parse("samples/xml/quotient/CounterExample.xml", false);
+        counterExampleS = new SimpleTransitionSystem(aut5[0]);
+        counterExampleT = new SimpleTransitionSystem(aut5[1]);
+        counterExampleX = new SimpleTransitionSystem(aut5[2]);
     }
 
 /*
@@ -158,6 +163,28 @@ public class QuotientTest {
         // System.out.println("Pruned reachability");
         outPruned.toXML("testOutput/outputtest1-pruned.xml");
         assertTrue(true);
+    }
+
+    @Test
+    public void CounterExampleTest() {
+        boolean isImplementation = counterExampleX.isImplementation();
+        boolean ref1 = new Refinement(new Composition(counterExampleS, counterExampleX), counterExampleT).check();
+        boolean ref2 = new Refinement(counterExampleX, new Quotient(counterExampleT, counterExampleS)).check();
+
+        assert(isImplementation);
+        assert(ref1 == ref2);
+
+        Refinement ref = new Refinement(counterExampleX, new Quotient(counterExampleT, counterExampleS));
+        ref.check();
+        System.out.println(ref.getErrMsg());
+
+        Quotient quotient = new Quotient(counterExampleT, counterExampleS);
+        SimpleTransitionSystem output = quotient.calculateQuotientAutomaton();
+        output.toXML("testOutput/quotient-counterExampleT-counterExampleS.xml");
+
+//        assertTrue(isImplementation);
+//        assertTrue(ref1);
+//        assertTrue(ref2); // This assert will fail for this counter example.
     }
 
 }
