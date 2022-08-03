@@ -2,8 +2,10 @@ package log;
 
 import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Log {
     private static Urgency urgency = Urgency.All;
@@ -40,9 +42,21 @@ public class Log {
         }
     }
 
+    public static void fatal(String... messages) {
+        fatal(String.join(" ", messages));
+    }
+
     public static void fatal(@Nullable Object obj) {
         fatal(
                 String.valueOf(obj)
+        );
+    }
+
+    public static void fatal(Object... objs) {
+        fatal(
+                String.join(
+                        " ", Arrays.stream(objs).map(String::valueOf).toArray(String[]::new)
+                )
         );
     }
 
@@ -56,9 +70,21 @@ public class Log {
         }
     }
 
+    public static void error(String... messages) {
+        error(String.join(" ", messages));
+    }
+
     public static void error(@Nullable Object obj) {
         error(
                 String.valueOf(obj)
+        );
+    }
+
+    public static void error(Object... objs) {
+        error(
+                String.join(
+                        " ", Arrays.stream(objs).map(String::valueOf).toArray(String[]::new)
+                )
         );
     }
 
@@ -72,9 +98,21 @@ public class Log {
         }
     }
 
+    public static void warn(String... messages) {
+        warn(String.join(" ", messages));
+    }
+
     public static void warn(@Nullable Object obj) {
         warn(
                 String.valueOf(obj)
+        );
+    }
+
+    public static void warn(Object... objs) {
+        warn(
+                String.join(
+                        " ", Arrays.stream(objs).map(String::valueOf).toArray(String[]::new)
+                )
         );
     }
 
@@ -88,9 +126,21 @@ public class Log {
         }
     }
 
+    public static void info(String... messages) {
+        info(String.join(" ", messages));
+    }
+
     public static void info(@Nullable Object obj) {
         info(
                 String.valueOf(obj)
+        );
+    }
+
+    public static void info(Object... objs) {
+        info(
+                String.join(
+                        " ", Arrays.stream(objs).map(String::valueOf).toArray(String[]::new)
+                )
         );
     }
 
@@ -104,9 +154,21 @@ public class Log {
         }
     }
 
+    public static void debug(String... messages) {
+        debug(String.join(" ", messages));
+    }
+
     public static void debug(@Nullable Object obj) {
         debug(
                 String.valueOf(obj)
+        );
+    }
+
+    public static void debug(Object... objs) {
+        debug(
+                String.join(
+                        " ", Arrays.stream(objs).map(String::valueOf).toArray(String[]::new)
+                )
         );
     }
 
@@ -120,9 +182,21 @@ public class Log {
         }
     }
 
+    public static void trace(String... messages) {
+        trace(String.join(" ", messages));
+    }
+
     public static void trace(@Nullable Object obj) {
         trace(
                 String.valueOf(obj)
+        );
+    }
+
+    public static void trace(Object... objs) {
+        trace(
+                String.join(
+                        " ", Arrays.stream(objs).map(String::valueOf).toArray(String[]::new)
+                )
         );
     }
 
