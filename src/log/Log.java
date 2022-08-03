@@ -12,11 +12,17 @@ public class Log {
         Log.urgency = urgency;
     }
 
-    static {
+    public static void setUrgency() {
         // Makes running tests an opt-in for logging, whereas default is opt-out
         if (isRunningTests()) {
             setUrgency(Urgency.Off);
+        } else {
+            setUrgency(Urgency.All);
         }
+    }
+
+    static {
+        setUrgency();
     }
 
     private static boolean isRunningTests() {
