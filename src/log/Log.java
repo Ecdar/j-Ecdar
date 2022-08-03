@@ -12,6 +12,22 @@ public class Log {
         Log.urgency = urgency;
     }
 
+    static {
+        // Makes running tests an opt-in for logging, whereas default is opt-out
+        if (isRunningTests()) {
+            setUrgency(Urgency.Off);
+        }
+    }
+
+    private static boolean isRunningTests() {
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            if (element.getClassName().startsWith("org.junit.")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void fatal(String message) {
         if (urgency.level >= Urgency.Fatal.level) {
             out(format(message, Urgency.Fatal));
