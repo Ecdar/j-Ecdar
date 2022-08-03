@@ -2,6 +2,7 @@ package models;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
@@ -115,7 +116,7 @@ public class DisjunctionTest {
         Guard out = CDD.toGuardList(neg, clocks);
 
 
-        System.out.println(out);
+        Log.trace(out);
 
                                     // ( ((x<=3)) or ((x>=7 && x<9)) )
         assert (out.toString().equals("(x<=3 or (x>=7 && x<9))"));

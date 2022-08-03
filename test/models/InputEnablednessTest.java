@@ -2,6 +2,7 @@ package models;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import org.junit.After;
@@ -28,7 +29,7 @@ public class InputEnablednessTest {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
 
-        System.out.println("started setup");
+        Log.trace("started setup");
 
         ClockGuard invL1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
 
@@ -127,7 +128,7 @@ public class InputEnablednessTest {
         //SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
        //  st.toXML("BASE.xml");
         actual = (actual);
-        System.out.println("fnished setup");
+        Log.trace("fnished setup");
     }
 
     @Test

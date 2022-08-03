@@ -1,5 +1,6 @@
 package logic;
 
+import log.Log;
 import models.*;
 
 import java.util.*;
@@ -46,9 +47,9 @@ public class Composition extends TransitionSystem {
 
                     // we need to fetch the outputs of I again, as they might have been modified in the process
                     Set<Channel> cleanOutputsOfI = new HashSet<>(systems[i].getOutputs());
-                    System.out.println("System names: " + systems[i].getName() + " -- " + systems[j].getName());
-                    System.out.println(cleanOutputsOfI);
-                    System.out.println(outputsOfJ);
+                    Log.trace("System names: " + systems[i].getName() + " -- " + systems[j].getName());
+                    Log.trace(cleanOutputsOfI);
+                    Log.trace(outputsOfJ);
                     // check if output actions overlap
                     Set<Channel> diff = setIntersection(cleanOutputsOfI, outputsOfJ);
                     if (!diff.isEmpty()) {
@@ -73,9 +74,9 @@ public class Composition extends TransitionSystem {
             outputs.addAll(outputsOfI);
            // outputs.addAll(syncs);
            // syncs.clear();
-            System.out.println("outputs " +outputs);
-            System.out.println("inputs " +inputs);
-            System.out.println("internal " +syncs);
+            Log.trace("outputs " +outputs);
+            Log.trace("inputs " +inputs);
+            Log.trace("internal " +syncs);
             setMaxBounds();
         }
     }
@@ -319,9 +320,9 @@ public class Composition extends TransitionSystem {
         // Check if action belongs to this TS at all before proceeding
         if (!outputs.contains(channel) && !inputs.contains(channel) && !syncs.contains(channel))
             return new ArrayList<>();
-        //System.out.println(symLocation.toString());
-        //System.out.println(systems[0].getAutomaton().getName());
-        //System.out.println(systems[1].getAutomaton().getName());
+        //Log.trace(symLocation.toString());
+        //Log.trace(systems[0].getAutomaton().getName());
+        //Log.trace(systems[1].getAutomaton().getName());
         // If action is sync, then check if there is corresponding output in TS
         if (!checkForOutputs(channel, ((ComplexLocation) symLocation).getLocations())) return new ArrayList<>();
 

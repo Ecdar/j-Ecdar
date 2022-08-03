@@ -2,6 +2,7 @@ package cdd;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import models.*;
 import org.junit.After;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class CDDTest {
         CDD cdd2 = CDD.allocateInterval(2,1,4,true,6, true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
-        System.out.println(CDD.toGuardList(cdd2,clocks));
+        Log.trace(CDD.toGuardList(cdd2,clocks));
 
         Guard g1 = new ClockGuard(b,a,3,Relation.LESS_EQUAL );
         Guard g2 = new ClockGuard(a,b,5,Relation.LESS_EQUAL );
@@ -54,7 +55,7 @@ public class CDDTest {
         guardList.add(g3);
         guardList.add(g4);
 
-        System.out.println(CDD.toGuardList(new CDD(new AndGuard(guardList)),clocks));
+        Log.trace(CDD.toGuardList(new CDD(new AndGuard(guardList)),clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         CDD.free(cdd1);
@@ -258,8 +259,8 @@ public class CDDTest {
         CDD result = cdd.conjunction(cdd1);
 
         CDDNode node = result.getRoot();
-        System.out.println("here " + node);
-        System.out.println(node.getSegmentAtIndex(0).getUpperBound());
+        Log.trace("here " + node);
+        Log.trace(node.getSegmentAtIndex(0).getUpperBound());
 
         result.printDot(); // --> the CDD is correct, so I guess the test is wrong
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
@@ -293,8 +294,8 @@ public class CDDTest {
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.allocateInterval(1, 0, 3, true, CDD_INF/2, false));
         exp = exp.disjunction(CDD.allocateInterval(2, 0, 0,true, 5,true));
-         System.out.println(CDD.toGuardList(exp.removeNegative().reduce(),clocks));
-        System.out.println(CDD.toGuardList(res.removeNegative().reduce(),clocks));
+         Log.trace(CDD.toGuardList(exp.removeNegative().reduce(),clocks));
+        Log.trace(CDD.toGuardList(res.removeNegative().reduce(),clocks));
         //exp.printDot();
         exp = exp.removeNegative().reduce();
         res = res.removeNegative().reduce();

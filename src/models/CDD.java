@@ -3,6 +3,7 @@ package models;
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import lib.CDDLib;
+import log.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class CDD {
         for (int i = 0; i < clocks.size(); i++) {
             if (clock.hashCode() == clocks.get(i).hashCode()) return i + 1;
         }
-        System.out.println("clock " + clock + " not in " + clocks);
+        Log.trace("clock " + clock + " not in " + clocks);
         assert (false);
         return 0;
     }
@@ -99,7 +100,7 @@ public class CDD {
         if (copy.isTrue()) // special case for guards
         {
             assert (false);
-            //System.out.println("to true guard --> why did I not go into the first one??");
+            //Log.trace("to true guard --> why did I not go into the first one??");
             return new TrueGuard();
         }
         if (copy.isBDD()) {

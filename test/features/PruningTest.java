@@ -1,6 +1,7 @@
 package features;
 
 
+import log.Log;
 import logic.JsonAutomatonEncoder;
 import logic.Pruning;
 import logic.Refinement;
@@ -76,8 +77,8 @@ public class PruningTest {
         pruned.toXML("testOutput/selfloopZeno.xml");
         JsonAutomatonEncoder.writeToJson(pruned.getAutomaton(),"./testjsonoutput/p1");
         SimpleTransitionSystem exp = expectedOutputSelfloopZeno;
-        System.out.println("Ref1: " + new Refinement(pruned, exp).check());
-        System.out.println("Ref2: " +  new Refinement(exp, pruned).check());
+        Log.trace("Ref1: " + new Refinement(pruned, exp).check());
+        Log.trace("Ref2: " +  new Refinement(exp, pruned).check());
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
 
     }
@@ -88,7 +89,7 @@ public class PruningTest {
         pruned.toXML("testOutput/selfloopNonZeno.xml");
         SimpleTransitionSystem exp = expectedOutputSelfloopNonZeno;
 
-        System.out.println("finished pruning");
+        Log.trace("finished pruning");
         assertTrue(new Refinement(pruned, exp).check()  &&  new Refinement(exp, pruned).check() ) ;
 
     }
@@ -157,11 +158,11 @@ public class PruningTest {
         XMLFileWriter.toXML("testOutput/pruningWithOrAfterPruning.xml",pruned);
         Refinement ref1 = new Refinement(pruned, exp);
         boolean res1= ref1.check();
-        System.out.println(ref1.getErrMsg());
+        Log.trace(ref1.getErrMsg());
         assertTrue(res1);
         Refinement ref2 = new Refinement(exp, pruned);
         boolean res2= ref2.check();
-        System.out.println(ref2.getErrMsg());
+        Log.trace(ref2.getErrMsg());
         assertTrue(res2);
 
 
@@ -243,7 +244,7 @@ public class PruningTest {
 /*
     @Test
     public void TestReachabilityPruning() {
-        System.out.println("calculating reach pruning");
+        Log.trace("calculating reach pruning");
 
         SimpleTransitionSystem outPrunedReach1 = compTimedReach.pruneReachTimed();
         outPrunedReach1.toXML("testOutput/compTimedReach.xml");

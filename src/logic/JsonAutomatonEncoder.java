@@ -91,7 +91,7 @@ public class JsonAutomatonEncoder {
                 for (Guard g1: disjunction) {
                     if (g1 instanceof ClockGuard) {
                         ClockGuard g = (ClockGuard) g1;
-                        //System.out.println(g);
+                        //Log.trace(g);
                         String interm = g.toString();
 
                         if (i == 0)
@@ -104,7 +104,7 @@ public class JsonAutomatonEncoder {
                     {
                         if (g1 instanceof BoolGuard) {
                             BoolGuard g = (BoolGuard) g1;
-                            //System.out.println(g);
+                            //Log.trace(g);
                             String interm = g.toString();
                             if (i == 0)
                                 guardString += interm;
@@ -159,7 +159,7 @@ public class JsonAutomatonEncoder {
                     if (g1 instanceof ClockGuard) {
 
                         ClockGuard g = (ClockGuard) g1;
-                        //System.out.println(g);
+                        //Log.trace(g);
                         String interm = g.toString();
 
                         if (i == 0)

@@ -1,5 +1,6 @@
 package logic;
 
+import log.Log;
 import models.*;
 
 import java.util.*;
@@ -167,7 +168,7 @@ public class Refinement {
             if (!passed.containsKey(locPair)) {
                 for (LocationPair keyPair : passed.keySet())
                     if (keyPair.equals(locPair)) {
-                        System.out.println("rest");
+                        Log.trace("rest");
                         assert (false);
                     }
             }
@@ -185,7 +186,7 @@ public class Refinement {
             // check that for every delay in TS 1 there is a corresponding delay in TS
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {
-                System.out.println("Delay violation");
+                Log.trace("Delay violation");
                 CDD.done();
                 return false;
             }
@@ -194,7 +195,7 @@ public class Refinement {
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
 
-                System.out.println("Output violation");
+                Log.trace("Output violation");
                 CDD.done();
                 return false;
             }
@@ -203,7 +204,7 @@ public class Refinement {
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
                 //assert(false); // assuming everything is input enabled
-                System.out.println("Input violation");
+                Log.trace("Input violation");
                 CDD.done();
                 return false;
             }
@@ -235,10 +236,10 @@ public class Refinement {
         if (CDD.isSubset(leftPart,rightPart))
             return true;
 
-        System.out.println("left invariant: " + leftState.getInvarCDDDirectlyFromInvariants());
-        System.out.println("right invariant: " + rightState.getInvarCDDDirectlyFromInvariants());
-        System.out.println("left : " + leftState);
-        System.out.println("right : " + rightState);
+        Log.trace("left invariant: " + leftState.getInvarCDDDirectlyFromInvariants());
+        Log.trace("right invariant: " + rightState.getInvarCDDDirectlyFromInvariants());
+        Log.trace("left : " + leftState);
+        Log.trace("right : " + rightState);
         return false;
     }
 
@@ -303,20 +304,20 @@ public class Refinement {
 
         // If trans2 does not satisfy all solution of trans1, return empty list which should result in refinement failure
         if (!isInput && leftCDD.minus(rightCDD).isNotFalse()) {
-            System.out.println("trans 2 does not satisfiy all solutions of trans 1");
-//            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
-            System.out.println(leftCDD);
-            System.out.println(rightCDD);
-            System.out.println(leftCDD.minus(rightCDD));
+            Log.trace("trans 2 does not satisfiy all solutions of trans 1");
+//            Log.trace("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            Log.trace(leftCDD);
+            Log.trace(rightCDD);
+            Log.trace(leftCDD.minus(rightCDD));
             return false;
         }
 
         if (isInput && rightCDD.minus(leftCDD).isNotFalse()) {
-            System.out.println("trans 2 does not satisfiy all solutions of trans 1");
-//            System.out.println("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
-            System.out.println(leftCDD);
-            System.out.println(rightCDD);
-            System.out.println(rightCDD.minus(leftCDD));
+            Log.trace("trans 2 does not satisfiy all solutions of trans 1");
+//            Log.trace("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            Log.trace(leftCDD);
+            Log.trace(rightCDD);
+            Log.trace(rightCDD.minus(leftCDD));
             return false;
         }
 
@@ -370,7 +371,7 @@ public class Refinement {
 
                     if (followerTransitions.isEmpty()) {
                         state2.getCDD().printDot();
-                        System.out.println("followerTransitions empty");
+                        Log.trace("followerTransitions empty");
                         return false;
                     }
                 } else {
@@ -387,26 +388,26 @@ public class Refinement {
 
                 }
 
-                //System.out.println("Channel: " + action);
+                //Log.trace("Channel: " + action);
                 if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput) : createNewStatePairs(leaderTransitions, followerTransitions, isInput))) {
-                    System.out.println(isInput);
-                    System.out.println("followerTransitions: " + followerTransitions.size());
+                    Log.trace(isInput);
+                    Log.trace("followerTransitions: " + followerTransitions.size());
                     ArrayList<Edge> followerEdges = new ArrayList<>();
                     for (Transition t: followerTransitions)
                         for (Edge e : t.getEdges())
                         {
                             followerEdges.add(e);
-                            System.out.println(e);
+                            Log.trace(e);
                         }
-                    System.out.println("leaderTransitions: " + leaderTransitions.size());
+                    Log.trace("leaderTransitions: " + leaderTransitions.size());
                     ArrayList<Edge> leaderEdges = new ArrayList<>();
                     for (Transition t: leaderTransitions)
                         for (Edge e : t.getEdges())
                         {
                             leaderEdges.add(e);
-                            System.out.println(e);
+                            Log.trace(e);
                         }
-                    System.out.println("create pairs failed");
+                    Log.trace("create pairs failed");
                     if (RET_REF)
                     {
                         SymbolicLocation ll = new InconsistentLocation();
@@ -480,7 +481,7 @@ public class Refinement {
         HashMap<Clock,Integer> res = new HashMap<>();
         res.putAll(ts1.getMaxBounds());
         res.putAll(ts2.getMaxBounds());
-        System.out.println("BOUNDS: " + res);
+        Log.trace("BOUNDS: " + res);
         maxBounds = res;
     }
 

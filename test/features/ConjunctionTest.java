@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.Conjunction;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
@@ -193,12 +194,12 @@ public class ConjunctionTest {
         SimpleTransitionSystem ts1 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{t9, t10}).getAutomaton());
         Refinement ref = new Refinement(ts1, new Conjunction(new TransitionSystem[]{t9, t10}));
         ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         ((SimpleTransitionSystem) t9).toXML("testOutput/t9.xml");
         ((SimpleTransitionSystem) t10).toXML("testOutput/t10.xml");
 
-        System.out.println(new Conjunction(new TransitionSystem[]{t9, t10}).getInputs() + " " + new Conjunction(new TransitionSystem[]{t9, t10}).getOutputs() );
-        System.out.println("ALPHA: " + ts1.getInputs() + " " + ts1.getOutputs() );
+        Log.trace(new Conjunction(new TransitionSystem[]{t9, t10}).getInputs() + " " + new Conjunction(new TransitionSystem[]{t9, t10}).getOutputs() );
+        Log.trace("ALPHA: " + ts1.getInputs() + " " + ts1.getOutputs() );
         ts1.toXML("testOutput/whynoinputs.xml");
         new SimpleTransitionSystem(t12.getAutomaton()).toXML("testOutput/t12.xml");
 

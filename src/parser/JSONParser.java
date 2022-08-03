@@ -1,5 +1,6 @@
 package parser;
 
+import log.Log;
 import logic.GraphEdge;
 import logic.GraphNode;
 import models.*;
@@ -28,7 +29,7 @@ public class JSONParser {
     public static Automaton[] parse(String folderPath, boolean makeInpEnabled) throws FileNotFoundException {
         File dir = new File(folderPath + "/Components");
         File[] files = dir.listFiles((dir1, name) -> name.endsWith(".json"));
-        System.out.println(folderPath);
+        Log.trace(folderPath);
         ArrayList<String> locations = new ArrayList<>(Collections.singletonList(folderPath + "/GlobalDeclarations.json"));
         if (files != null) {
             locations.addAll(Arrays.stream(files).map(File::toString).collect(Collectors.toList()));
@@ -67,7 +68,7 @@ public class JSONParser {
         obj.put("federation", "" + refTree.getStatePair().getLeft().getCDD());
         obj.put("transitions", helper(children));
 
-        System.out.println(obj.toJSONString());
+        Log.trace(obj.toJSONString());
         return obj.toJSONString();
     }
 

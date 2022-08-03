@@ -1,6 +1,7 @@
 package logic;
 
 import exceptions.CddAlreadyRunningException;
+import log.Log;
 import models.*;
 
 import java.util.*;
@@ -333,8 +334,8 @@ public class Conjunction extends TransitionSystem {
         for (int i = 1; i < systems.length; i++) {
             List<Move> moves = systems[i].getNextMoves(locations.get(i), channel);
             if (channel.getName().contains("coin")) {
-                System.out.println(getName());
-                System.out.println("Location: " + locations.get(i) + " " + moves.size());
+                Log.trace(getName());
+                Log.trace("Location: " + locations.get(i) + " " + moves.size());
             }
             if (moves.isEmpty()) {
                 return new ArrayList<>();

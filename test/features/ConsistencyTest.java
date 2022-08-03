@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.*;
 import models.Automaton;
 import models.CDD;
@@ -91,7 +92,7 @@ public class ConsistencyTest {
 
         TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
 
-        ts.getAutomaton().getEdges().forEach(e->System.out.println(e));
+        ts.getAutomaton().getEdges().forEach(e->Log.trace(e));
         assertTrue(ts.isLeastConsistent());
     }
 
@@ -206,7 +207,7 @@ public class ConsistencyTest {
         Refinement ref = new Refinement(comp, G21);
 
         assertFalse(ref.check());
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertEquals("Automaton G9 is non-deterministic." + ", Automata G3, G4, G5, G7, G10, G12 are inconsistent.", ref.getErrMsg());
     }
 }

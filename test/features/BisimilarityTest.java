@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.Bisimilarity;
 import logic.SimpleTransitionSystem;
 import models.Automaton;
@@ -49,7 +50,7 @@ public class BisimilarityTest {
         Automaton aut = Bisimilarity.checkBisimilarity(auts[10]);
         SimpleTransitionSystem sys = new SimpleTransitionSystem(aut);
         // sys.toXML("testOutput/bisim3.xml");
-        System.out.println(aut.getLocations().size());
+        Log.trace(aut.getLocations().size());
         assertTrue(aut.getLocations().size()==3);
     }
 

@@ -1,5 +1,6 @@
 package log;
 
+import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -17,10 +18,30 @@ public class Log {
         }
     }
 
+    public static void fatal(@Nullable Object obj) {
+        fatal(
+                String.valueOf(obj)
+        );
+    }
+
+    public static void fatal() {
+        fatal("");
+    }
+
     public static void error(String message) {
         if (urgency.level >= Urgency.Error.level) {
             out(format(message, Urgency.Error));
         }
+    }
+
+    public static void error(@Nullable Object obj) {
+        error(
+                String.valueOf(obj)
+        );
+    }
+
+    public static void error() {
+        error("");
     }
 
     public static void warn(String message) {
@@ -29,10 +50,30 @@ public class Log {
         }
     }
 
+    public static void warn(@Nullable Object obj) {
+        warn(
+                String.valueOf(obj)
+        );
+    }
+
+    public static void warn() {
+        warn("");
+    }
+
     public static void info(String message) {
         if (urgency.level >= Urgency.Info.level) {
             out(format(message, Urgency.Info));
         }
+    }
+
+    public static void info(@Nullable Object obj) {
+        info(
+                String.valueOf(obj)
+        );
+    }
+
+    public static void info() {
+        info("");
     }
 
     public static void debug(String message) {
@@ -41,10 +82,30 @@ public class Log {
         }
     }
 
+    public static void debug(@Nullable Object obj) {
+        debug(
+                String.valueOf(obj)
+        );
+    }
+
+    public static void debug() {
+        debug("");
+    }
+
     public static void trace(String message) {
         if (urgency.level >= Urgency.Trace.level) {
             out(format(message, Urgency.Trace));
         }
+    }
+
+    public static void trace(@Nullable Object obj) {
+        trace(
+                String.valueOf(obj)
+        );
+    }
+
+    public static void trace() {
+        trace("");
     }
 
     private static StackTraceElement getCaller() {
