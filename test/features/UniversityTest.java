@@ -288,6 +288,7 @@ public class UniversityTest {
 
 
     @Test
+    @Ignore
     public void doubleQuotientTest() {
         // refinement: res <= spec \ adm2 \ machine
         TransitionSystem lhs = getResearcher();
