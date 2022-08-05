@@ -327,7 +327,9 @@ public class DelayRefinementTest {
         SimpleTransitionSystem Z2_1 = new SimpleTransitionSystem(automata[47]);
         assertTrue(new Refinement(new Conjunction(Z2_1,Z3), Z2).check());
         Quotient q = new Quotient(Z2,Z3);
-        Refinement ref = new Refinement(Z2_1,q);
+        Refinement ref = new Refinement(Z2_1,  new SimpleTransitionSystem(q.getAutomaton()));
+
+        XMLFileWriter.toXML("testOutput/quotientz2_z3.xml",new SimpleTransitionSystem(q.getAutomaton()));
         boolean res = ref.check(true);
         System.out.println("inputs:");
         System.out.println(Z2_1.getInputs());

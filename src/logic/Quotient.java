@@ -281,12 +281,14 @@ public class Quotient extends TransitionSystem {
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
                                     CDD targetState =e_comp.getTarget().getInvariantCDD();
                                     targetState= targetState.transitionBack(e_comp);
+                                    targetState = targetState.conjunction(e_comp.getSource().getInvariantCDD());
+                                    System.out.println(targetState);
                                     targetState= targetState.conjunction(negated);
                                     assert(inputs.contains(c));
                                     List<Update> updates = new ArrayList<Update>() {{
                                         add(new ClockUpdate(newClock, 0));
                                     }};
-                                    System.out.println("adding edge");
+                                    System.out.println("adding edge " + targetState);
                                     edges.add(new Edge(loc, inc, c, true, CDD.toGuardList(targetState, clocks.getItems()), updates));
                                 }
                             }
@@ -306,7 +308,7 @@ public class Quotient extends TransitionSystem {
                         List<Update> updates = new ArrayList<Update>() {{
                             add(new ClockUpdate(newClock, 0));
                         }};
-                        System.out.println("adding edge " + combined);
+                        System.out.println("adding edgee " + combined + " " + l_spec.getInvariantCDD());
                         edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(combined, clocks.getItems()), updates));
                     }
 
