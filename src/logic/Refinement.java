@@ -164,7 +164,7 @@ public class Refinement {
             // mark the pair of states as visited
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
             StatePair pair = new StatePair(newState1, newState2, currNode);
-
+/*
             if (!passed.containsKey(locPair)) {
                 for (LocationPair keyPair : passed.keySet())
                     if (keyPair.equals(locPair)) {
@@ -172,7 +172,7 @@ public class Refinement {
                         assert (false);
                     }
             }
-
+*/
 
             if (passed.containsKey(locPair)) {
                 passed.get(locPair).getLeft().disjunctCDD(pair.getLeft().getCDD());
@@ -182,7 +182,7 @@ public class Refinement {
                 passed.put(locPair,pair);
 
             // assert(passedContainsStatePair(curr));
-
+            System.out.println("Picked state pair " + locPair.leftLocation.getName()+"-"+locPair.rightLocation.getName());
             // check that for every delay in TS 1 there is a corresponding delay in TS
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {
@@ -227,7 +227,7 @@ public class Refinement {
 
     private boolean checkDelay(State leftState, State rightState)
     {
-        assert (leftState.getCDD().equiv(rightState.getCDD()));
+        //assert (leftState.getCDD().equiv(rightState.getCDD()));
         CDD currentStateCDD = new CDD(leftState.getCDD().getPointer()); //TODO: is the explicit new needed?
         currentStateCDD=currentStateCDD.delay();
 
@@ -236,6 +236,8 @@ public class Refinement {
         if (CDD.isSubset(leftPart,rightPart))
             return true;
 
+        Log.trace("right name " + ts2.getName());
+        Log.trace("left name " + ts1.getName());
         Log.trace("left invariant: " + leftState.getInvarCDDDirectlyFromInvariants());
         Log.trace("right invariant: " + rightState.getInvarCDDDirectlyFromInvariants());
         Log.trace("left : " + leftState);
@@ -287,7 +289,7 @@ public class Refinement {
         return new StatePair(leaderTarget, target2);
     }
 
-    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2, boolean isInput) {
+    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2, boolean isInput, Channel currentChan) {
         boolean pairFound = false;
 
 
@@ -330,6 +332,14 @@ public class Refinement {
                     if (!pair.getRight().getLocation().getIsUniversal())
                     {
                         if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
+                            if (pair.getRight().getLocation().getName().contains("inc"))
+                            {
+                                System.out.println("creating target state pair of trans to inc");
+                                System.out.println(currentChan);
+                                System.out.println("trans came from " + transition1.getSource().getLocation().getName() + " and "  + transition2.getSource().getLocation().getName());
+                                System.out.println("trans lead to " + pair.getLeft().getLocation().getName() + " and "  + pair.getRight().getLocation().getName());
+
+                            }
                             waiting.add(pair);
                             if (RET_REF) {
                                 currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
@@ -389,7 +399,7 @@ public class Refinement {
                 }
 
                 //Log.trace("Channel: " + action);
-                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput) : createNewStatePairs(leaderTransitions, followerTransitions, isInput))) {
+                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput, action) : createNewStatePairs(leaderTransitions, followerTransitions, isInput,action))) {
                     Log.trace(isInput);
                     Log.trace("followerTransitions: " + followerTransitions.size());
                     ArrayList<Edge> followerEdges = new ArrayList<>();

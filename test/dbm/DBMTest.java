@@ -142,14 +142,15 @@ public class DBMTest {
         z= z.close();
         z.prettyPrint(true,true);
         Log.trace(z.isValid());
+
         int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
         z.extrapolateMaxBounds(bounds);
         Zone copy = new Zone(z);
-        z.prettyPrint(true,true);
+        z.printDbm(true,true);
         z.extrapolateMaxBounds(bounds);
-        z.prettyPrint(true,true);
+        z.printDbm(true,true);
         z.extrapolateMaxBounds(bounds);
-        z.prettyPrint(true,true);
+        z.printDbm(true,true);
         assert(z.equals(copy));
     }
 
@@ -163,11 +164,13 @@ public class DBMTest {
                 1,1,1,1,1,1,
                 121,1,1,1,1,1,};
         Zone z = new Zone(arr);
+
         z.prettyPrint(true,true);
         Log.trace(z.isValid());
+
         int[] bounds = new int[] {0, 12, 31, 41, 41, 41};
         z.extrapolateMaxBounds(bounds);
-        z.prettyPrint(true,true);
+        z.printDbm(true,true);
     }
 
 
