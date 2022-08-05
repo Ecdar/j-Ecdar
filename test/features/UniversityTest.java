@@ -181,7 +181,7 @@ public class UniversityTest {
         Refinement refinement = new Refinement(lhs, rhs);
 
         boolean refines = refinement.check();
-
+        System.out.println(refinement.getErrMsg());
         assertTrue(refines);
     }
 
@@ -268,6 +268,25 @@ public class UniversityTest {
 
     }
 
+
+
+    @Test
+    public void testFromTestFramework2() {
+        // "consistency: ((Spec \\ Machine) \\ Researcher);
+        // refinement: Administration <= ((Spec \\ Machine) \\ Researcher)
+
+
+        TransitionSystem consistency = new Quotient(new Quotient(getSpec(),getMachine()),getResearcher());
+        assertTrue(consistency.isFullyConsistent());
+        Refinement ref = new Refinement(getAdm(),consistency);
+        boolean res = ref.check(true);
+        System.out.println(ref.getErrMsg());
+        System.out.println(ref.getTree().toDot());
+        assertTrue(res);
+
+    }
+
+
     @Test
     public void doubleQuotientTest() {
         // refinement: res <= spec \ adm2 \ machine
@@ -280,14 +299,14 @@ public class UniversityTest {
 
         assertFalse(refines);
     }
-    @Test
+    @Test @Ignore
     public void doubleQuotientTest1() {
         // refinement: res <= spec \ adm2 \ machine
         TransitionSystem lhs = getMachine();
         Quotient rhs1 = new Quotient(getSpec(), getAdm2());
         Quotient rhs = new Quotient(rhs1,getResearcher());
         Refinement refinement = new Refinement(lhs, rhs);
-
+        assertFalse(new Refinement(new Composition(getResearcher(),getAdm2(),getMachine()),getSpec()).check());
         boolean refines = refinement.check();
 
         assertFalse(refines);

@@ -67,4 +67,8 @@ public class Move {
     public void setUpdates(List<Update> updates) {
         this.updates = updates;
     }
+
+    public void setTarget(SymbolicLocation loc) {
+        target = loc;
+    }
 }
