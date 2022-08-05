@@ -78,7 +78,7 @@ public class ComplexLocation extends SymbolicLocation {
         boolean isUniversal = false;
         for (SymbolicLocation l: getLocations())
         {
-            isUniversal = isUniversal|| l.getIsUrgent();
+            isUniversal = isUniversal|| l.getIsUniversal();
         }
         return isUniversal;
     }
@@ -88,7 +88,7 @@ public class ComplexLocation extends SymbolicLocation {
         boolean isInconsistent = false;
         for (SymbolicLocation l: getLocations())
         {
-            isInconsistent = isInconsistent|| l.getIsUrgent();
+            isInconsistent = isInconsistent|| l.getIsInconsistent();
         }
         return isInconsistent;
     }

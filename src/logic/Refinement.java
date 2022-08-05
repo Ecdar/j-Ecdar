@@ -163,7 +163,7 @@ public class Refinement {
             // mark the pair of states as visited
             LocationPair locPair = new LocationPair(left.getLocation(), right.getLocation());
             StatePair pair = new StatePair(newState1, newState2, currNode);
-
+/*
             if (!passed.containsKey(locPair)) {
                 for (LocationPair keyPair : passed.keySet())
                     if (keyPair.equals(locPair)) {
@@ -171,7 +171,7 @@ public class Refinement {
                         assert (false);
                     }
             }
-
+*/
 
             if (passed.containsKey(locPair)) {
                 passed.get(locPair).getLeft().disjunctCDD(pair.getLeft().getInvariant());
@@ -181,7 +181,7 @@ public class Refinement {
                 passed.put(locPair,pair);
 
             // assert(passedContainsStatePair(curr));
-
+            System.out.println("Picked state pair " + locPair.leftLocation.getName()+"-"+locPair.rightLocation.getName());
             // check that for every delay in TS 1 there is a corresponding delay in TS
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {
@@ -245,6 +245,7 @@ public class Refinement {
 
         System.out.println("left invariant: " + leftState.getLocationInvariant());
         System.out.println("right invariant: " + rightState.getLocationInvariant());
+
         System.out.println("left : " + leftState);
         System.out.println("right : " + rightState);
 
@@ -295,7 +296,7 @@ public class Refinement {
         return new StatePair(leaderTarget, target2);
     }
 
-    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2, boolean isInput) {
+    private boolean createNewStatePairs(List<Transition> trans1, List<Transition> trans2, boolean isInput, Channel currentChan) {
         boolean pairFound = false;
 
 
@@ -338,6 +339,14 @@ public class Refinement {
                     if (!pair.getRight().getLocation().getIsUniversal())
                     {
                         if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
+                            if (pair.getRight().getLocation().getName().contains("inc"))
+                            {
+                                System.out.println("creating target state pair of trans to inc");
+                                System.out.println(currentChan);
+                                System.out.println("trans came from " + transition1.getSource().getLocation().getName() + " and "  + transition2.getSource().getLocation().getName());
+                                System.out.println("trans lead to " + pair.getLeft().getLocation().getName() + " and "  + pair.getRight().getLocation().getName());
+
+                            }
                             waiting.add(pair);
                             if (RET_REF) {
                                 currNode.constructSuccessor(pair, transition1.getEdges(), transition2.getEdges());
@@ -397,7 +406,7 @@ public class Refinement {
                 }
 
                 //System.out.println("Channel: " + action);
-                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput) : createNewStatePairs(leaderTransitions, followerTransitions, isInput))) {
+                if(!(isInput ? createNewStatePairs(followerTransitions, leaderTransitions, isInput, action) : createNewStatePairs(leaderTransitions, followerTransitions, isInput,action))) {
                     System.out.println(isInput);
                     System.out.println("followerTransitions: " + followerTransitions.size());
                     ArrayList<Edge> followerEdges = new ArrayList<>();

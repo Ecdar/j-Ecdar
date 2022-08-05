@@ -117,7 +117,6 @@ public class UniversitySimpleTest {
         System.out.println(ref.getErrMsg());
         assertTrue(res);
     }
-/*
 
     @Test
     public void newQuotientTest4B() {
@@ -188,7 +187,7 @@ public class UniversitySimpleTest {
         assertTrue(res);
     }
 
-
+    @Test
     public void newQuotientTest3() {
         XMLFileWriter.toXML("adm2new.xml",new Automaton[]{adm2.getAutomaton()});
         XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});
@@ -201,8 +200,6 @@ public class UniversitySimpleTest {
         System.out.println(ref.getErrMsg());
         assertTrue(res);
     }
-
-*/
 
     @Test
     public void testHalf2RefinesSelf() {

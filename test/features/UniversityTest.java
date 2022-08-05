@@ -173,7 +173,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void quotientSelfAdmAutomaton() {
         // refinement: spec \ adm <= spec \ amd
         TransitionSystem lhs = new SimpleTransitionSystem(new Quotient(getSpec(), getAdm()).getAutomaton());
@@ -181,7 +180,7 @@ public class UniversityTest {
         Refinement refinement = new Refinement(lhs, rhs);
 
         boolean refines = refinement.check();
-
+        System.out.println(refinement.getErrMsg());
         assertTrue(refines);
     }
 
@@ -240,7 +239,6 @@ public class UniversityTest {
 
 
     @Test
-    @Ignore
     public void testFromTestFramework1() {
         // refinement: Machine <= ((((Adm2 && HalfAdm1) || Machine || Researcher) \\\\ (Adm2 && HalfAdm2)) \\\\ Researcher)
 
@@ -268,6 +266,25 @@ public class UniversityTest {
 
     }
 
+
+
+    @Test
+    public void testFromTestFramework2() {
+        // "consistency: ((Spec \\ Machine) \\ Researcher);
+        // refinement: Administration <= ((Spec \\ Machine) \\ Researcher)
+
+
+        TransitionSystem consistency = new Quotient(new Quotient(getSpec(),getMachine()),getResearcher());
+        assertTrue(consistency.isFullyConsistent());
+        Refinement ref = new Refinement(getAdm(),consistency);
+        boolean res = ref.check(true);
+        System.out.println(ref.getErrMsg());
+        System.out.println(ref.getTree().toDot());
+        assertTrue(res);
+
+    }
+
+
     @Test
     public void doubleQuotientTest() {
         // refinement: res <= spec \ adm2 \ machine
@@ -287,7 +304,7 @@ public class UniversityTest {
         Quotient rhs1 = new Quotient(getSpec(), getAdm2());
         Quotient rhs = new Quotient(rhs1,getResearcher());
         Refinement refinement = new Refinement(lhs, rhs);
-
+        assertFalse(new Refinement(new Composition(getResearcher(),getAdm2(),getMachine()),getSpec()).check());
         boolean refines = refinement.check();
 
         assertFalse(refines);
@@ -319,7 +336,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest1Automaton() {
         Composition composition = new Composition(getMachine(), getAdm());
         Quotient quotient = new Quotient(getSpec(), getResearcher());
@@ -355,7 +371,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4A() {
         // refinement: machine || researcher <= spec \ adm
         Composition lhs = new Composition(getMachine(), getResearcher());
@@ -370,7 +385,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4AAutomaton() {
         /* This test is similar to "newQuotientTest4A".
          *  But here we create a SimpleTransitionSystem for the Quotient,
@@ -400,7 +414,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4BAutomaton() {
         // refinement: machine || adm <= spec \ researcher
         Composition lhs = new Composition(getMachine(), getAdm());
@@ -425,7 +438,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4CAutomaton() {
         // refinement: researcher || adm <= spec \ machine
         Composition lhs = new Composition(getResearcher(), getAdm());
@@ -449,7 +461,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4DAutomaton() {
         // Refinement: researcher || adm <= spec \ machine
         Composition lhs = new Composition(getResearcher(), getAdm());
@@ -474,7 +485,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void simpliversityTest2() {
         // refinement: researcher <= spec \ adm
         TransitionSystem lhs = getSimpleResearcher();
@@ -491,7 +501,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest3() {
         // refinement: machine || researcher <= spec \ adm
         Composition lhs = new Composition(getMachine(), getResearcher());

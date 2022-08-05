@@ -308,7 +308,7 @@ public class Zone {
 
     // Method to nicely print DBM for testing purposes.
     // The boolean flag determines if values of the zone will be converted from DBM format to actual bound of constraint
-    public void prettyPrint(boolean toConvert, boolean showStrictness) {
+    public void printDbm(boolean toConvert, boolean showStrictness) {
         int intLength = 0;
         int toPrint = 0;
 

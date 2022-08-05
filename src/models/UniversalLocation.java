@@ -3,7 +3,7 @@ package models;
 public class UniversalLocation extends SymbolicLocation {
     @Override
     public String getName() {
-        return null;
+        return "univ-loc";
     }
 
     @Override
