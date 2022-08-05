@@ -59,9 +59,6 @@ public class ConjunctionTest {
         t10 = new SimpleTransitionSystem(machines[9]);
         t11 = new SimpleTransitionSystem(machines[10]);
         t12 = new SimpleTransitionSystem(machines[11]);
-
-        CDD.init(100,100,100);
-        CDD.addClocks(t1.getClocks(),t1Copy.getClocks(),t2.getClocks(),t2Copy.getClocks(),t3.getClocks(),t3Copy.getClocks(),t4.getClocks(),t4Copy.getClocks(),t5.getClocks(),t5Copy.getClocks(),t6.getClocks(),t7.getClocks(),t8.getClocks(),t9.getClocks(),t10.getClocks(),t11.getClocks(),t12.getClocks());
     }
 
     @Test

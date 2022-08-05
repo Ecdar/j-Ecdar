@@ -132,13 +132,7 @@ public class Refinement {
         if (!checkPreconditions())
             return false;
 
-        boolean initialisedCdd = false;
-        if (!CDD.isRunning()) {
-            CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-            CDD.addClocks(allClocks);
-            CDD.addBooleans(allBVs);
-            initialisedCdd = true;
-        }
+        boolean initialisedCdd = CDD.tryInit(allClocks, allBVs);
 
         // the first states we look at are the initial ones
         waiting.push(getInitialStatePair());

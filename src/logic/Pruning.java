@@ -22,9 +22,7 @@ public class Pruning {
         Set<Location> inconsistentLocations;
         Map<Location, CDD> passedInconsistentStates;
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBooleans(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
 
         for (Location l : locations)
@@ -84,7 +82,10 @@ public class Pruning {
             locations.add(new Location("inc", new TrueGuard(), true, false, false, true));
             edges = new ArrayList<>();
         }
-        CDD.done();
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
         Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), true);
         return new SimpleTransitionSystem(resAut);
     }

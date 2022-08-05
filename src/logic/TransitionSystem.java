@@ -130,11 +130,7 @@ public abstract class TransitionSystem {
 
     public boolean isDeterministic() {
 
-        boolean initialisedCdd = false;
-        if (!CDD.isRunning()) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize, getClocks(), getBVs());
-            initialisedCdd = true;
-        }
+        boolean initialisedCdd = CDD.tryInit(getClocks(), getBVs());
 
         boolean isDeterministic = true;
         List<String> nondetermTs = new ArrayList<>();
@@ -168,11 +164,7 @@ public abstract class TransitionSystem {
         boolean isDeterm = isDeterministic();
         boolean isConsistent = true;
 
-        boolean initialisedCdd = false;
-        if (!CDD.isRunning()) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize, getClocks(), getBVs());
-            initialisedCdd = true;
-        }
+        boolean initialisedCdd = CDD.tryInit(getClocks(), getBVs());
 
         List<String> inconsistentTs = new ArrayList<>();
         for (SimpleTransitionSystem system : getSystems()) {
@@ -193,11 +185,7 @@ public abstract class TransitionSystem {
     public boolean isImplementation() {
         boolean isCons = isFullyConsistent();
 
-        boolean initialisedCdd = false;
-        if (!CDD.isRunning()) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize, getClocks(), getBVs());
-            initialisedCdd = true;
-        }
+        boolean initialisedCdd = CDD.tryInit(getClocks(), getBVs());
 
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();

@@ -747,6 +747,22 @@ public class CDD {
         return initialisation;
     }
 
+    public static int init(List<Clock> clocks, List<BoolVar> booleans) {
+        return init(maxSize, cs, stackSize, clocks, booleans);
+    }
+
+    public static boolean tryInit(int maxSize, int cs, int stackSize, List<Clock> clocks, List<BoolVar> booleans) {
+        if (cddIsRunning) {
+            return false;
+        }
+        init(maxSize, cs, stackSize, clocks, booleans);
+        return true;
+    }
+
+    public static boolean tryInit(List<Clock> clocks, List<BoolVar> booleans) {
+        return tryInit(maxSize, cs, stackSize, clocks, booleans);
+    }
+
     public static void done() {
         cddIsRunning = false;
         numClocks = 0;

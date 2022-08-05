@@ -25,9 +25,7 @@ public class Bisimilarity {
         bisimilarLocs.add(locs); // at the start we "assume all locs are bisimilar"
 
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBooleans(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
         thereWasAChange= true;
 
 
@@ -143,7 +141,9 @@ public class Bisimilarity {
             }
         }
 
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return new Automaton(copy.getName()+"Bisimilar",locs,finalEdges,clocks, copy.getBVs());
 
     }

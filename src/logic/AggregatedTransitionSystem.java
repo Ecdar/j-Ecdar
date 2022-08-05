@@ -137,13 +137,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     private Automaton aggregate(Automaton[] automata) {
-        boolean initialisedCdd = false;
-        if (!CDD.isRunning()) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-            CDD.addClocks(getClocks());
-            CDD.addBooleans(BVs.getItems());
-            initialisedCdd = true;
-        }
+        boolean initialisedCdd = CDD.tryInit(getClocks(), BVs.getItems());
 
         String name = getName();
 

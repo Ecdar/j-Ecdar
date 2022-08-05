@@ -107,9 +107,7 @@ public class Quotient extends TransitionSystem {
         Automaton spec = left.getAutomaton();
         Automaton comp = right.getAutomaton();
 
-        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-        CDD.addClocks(clocks.getItems());
-        CDD.addBooleans(BVs.getItems());
+        boolean initialisedCdd = CDD.tryInit(clocks.getItems(), BVs.getItems());
         String name = left.getSystems().get(0).getName() + "DIV" + right.getSystems().get(0).getName();
 
         // create product of locations
@@ -389,7 +387,9 @@ public class Quotient extends TransitionSystem {
         clocks.add(newClock);
         List <Location> locsWithNewClocks = updateLocations(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
         List <Edge> edgesWithNewClocks = updateEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), true);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);

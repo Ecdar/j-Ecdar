@@ -36,7 +36,6 @@ public class UnspecTest {
                 "Components/AA.json",
                 "Components/B.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
-   ;
 
         a = new SimpleTransitionSystem((machines[0]));
         aCopy = new SimpleTransitionSystem(new Automaton((machines[0])));
@@ -48,43 +47,22 @@ public class UnspecTest {
 
     @Test
     public void testARefinesSelf() {
-        CDD.init(100,100,100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(a.getClocks());
-        clocks.addAll(aCopy.getClocks());
-        CDD.addClocks(clocks);
         assertTrue(new Refinement(new SimpleTransitionSystem((a.getAutomaton())), aCopy).check());
     }
 
     @Test
     public void testAaRefinesSelf() {
-        CDD.init(100,100,100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(aa.getClocks());
-        clocks.addAll(aaCopy.getClocks());
-        CDD.addClocks(clocks);
         assertTrue(new Refinement(new SimpleTransitionSystem((aa.getAutomaton())), aaCopy).check());
     }
 
     @Test
     public void testBRefinesSelf() {
-        CDD.init(100,100,100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(b.getClocks());
-        clocks.addAll(bCopy.getClocks());
-        CDD.addClocks(clocks);
         assertTrue(new Refinement(new SimpleTransitionSystem((b.getAutomaton())), bCopy).check());
     }
 
     @Test
     public void compRefinesB() {
         // in the old test case, the refinement should fail because right side has more inputs, now it should pass
-        CDD.init(100,100,100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(aa.getClocks());
-        clocks.addAll(aaCopy.getClocks());
-        clocks.addAll(b.getClocks());
-        CDD.addClocks(clocks);
         assertTrue(new Refinement(new Composition(new TransitionSystem[]{a, aa}), b).check());
     }
 }
