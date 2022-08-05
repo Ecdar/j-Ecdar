@@ -9,6 +9,7 @@ import models.CDD;
 import models.Location;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import parser.JSONParser;
 import parser.XMLParser;

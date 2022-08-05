@@ -6,7 +6,6 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 public class JsonAutomatonEncoder {
 
@@ -149,7 +148,7 @@ public class JsonAutomatonEncoder {
                 edgeJson.put("status", "OUTPUT");
             edgeJson.put("select", "");
 
-            String guardString = e.getGuards().toString();
+            String guardString = e.getGuard().toString();
             /*int i= 0; int j=0;
             for (List<Guard> disjunction: e.getGuards())
             {

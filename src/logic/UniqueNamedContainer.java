@@ -1,15 +1,13 @@
 package logic;
 
-import models.BoolVar;
-import models.Clock;
-import models.UniqueNamed;
+import models.UniquelyNamed;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class UniqueNamedContainer<T extends UniqueNamed> {
+public class UniqueNamedContainer<T extends UniquelyNamed> {
     private List<T> items;
 
     public UniqueNamedContainer(List<T> items) {
@@ -44,7 +42,7 @@ public class UniqueNamedContainer<T extends UniqueNamed> {
 
     }
 
-    private boolean sameName(UniqueNamed item1, UniqueNamed item2){
+    private boolean sameName(UniquelyNamed item1, UniquelyNamed item2){
         return item1.getOriginalName().equals(item2.getOriginalName());
     }
 

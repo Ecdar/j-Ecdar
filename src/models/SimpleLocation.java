@@ -1,11 +1,9 @@
 package models;
 
-import java.util.List;
 import java.util.Objects;
 
 public class SimpleLocation extends SymbolicLocation {
     private final Location location;
-
 
     public SimpleLocation(Location location) {
         this.location = location;
@@ -50,17 +48,23 @@ public class SimpleLocation extends SymbolicLocation {
         return location.getX();
     }
 
+    @Override
     public CDD getInvariantCDD() {
-        CDD cdd = new CDD(location.getInvariant());
-        return cdd;
+        return new CDD(location.getInvariant());
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SimpleLocation that = (SimpleLocation) o;
-        return location.equals(that.location);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof SimpleLocation)) {
+            return false;
+        }
+
+        SimpleLocation other = (SimpleLocation) obj;
+        return location.equals(other.location);
     }
 
     @Override
@@ -70,6 +74,6 @@ public class SimpleLocation extends SymbolicLocation {
 
     @Override
     public String toString() {
-        return "" + location;
+        return location.toString();
     }
 }

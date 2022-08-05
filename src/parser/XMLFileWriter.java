@@ -1,6 +1,5 @@
 package parser;
 
-import com.google.protobuf.BoolValueOrBuilder;
 import logic.SimpleTransitionSystem;
 import models.*;
 import org.jdom2.Document;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class XMLFileWriter {
@@ -202,7 +200,7 @@ public class XMLFileWriter {
             aut.addContent(loc);
         }
         Element init = new Element("init");
-        init.setAttribute("ref",automaton.getInitLoc().getName());
+        init.setAttribute("ref",automaton.getInitial().getName());
         aut.addContent(init);
         for (Edge e : automaton.getEdges())
         {
@@ -237,7 +235,7 @@ public class XMLFileWriter {
 
             Element guardlabel = new Element("label");
             guardlabel.setAttribute("kind", "guard");
-            String guardString = e.getGuards().toString();
+            String guardString = e.getGuard().toString();
 
 /*
             int i= 0; int j=0;

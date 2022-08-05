@@ -1,6 +1,5 @@
 package models;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class LocationPair {
@@ -12,19 +11,22 @@ public class LocationPair {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LocationPair that = (LocationPair) o;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-        return leftLocation.equals(that.leftLocation) &&
-                rightLocation.equals(that.rightLocation);
+        if (!(obj instanceof LocationPair)) {
+            return false;
+        }
+
+        LocationPair other = (LocationPair) obj;
+        return leftLocation.equals(other.leftLocation) &&
+                rightLocation.equals(other.rightLocation);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(leftLocation, rightLocation);
     }
-
-
 }

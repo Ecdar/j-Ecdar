@@ -156,7 +156,7 @@ public class Pruning {
                 if (!(e.getTarget().getInvariant() instanceof FalseGuard)) {
                     CDD target = e.getTarget().getInvariantCDD();
                     CDD cddBeforeEdge = target.transitionBack(e);
-                    e.setGuards(CDD.toGuardList(cddBeforeEdge.conjunction(e.getSource().getInvariantCDD()), clocks));
+                    e.setGuard(CDD.toGuardList(cddBeforeEdge.conjunction(e.getSource().getInvariantCDD()), clocks));
                 }
             }
         }
@@ -196,7 +196,7 @@ public class Pruning {
             CDD guardCDD = e.getGuardCDD();
             CDD fedAfterRemovingInconsistentPart =guardCDD.minus(target);
 
-            e.setGuards(CDD.toGuardList(fedAfterRemovingInconsistentPart,clocks));
+            e.setGuard(CDD.toGuardList(fedAfterRemovingInconsistentPart,clocks));
         }
 
         // Removing the transition / strenthening the guards might have turned the source location inconsistent

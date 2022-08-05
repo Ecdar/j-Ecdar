@@ -1,11 +1,8 @@
 package models;
 
-import javax.rmi.ssl.SslRMIClientSocketFactory;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class ComplexLocation extends SymbolicLocation {
     private final List<SymbolicLocation> locations;
@@ -21,17 +18,6 @@ public class ComplexLocation extends SymbolicLocation {
         }
         invariants = invar;
     }
-    public ComplexLocation(SimpleLocation location) {
-        this.locations = new ArrayList<>(){{add(location);}};
-        CDD invar = CDD.cddTrue();
-        for (SymbolicLocation loc1 : locations)
-        {
-            CDD invarLoc = loc1.getInvariantCDD();
-            invar = invar.conjunction(invarLoc);
-        }
-        invariants = invar;
-    }
-
 
     public List<SymbolicLocation> getLocations() {
         return locations;
