@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Move {
-    private final SymbolicLocation source, target;
+    private SymbolicLocation source, target;
     private final List<Edge> edges;
     private CDD guardCDD;
     private List<Update> updates;

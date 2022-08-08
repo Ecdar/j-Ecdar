@@ -1,6 +1,5 @@
 package logic;
 
-import log.Log;
 import models.*;
 
 import java.util.*;
@@ -21,54 +20,35 @@ public class Quotient extends TransitionSystem {
 
     private final TransitionSystem left, right;
     private final Set<Channel> inputs, outputs;
-    static private int quotientCounter = 0;
-
-    private int quotientID = 0;
+    private final Channel newChan;
     private Clock newClock;
     private boolean printComments = false;
-    static SymbolicLocation univ = new UniversalLocation();
-    static SymbolicLocation inc = new InconsistentLocation();
-
-    private Channel newChan;
+    SymbolicLocation univ = new UniversalLocation();
+    SymbolicLocation inc = new InconsistentLocation();
 
     public Quotient(TransitionSystem left, TransitionSystem right) {
         this.left = left;
         this.right = right;
 
         //clocks should contain the clocks of ts1, ts2 and a new clock
-        //newClock = new Clock("quo_new", "quo"); //TODO: get ownerName in a better way
-        newClock = new Clock("quo_new"+quotientCounter, "quo"+quotientCounter);
-        if (!clocks.getItems().contains(newClock))
-            clocks.add(newClock);
-
+        newClock = new Clock("quo_new", "quo"); //TODO: get ownerName in a better way
+        clocks.add(newClock);
         clocks.addAll(left.getClocks());
         clocks.addAll(right.getClocks());
         BVs.addAll(left.getBVs());
         BVs.addAll(right.getBVs());
         if (printComments)
-            Log.trace("Clocks of ts1 ( " + left.getClocks() + " ) and ts2 ( " + right.getClocks() + " ) merged to + " + clocks);
+            System.out.println("Clocks of ts1 ( " + left.getClocks() + " ) and ts2 ( " + right.getClocks() + " ) merged to + " + clocks);
 
 
         // inputs should contain inputs of ts1, outputs of ts2 and a new input
         inputs = new HashSet<>(left.getInputs());
         inputs.addAll(right.getOutputs());
-        /*boolean foundNewInput = false;
-        for (Channel c : inputs) {
-            if (c.getName().equals("i_new")) {
-                foundNewInput = true;
-            }
-        }
-        if (!foundNewInput) {
-            inputs.add(newChan);
-        }*/
-        newChan = new Channel("i_new"+quotientCounter);
-        quotientID= quotientCounter;
-        quotientCounter++;
+        newChan = new Channel("i_new");
+        inputs.add(newChan);
 
         Set<Channel> outputsOfSpec = new HashSet<>(left.getOutputs());
-        outputsOfSpec.addAll(left.getSyncs());
         Set<Channel> outputsOfComp = new HashSet<>(right.getOutputs());
-        outputsOfComp.addAll(right.getSyncs());
 
         Set<Channel> inputsOfCompMinusInputsOfSpec = new HashSet<>(right.getInputs());
         inputsOfCompMinusInputsOfSpec.removeAll(left.getInputs());
@@ -78,10 +58,10 @@ public class Quotient extends TransitionSystem {
 
         printComments =true;
         if (printComments)
-            Log.trace("ts1.in = " + left.getInputs() + ", ts1.out = " + left.getOutputs());
+            System.out.println("ts1.in = " + left.getInputs() + ", ts1.out = " + left.getOutputs());
         if (printComments)
-            Log.trace("ts2.in = " + right.getInputs() + ", ts2.out = " + right.getOutputs());
-        if (printComments) Log.trace("quotient.in = " + inputs + ", quotioent.out = " + outputs);
+            System.out.println("ts2.in = " + right.getInputs() + ", ts2.out = " + right.getOutputs());
+        if (printComments) System.out.println("quotient.in = " + inputs + ", quotioent.out = " + outputs);
         printComments =false;
     }
 
@@ -97,8 +77,8 @@ public class Quotient extends TransitionSystem {
         SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{left, right});
         ((ComplexLocation) initLoc).removeInvariants();
         if (printComments)
-            Log.trace("ts1.init = " + left.getInitialLocation() + ", ts2.init= " + right.getInitialLocation());
-        if (printComments) Log.trace("quotients.init = " + initLoc);
+            System.out.println("ts1.init = " + left.getInitialLocation() + ", ts2.init= " + right.getInitialLocation());
+        if (printComments) System.out.println("quotients.init = " + initLoc);
         return initLoc;
     }
 
@@ -118,11 +98,11 @@ public class Quotient extends TransitionSystem {
 
         // just an easy way to access spec and comp from here on
         // TODO: check that there is only one automaton in each, maybe implement so that several automata can be explored at once
-  //      assert (left.getSystems().size() == 1);
-  //      assert (right.getSystems().size() == 1);
+        //      assert (left.getSystems().size() == 1);
+        //      assert (right.getSystems().size() == 1);
 
-  //      Automaton spec = left.getSystems().get(0).getAutomaton();
-  //      Automaton comp = right.getSystems().get(0).getAutomaton();
+        //      Automaton spec = left.getSystems().get(0).getAutomaton();
+        //      Automaton comp = right.getSystems().get(0).getAutomaton();
 
         Automaton spec = left.getAutomaton();
         Automaton comp = right.getAutomaton();
@@ -168,8 +148,8 @@ public class Quotient extends TransitionSystem {
 
                 // selfloops for the inc / univ state will be newly created, so we do not need to take care of them here
                 if (!l_spec.getName().equals("inc") && !l_spec.getName().equals("univ") && !l_comp.getName().equals("inc") && !l_comp.getName().equals("univ")) {
-                    Log.trace(loc.getName());
-                    Log.trace("RULE1");
+                    System.out.println(loc.getName());
+                    System.out.println("RULE1");
                     // rule 1 "cartesian product"
                     for (Channel c : allChans) {
                         // only if both spec and comp have a transition with this channel
@@ -204,11 +184,11 @@ public class Quotient extends TransitionSystem {
                         }
                     }
 
-                    Log.trace("RULE 2");
+                    System.out.println("RULE 2");
                     //Rule 2: "channels in comp not in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the spec alphabet
-                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c) && !left.getSyncs().contains(c)) {
+                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c)) {
                             // if the current location in comp has a transition with c
                             if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
@@ -224,14 +204,14 @@ public class Quotient extends TransitionSystem {
                                     targetInvar = targetInvar.conjunction(l_comp.getInvariantCDD());
                                     targetInvar = targetInvar.conjunction(l_spec.getInvariantCDD());
                                     boolean isInput = inputs.contains(e_comp.getChan());
-                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getItems()), e_comp.getUpdates()));
+                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar, clocks.getItems()), e_comp.getUpdates()));
                                 }
                             }
                         }
                     }
 
 
-                    Log.trace("RULE 3 and 4");
+                    System.out.println("RULE 3 and 4");
                     //Rule 3+4: "edge to univ for negated comp guards"
                     for (Channel c : right.getOutputs()) {
                         CDD collectedGuardsComp = CDD.cddFalse();
@@ -247,7 +227,7 @@ public class Quotient extends TransitionSystem {
                             edges.add(new Edge(loc, univ, c, isInput, CDD.toGuardList(negated, clocks.getItems()), new ArrayList<>()));
                     }
 
-                    Log.trace("RULE 5");
+                    System.out.println("RULE 5");
                     // Rule 5 "transition to univ for negated comp invariant"
                     if (!l_comp.getInvariantCDD().isTrue()) {
                         // negate the comp. invariant.
@@ -258,7 +238,7 @@ public class Quotient extends TransitionSystem {
                         }
                     }
 
-                    Log.trace("RULE 6");
+                    System.out.println("RULE 6");
                     // Rule 6 "edge to inconsistent for common outputs blocked in spec"
                     Set<Channel> combinedOutputs = new HashSet<>(right.getOutputs());
                     combinedOutputs.retainAll(left.getOutputs());
@@ -268,10 +248,10 @@ public class Quotient extends TransitionSystem {
                             CDD guardsOfSpec = CDD.cddFalse();
                             for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c))
                                 guardsOfSpec = guardsOfSpec.disjunction(e_spec.getTarget().getInvariantCDD()).transitionBack(e_spec);
-                            Log.trace("guards of spec: " + guardsOfSpec);
+                            System.out.println("guards of spec: " + guardsOfSpec);
                             guardsOfSpec.printDot();
                             CDD negated = guardsOfSpec.negation();
-                            Log.trace("negated: " + negated);
+                            System.out.println("negated: " + negated);
                             negated.printDot();
                             if (negated.isNotFalse())
                             {
@@ -279,44 +259,42 @@ public class Quotient extends TransitionSystem {
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
                                     CDD targetState =e_comp.getTarget().getInvariantCDD();
                                     targetState= targetState.transitionBack(e_comp);
-                                    targetState = targetState.conjunction(e_comp.getSource().getInvariantCDD());
-                                    System.out.println(targetState);
                                     targetState= targetState.conjunction(negated);
                                     assert(inputs.contains(c));
                                     List<Update> updates = new ArrayList<Update>() {{
                                         add(new ClockUpdate(newClock, 0));
                                     }};
-                                    Log.trace("adding edge");
+                                    System.out.println("adding edge");
                                     edges.add(new Edge(loc, inc, c, true, CDD.toGuardList(targetState, clocks.getItems()), updates));
                                 }
                             }
                         }
                     }
 
-                    Log.trace("RULE 7");
+                    System.out.println("RULE 7");
                     // Rule 7 "Edge for negated spec invariant"
                     if (!l_spec.getInvariantCDD().isTrue()) {
                         // negate the spec. invariant
                         CDD invarNegated = l_spec.getInvariantCDD().negation();
-                        Log.trace(l_spec.getInvariantCDD());
-                        Log.trace(invarNegated);
+                        System.out.println(l_spec.getInvariantCDD());
+                        System.out.println(invarNegated);
 
                         // merge the negation with the invariant of the component, to create each new transition
                         CDD combined = l_comp.getInvariantCDD().conjunction(invarNegated);
                         List<Update> updates = new ArrayList<Update>() {{
                             add(new ClockUpdate(newClock, 0));
                         }};
-                        Log.trace("adding edge " + combined);
+                        System.out.println("adding edge " + combined);
                         edges.add(new Edge(loc, inc, newChan, true, CDD.toGuardList(combined, clocks.getItems()), updates));
                     }
 
 
 
-                    Log.trace("RULE 8");
+                    System.out.println("RULE 8");
                     //Rule 8: "independent action in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the components alphabet
-                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c) && !right.getSyncs().contains(c)) {
+                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c)) {
                             // if the current location in spec has a transition with c
                             if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
@@ -333,14 +311,14 @@ public class Quotient extends TransitionSystem {
 
 
                                     if (c.getName().equals("patent"))
-                                        Log.trace("HERE " + targetInvar);
+                                        System.out.println("HERE " + targetInvar);
                                     boolean isInput = inputs.contains(c);
-                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar,clocks.getItems()), e_spec.getUpdates()));
+                                    edges.add(new Edge(loc, target, c, isInput, CDD.toGuardList(targetInvar, clocks.getItems()), e_spec.getUpdates()));
                                 }
                             }
                         }
                     }
-                    Log.trace("ONE LOOP DONE");
+                    System.out.println("ONE LOOP DONE");
                 }
             }
 
@@ -359,7 +337,7 @@ public class Quotient extends TransitionSystem {
             edges.add(new Edge(univ, univ, c, false, new TrueGuard(), new ArrayList<>()));
         }
 
-        Log.trace("Done with creating edges");
+        System.out.println("Done with creating edges");
         if (prepareForBisimilarityReduction) {
             // turning transitions to univ that are not restricted by spec into selfloops
             // TODO: did I do this as we intended
@@ -389,11 +367,11 @@ public class Quotient extends TransitionSystem {
             allChannels.removeAll(spec.getOutputAct());
             channelsThatOnlySelfLoopInSpec.addAll(allChannels);
 
-        // Cannot edit the lists of locations / transitions while we loop through them, so we need to collect the ones we want to add/remove.
-        Set<Edge> toRemove = new HashSet<Edge>();
-        Set<Edge> toAdd = new HashSet<Edge>();
-        // for every channel that is independent, loop through all edges and transitions, to remove the ones that lead to univ and replace them by selfloops
-        for (Edge e : edges) {
+            // Cannot edit the lists of locations / transitions while we loop through them, so we need to collect the ones we want to add/remove.
+            Set<Edge> toRemove = new HashSet<Edge>();
+            Set<Edge> toAdd = new HashSet<Edge>();
+            // for every channel that is independent, loop through all edges and transitions, to remove the ones that lead to univ and replace them by selfloops
+            for (Edge e : edges) {
                 if (e.getTarget().getName().equals("univ") & channelsThatOnlySelfLoopInSpec.contains(e.getChannel())) {
                     toRemove.add(e);
                     toAdd.add(new Edge(e.getSource(), e.getSource(), e.getChannel(), e.isInput(), e.getGuard(), e.getUpdates()));
@@ -401,14 +379,14 @@ public class Quotient extends TransitionSystem {
             }
 
 
-        for (Edge e : toRemove)
-            edges.remove(e);
-        for (Edge e : toAdd)
-            edges.add(e);
+            for (Edge e : toRemove)
+                edges.remove(e);
+            for (Edge e : toAdd)
+                edges.add(e);
         }
 
-        if (!clocks.getItems().contains(newClock))
-            clocks.add(newClock);
+        newClock = new Clock("quo_new", "quo");
+        clocks.add(newClock);
         List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
         List <Edge> edgesWithNewClocks = updateClocksInEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
         CDD.done();
@@ -444,35 +422,19 @@ public class Quotient extends TransitionSystem {
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         // get possible transitions from current state, for a given channel
         SymbolicLocation location = currentState.getLocation();
-        System.out.println("Current state location " + location);
 
         List<Move> moves = getNextMoves(location, channel);
         List<Transition> result = createNewTransitions(currentState, moves, allClocks);
 
-       // assert(!result.isEmpty());
+        // assert(!result.isEmpty());
         return result;
     }
 
-    public List<Move> getNextMoves(SymbolicLocation locationIn, Channel channel) {
+    public List<Move> getNextMoves(SymbolicLocation location, Channel channel) {
         List<Move> resultMoves = new ArrayList<>();
-        Log.trace("gettingNextMove of " + location.getName());
-        SymbolicLocation locationCheck = locationIn;
-        if (locationCheck instanceof ComplexLocation) {
-            List<SymbolicLocation> locations = ((ComplexLocation) locationIn).getLocations();
-            for (SymbolicLocation loc : locations)
-            {
-                if (loc.getIsUniversal()) {
-                    assert(false); // after already merging all the targets of moves to lead to the same univ / inc location, we should never reach this
-                    locationCheck = univ;
-                }
-                if (loc.getIsInconsistent()) {
-                    assert(false);
-                    locationCheck = inc;
-                }
-            }
-        }
-        if (locationCheck instanceof ComplexLocation ) {
-            List<SymbolicLocation> locations = ((ComplexLocation) locationCheck).getLocations();
+        System.out.println("gettingNextMove of " + location.getName());
+        if (location instanceof ComplexLocation) {
+            List<SymbolicLocation> locations = ((ComplexLocation) location).getLocations();
 
             // symbolic locations corresponding to each TS
             SymbolicLocation locLeft = locations.get(0);
@@ -487,11 +449,10 @@ public class Quotient extends TransitionSystem {
                 if (!movesLeft.isEmpty() && !movesRight.isEmpty()) {
                     List<Move> moveProduct = moveProduct(movesLeft, movesRight, true,true);
                     for (Move move : moveProduct) {
-
                         move.conjunctCDD(move.getEnabledPart());
                     }
                     resultMoves.addAll(moveProduct);
-                    Log.trace("Rule 1");
+                    System.out.println("Rule 1");
                 }
             }
 
@@ -505,7 +466,7 @@ public class Quotient extends TransitionSystem {
                     for (Move move : moveProduct) {
                         move.conjunctCDD(move.getEnabledPart());
                     }
-                    Log.trace("Rule 2");
+                    System.out.println("Rule 2");
                     resultMoves.addAll(moveProduct);
                 }
             }
@@ -520,7 +481,7 @@ public class Quotient extends TransitionSystem {
                     for (Move move : moveProduct) {
                         move.conjunctCDD(move.getEnabledPart());
                     }
-                    Log.trace("Rule 8");
+                    System.out.println("Rule 8");
                     resultMoves.addAll(moveProduct);
                 }
             }
@@ -528,22 +489,20 @@ public class Quotient extends TransitionSystem {
 
 
 
-            if (channel.getName().equals("i_new"+quotientID))
-            {
-                // rule 7
-                Move newMoveRule7 = new Move(locationCheck, inc, new ArrayList<>());
-                // invariant is negation of invariant of left conjuncted with invariant of right
-                CDD negatedInvar = locLeft.getInvariantCDD().negation();
-                CDD combined = negatedInvar.conjunction(locRight.getInvariantCDD());
-                newMoveRule7.setGuards(combined);
-                newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
-                resultMoves.add(newMoveRule7);
-                Log.trace("Rule 7");
-            }
+            // rule 7
+            Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
+            // invariant is negation of invariant of left conjuncted with invariant of right
+            CDD negatedInvar = locLeft.getInvariantCDD().negation();
+            CDD combined = negatedInvar.conjunction(locRight.getInvariantCDD());
+            newMoveRule7.setGuards(combined);
+            newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
+            resultMoves.add(newMoveRule7);
+            System.out.println("Rule 7");
+
             // rule 5
             if (getActions().contains(channel)) {
-                Log.trace("Rule 5");
-                Move newMoveRule5 = new Move(locationCheck, univ, new ArrayList<>());
+                System.out.println("Rule 5");
+                Move newMoveRule5 = new Move(location, univ, new ArrayList<>());
                 // negate invariant of ts2
                 newMoveRule5.setGuards(locRight.getInvariantCDD().negation());
                 newMoveRule5.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
@@ -566,9 +525,8 @@ public class Quotient extends TransitionSystem {
 
 
                 for (Move move : movesFromRight) {
-
-                    Log.trace("Rule 6");
-                    Move newMoveRule6 = new Move(locationCheck, inc, new ArrayList<>());
+                    System.out.println("Rule 6");
+                    Move newMoveRule6 = new Move(location, inc, new ArrayList<>());
                     newMoveRule6.setGuards(move.getEnabledPart().conjunction(negated));
                     newMoveRule6.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                     resultMoves.add(newMoveRule6);
@@ -585,8 +543,8 @@ public class Quotient extends TransitionSystem {
                 }
                 CDDFromMovesFromRight = CDDFromMovesFromRight.negation().removeNegative();
 
-                Log.trace("Rule 3/4");
-                Move newMove4 = new Move(locationCheck, univ, new ArrayList<>());
+                System.out.println("Rule 3/4");
+                Move newMove4 = new Move(location, univ, new ArrayList<>());
                 newMove4.setGuards(CDDFromMovesFromRight);
                 resultMoves.add(newMove4);
             }
@@ -596,10 +554,10 @@ public class Quotient extends TransitionSystem {
                 List<Move> movesFrom1 = left.getNextMoves(locLeft, channel);
 
                 for (Move move : movesFrom1) {
-                    Log.trace("Rule 5");
+                    System.out.println("Rule 5");
                     SymbolicLocation newLoc = new ComplexLocation(new ArrayList<>(Arrays.asList(move.getTarget(), locRight)));
                     ((ComplexLocation) newLoc).removeInvariants();
-                    Move newMove3 = new Move(locationCheck, newLoc, new ArrayList<>());
+                    Move newMove3 = new Move(location, newLoc, new ArrayList<>());
                     CDD targetInvar = move.getTarget().getInvariantCDD();
                     targetInvar = targetInvar.transitionBack(move);
                     newMove3.setGuards(move.getGuardCDD().conjunction(targetInvar));
@@ -609,43 +567,24 @@ public class Quotient extends TransitionSystem {
 
             }
             // Rule 10
-        } else if (locationCheck instanceof InconsistentLocation) {
+        } else if (location instanceof InconsistentLocation) {
             if (getInputs().contains(channel)) {
-                Log.trace("Rule 10");
-                Move newMove = new Move(locationCheck, inc, new ArrayList<>());
-                ClockGuard g = new ClockGuard(newClock,null,0,Relation.EQUAL);
-                newMove.setGuards(new CDD(g));
-//                newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
+                System.out.println("Rule 10");
+                Move newMove = new Move(location, inc, new ArrayList<>());
+                newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove);
             }
             // Rule 9
-        } else if (locationCheck instanceof UniversalLocation) {
+        } else if (location instanceof UniversalLocation) {
             if (getActions().contains(channel)) {
-                Log.trace("Rule 9");
-                Move newMove = new Move(locationCheck, univ, new ArrayList<>());
+                System.out.println("Rule 9");
+                Move newMove = new Move(location, univ, new ArrayList<>());
                 resultMoves.add(newMove);
             }
         }
-        Log.trace("result moves");
-        List<Move> toDelete = new ArrayList<>();
+        System.out.println("result moves");
         for (Move m : resultMoves)
-        {
-
-            if (m.getTarget().getIsInconsistent())
-            {
-                m.setTarget(inc);
-            }
-            if (m.getTarget().getIsUniversal())
-            {
-                m.setTarget(univ);
-            }
-            if (m.getGuardCDD().isFalse())
-                toDelete.add(m);
-        }
-        resultMoves.removeAll(toDelete);
-        for (Move m : resultMoves)
-            Log.trace(m.getSource().getName() + " -> " + /*m.getEdges().get(0).getChannel() +*/ " -> " + m.getTarget().getName());
-
+            System.out.println(m.getSource().getName() + " -> " + /*m.getEdges().get(0).getChannel() +*/ " -> " + m.getTarget().getName());
         return resultMoves;
     }
 

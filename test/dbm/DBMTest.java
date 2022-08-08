@@ -140,7 +140,7 @@ public class DBMTest {
                 121,9,105,33,59,1};
         Zone z = new Zone(arr);
         z= z.close();
-        z.prettyPrint(true,true);
+        z.printDbm(true,true);
         Log.trace(z.isValid());
 
         int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
@@ -165,7 +165,7 @@ public class DBMTest {
                 121,1,1,1,1,1,};
         Zone z = new Zone(arr);
 
-        z.prettyPrint(true,true);
+        z.printDbm(true,true);
         Log.trace(z.isValid());
 
         int[] bounds = new int[] {0, 12, 31, 41, 41, 41};
