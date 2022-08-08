@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.*;
 import models.*;
 import parser.*;
@@ -204,20 +205,20 @@ public class UniversityTest {
 
         TransitionSystem right1=new Composition(new Conjunction(getAdm2(),getHalf1()),getMachine());
         TransitionSystem right2=new Composition(getAdm2(),getMachine());
-        System.out.println(right2.getOutputs());
-        System.out.println(right2.getInputs());
-        System.out.println(right2.getAutomaton().getOutputAct());
-        System.out.println(right2.getAutomaton().getInputAct());
+        Log.trace(right2.getOutputs());
+        Log.trace(right2.getInputs());
+        Log.trace(right2.getAutomaton().getOutputAct());
+        Log.trace(right2.getAutomaton().getInputAct());
 
         TransitionSystem left = new Composition(new Conjunction(getHalf1(),getHalf2()),getMachine());
 
         TransitionSystem right = new Conjunction(right1, right2);
-        System.out.println(right1.getOutputs());
-        System.out.println(right2.getOutputs());
-        System.out.println(right.getOutputs());
+        Log.trace(right1.getOutputs());
+        Log.trace(right2.getOutputs());
+        Log.trace(right.getOutputs());
 
         TransitionSystem rightAut = new Conjunction(new SimpleTransitionSystem(right1.getAutomaton()), new SimpleTransitionSystem(right2.getAutomaton()));
-        System.out.println(rightAut.getOutputs());
+        Log.trace(rightAut.getOutputs());
 
         XMLFileWriter.toXML("testOutput/right.xml",right.getAutomaton());
         XMLFileWriter.toXML("testOutput/right1.xml",right1.getAutomaton());
@@ -228,12 +229,12 @@ public class UniversityTest {
 
         Refinement refinement1 = new Refinement(left,rightAut);
         boolean refines1 = refinement1.check(true);
-        //System.out.println(refinement1.getTree().toDot());
+        //Log.trace(refinement1.getTree().toDot());
         assertTrue(refines1);
 
         Refinement refinement = new Refinement(left,right);
         boolean refines = refinement.check(true);
-        //System.out.println(refinement.getTree().toDot());
+        //Log.trace(refinement.getTree().toDot());
         assertTrue(refines);
 
     }
@@ -262,8 +263,8 @@ public class UniversityTest {
         assertTrue(ref3.check());
         Refinement ref = new Refinement(left,q2);
         boolean res = ref.check(true);
-        System.out.println(ref.getErrMsg());
-        //System.out.println(ref.getTree().toDot());
+        Log.trace(ref.getErrMsg());
+        //Log.trace(ref.getTree().toDot());
         assertTrue(res);
 
     }
@@ -504,7 +505,7 @@ public class UniversityTest {
         Refinement refinement = new Refinement(lhs, rhs);
         assertTrue(new Refinement(new Composition(getSimpleAdm(),getSimpleResearcher()),getSimpleSpec()).check());
         boolean refines = refinement.check();
-        System.out.println(refinement.getErrMsg());
+        Log.trace(refinement.getErrMsg());
 
         assertTrue(refines);
     }

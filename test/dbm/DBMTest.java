@@ -1,6 +1,7 @@
 package dbm;
 
 import lib.DBMLib;
+import log.Log;
 import logic.State;
 import models.*;
 import org.junit.After;
@@ -121,9 +122,9 @@ public class DBMTest {
         Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);
         State state1 = new State(new SimpleLocation(l1),new CDD(initialZone));
         //state1.delay();
-        System.out.println(state1);
+        Log.trace(state1);
         state1.extrapolateMaxBounds(map,clockList);
-        System.out.println(state1);
+        Log.trace(state1);
         assertEquals("{L1, (y<=2 && y-x<=2)}", state1.toString());
         CDD.done();
     }
@@ -140,7 +141,8 @@ public class DBMTest {
         Zone z = new Zone(arr);
         z= z.close();
         z.printDbm(true,true);
-        System.out.println(z.isValid());
+        Log.trace(z.isValid());
+
         int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
         z.extrapolateMaxBounds(bounds);
         Zone copy = new Zone(z);
@@ -162,8 +164,10 @@ public class DBMTest {
                 1,1,1,1,1,1,
                 121,1,1,1,1,1,};
         Zone z = new Zone(arr);
+
         z.printDbm(true,true);
-        System.out.println(z.isValid());
+        Log.trace(z.isValid());
+
         int[] bounds = new int[] {0, 12, 31, 41, 41, 41};
         z.extrapolateMaxBounds(bounds);
         z.printDbm(true,true);

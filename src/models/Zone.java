@@ -1,6 +1,7 @@
 package models;
 
 import lib.DBMLib;
+import log.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -312,7 +313,7 @@ public class Zone {
         int intLength = 0;
         int toPrint = 0;
 
-        System.out.println("---------------------------------------");
+        Log.trace("---------------------------------------");
         for (int i = 0, j = 1; i < length; i++, j++) {
 
             toPrint = toConvert ? DBMLib.raw2bound(dbm[i]) : dbm[i];
@@ -324,8 +325,8 @@ public class Zone {
                 System.out.print(strictness);
             }
             if (j == dimension) {
-                System.out.println();
-                if (i == length - 1) System.out.println("---------------------------------------");
+                Log.trace();
+                if (i == length - 1) Log.trace("---------------------------------------");
                 j = 0;
             } else {
                 intLength = String.valueOf(toPrint).length();

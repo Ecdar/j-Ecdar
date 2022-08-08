@@ -1,6 +1,7 @@
 package features;
 
 import lib.DBMLib;
+import log.Log;
 
 public class Helpers {
 
@@ -14,7 +15,7 @@ public class Helpers {
         int intLength = 0;
         int toPrint = 0;
 
-        System.out.println("---------------------------------------");
+        Log.trace("---------------------------------------");
         for (int i = 0, j = 1; i < length; i++, j++) {
 
             toPrint = toConvert ? DBMLib.raw2bound(x[i]) : x[i];
@@ -26,8 +27,8 @@ public class Helpers {
                 System.out.print(strictness);
             }
             if (j == dim) {
-                System.out.println();
-                if (i == length - 1) System.out.println("---------------------------------------");
+                Log.trace();
+                if (i == length - 1) Log.trace("---------------------------------------");
                 j = 0;
             } else {
                 intLength = String.valueOf(toPrint).length();

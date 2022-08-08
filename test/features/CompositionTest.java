@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
@@ -86,7 +87,7 @@ public class CompositionTest {
         SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(copy);
         Refinement ref = new Refinement(selfloop,selfloop1);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assert (res==true);
     }
 
@@ -104,7 +105,7 @@ public class CompositionTest {
         // TODO : for some reason this fails, now that I fixed the "isUniversal" of complex locations
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
 
     }
@@ -120,7 +121,7 @@ public class CompositionTest {
         assert(new Refinement(comp,spec).check());
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
 
     }

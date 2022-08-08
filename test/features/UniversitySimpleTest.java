@@ -2,6 +2,7 @@ package features;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import logic.*;
 import models.Automaton;
 import models.CDD;
@@ -103,7 +104,7 @@ public class UniversitySimpleTest {
         TransitionSystem comp = new SimpleTransitionSystem(new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton());
         Refinement ref = new Refinement(comp, new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 /*
@@ -113,7 +114,7 @@ public class UniversitySimpleTest {
         Quotient q = new Quotient(spec,researcher);
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 
@@ -123,7 +124,7 @@ public class UniversitySimpleTest {
         Quotient q = new Quotient(spec,machine);
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
     @Test
@@ -131,7 +132,7 @@ public class UniversitySimpleTest {
         Quotient q = new Quotient(spec,machine);
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 
@@ -147,7 +148,7 @@ public class UniversitySimpleTest {
 
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), spec );
         boolean result = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(result);
     }
 
@@ -163,7 +164,7 @@ public class UniversitySimpleTest {
 
         Refinement ref = new Refinement(researcher, new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton())  );
         boolean result = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(result);
     }
 
@@ -173,7 +174,7 @@ public class UniversitySimpleTest {
         Automaton comp = XMLParser.parse("comp.xml",true)[0];
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp), new SimpleTransitionSystem(quo) );
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 
@@ -187,7 +188,7 @@ public class UniversitySimpleTest {
 
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), st);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 
@@ -338,7 +339,7 @@ public class UniversitySimpleTest {
         //comp.getAutomaton();
         Refinement ref = new Refinement(comp, spec);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
 
 
         assertTrue(res);
@@ -351,7 +352,7 @@ public class UniversitySimpleTest {
 
         Refinement ref = new Refinement(comp, spec);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
 
 
         assertTrue(res);
@@ -364,7 +365,7 @@ public class UniversitySimpleTest {
                 new Composition(new TransitionSystem[]{adm,
                         new Composition(new TransitionSystem[]{machine, researcher})}),
                 spec);
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         boolean res = ref.check();
 
         assertTrue(res

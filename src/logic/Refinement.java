@@ -229,7 +229,7 @@ public class Refinement {
     }
 
     private boolean checkDelay(State leftState, State rightState)
-        throws IllegalArgumentException, NullPointerException {
+            throws IllegalArgumentException, NullPointerException {
         if (!leftState.getInvariant().equiv(rightState.getInvariant())) {
             throw new IllegalArgumentException("The invariant of both the left and right states must be equivalent");
         }
@@ -481,10 +481,10 @@ public class Refinement {
                     supersetNode = state.getNode();
                     return true;
                 }
-               // if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
-               // {
-               //     assert(false);
-               // }
+                // if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
+                // {
+                //     assert(false);
+                // }
             }
         }
 

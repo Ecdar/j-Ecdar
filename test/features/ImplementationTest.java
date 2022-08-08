@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.Composition;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
@@ -140,7 +141,7 @@ public class ImplementationTest {
     @Test
     public void testG13(){
         boolean res = G13.isImplementation();
-        System.out.println(G13.getLastErr());
+        Log.trace(G13.getLastErr());
         assertTrue(res);
     }
 

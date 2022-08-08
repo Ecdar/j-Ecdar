@@ -116,7 +116,7 @@ public abstract class TestDriver {
      */
     @SuppressWarnings("WeakerAccess")
     public void write(String message) {
-        System.out.println(message);
+        Log.trace(message);
         hasOutputted = true;
     }
 
