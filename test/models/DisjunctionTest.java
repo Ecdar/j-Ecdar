@@ -31,15 +31,8 @@ public class DisjunctionTest {
     @BeforeClass
     public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
         automata = XMLParser.parse("./samples/xml/DisjunctionTests.xml", true);
-        CDD.init(100, 100, 100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(automata[0].getClocks());
-        clocks.addAll(automata[1].getClocks());
-        CDD.addClocks(clocks);
         D1 = new SimpleTransitionSystem((automata[0]));
         D2 = new SimpleTransitionSystem((automata[1]));
-
-
     }
 
     @Test
@@ -112,7 +105,7 @@ public class DisjunctionTest {
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis2));
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis3));
         CDD neg = disjunctedGuards.negation();
-        Guard out = CDD.toGuardList(neg, clocks);
+        Guard out = neg.getGuard(clocks);
 
 
         System.out.println(out);

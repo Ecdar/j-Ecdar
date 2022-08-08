@@ -1,6 +1,9 @@
 package models;
 
+import logic.State;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Location {
     private final String name;
@@ -43,6 +46,50 @@ public class Location {
             copy.isInconsistent,
             copy.x,
             copy.y
+        );
+    }
+
+    public Location(Collection<Location> locations) {
+        if (locations.size() == 0) {
+            throw new IllegalArgumentException("At least a single location is required");
+        }
+
+        this.name = String.join(
+                "",
+                locations.stream()
+                        .map(Location::getName)
+                        .collect(Collectors.toList())
+        );
+
+        this.isInitial = locations.stream().allMatch(location -> location.isInitial);
+        this.isUrgent = locations.stream().anyMatch(location -> location.isUrgent);
+        this.isUniversal = locations.stream().allMatch(location -> location.isUniversal);
+        this.isInconsistent = locations.stream().anyMatch(location -> location.isInconsistent);
+
+        CDD invariant = CDD.cddTrue();
+        for (Location location : locations) {
+            invariant = location.getInvariantCDD().conjunction(invariant);
+            this.x += location.x;
+            this.y = location.y;
+        }
+
+        this.invariant = invariant.getGuard();
+
+        // We use the average location coordinates
+        this.x /= locations.size();
+        this.y /= locations.size();
+    }
+
+    public Location(State state, List<Clock> clocks) {
+        this(
+                state.getLocation().getName(),
+                state.getInvariants(clocks),
+                state.getLocation().getIsInitial(),
+                state.getLocation().getIsUrgent(),
+                state.getLocation().getIsUniversal(),
+                state.getLocation().getIsInconsistent(),
+                state.getLocation().getX(),
+                state.getLocation().getX()
         );
     }
 

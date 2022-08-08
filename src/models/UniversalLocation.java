@@ -36,7 +36,7 @@ public class UniversalLocation extends SymbolicLocation {
         return 0;
     }
 
-    public CDD getInvariantCDD() {
+    public CDD getInvariant() {
         // should be true, so no invariants
         return CDD.cddTrue();
     }

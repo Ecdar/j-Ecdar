@@ -99,7 +99,7 @@ public class VariousTest {
 
 
         origin1 = origin1.delay();
-        Guard origin1Guards = CDD.toGuardList(origin1,clocks);
+        Guard origin1Guards = origin1.getGuard(clocks);
         System.out.println(origin1Guards);
         assert(true);
 
@@ -128,7 +128,7 @@ public class VariousTest {
 
         CDD origin1 = new CDD(new AndGuard(inner));
 
-        Guard origin1Guards = CDD.toGuardList(origin1,clocks);
+        Guard origin1Guards = origin1.getGuard(clocks);
         System.out.println(origin1Guards);
 
 
@@ -136,9 +136,9 @@ public class VariousTest {
         Update clockUpdate = new ClockUpdate(x,0);
         List<Update>  list1 = new ArrayList<>();
         list1.add(clockUpdate);
-        origin1 = CDD.applyReset(origin1,list1);
+        origin1 = origin1.applyReset(list1);
 
-        Guard origin2Guards = CDD.toGuardList(origin1,clocks);
+        Guard origin2Guards = origin1.getGuard(clocks);
         System.out.println(origin2Guards);
 
         assert(origin2Guards.toString().equals("(x==0 && y<=3 && y-x<=3 && x-y<=0)"));
@@ -233,8 +233,8 @@ public class VariousTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);clocks.add(y);
         CDD.addClocks(clocks);
-        CDD test = CDD.allocateInterval(1,0,2,true,3,true);
-        System.out.println(CDD.toGuardList(test,clocks));
+        CDD test = CDD.createInterval(1,0,2,true,3,true);
+        System.out.println(test.getGuard(clocks));
         test.printDot();
         assert(true);
     }

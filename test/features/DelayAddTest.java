@@ -38,21 +38,15 @@ public class DelayAddTest {
 
     @Test
     public void A1A2NotRefinesB() {
-
-        CDD.init(100,100,100);
-        CDD.addClocks(automata[0].getClocks(),automata[1].getClocks(),automata[2].getClocks() );
         TransitionSystem comp = new Composition(
-                new TransitionSystem[]{
-                        new SimpleTransitionSystem((automata[0])),
-                        new SimpleTransitionSystem((automata[1]))});
+                        new SimpleTransitionSystem(automata[0]),
+                        new SimpleTransitionSystem(automata[1])
+        );
         assertFalse(new Refinement(comp, new SimpleTransitionSystem((automata[2]))).check());
     }
 
     @Test
     public void C1NotRefinesC2() {
-
-        CDD.init(100,100,100);
-        CDD.addClocks(automata[3].getClocks(),automata[4].getClocks() );
         assertFalse(new Refinement(new SimpleTransitionSystem((automata[3])), new SimpleTransitionSystem((automata[4]))).check());
     }
 
@@ -60,8 +54,6 @@ public class DelayAddTest {
     public void D1NotRefinesD2() {
         // should fail because outputs are different
 
-        CDD.init(100,100,100);
-        CDD.addClocks(automata[6].getClocks(),automata[5].getClocks() );
         assertFalse(new Refinement(new SimpleTransitionSystem((automata[5])), new SimpleTransitionSystem((automata[6]))).check());
     }
 }

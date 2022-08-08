@@ -22,9 +22,7 @@ public class Pruning {
         Set<Location> inconsistentLocations;
         Map<Location, CDD> passedInconsistentStates;
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
 
         for (Location l : locations)
@@ -84,7 +82,10 @@ public class Pruning {
             locations.add(new Location("inc", new TrueGuard(), true, false, false, true));
             edges = new ArrayList<>();
         }
-        CDD.done();
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
         Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), true);
         return new SimpleTransitionSystem(resAut);
     }
@@ -97,8 +98,8 @@ public class Pruning {
     private static boolean checkInitialState(Location targetLoc) {
         if (targetLoc.isInitial())
         {
-            CDD initial = CDD.zeroCDD();
-            if (CDD.intersects(targetLoc.getInconsistentPart(),initial))
+            CDD initial = CDD.cddZero();
+            if (targetLoc.getInconsistentPart().intersects(initial))
             {
                 return true;
             }
@@ -112,7 +113,7 @@ public class Pruning {
      */
     private static void setInconsistentCDDs(Set<Location> inconsistentLocations) {
         for (Location l : inconsistentLocations)
-            l.setInconsistentPart(CDD.getUnrestrainedCDD());
+            l.setInconsistentPart(CDD.cddUnrestrained());
     }
 
     /**
@@ -139,7 +140,7 @@ public class Pruning {
                 }
                 else {
                     CDD invarMinusIncCDD = l.getInvariantCDD().minus(l.getInconsistentPart());
-                    l.setInvariant(CDD.toGuardList(invarMinusIncCDD,clocks));
+                    l.setInvariant(invarMinusIncCDD.getGuard(clocks));
                 }
             }
         }
@@ -156,7 +157,7 @@ public class Pruning {
                 if (!(e.getTarget().getInvariant() instanceof FalseGuard)) {
                     CDD target = e.getTarget().getInvariantCDD();
                     CDD cddBeforeEdge = target.transitionBack(e);
-                    e.setGuard(CDD.toGuardList(cddBeforeEdge.conjunction(e.getSource().getInvariantCDD()), clocks));
+                    e.setGuard(cddBeforeEdge.conjunction(e.getSource().getInvariantCDD()).getGuard(clocks));
                 }
             }
         }
@@ -196,7 +197,7 @@ public class Pruning {
             CDD guardCDD = e.getGuardCDD();
             CDD fedAfterRemovingInconsistentPart =guardCDD.minus(target);
 
-            e.setGuard(CDD.toGuardList(fedAfterRemovingInconsistentPart,clocks));
+            e.setGuard(fedAfterRemovingInconsistentPart.getGuard(clocks));
         }
 
         // Removing the transition / strenthening the guards might have turned the source location inconsistent
@@ -225,7 +226,7 @@ public class Pruning {
                         CDD goodPart = targetInvariantCDDOfTransThatSavesUs.minus(incPartOfTransThatSavesUs);
 
                         CDD doubleCheck = goodPart.transitionBack(otherE);
-                        goodPart = CDD.applyReset(goodPart,otherE.getUpdates());
+                        goodPart = goodPart.applyReset(otherE.getUpdates());
 
                         // apply guards
                         CDD guardFed = otherE.getGuardCDD();
@@ -375,7 +376,7 @@ public class Pruning {
         if (printComments)
             System.out.println("Removing transition if its not satisfiable anymore");
 
-        CDD testForSatEdgeCDD = CDD.getUnrestrainedCDD();
+        CDD testForSatEdgeCDD = CDD.cddUnrestrained();
 
 
         // apply target invariant
@@ -385,7 +386,7 @@ public class Pruning {
         testForSatEdgeCDD = testForSatEdgeCDD.minus(e.getTarget().getInconsistentPart());
 
 
-        CDD.applyReset(testForSatEdgeCDD, e.getUpdates());
+        testForSatEdgeCDD.applyReset(e.getUpdates());
 
         // apply guards
         CDD guardCDD1 = e.getGuardCDD();
@@ -477,7 +478,7 @@ public class Pruning {
 
         // do predt.
 
-        CDD predtFed = CDD.predt(incCDD, allGoodCDDs);
+        CDD predtFed = incCDD.predt(allGoodCDDs);
         System.out.println("predtFed   " + predtFed + " " + incCDD + " " + allGoodCDDs);
 
         // add the inconsistent Federation to it, so in case both the transition to bad and the transition to good
