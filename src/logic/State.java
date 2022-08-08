@@ -1,7 +1,6 @@
 package logic;
 
 import lib.DBMLib;
-import log.Log;
 import models.*;
 
 import java.util.HashMap;
@@ -19,24 +18,24 @@ public class State {
 
     public State(State oldState) {
         this.location = oldState.getLocation();
-        this.invarCDD = new CDD(oldState.getCDD().getPointer());
+        this.invarCDD = new CDD(oldState.getInvariant().getPointer());
     }
 
     public SymbolicLocation getLocation() {
         return location;
     }
 
-    public CDD getCDD() {
+    public CDD getInvariant() {
         return invarCDD;
     }
 
 
-    public CDD getInvarCDDDirectlyFromInvariants() {
-        return location.getInvariantCDD();
+    public CDD getLocationInvariant() {
+        return location.getInvariant();
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return CDD.toGuardList(location.getInvariantCDD(),relevantClocks);
+        return location.getInvariant().getGuard(relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -49,7 +48,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        CDD result = this.invarCDD.conjunction(location.getInvariantCDD());
+        CDD result = this.invarCDD.conjunction(location.getInvariant());
         this.invarCDD=result;
     }
 
@@ -58,7 +57,7 @@ public class State {
     }
 
     public void applyResets(List<Update> resets) {
-        invarCDD=CDD.applyReset(invarCDD, resets);
+        invarCDD=invarCDD.applyReset(resets);
     }
 
     public void extrapolateMaxBounds(HashMap<Clock,Integer> maxBounds, List<Clock> relevantClocks){
@@ -76,7 +75,7 @@ public class State {
             {
                 if (!maxBounds.containsKey(clk))
                 {
-                   // assert false; // TODO: should we really get into here??
+                    // assert false; // TODO: should we really get into here??
                     bounds[counter]=0;
                 }
                 else
@@ -95,19 +94,19 @@ public class State {
             return;
         }
         else
-        while (!bcddLeftToAnalyse.isTerminal())
-        {
-            CddExtractionResult extractResult = bcddLeftToAnalyse.reduce().removeNegative().extractBddAndDbm();
-            bcddLeftToAnalyse = extractResult.getCddPart().removeNegative().reduce();
+            while (!bcddLeftToAnalyse.isTerminal())
+            {
+                CddExtractionResult extractResult = bcddLeftToAnalyse.reduce().removeNegative().extract();
+                bcddLeftToAnalyse = extractResult.getCddPart().removeNegative().reduce();
 
-            Zone z = new Zone(extractResult.getDbm());
-            CDD bddPart = extractResult.getBddPart();
-            Zone newZone = new Zone(DBMLib.dbm_close(z.getDbm(),z.getDimension()));
-            newZone.extrapolateMaxBounds(bounds);
-            CDD extrapolatedDBMCDD = CDD.allocateFromDbm(newZone.getDbm(),CDD.numClocks);
-            CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
-            resCDD = resCDD.disjunction(extrapolatedCDD);
-        }
+                Zone z = new Zone(extractResult.getDbm());
+                CDD bddPart = extractResult.getBddPart();
+                Zone newZone = new Zone(DBMLib.dbm_close(z.getDbm(),z.getDimension()));
+                newZone.extrapolateMaxBounds(bounds);
+                CDD extrapolatedDBMCDD = CDD.createFromDbm(newZone.getDbm(),CDD.numClocks);
+                CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
+                resCDD = resCDD.disjunction(extrapolatedCDD);
+            }
 
         invarCDD = resCDD;
     }
@@ -120,8 +119,8 @@ public class State {
         boolean print = false;
         if (copy.toString().contains("30"))
         {
-            Log.trace("max bounds : " + maxBounds);
-            Log.trace(CDD.toGuardList(copy, relevantClocks));
+            System.out.println("max bounds : " + maxBounds);
+            System.out.println(copy.getGuard(relevantClocks));
             print = true;
         }
         if (copy.isBDD())
@@ -131,7 +130,7 @@ public class State {
         else
             while (!copy.isTerminal())
             {
-                CddExtractionResult extractResult = copy.reduce().removeNegative().extractBddAndDbm();
+                CddExtractionResult extractResult = copy.reduce().removeNegative().extract();
                 copy = extractResult.getCddPart().removeNegative().reduce();
 
                 Zone z = new Zone(extractResult.getDbm());
@@ -160,17 +159,17 @@ public class State {
                 {
                     for (int i: bounds)
                         System.out.print(i + " ");
-                    Log.trace();
+                    System.out.println();
                 }
                 z.extrapolateMaxBoundsDiagonal(bounds);
                 if (print) z.printDbm(true,true);
-                CDD extrapolatedDBMCDD = CDD.allocateFromDbm(z.getDbm(),CDD.numClocks);
+                CDD extrapolatedDBMCDD = CDD.createFromDbm(z.getDbm(),CDD.numClocks);
                 CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
                 resCDD = resCDD.disjunction(extrapolatedCDD);
 
             }
         if (print)
-            Log.trace(resCDD);
+            System.out.println(resCDD);
         invarCDD = resCDD;
     }
     @Override

@@ -13,7 +13,7 @@ public class ComplexLocation extends SymbolicLocation {
         CDD invar = CDD.cddTrue();
         for (SymbolicLocation loc1 : locations)
         {
-            CDD invarLoc = loc1.getInvariantCDD();
+            CDD invarLoc = loc1.getInvariant();
             invar = invar.conjunction(invarLoc);
         }
         invariants = invar;
@@ -93,7 +93,7 @@ public class ComplexLocation extends SymbolicLocation {
         return isInconsistent;
     }
 
-    public CDD getInvariantCDD() {
+    public CDD getInvariant() {
         return invariants;
     }
 

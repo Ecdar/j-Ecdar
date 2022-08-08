@@ -45,17 +45,6 @@ public class UniversitySimpleTest {
                 "Components/HalfAdm1.json",
                 "Components/HalfAdm2.json"};
         Automaton[] machines = JSONParser.parse(base, components, true);
-        CDD.init(100,100,100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(machines[0].getClocks());
-        clocks.addAll(machines[1].getClocks());
-        clocks.addAll(machines[2].getClocks());
-        clocks.addAll(machines[3].getClocks());
-        clocks.addAll(machines[4].getClocks());
-        clocks.addAll(machines[5].getClocks());
-        clocks.addAll(machines[6].getClocks());
-        clocks.addAll(machines[7].getClocks());
-        CDD.addClocks(clocks);
 
         adm = new SimpleTransitionSystem((machines[0]));
         admCopy = new SimpleTransitionSystem(new Automaton((machines[0])));
@@ -73,7 +62,6 @@ public class UniversitySimpleTest {
         half1Copy = new SimpleTransitionSystem(new Automaton((machines[6])));
         half2 = new SimpleTransitionSystem((machines[7]));
         half2Copy = new SimpleTransitionSystem(new Automaton((machines[7])));
-        CDD.done();
     }
 
     @Test
@@ -101,6 +89,7 @@ public class UniversitySimpleTest {
 
 
     @Test
+    @Ignore
     public void newQuotientTest2() {
 
         assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());

@@ -7,7 +7,7 @@ public class BoolGuard extends Guard {
     private final Relation relation;
     private final boolean value;
 
-    private BoolGuard(BoolVar var, Relation relation, boolean value) {
+    public BoolGuard(BoolVar var, Relation relation, boolean value) {
         // These are the only relation types allowed
         if (relation != Relation.EQUAL && relation != Relation.NOT_EQUAL) {
             throw new IllegalArgumentException("The relation of the clock guard is invalid");

@@ -25,9 +25,7 @@ public class Bisimilarity {
         bisimilarLocs.add(locs); // at the start we "assume all locs are bisimilar"
 
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
         thereWasAChange= true;
 
 
@@ -129,12 +127,12 @@ public class Bisimilarity {
                             CDD allCDDs = CDD.cddFalse();
                             for (Edge e : edgeList) {
                                 CDD targetFedAfterReset = e.getTarget().getInvariantCDD();
-                                targetFedAfterReset = CDD.applyReset(targetFedAfterReset,e.getUpdates());
+                                targetFedAfterReset = targetFedAfterReset.applyReset(e.getUpdates());
                                 allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
 
                                 assert (Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
                             }
-                            finalEdges.add(new Edge(l, targetLoc, c,  edgeList.get(0).isInput(), CDD.toGuardList(allCDDs, copy.getClocks()), allEdges.get(0).getUpdates()));
+                            finalEdges.add(new Edge(l, targetLoc, c,  edgeList.get(0).isInput(), allCDDs.getGuard(copy.getClocks()), allEdges.get(0).getUpdates()));
                         }
 
                     }
@@ -143,7 +141,9 @@ public class Bisimilarity {
             }
         }
 
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return new Automaton(copy.getName()+"Bisimilar",locs,finalEdges,clocks, copy.getBVs());
 
     }
@@ -196,20 +196,20 @@ public class Bisimilarity {
                     else
                         e2CDD = s2.conjunction(e2.getGuardCDD()).disjunction(e2CDD);
                 }
-                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
+                if (e1CDD.intersects(s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
                 {
                     return true;
                 }
 
 
-               if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+               if (e1CDD.intersects(s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
                     if (l1.getName().equals(l2.getName())) {
                     }
                     return true;
                 }
             }
-            if (!CDD.isSubset(e1CDD,e2CDD)) {
+            if (!e1CDD.isSubset(e2CDD)) {
                 return true;
             }
         }
@@ -236,7 +236,7 @@ public class Bisimilarity {
                         e1CDD = s1.conjunction(e1.getGuardCDD()).disjunction(e1CDD);
                 }
 
-                if (CDD.intersects(e2CDD,s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+                if (e2CDD.intersects(s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
 
                     return true;
@@ -244,7 +244,7 @@ public class Bisimilarity {
 
 
             }
-            if (!CDD.isSubset(e2CDD, e1CDD)) {
+            if (!e2CDD.isSubset(e1CDD)) {
                 return true;
             }
         }

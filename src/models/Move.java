@@ -21,12 +21,16 @@ public class Move {
         }
     }
 
+    public Move(SymbolicLocation source, SymbolicLocation target) {
+        this(source, target, new ArrayList<>());
+    }
+
     /**
      * Return the enabled part of a move based on guard, source invariant and predated target invariant
      **/
     public CDD getEnabledPart() {
-        CDD targetInvariant = getTarget().getInvariantCDD();
-        CDD sourceInvariant = getSource().getInvariantCDD();
+        CDD targetInvariant = getTarget().getInvariant();
+        CDD sourceInvariant = getSource().getInvariant();
         return getGuardCDD()
                 .conjunction(targetInvariant.transitionBack(this))
                 .conjunction(sourceInvariant);
@@ -53,7 +57,7 @@ public class Move {
     }
 
     public Guard getGuards(List<Clock> relevantClocks) {
-        return CDD.toGuardList(guardCDD, relevantClocks);
+        return guardCDD.getGuard(relevantClocks);
     }
 
     public void setGuards(CDD guardCDD) {

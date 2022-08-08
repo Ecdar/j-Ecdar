@@ -32,6 +32,7 @@ public class XMLParser {
                 automata.add(buildAutomaton(el, makeInpEnabled));
             }
         } catch (Exception e) {
+            CDD.done();
             throw new RuntimeException(e);
         }
 

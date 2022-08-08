@@ -51,14 +51,14 @@ public class Automaton {
         );
 
         if (makeInputEnabled) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-            CDD.addClocks(clocks);
-            CDD.addBddvar(BVs);
-            addTargetInvariantToEdges();
+            boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
+            addTargetInvariantToEdges();
             makeInputEnabled();
 
-            CDD.done();
+            if (initialisedCdd) {
+                CDD.done();
+            }
         }
     }
 
@@ -244,7 +244,7 @@ public class Automaton {
                 }
 
                 if (resCDD.isNotFalse()) {
-                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
+                    Edge newEdge = new Edge(loc, loc, input, true, resCDD.getGuard(getClocks()), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
 
@@ -258,7 +258,7 @@ public class Automaton {
             CDD targetCDD = edge.getTarget().getInvariantCDD();
             CDD past = targetCDD.transitionBack(edge);
             if (!past.equiv(CDD.cddTrue()))
-                edge.setGuard(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
+                edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
         }
     }
 }

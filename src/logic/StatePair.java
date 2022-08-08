@@ -32,12 +32,12 @@ public class StatePair {
     }
 
     public String prettyPrint() {
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getCDD() + " " + right.getCDD();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getInvariant() + " " + right.getInvariant();
     }
 
     @Override
     public String toString() {
         //return "L=" + left + ", R=" + right;
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getCDD() + " " + right.getCDD();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getInvariant() + " " + right.getInvariant();
     }
 }

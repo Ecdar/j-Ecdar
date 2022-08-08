@@ -43,22 +43,22 @@ public class DBMTest {
         // STATES----------------------
         // From 0 to inf
         Zone z1 = new Zone(new int[]{1, 1, 10, 20});
-        CDD cdd1 = CDD.allocateFromDbm(z1.getDbm(),clockList.size()+1);
+        CDD cdd1 = CDD.createFromDbm(z1.getDbm(),clockList.size()+1);
         state1 = new State(sl1, cdd1);
 
         // From 2 to inf
         Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
-        CDD cdd2 = CDD.allocateFromDbm(z2.getDbm(),clockList.size()+1);
+        CDD cdd2 = CDD.createFromDbm(z2.getDbm(),clockList.size()+1);
         state2 = new State(sl1, cdd2);
 
         // From 0 to 5
         Zone z3 = new Zone(new int[]{1, 1, 11, 1});
-        CDD cdd3 = CDD.allocateFromDbm(z3.getDbm(),clockList.size()+1);
+        CDD cdd3 = CDD.createFromDbm(z3.getDbm(),clockList.size()+1);
         state3 = new State(sl1, cdd3);
 
         // From 3 to 12
         Zone z4 = new Zone(new int[]{1, -5, 25, 1});
-        CDD cdd4 = CDD.allocateFromDbm(z4.getDbm(),clockList.size()+1);
+        CDD cdd4 = CDD.createFromDbm(z4.getDbm(),clockList.size()+1);
         state4 = new State(sl1, cdd4);
 
 

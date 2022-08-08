@@ -86,7 +86,7 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
     private String tryEnsureDone(Throwable e) {
         String description = e.getClass().getName() + ": " + e.getMessage();
 
-        try {CDD.ensure_done(); }
+        try {CDD.ensureDone(); }
         catch (Throwable ee) {
             description += "\n" + ee.getClass().getName() + ": " + ee.getMessage();
         }

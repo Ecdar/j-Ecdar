@@ -1,6 +1,5 @@
 package logic;
 
-import log.Log;
 import models.*;
 import parser.XMLFileWriter;
 
@@ -52,7 +51,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public void setMaxBounds()
     {
-       // Log.trace("Max bounds: " + automaton.getMaxBoundsForAllClocks());
+        // System.out.println("Max bounds: " + automaton.getMaxBoundsForAllClocks());
         HashMap<Clock,Integer> res = new HashMap<>();
 
         res.putAll(automaton.getMaxBoundsForAllClocks());
@@ -85,9 +84,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<Transition> tempTrans = getNextTransitions(currState, action);
                 if (checkMovesOverlap(tempTrans)) {
                     for (Transition t: tempTrans) {
-                        Log.trace("next trans");
+                        System.out.println("next trans");
                         for (Edge e : t.getEdges())
-                            Log.trace(e);
+                            System.out.println(e);
                     }
                     return false;
                 }
@@ -106,7 +105,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     // Check if zones of moves for the same action overlap, that is if there is non-determinism
     public boolean checkMovesOverlap(List<Transition> trans) {
         if (trans.size() < 2) return false;
-        //Log.trace("check moves overlap -------------------------------------------------------------------");
+        //System.out.println("check moves overlap -------------------------------------------------------------------");
         for (int i = 0; i < trans.size(); i++) {
             for (int j = i + 1; j < trans.size(); j++) {
                 if (trans.get(i).getTarget().getLocation().equals(trans.get(j).getTarget().getLocation())
@@ -123,19 +122,19 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
 
-                if (state1.getCDD().isNotFalse() && state2.getCDD().isNotFalse()) {
-                    if(CDD.intersects(state1.getCDD(),state2.getCDD())) {
-                        /*Log.trace(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
-                        Log.trace(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
-                        Log.trace(trans.get(0).getEdges().get(0).getChannel());
-                        Log.trace(trans.get(0).getEdges().get(0));
-                        Log.trace(trans.get(1).getEdges().get(0));
-                        Log.trace(CDD.toGuardList(state1.getInvarCDD(),clocks));
-                        Log.trace(CDD.toGuardList(state2.getInvarCDD(),clocks));
+                if (state1.getInvariant().isNotFalse() && state2.getInvariant().isNotFalse()) {
+                    if(state1.getInvariant().intersects(state2.getInvariant())) {
+                        /*System.out.println(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
+                        System.out.println(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
+                        System.out.println(trans.get(0).getEdges().get(0).getChannel());
+                        System.out.println(trans.get(0).getEdges().get(0));
+                        System.out.println(trans.get(1).getEdges().get(0));
+                        System.out.println(CDD.toGuardList(state1.getInvarCDD(),clocks));
+                        System.out.println(CDD.toGuardList(state2.getInvarCDD(),clocks));
                         // trans.get(j).getGuardCDD().printDot();
-                        Log.trace(CDD.toGuardList(trans.get(i).getEdges().get(0).getGuardCDD(),clocks));
-                        Log.trace(CDD.toGuardList(trans.get(j).getEdges().get(0).getGuardCDD(),clocks));
-                        Log.trace("they intersect??!");*/
+                        System.out.println(CDD.toGuardList(trans.get(i).getEdges().get(0).getGuardCDD(),clocks));
+                        System.out.println(CDD.toGuardList(trans.get(j).getEdges().get(0).getGuardCDD(),clocks));
+                        System.out.println("they intersect??!");*/
                         return true;
                     }
                 }
@@ -162,7 +161,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         State toStore = new State(currState);
 
         toStore.extrapolateMaxBounds(getMaxBounds(),clocks.getItems());
-        Log.trace(getMaxBounds());
+        System.out.println(getMaxBounds());
         //if (passedContainsState(toStore))
         //    return true;
         passed.add(toStore);
@@ -172,18 +171,18 @@ public class SimpleTransitionSystem extends TransitionSystem{
             for (Transition ts : tempTrans) {
                 boolean inputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                 if (!inputConsistent) {
-                    Log.trace("Input inconsistent");
+                    System.out.println("Input inconsistent");
                     return false;
                 }
             }
         }
         boolean outputExisted = false;
         // If delaying indefinitely is possible -> Prune the rest
-        if (canPrune && CDD.canDelayIndefinitely(currState.getCDD())) {
+        if (canPrune && currState.getInvariant().canDelayIndefinitely()) {
             return true;
         }
-            // Else if independent progress does not hold through delaying indefinitely,
-            // we must check for being able to output and satisfy independent progress
+        // Else if independent progress does not hold through delaying indefinitely,
+        // we must check for being able to output and satisfy independent progress
         else {
             for (Channel channel : outputs) {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
@@ -200,7 +199,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             if(!canPrune) {
                 if (outputExisted)
                     return true;
-                return CDD.canDelayIndefinitely(currState.getCDD());
+                return currState.getInvariant().canDelayIndefinitely();
 
             }
             // If by now no locations reached by output edges managed to satisfy independent progress check
@@ -255,7 +254,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             State state = new State(ts.getSource());
             state.applyGuards(ts.getGuardCDD());
 
-            if(!CDD.isUrgent(state.getCDD()))
+            if(!state.getInvariant().isUrgent())
                 return false;
         }
         return true;
@@ -264,14 +263,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
     private boolean passedContainsState(State state1) {
-       State state = new State(state1);
+        State state = new State(state1);
         state.extrapolateMaxBounds(maxBounds, clocks.getItems());
 
 
         for (State passedState : passed) {
-        //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
+            //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    CDD.isSubset(state.getCDD(),(passedState.getCDD()))) {
+                    state.getInvariant().isSubset((passedState.getInvariant()))) {
                 return true;
             }
         }
@@ -287,7 +286,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         for (State passedState : waiting) {
             // check for zone inclusion
             if (state.getLocation().equals(passedState.getLocation()) &&
-                    CDD.isSubset(state.getCDD(),passedState.getCDD())) {
+                    state.getInvariant().isSubset(passedState.getInvariant())) {
                 return true;
             }
         }
@@ -328,9 +327,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
     public SimpleTransitionSystem pruneReachTimed(){
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks.getItems());
-        CDD.addBddvar(BVs.getItems());
+        boolean initialisedCdd = CDD.tryInit(clocks.getItems(), BVs.getItems());
 
         //TODO: this function is not correct yet. // FIXED: 05.1.2021
         // In the while loop, we should collect all edges associated to transitions (not just all locations associated to states), and remove all that were never associated
@@ -391,7 +388,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         Automaton aut = new Automaton(getName(), locations, edges, getClocks(),getAutomaton().getBVs(), false);
 
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return new SimpleTransitionSystem(aut);
     }
 
