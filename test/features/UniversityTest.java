@@ -181,7 +181,7 @@ public class UniversityTest {
         Refinement refinement = new Refinement(lhs, rhs);
 
         boolean refines = refinement.check();
-
+        System.out.println(refinement.getErrMsg());
         assertTrue(refines);
     }
 
