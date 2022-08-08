@@ -1,6 +1,5 @@
 package connection;
 
-import log.Log;
 import logic.*;
 import logic.query.Query;
 import models.Automaton;
@@ -94,12 +93,12 @@ public class Main {
                     queries = Controller.handleRequest("-json " + inputFolderPath, queryString, false);
                 }
                 for (Query query: queries) {
-                    Log.trace(query.getResult());
-                    Log.trace(query.getResultStrings());
+                    System.out.println(query.getResult());
+                    System.out.println(query.getResultStrings());
                 }
 
             } catch (Exception e) {
-                Log.trace(e.getMessage());
+                System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
 
@@ -109,7 +108,7 @@ public class Main {
             }
 
         } catch (ParseException e) {
-            Log.trace(e.getMessage());
+            System.out.println(e.getMessage());
             printHelp(formatter,options);
         }
 
