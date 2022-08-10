@@ -48,9 +48,7 @@ public class Quotient extends TransitionSystem {
         inputs.add(newChan);
 
         Set<Channel> outputsOfSpec = new HashSet<>(left.getOutputs());
-        outputsOfSpec.addAll(left.getSyncs());
         Set<Channel> outputsOfComp = new HashSet<>(right.getOutputs());
-        outputsOfComp.addAll(right.getSyncs());
 
         Set<Channel> inputsOfCompMinusInputsOfSpec = new HashSet<>(right.getInputs());
         inputsOfCompMinusInputsOfSpec.removeAll(left.getInputs());
@@ -100,18 +98,16 @@ public class Quotient extends TransitionSystem {
 
         // just an easy way to access spec and comp from here on
         // TODO: check that there is only one automaton in each, maybe implement so that several automata can be explored at once
-  //      assert (left.getSystems().size() == 1);
-  //      assert (right.getSystems().size() == 1);
+        //      assert (left.getSystems().size() == 1);
+        //      assert (right.getSystems().size() == 1);
 
-  //      Automaton spec = left.getSystems().get(0).getAutomaton();
-  //      Automaton comp = right.getSystems().get(0).getAutomaton();
+        //      Automaton spec = left.getSystems().get(0).getAutomaton();
+        //      Automaton comp = right.getSystems().get(0).getAutomaton();
 
         Automaton spec = left.getAutomaton();
         Automaton comp = right.getAutomaton();
 
-        CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-        CDD.addClocks(clocks.getItems());
-        CDD.addBooleans(BVs.getItems());
+        boolean initialisedCdd = CDD.tryInit(clocks.getItems(), BVs.getItems());
         String name = left.getSystems().get(0).getName() + "DIV" + right.getSystems().get(0).getName();
 
         // create product of locations
@@ -190,7 +186,7 @@ public class Quotient extends TransitionSystem {
                     //Rule 2: "channels in comp not in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the spec alphabet
-                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c) && !left.getSyncs().contains(c)) {
+                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c)) {
                             // if the current location in comp has a transition with c
                             if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
@@ -296,7 +292,7 @@ public class Quotient extends TransitionSystem {
                     //Rule 8: "independent action in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the components alphabet
-                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c) && !right.getSyncs().contains(c)) {
+                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c)) {
                             // if the current location in spec has a transition with c
                             if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
@@ -369,11 +365,11 @@ public class Quotient extends TransitionSystem {
             allChannels.removeAll(spec.getOutputAct());
             channelsThatOnlySelfLoopInSpec.addAll(allChannels);
 
-        // Cannot edit the lists of locations / transitions while we loop through them, so we need to collect the ones we want to add/remove.
-        Set<Edge> toRemove = new HashSet<Edge>();
-        Set<Edge> toAdd = new HashSet<Edge>();
-        // for every channel that is independent, loop through all edges and transitions, to remove the ones that lead to univ and replace them by selfloops
-        for (Edge e : edges) {
+            // Cannot edit the lists of locations / transitions while we loop through them, so we need to collect the ones we want to add/remove.
+            Set<Edge> toRemove = new HashSet<Edge>();
+            Set<Edge> toAdd = new HashSet<Edge>();
+            // for every channel that is independent, loop through all edges and transitions, to remove the ones that lead to univ and replace them by selfloops
+            for (Edge e : edges) {
                 if (e.getTarget().getName().equals("univ") & channelsThatOnlySelfLoopInSpec.contains(e.getChannel())) {
                     toRemove.add(e);
                     toAdd.add(new Edge(e.getSource(), e.getSource(), e.getChannel(), e.isInput(), e.getGuard(), e.getUpdates()));
@@ -381,17 +377,19 @@ public class Quotient extends TransitionSystem {
             }
 
 
-        for (Edge e : toRemove)
-            edges.remove(e);
-        for (Edge e : toAdd)
-            edges.add(e);
+            for (Edge e : toRemove)
+                edges.remove(e);
+            for (Edge e : toAdd)
+                edges.add(e);
         }
 
         newClock = new Clock("quo_new", "quo");
         clocks.add(newClock);
-        List <Location> locsWithNewClocks = updateClocksInLocs(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
-        List <Edge> edgesWithNewClocks = updateClocksInEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
-        CDD.done();
+        List <Location> locsWithNewClocks = updateLocations(new HashSet<>(locations),clocks.getItems(), clocks.getItems(),BVs.getItems(),BVs.getItems());
+        List <Edge> edgesWithNewClocks = updateEdges(new HashSet<>(edges),clocks.getItems(), clocks.getItems(),BVs.getItems(), BVs.getItems());
+        if (initialisedCdd) {
+            CDD.done();
+        }
         Automaton aut = new Automaton(name, locsWithNewClocks, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), true);
 
         SimpleTransitionSystem simp = new SimpleTransitionSystem(aut);
@@ -428,7 +426,7 @@ public class Quotient extends TransitionSystem {
         List<Move> moves = getNextMoves(location, channel);
         List<Transition> result = createNewTransitions(currentState, moves, allClocks);
 
-       // assert(!result.isEmpty());
+        // assert(!result.isEmpty());
         return result;
     }
 
@@ -586,7 +584,7 @@ public class Quotient extends TransitionSystem {
         }
         System.out.println("result moves");
         for (Move m : resultMoves)
-           System.out.println(m.getSource().getName() + " -> " + /*m.getEdges().get(0).getChannel() +*/ " -> " + m.getTarget().getName());
+            System.out.println(m.getSource().getName() + " -> " + /*m.getEdges().get(0).getChannel() +*/ " -> " + m.getTarget().getName());
         return resultMoves;
     }
 

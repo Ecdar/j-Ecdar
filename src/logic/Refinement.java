@@ -38,10 +38,8 @@ public class Refinement {
         inputs2 = ts2.getInputs();
 
         outputs1 = new HashSet<>(ts1.getOutputs());
-        outputs1.addAll(ts1.getSyncs());
 
         outputs2 = new HashSet<>(ts2.getOutputs());
-        outputs2.addAll(ts2.getSyncs());
 
         setMaxBounds();
     }
@@ -134,9 +132,7 @@ public class Refinement {
         if (!checkPreconditions())
             return false;
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(allClocks);
-        CDD.addBooleans(allBVs);
+        boolean initialisedCdd = CDD.tryInit(allClocks, allBVs);
 
         // the first states we look at are the initial ones
         waiting.push(getInitialStatePair());
@@ -186,7 +182,9 @@ public class Refinement {
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {
                 System.out.println("Delay violation");
-                CDD.done();
+                if (initialisedCdd) {
+                    CDD.done();
+                }
                 return false;
             }
 
@@ -195,7 +193,9 @@ public class Refinement {
             if (!holds1) {
 
                 System.out.println("Output violation");
-                CDD.done();
+                if (initialisedCdd) {
+                    CDD.done();
+                }
                 return false;
             }
 
@@ -204,13 +204,17 @@ public class Refinement {
             if (!holds2) {
                 //assert(false); // assuming everything is input enabled
                 System.out.println("Input violation");
-                CDD.done();
+                if (initialisedCdd) {
+                    CDD.done();
+                }
                 return false;
             }
         }
 
         // if we got here it means refinement property holds
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return true;
     }
 
@@ -225,7 +229,7 @@ public class Refinement {
     }
 
     private boolean checkDelay(State leftState, State rightState)
-        throws IllegalArgumentException, NullPointerException {
+            throws IllegalArgumentException, NullPointerException {
         if (!leftState.getInvariant().equiv(rightState.getInvariant())) {
             throw new IllegalArgumentException("The invariant of both the left and right states must be equivalent");
         }
@@ -469,10 +473,10 @@ public class Refinement {
                     supersetNode = state.getNode();
                     return true;
                 }
-               // if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
-               // {
-               //     assert(false);
-               // }
+                // if (currRight.getCDD().toFederation().isSubset(passedRight.getCDD().toFederation()))
+                // {
+                //     assert(false);
+                // }
             }
         }
 
@@ -480,8 +484,8 @@ public class Refinement {
     }
 
     public StatePair getInitialStatePair() {
-        State left = ts1.getInitialStateRef( ts2.getInitialLocation().getInvariant());
-        State right = ts2.getInitialStateRef(ts1.getInitialLocation().getInvariant());
+        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariant());
+        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariant());
         return new StatePair(left, right);
     }
 

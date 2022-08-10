@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.Conjunction;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
@@ -22,12 +23,12 @@ public class BoolVarNamingTest {
         Automaton auts[] = XMLParser.parse("samples/xml/booleanRefinement.xml",false);
         Conjunction conjunction = new Conjunction(new TransitionSystem[]{new SimpleTransitionSystem(auts[2]), new SimpleTransitionSystem(auts[1])});
 
-        System.out.println("new SimpleTransitionSystem(auts[2])" + new SimpleTransitionSystem(auts[2]).getBVs().size());
-        System.out.println(conjunction.getBVs().size());
+        Log.trace("new SimpleTransitionSystem(auts[2])" + new SimpleTransitionSystem(auts[2]).getBVs().size());
+        Log.trace(conjunction.getBVs().size());
         List<String> names = conjunction.getBVs().stream().map(BoolVar::getUniqueName).collect(Collectors.toList());
 
         assertEquals(2, names.size());
-        System.out.println(names);
+        Log.trace(names);
         assertTrue("IsImplementation.a", names.contains("isImplementation.a"));
         assertTrue("Template1.a", names.contains("Template1.a"));
     }

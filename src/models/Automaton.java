@@ -51,14 +51,14 @@ public class Automaton {
         );
 
         if (makeInputEnabled) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-            CDD.addClocks(clocks);
-            CDD.addBooleans(BVs);
-            addTargetInvariantToEdges();
+            boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
+            addTargetInvariantToEdges();
             makeInputEnabled();
 
-            CDD.done();
+            if (initialisedCdd) {
+                CDD.done();
+            }
         }
     }
 

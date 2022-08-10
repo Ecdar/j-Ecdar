@@ -25,9 +25,7 @@ public class Bisimilarity {
         bisimilarLocs.add(locs); // at the start we "assume all locs are bisimilar"
 
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBooleans(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
         thereWasAChange= true;
 
 
@@ -143,7 +141,9 @@ public class Bisimilarity {
             }
         }
 
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return new Automaton(copy.getName()+"Bisimilar",locs,finalEdges,clocks, copy.getBVs());
 
     }
@@ -218,9 +218,9 @@ public class Bisimilarity {
         for (Edge e2 : edgesL2)
         {
             Channel c = e2.getChan();
-           // System.out.println(c);
+           // Log.trace(c);
             //if (c.getName().equals("c[0]"))
-           //     System.out.println("this i did reach" + edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()) );
+           //     Log.trace("this i did reach" + edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()) );
             if (edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()).isEmpty()) {
                 return true;
             }

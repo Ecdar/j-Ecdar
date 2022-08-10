@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.*;
 import models.Automaton;
 import models.CDD;
@@ -393,8 +394,8 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem(automata[8])});
         Refinement ref = new Refinement(comp, new SimpleTransitionSystem(automata[9]));
         boolean result =ref.check();
-        //System.out.println(comp.isImplementation());
-        System.out.println(ref.getErrMsg());
+        //Log.trace(comp.isImplementation());
+        Log.trace(ref.getErrMsg());
 
 
         assertTrue(result);
@@ -495,7 +496,7 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem((automata[39])),
                         new SimpleTransitionSystem((automata[40]))});
         boolean result = new Refinement(comp, new SimpleTransitionSystem((automata[41]))).check();
-        System.out.println(result);
+        Log.trace(result);
         assertFalse(result);
     }
 
@@ -542,7 +543,7 @@ public class DelayRefinementTest {
     public void M1RefinesM0() {
         Refinement ref = new Refinement(new SimpleTransitionSystem(automata[57]), new SimpleTransitionSystem(automata[56]));
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 

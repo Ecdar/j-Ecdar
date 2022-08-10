@@ -92,7 +92,7 @@ public class BoolTest {
 
         // A & !B & !C
         System.out.println("here too! " + cdd);
-  //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
+        //      assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
         CDD.done();
     }
 
@@ -295,6 +295,7 @@ public class BoolTest {
         Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
         Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
         Edge e2 = new Edge(l0, l1, i1, true, compl.getGuard(clocks), noUpdate);
+        CDD.done();
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
@@ -314,7 +315,6 @@ public class BoolTest {
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
         XMLFileWriter.toXML("testOutput/booltest2.xml",new SimpleTransitionSystem(aut));
         assert(new SimpleTransitionSystem(aut).isDeterministic()); // no idea if it is...
-        CDD.done();
         assert(true);
 //here: [cg: (x<1 && y≥2 && y≤7) || (x≤10 && y<2) || (x≤10 && y>7) || (x>10) - bg:()]
     }
@@ -399,6 +399,7 @@ public class BoolTest {
         Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
         Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
         Edge e2 = new Edge(l0, l1, i1, true, compl.getGuard(clocks), noUpdate);
+        CDD.done();
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
@@ -413,7 +414,6 @@ public class BoolTest {
 
 
 
-        CDD.done();
 
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,true);
         XMLFileWriter.toXML("testOutput/booltest2.xml",new SimpleTransitionSystem(aut));
@@ -461,11 +461,11 @@ public class BoolTest {
         CDD test2 = new CDD(CDDLib.cddNBddvar(bddStartLevel));
         BDDArrays arr2 = new BDDArrays(CDDLib.bddToArray(test2.getPointer(),CDD.numBools));
         System.out.println(arr2);
+        CDD.done();
 
         assert(arr2.getVariables().get(0).get(0) ==3);
         assert(arr2.getValues().get(0).get(0) ==0);
 
-        CDD.done();
 
 
 
@@ -694,8 +694,8 @@ public class BoolTest {
         XMLFileWriter.toXML("testOutput/BoolAutomatonNew.xml",new Automaton[]{newAut});
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-       // assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());
-      //  assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(newAut)).check());
+        // assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());
+        //  assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(newAut)).check());
 
 
         System.out.println(aut.toString());

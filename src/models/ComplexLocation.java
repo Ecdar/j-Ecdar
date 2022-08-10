@@ -75,10 +75,10 @@ public class ComplexLocation extends SymbolicLocation {
 
     @Override
     public boolean getIsUniversal() {
-        boolean isUniversal = false;
+        boolean isUniversal = true;
         for (SymbolicLocation l: getLocations())
         {
-            isUniversal = isUniversal|| l.getIsUrgent();
+            isUniversal = isUniversal && l.getIsUniversal();
         }
         return isUniversal;
     }

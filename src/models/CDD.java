@@ -703,7 +703,7 @@ public class CDD {
         return CDD.createFromDbm(zone.getDbm(), numClocks);
     }
 
-    public static boolean isCddIsRunning() {
+    public static boolean isRunning() {
         return cddIsRunning;
     }
 
@@ -738,6 +738,29 @@ public class CDD {
         }
         cddIsRunning = true;
         return CDDLib.cddInit(maxSize, cs, stackSize);
+    }
+
+    public static int init(int maxSize, int cs, int stackSize, List<Clock> clocks, List<BoolVar> booleans) {
+        int initialisation = init(maxSize, cs, stackSize);
+        addClocks(clocks);
+        addBooleans(booleans);
+        return initialisation;
+    }
+
+    public static int init(List<Clock> clocks, List<BoolVar> booleans) {
+        return init(maxSize, cs, stackSize, clocks, booleans);
+    }
+
+    public static boolean tryInit(int maxSize, int cs, int stackSize, List<Clock> clocks, List<BoolVar> booleans) {
+        if (cddIsRunning) {
+            return false;
+        }
+        init(maxSize, cs, stackSize, clocks, booleans);
+        return true;
+    }
+
+    public static boolean tryInit(List<Clock> clocks, List<BoolVar> booleans) {
+        return tryInit(maxSize, cs, stackSize, clocks, booleans);
     }
 
     public static void done() {
@@ -834,6 +857,14 @@ public class CDD {
     public static CDD createNegatedBddNode(int level) {
         checkIfNotRunning();
         return new CDD(CDDLib.cddNBddvar(level));
+    }
+
+    public static CDD createBddNode(int level, boolean value) {
+        checkIfNotRunning();
+        if (value) {
+            return createBddNode(level);
+        }
+        return createNegatedBddNode(level);
     }
 
     private static void checkIfNotRunning() {

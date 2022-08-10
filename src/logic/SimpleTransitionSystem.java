@@ -51,7 +51,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public void setMaxBounds()
     {
-       // System.out.println("Max bounds: " + automaton.getMaxBoundsForAllClocks());
+        // System.out.println("Max bounds: " + automaton.getMaxBoundsForAllClocks());
         HashMap<Clock,Integer> res = new HashMap<>();
 
         res.putAll(automaton.getMaxBoundsForAllClocks());
@@ -181,8 +181,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
         if (canPrune && currState.getInvariant().canDelayIndefinitely()) {
             return true;
         }
-            // Else if independent progress does not hold through delaying indefinitely,
-            // we must check for being able to output and satisfy independent progress
+        // Else if independent progress does not hold through delaying indefinitely,
+        // we must check for being able to output and satisfy independent progress
         else {
             for (Channel channel : outputs) {
                 List<Transition> tempTrans = getNextTransitions(currState, channel);
@@ -263,12 +263,12 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
     private boolean passedContainsState(State state1) {
-       State state = new State(state1);
+        State state = new State(state1);
         state.extrapolateMaxBounds(maxBounds, clocks.getItems());
 
 
         for (State passedState : passed) {
-        //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
+            //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
             if (state.getLocation().equals(passedState.getLocation()) &&
                     state.getInvariant().isSubset((passedState.getInvariant()))) {
                 return true;
@@ -327,9 +327,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
     public SimpleTransitionSystem pruneReachTimed(){
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks.getItems());
-        CDD.addBooleans(BVs.getItems());
+        boolean initialisedCdd = CDD.tryInit(clocks.getItems(), BVs.getItems());
 
         //TODO: this function is not correct yet. // FIXED: 05.1.2021
         // In the while loop, we should collect all edges associated to transitions (not just all locations associated to states), and remove all that were never associated
@@ -390,7 +388,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
         Automaton aut = new Automaton(getName(), locations, edges, getClocks(),getAutomaton().getBVs(), false);
 
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return new SimpleTransitionSystem(aut);
     }
 

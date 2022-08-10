@@ -59,9 +59,6 @@ public class ConjunctionTest {
         t10 = new SimpleTransitionSystem(machines[9]);
         t11 = new SimpleTransitionSystem(machines[10]);
         t12 = new SimpleTransitionSystem(machines[11]);
-
-        CDD.init(100,100,100);
-        CDD.addClocks(t1.getClocks(),t1Copy.getClocks(),t2.getClocks(),t2Copy.getClocks(),t3.getClocks(),t3Copy.getClocks(),t4.getClocks(),t4Copy.getClocks(),t5.getClocks(),t5Copy.getClocks(),t6.getClocks(),t7.getClocks(),t8.getClocks(),t9.getClocks(),t10.getClocks(),t11.getClocks(),t12.getClocks());
     }
 
     @Test
@@ -91,12 +88,12 @@ public class ConjunctionTest {
 
     @Test
     public void T1ConjT2RefinesT3() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t1, t2}), t3).check());
+        assertTrue(new Refinement(new Conjunction(t1, t2), t3).check());
     }
 
     @Test
     public void T1ConjT2RefinesT3Aut() {
-        Conjunction con = new Conjunction(new TransitionSystem[]{t1, t2});
+        Conjunction con = new Conjunction(t1, t2);
         Automaton aut = con.getAutomaton();
 
         assertTrue(new Refinement(new SimpleTransitionSystem(aut), t3).check());
@@ -104,24 +101,24 @@ public class ConjunctionTest {
 
     @Test
     public void T2ConjT3RefinesT1() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t2, t3}), t1).check());
+        assertTrue(new Refinement(new Conjunction(t2, t3), t1).check());
     }
 
     @Test
     public void T2ConjT3RefinesT1Aut() {
-        Conjunction con = new Conjunction(new TransitionSystem[]{t2, t3});
+        Conjunction con = new Conjunction(t2, t3);
         Automaton aut = con.getAutomaton();
         assertTrue(new Refinement(new SimpleTransitionSystem(aut), t1).check());
     }
 
     @Test
     public void T1ConjT3RefinesT2() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t1, t3}), t2).check());
+        assertTrue(new Refinement(new Conjunction(t1, t3), t2).check());
     }
 
     @Test
     public void T1ConjT3RefinesT2Aut() {
-        Conjunction con = new Conjunction(new TransitionSystem[]{t1, t3});
+        Conjunction con = new Conjunction(t1, t3);
         Automaton aut = con.getAutomaton();
 
         assertTrue(new Refinement(new SimpleTransitionSystem(aut), t2).check());
@@ -129,12 +126,12 @@ public class ConjunctionTest {
 
     @Test
     public void T1ConjT2ConjT4RefinesT5() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t1, t2, t4}), t5).check());
+        assertTrue(new Refinement(new Conjunction(t1, t2, t4), t5).check());
     }
 
     @Test
     public void T1ConjT2ConjT4RefinesT5Aut() {
-        Conjunction con = new Conjunction(new TransitionSystem[]{t1, t2, t4});
+        Conjunction con = new Conjunction(t1, t2, t4);
         Automaton aut = con.getAutomaton();
 
         assertTrue(new Refinement(new SimpleTransitionSystem(aut), t5).check());
@@ -142,47 +139,47 @@ public class ConjunctionTest {
 
     @Test
     public void T3ConjT4RefinesT5() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t3, t4}), t5).check());
+        assertTrue(new Refinement(new Conjunction(t3, t4), t5).check());
     }
 
     @Test
     public void T3ConjT4RefinesT5Aut() {
-        Conjunction con = new Conjunction(new TransitionSystem[]{t3, t4});
+        Conjunction con = new Conjunction(t3, t4);
         Automaton aut = con.getAutomaton();
         assertTrue(new Refinement(new SimpleTransitionSystem(aut), t5).check());
     }
 
     @Test
     public void test1NestedConjRefinesT5() {
-        TransitionSystem ts1 = new Conjunction(new TransitionSystem[]{t1, t2});
-        TransitionSystem ts2 = new Conjunction(new TransitionSystem[]{ts1, t4});
+        TransitionSystem ts1 = new Conjunction(t1, t2);
+        TransitionSystem ts2 = new Conjunction(ts1, t4);
 
         assertTrue(new Refinement(ts2, t5).check());
     }
 
     @Test
     public void test1NestedConjRefinesT5Aut() {
-        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{t1, t2}).getAutomaton());
-        SimpleTransitionSystem ts2 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{ts1, t4}).getAutomaton());
+        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(new Conjunction(t1, t2).getAutomaton());
+        SimpleTransitionSystem ts2 = new SimpleTransitionSystem(new Conjunction(ts1, t4).getAutomaton());
 
         assertTrue(new Refinement(ts2, t5).check());
     }
 
     @Test
     public void T6ConjT7RefinesT8() {
-        assertTrue(new Refinement(new Conjunction(new TransitionSystem[]{t6, t7}), t8).check());
+        assertTrue(new Refinement(new Conjunction(t6, t7), t8).check());
     }
 
     @Test
     public void T6ConjT7RefinesT8Aut() {
 
-        assertTrue(new Refinement(new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{t6, t7}).getAutomaton()), t8).check());
+        assertTrue(new Refinement(new SimpleTransitionSystem(new Conjunction(t6, t7).getAutomaton()), t8).check());
     }
 
     @Test
     public void test1NestedConjRefinesT12() {
-        TransitionSystem ts1 = new Conjunction(new TransitionSystem[]{t9, t10});
-        TransitionSystem ts2 = new Conjunction(new TransitionSystem[]{ts1, t11});
+        TransitionSystem ts1 = new Conjunction(t9, t10);
+        TransitionSystem ts2 = new Conjunction(ts1, t11);
 
         assertTrue(new Refinement(ts2, t12).check());
     }
@@ -190,19 +187,19 @@ public class ConjunctionTest {
     @Test
     public void test1NestedConjRefinesT12Aut() {
         CDD.done();
-        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{t9, t10}).getAutomaton());
-        Refinement ref = new Refinement(ts1, new Conjunction(new TransitionSystem[]{t9, t10}));
+        SimpleTransitionSystem ts1 = new SimpleTransitionSystem(new Conjunction(t9, t10).getAutomaton());
+        Refinement ref = new Refinement(ts1, new Conjunction(t9, t10));
         ref.check();
         System.out.println(ref.getErrMsg());
         ((SimpleTransitionSystem) t9).toXML("testOutput/t9.xml");
         ((SimpleTransitionSystem) t10).toXML("testOutput/t10.xml");
 
-        System.out.println(new Conjunction(new TransitionSystem[]{t9, t10}).getInputs() + " " + new Conjunction(new TransitionSystem[]{t9, t10}).getOutputs() );
+        System.out.println(new Conjunction(t9, t10).getInputs() + " " + new Conjunction(t9, t10).getOutputs() );
         System.out.println("ALPHA: " + ts1.getInputs() + " " + ts1.getOutputs() );
         ts1.toXML("testOutput/whynoinputs.xml");
         new SimpleTransitionSystem(t12.getAutomaton()).toXML("testOutput/t12.xml");
 
-        TransitionSystem ts2 = new SimpleTransitionSystem(new Conjunction(new TransitionSystem[]{ts1, t11}).getAutomaton());
+        TransitionSystem ts2 = new SimpleTransitionSystem(new Conjunction(ts1, t11).getAutomaton());
 
         assertFalse(new Refinement(ts2, t12).check()); // dont think this is supposed to work after converting into automaton, since we make the alphabet smaller
     }

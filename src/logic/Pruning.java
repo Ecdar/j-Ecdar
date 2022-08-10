@@ -22,9 +22,7 @@ public class Pruning {
         Set<Location> inconsistentLocations;
         Map<Location, CDD> passedInconsistentStates;
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBooleans(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
 
         for (Location l : locations)
@@ -84,7 +82,10 @@ public class Pruning {
             locations.add(new Location("inc", new TrueGuard(), true, false, false, true));
             edges = new ArrayList<>();
         }
-        CDD.done();
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
         Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), true);
         return new SimpleTransitionSystem(resAut);
     }
@@ -288,7 +289,7 @@ public class Pruning {
 
 
         // apply updates as guard
-       //incCDD = CDD.applyReset(incCDD,e.getUpdates());
+        //incCDD = CDD.applyReset(incCDD,e.getUpdates());
 
         if (incCDD.isFalse()) {
             // Checking for satisfiability after clocks were reset (only a problem because target invariant might now be x>4)
@@ -325,7 +326,7 @@ public class Pruning {
             incCDD= predtOfAllOutputs(e, incCDD, edges);
             // for each "good" transition, we remove its zone from the zone leading to inc. via the predt function
 
-             // if the bad federation was not restricted via any good transition (i.e., its the same as before)
+            // if the bad federation was not restricted via any good transition (i.e., its the same as before)
             // we have to take its past into the federation, as ending up in its past is already dooming us
             if ((incCDD.equiv(save))) { // TODO: check that
                 if (printComments)

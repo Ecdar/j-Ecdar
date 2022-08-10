@@ -2,6 +2,7 @@ package models;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
@@ -31,15 +32,8 @@ public class DisjunctionTest {
     @BeforeClass
     public static void setUpBeforeClass() throws CddAlreadyRunningException, CddNotRunningException {
         automata = XMLParser.parse("./samples/xml/DisjunctionTests.xml", true);
-        CDD.init(100, 100, 100);
-        List<Clock> clocks = new ArrayList<>();
-        clocks.addAll(automata[0].getClocks());
-        clocks.addAll(automata[1].getClocks());
-        CDD.addClocks(clocks);
         D1 = new SimpleTransitionSystem((automata[0]));
         D2 = new SimpleTransitionSystem((automata[1]));
-
-
     }
 
     @Test
@@ -115,7 +109,7 @@ public class DisjunctionTest {
         Guard out = neg.getGuard(clocks);
 
 
-        System.out.println(out);
+        Log.trace(out);
 
                                     // ( ((x<=3)) or ((x>=7 && x<9)) )
         assert (out.toString().equals("(x<=3 or (x>=7 && x<9))"));

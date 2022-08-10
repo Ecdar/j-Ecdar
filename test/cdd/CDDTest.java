@@ -285,7 +285,7 @@ public class CDDTest {
         Guard e2_g2 = new ClockGuard(y, null, 5,  Relation.LESS_EQUAL);
 
         List<Guard> g1 = new ArrayList<>();
-      //  g1.add(new AndGuard(e2_g1, e2_g3));
+        //  g1.add(new AndGuard(e2_g1, e2_g3));
         g1.add(e2_g1);
         g1.add(e2_g2);
         CDD res = new CDD(new OrGuard(g1));
@@ -293,7 +293,7 @@ public class CDDTest {
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));
         exp = exp.disjunction(CDD.createInterval(2, 0, 0,true, 5,true));
-         System.out.println(exp.removeNegative().reduce().getGuard(clocks));
+        System.out.println(exp.removeNegative().reduce().getGuard(clocks));
         System.out.println(res.removeNegative().reduce().getGuard(clocks));
         //exp.printDot();
         exp = exp.removeNegative().reduce();

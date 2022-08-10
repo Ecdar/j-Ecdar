@@ -150,7 +150,7 @@ public class XMLFileWriter {
 
                         ClockGuard g = (ClockGuard) g1;
 
-                    //System.out.println(g);
+                    //Log.trace(g);
                     String interm = g.toString();
 
                     if (i == 0)
@@ -249,7 +249,7 @@ public class XMLFileWriter {
                     if (g1 instanceof ClockGuard) {
 
                         ClockGuard g = (ClockGuard) g1;
-                    //System.out.println(g);
+                    //Log.trace(g);
                     String interm = g.toString();
 
                     if (i == 0)

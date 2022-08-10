@@ -32,6 +32,7 @@ public class XMLParser {
                 automata.add(buildAutomaton(el, makeInpEnabled));
             }
         } catch (Exception e) {
+            CDD.done();
             throw new RuntimeException(e);
         }
 
@@ -118,7 +119,7 @@ public class XMLParser {
                 }
             }
         }
-        //System.out.println(clockList);
+        //Log.trace(clockList);
         return clockList;
     }
 
@@ -166,7 +167,7 @@ public class XMLParser {
             boolean xyDefined = false;
 
             if (loc.getAttribute("x").isSpecified()) {
-                //System.out.println(loc.getAttributeValue("x"));
+                //Log.trace(loc.getAttributeValue("x"));
                 x = Integer.parseInt(loc.getAttributeValue("x"));
                 y = Integer.parseInt(loc.getAttributeValue("y"));
                 xyDefined=true;
@@ -190,9 +191,9 @@ public class XMLParser {
             assert(names.size()<=1);
             for (Element name : names)
             {
-                //System.out.println(name.getContent().get(0).getValue().toString());
+                //Log.trace(name.getContent().get(0).getValue().toString());
                 if (name.getContent().get(0).getValue().toString().equals("inc")) {
-                    //System.out.println("Parsed an inconsistent location");
+                    //Log.trace("Parsed an inconsistent location");
                     if (xyDefined)
                         newLoc = new Location(locName, invariants, isInitial, false, false, true, x,y);
                     else

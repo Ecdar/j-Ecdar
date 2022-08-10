@@ -75,7 +75,7 @@ public class State {
             {
                 if (!maxBounds.containsKey(clk))
                 {
-                   // assert false; // TODO: should we really get into here??
+                    // assert false; // TODO: should we really get into here??
                     bounds[counter]=0;
                 }
                 else
@@ -94,19 +94,19 @@ public class State {
             return;
         }
         else
-        while (!bcddLeftToAnalyse.isTerminal())
-        {
-            CddExtractionResult extractResult = bcddLeftToAnalyse.reduce().removeNegative().extract();
-            bcddLeftToAnalyse = extractResult.getCddPart().removeNegative().reduce();
+            while (!bcddLeftToAnalyse.isTerminal())
+            {
+                CddExtractionResult extractResult = bcddLeftToAnalyse.reduce().removeNegative().extract();
+                bcddLeftToAnalyse = extractResult.getCddPart().removeNegative().reduce();
 
-            Zone z = new Zone(extractResult.getDbm());
-            CDD bddPart = extractResult.getBddPart();
-            Zone newZone = new Zone(DBMLib.dbm_close(z.getDbm(),z.getDimension()));
-            newZone.extrapolateMaxBounds(bounds);
-            CDD extrapolatedDBMCDD = CDD.createFromDbm(newZone.getDbm(),CDD.numClocks);
-            CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
-            resCDD = resCDD.disjunction(extrapolatedCDD);
-        }
+                Zone z = new Zone(extractResult.getDbm());
+                CDD bddPart = extractResult.getBddPart();
+                Zone newZone = new Zone(DBMLib.dbm_close(z.getDbm(),z.getDimension()));
+                newZone.extrapolateMaxBounds(bounds);
+                CDD extrapolatedDBMCDD = CDD.createFromDbm(newZone.getDbm(),CDD.numClocks);
+                CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
+                resCDD = resCDD.disjunction(extrapolatedCDD);
+            }
 
         invarCDD = resCDD;
     }
@@ -162,7 +162,7 @@ public class State {
                     System.out.println();
                 }
                 z.extrapolateMaxBoundsDiagonal(bounds);
-                if (print) z.prettyPrint(true,true);
+                if (print) z.printDbm(true,true);
                 CDD extrapolatedDBMCDD = CDD.createFromDbm(z.getDbm(),CDD.numClocks);
                 CDD extrapolatedCDD = bddPart.conjunction(extrapolatedDBMCDD);
                 resCDD = resCDD.disjunction(extrapolatedCDD);
