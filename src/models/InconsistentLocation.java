@@ -3,7 +3,7 @@ package models;
 public class InconsistentLocation extends SymbolicLocation {
     @Override
     public String getName() {
-        return "inc-loc";
+        return null;
     }
 
     @Override

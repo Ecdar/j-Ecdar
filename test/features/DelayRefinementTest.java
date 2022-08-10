@@ -10,7 +10,6 @@ import org.junit.Test;
 import parser.XMLFileWriter;
 import parser.XMLParser;
 
-import java.sql.Ref;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertTrue;
@@ -320,32 +319,6 @@ public class DelayRefinementTest {
 
 
     @Test
-    public void Z2RefinesZ2Z3Z4() {
-        SimpleTransitionSystem Z2 = new SimpleTransitionSystem(automata[47]);
-        SimpleTransitionSystem Z3 = new SimpleTransitionSystem(automata[48]);
-        SimpleTransitionSystem Z4 = new SimpleTransitionSystem(automata[49]);
-        SimpleTransitionSystem Z2_1 = new SimpleTransitionSystem(automata[47]);
-        assertTrue(new Refinement(new Conjunction(Z2_1,Z3), Z2).check());
-        Quotient q = new Quotient(Z2,Z3);
-        Refinement ref = new Refinement(Z2_1,  new SimpleTransitionSystem(q.getAutomaton()));
-
-        XMLFileWriter.toXML("testOutput/quotientz2_z3.xml",new SimpleTransitionSystem(q.getAutomaton()));
-        boolean res = ref.check(true);
-        System.out.println("inputs:");
-        System.out.println(Z2_1.getInputs());
-        System.out.println(q.getInputs());
-
-        System.out.println("outputs:");
-        System.out.println(Z2_1.getOutputs());
-        System.out.println(q.getOutputs());
-
-        System.out.println(ref.getErrMsg());
-        assertTrue(res);
-        assertTrue(new Refinement(Z2_1,new Quotient(Z2, new Quotient(Z3,Z4))).check());
-    }
-
-
-    @Test
     public void Z5RefinesSelf() {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[50]), new SimpleTransitionSystem(new Automaton(automata[50]))).check());
     }
@@ -409,52 +382,6 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem(automata[1])});
         assertTrue(new Refinement(comp, new SimpleTransitionSystem(automata[2])).check());
     }
-
-
-    @Test
-    public void T0RefinesT3T1T2() {
-        TransitionSystem T1_new = new SimpleTransitionSystem(automata[0]);
-        TransitionSystem T2_new = new SimpleTransitionSystem(automata[1]);
-        TransitionSystem T4_new = new SimpleTransitionSystem(automata[11]);
-        TransitionSystem T3_new = new SimpleTransitionSystem(automata[2]);
-
-        TransitionSystem T01 = new SimpleTransitionSystem(automata[0]);
-        TransitionSystem T11 = new SimpleTransitionSystem(automata[1]);
-        TransitionSystem T21 = new SimpleTransitionSystem(automata[11]);
-        TransitionSystem T31 = new SimpleTransitionSystem(automata[2]);
-
-
-        TransitionSystem quotient1 = new Quotient(
-                       T3_new,
-                        T4_new);
-        TransitionSystem quotient2 = new Quotient(quotient1,T2_new);
-
-        XMLFileWriter.toXML("testOutput/doublequotient.xml",quotient2.getAutomaton());
-
-        TransitionSystem quotient1New = new Quotient(
-                T31,
-                T21);
-        TransitionSystem quotient2New = new Quotient(new SimpleTransitionSystem(quotient1New.getAutomaton()),T11);
-
-
-
-        /*
-
-        Refinement ref = new Refinement(new SimpleTransitionSystem(quotient2.getAutomaton()),new SimpleTransitionSystem(quotient2New.getAutomaton()));
-        boolean res = ref.check();
-        System.out.println(res);
-        System.out.println("error:" + ref.getErrMsg());
-        assertTrue(new Refinement(quotient2New,quotient2).check());
-        assertTrue(new Refinement(quotient2,quotient2New).check());*/
-        Refinement ref2 = new Refinement(new Composition(T1_new, T2_new,T4_new), T3_new);
-        assertTrue(ref2.check());
-
-        Refinement ref1 = new Refinement(T1_new, quotient2);
-        boolean res1 = ref1.check(true);
-        //System.out.println(ref1.getTree().toDot());
-        assertTrue(res1);
-    }
-
 
     @Test
     public void F1F2RefinesF3() {

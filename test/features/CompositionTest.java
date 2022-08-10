@@ -6,7 +6,6 @@ import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
-import models.Location;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -94,14 +93,7 @@ public class CompositionTest {
     public void testCompRefinesSpecWeird() {
 
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
-        for (Location l : comp.getAutomaton().getLocations())
-        {
-            if (l.isInconsistent())
-                System.out.println("ISINC");
-            if (l.isUniversal())
-                System.out.println("ISUNIV");
-        }
-        // TODO : for some reason this fails, now that I fixed the "isUniversal" of complex locations
+        comp.getAutomaton();
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
         System.out.println(ref.getErrMsg());

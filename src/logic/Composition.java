@@ -50,7 +50,6 @@ public class Composition extends TransitionSystem {
                     System.out.println(cleanOutputsOfI);
                     System.out.println(outputsOfJ);
                     // check if output actions overlap
-
                     Set<Channel> diff = setIntersection(cleanOutputsOfI, outputsOfJ);
                     if (!diff.isEmpty()) {
                         throw new IllegalArgumentException("The automata cannot be composed");
