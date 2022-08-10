@@ -17,6 +17,10 @@ public class Automaton {
     private final Location initial;
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInputEnabled) {
+        if (locations.isEmpty()) {
+            throw new IllegalArgumentException("An automaton msut have atleast one location");
+        }
+
         this.name = name;
         this.locations = locations;
         this.clocks = clocks;
