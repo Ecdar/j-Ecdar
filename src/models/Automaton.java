@@ -18,7 +18,7 @@ public class Automaton {
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInputEnabled) {
         if (locations.isEmpty()) {
-            throw new IllegalArgumentException("An automaton msut have atleast one location");
+            throw new IllegalArgumentException("An automaton must have atleast one location");
         }
 
         this.name = name;
@@ -53,7 +53,7 @@ public class Automaton {
 
         /* The finite set of actions must be partitioned into inputs and outputs.
          *   Here we check whether they are partitioned by checking that the intersection of the
-         *   inputs and outputs are empty as an action can only be either an input or an output.
+         *   inputs and outputs are empty as an action can only be either an input xor an output.
          *   We don't have to check whether an action is neither an input nor an output as the set
          *   of actions is build as the union of the inputs and outputs and for this reason
          *   guarantees to be in the set of actions. */
