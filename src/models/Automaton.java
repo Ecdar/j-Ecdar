@@ -35,6 +35,7 @@ public class Automaton {
 
         this.edges = edges;
 
+        // Retrieve the inputs and outputs
         inputAct = new HashSet<>();
         outputAct = new HashSet<>();
         for (Edge edge : this.edges) {
@@ -46,6 +47,23 @@ public class Automaton {
             }
         }
 
+        /* The finite set of actions must be partitioned into inputs and outputs.
+         *   Here we check whether they are partitioned by checking that the intersection of the
+         *   inputs and outputs are empty as an action can only be either an input or an output.
+         *   We don't have to check whether an action is neither an input nor an output as the set
+         *   of actions is build as the union of the inputs and outputs and for this reason
+         *   guarantees to be in the set of actions. */
+        Set<Channel> intersection = new HashSet<>(inputAct);
+        intersection.retainAll(outputAct);
+        if (!intersection.isEmpty()) {
+            throw new IllegalArgumentException("The action set of a specification must be a partition, where each action is either an input xor an output");
+        }
+
+        /* As the inputs and outputs are shown to be disjoint then the union of them
+         *   it holds that the disjoint union of inputs and outputs is a finite set
+         *   of actions partitioned into inputs and outputs. Here the "disjoint" comes
+         *   from actions (or Channels) are reference types and are for this reason not
+         *   merged with actions of the same name. */
         actions = Sets.newHashSet(
                 Iterables.concat(inputAct, outputAct)
         );
