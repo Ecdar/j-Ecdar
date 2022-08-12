@@ -13,7 +13,7 @@ public class Automaton {
     private final List<BoolVar> BVs;
     private final List<Edge> edges;
     private final List<Clock> clocks;
-    private Set<Channel> inputAct, outputAct, actions;
+    private final Set<Channel> inputAct, outputAct, actions;
     private final Location initial;
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInputEnabled) {
