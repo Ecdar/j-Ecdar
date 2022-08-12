@@ -102,9 +102,9 @@ public class Automaton {
                     Location target = locations.get(targetIndex);
                     return new Edge(edge, clocks, BVs, source, target, automaton.clocks, automaton.BVs);
                 }).collect(Collectors.toList());
-        inputAct = automaton.inputAct;
-        outputAct = automaton.outputAct;
-        actions = automaton.actions;
+        inputAct = new HashSet<>(automaton.inputAct);
+        outputAct = new HashSet<>(automaton.outputAct);
+        actions = new HashSet<>(automaton.actions);
         initial = new Location(automaton.initial, clocks, automaton.clocks, BVs, automaton.BVs);
     }
 
