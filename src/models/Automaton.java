@@ -74,14 +74,8 @@ public class Automaton {
         );
 
         if (makeInputEnabled) {
-            boolean initialisedCdd = CDD.tryInit(clocks, BVs);
-
             addTargetInvariantToEdges();
             makeInputEnabled();
-
-            if (initialisedCdd) {
-                CDD.done();
-            }
         }
     }
 
@@ -112,6 +106,21 @@ public class Automaton {
         outputAct = automaton.outputAct;
         actions = automaton.actions;
         initial = new Location(automaton.initial, clocks, automaton.clocks, BVs, automaton.BVs);
+    }
+
+    private void addTargetInvariantToEdges() {
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+
+        for (Edge edge : getEdges()) {
+            CDD targetCDD = edge.getTarget().getInvariantCDD();
+            CDD past = targetCDD.transitionBack(edge);
+            if (!past.equiv(CDD.cddTrue()))
+                edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
+        }
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
     }
 
     public List<Location> getLocations() {
@@ -244,6 +253,8 @@ public class Automaton {
     }
 
     public void makeInputEnabled() {
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+
         for (Location loc : getLocations()) {
             CDD sourceInvariantCDD = loc.getInvariantCDD();
             // loop through all inputs
@@ -270,18 +281,11 @@ public class Automaton {
                     Edge newEdge = new Edge(loc, loc, input, true, resCDD.getGuard(getClocks()), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
-
             }
         }
 
-    }
-
-    public void addTargetInvariantToEdges() {
-        for (Edge edge : getEdges()) {
-            CDD targetCDD = edge.getTarget().getInvariantCDD();
-            CDD past = targetCDD.transitionBack(edge);
-            if (!past.equiv(CDD.cddTrue()))
-                edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
+        if (initialisedCdd) {
+            CDD.done();
         }
     }
 }
