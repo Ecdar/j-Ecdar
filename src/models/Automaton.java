@@ -18,7 +18,7 @@ public class Automaton {
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInputEnabled) {
         if (locations.isEmpty()) {
-            throw new IllegalArgumentException("An automaton must have atleast one location");
+            throw new IllegalArgumentException(String.format("Automaton %s must have at least one location.", name));
         }
 
         this.name = name;
@@ -30,10 +30,10 @@ public class Automaton {
                 .filter(Location::isInitial)
                 .collect(Collectors.toList());
         if (initialLocations.size() > 1) {
-            throw new IllegalArgumentException("Cannot have more than one initial location");
+            throw new IllegalArgumentException(String.format("Automaton %s cannot have more than one initial location", name));
         }
         if (initialLocations.size() == 0) {
-            throw new IllegalArgumentException("Must have one initial location");
+            throw new IllegalArgumentException(String.format("Automaton %s must have at least one initial location", name));
         }
         initial = initialLocations.get(0);
 
@@ -60,14 +60,15 @@ public class Automaton {
         Set<Channel> intersection = new HashSet<>(inputAct);
         intersection.retainAll(outputAct);
         if (!intersection.isEmpty()) {
-            throw new IllegalArgumentException("The action set of a specification must be a partition, where each action is either an input xor an output");
+            // Constructs a string with the names of the actions violating the partition property as "{a, b, c}"
+            String violatingActions = "{" + intersection
+                    .stream()
+                    .map(Channel::getName)
+                    .collect(Collectors.joining(", ")) + "}";
+            throw new IllegalArgumentException(String.format("The actions %s of specification automaton %s is not a partition.", violatingActions, name));
         }
 
-        /* As the inputs and outputs are shown to be disjoint then the union of them
-         *   it holds that the disjoint union of inputs and outputs is a finite set
-         *   of actions partitioned into inputs and outputs. Here the "disjoint" comes
-         *   from actions (or Channels) are reference types and are for this reason not
-         *   merged with actions of the same name. */
+        /* Since inputAct and outputAct are now disjoint, we can simply construct actions as the union of both sets. */
         actions = Sets.newHashSet(
                 Iterables.concat(inputAct, outputAct)
         );
