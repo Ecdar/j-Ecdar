@@ -300,7 +300,7 @@ public class UniversityTest {
 
         assertFalse(refines);
     }
-    @Test @Ignore
+    @Test
     public void doubleQuotientTest1() {
         // refinement: res <= spec \ adm2 \ machine
         TransitionSystem lhs = getMachine();
