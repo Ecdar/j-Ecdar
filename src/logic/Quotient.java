@@ -49,9 +49,7 @@ public class Quotient extends TransitionSystem {
     public SymbolicLocation getInitialLocation() {
         // the invariant of locations consisting of locations from each transition system should be true
         // which means the location has no invariants
-        SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{t, s});
-        ((ComplexLocation) initLoc).removeInvariants();
-        return initLoc;
+        return getInitialLocation(new TransitionSystem[]{t, s});
     }
 
     public SimpleTransitionSystem calculateQuotientAutomaton() {
