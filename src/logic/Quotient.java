@@ -57,7 +57,7 @@ public class Quotient extends TransitionSystem {
     }
 
     public SimpleTransitionSystem calculateQuotientAutomaton(boolean prepareForBisimilarityReduction) {
-
+        assert false;
 
         // Lists of edges and locations for the newly built automaton
         List<Edge> edges = new ArrayList<Edge>();
@@ -400,102 +400,76 @@ public class Quotient extends TransitionSystem {
         return result;
     }
 
-    public List<Move> getNextMoves(SymbolicLocation location, Channel channel) {
+    public List<Move> getNextMoves(SymbolicLocation location, Channel a) {
         List<Move> resultMoves = new ArrayList<>();
         System.out.println("gettingNextMove of " + location.getName());
         if (location instanceof ComplexLocation) {
             List<SymbolicLocation> locations = ((ComplexLocation) location).getLocations();
 
             // symbolic locations corresponding to each TS
-            SymbolicLocation locLeft = locations.get(0);
-            SymbolicLocation locRight = locations.get(1);
+            SymbolicLocation lt = locations.get(0);
+            SymbolicLocation ls = locations.get(1);
 
+            List<Move> t_moves = t.getNextMoves(lt, a);
+            List<Move> s_moves = s.getNextMoves(ls, a);
 
             // rule 1 (cartesian product)
-            if (t.getActions().contains(channel) && s.getActions().contains(channel)) {
-                List<Move> movesLeft = t.getNextMoves(locLeft, channel);
-                List<Move> movesRight = s.getNextMoves(locRight, channel);
-
-                if (!movesLeft.isEmpty() && !movesRight.isEmpty()) {
-                    List<Move> moveProduct = moveProduct(movesLeft, movesRight, true,true);
-                    for (Move move : moveProduct) {
-                        move.conjunctCDD(move.getEnabledPart());
-                    }
-                    resultMoves.addAll(moveProduct);
-                    System.out.println("Rule 1");
+            if (in(a, intersect(s.getActions(), t.getActions()))) {
+                List<Move> moveProduct = moveProduct(t_moves, s_moves, true,true);
+                for (Move move : moveProduct) {
+                    move.conjunctCDD(move.getEnabledPart());
                 }
+                resultMoves.addAll(moveProduct);
             }
 
             // rule 2
-            if (!t.getActions().contains(channel) && s.getActions().contains(channel)) {
-                List<Move> movesRight = s.getNextMoves(locRight, channel);
+            if (in(a, difference(s.getActions(), t.getActions()))) {
                 List<Move> movesLeft = new ArrayList<>();
-                movesLeft.add(new Move(locLeft,locLeft,new ArrayList<>())); // TODO: check that this works
-                if (!movesRight.isEmpty()) {
-                    List<Move> moveProduct = moveProduct(movesLeft, movesRight, true,true);
-                    for (Move move : moveProduct) {
-                        move.conjunctCDD(move.getEnabledPart());
-                    }
-                    System.out.println("Rule 2");
-                    resultMoves.addAll(moveProduct);
+                movesLeft.add(new Move(lt,lt, new ArrayList<>()));
+
+                List<Move> moveProduct = moveProduct(movesLeft, s_moves, true,true);
+                for (Move move : moveProduct) {
+                    move.conjunctCDD(move.getEnabledPart());
                 }
+                resultMoves.addAll(moveProduct);
             }
 
-            // rule 8
-            if (t.getActions().contains(channel) && !s.getActions().contains(channel)) {
-                List<Move> movesLeft = t.getNextMoves(locLeft, channel);
-                List<Move> movesRight = new ArrayList<>();
-                movesRight.add(new Move(locRight,locRight,new ArrayList<>())); // TODO: check that this works
-                if (!movesLeft.isEmpty()) {
-                    List<Move> moveProduct = moveProduct(movesLeft, movesRight, true,true);
-                    for (Move move : moveProduct) {
-                        move.conjunctCDD(move.getEnabledPart());
-                    }
-                    System.out.println("Rule 8");
-                    resultMoves.addAll(moveProduct);
-                }
-            }
-
-
-
-
-            // rule 7
-            Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
-            // invariant is negation of invariant of left conjuncted with invariant of right
-            CDD negatedInvar = locLeft.getInvariant().negation();
-            CDD combined = negatedInvar.conjunction(locRight.getInvariant());
-            newMoveRule7.setGuards(combined);
-            newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
-            resultMoves.add(newMoveRule7);
-            System.out.println("Rule 7");
-
+            // rule 3
+            // rule 4
             // rule 5
-            if (getActions().contains(channel)) {
-                System.out.println("Rule 5");
-                Move newMoveRule5 = new Move(location, univ, new ArrayList<>());
-                // negate invariant of ts2
-                newMoveRule5.setGuards(locRight.getInvariant().negation());
-                newMoveRule5.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
-                resultMoves.add(newMoveRule5);
+            if (in(a, s.getOutputs())) {
+                CDD guard_s = CDD.cddFalse();
+                for (Move s_move : s_moves) {
+                    guard_s = guard_s.disjunction(s_move.getEnabledPart());
+                }
+                guard_s = guard_s.negation().removeNegative().reduce();
+
+                CDD inv_neg_inv_loc_s = ls.getInvariant().negation().removeNegative().reduce();
+
+                CDD combined = guard_s.disjunction(inv_neg_inv_loc_s);
+
+                Move move = new Move(location, univ, new ArrayList<>());
+                move.conjunctCDD(combined);
+                resultMoves.add(move);
+            } else {
+                CDD inv_neg_inv_loc_s = ls.getInvariant().negation().removeNegative().reduce();
+
+                Move move = new Move(location, univ);
+                move.conjunctCDD(inv_neg_inv_loc_s);
+                resultMoves.add(move);
             }
-
-
 
             // rule 6
-            if (t.getOutputs().contains(channel) && s.getOutputs().contains(channel)) {
-                List<Move> movesFromLeft = t.getNextMoves(locLeft, channel);
-                List<Move> movesFromRight = s.getNextMoves(locRight, channel);
-
+            if (in(a, intersect(t.getOutputs(), s.getOutputs()))) {
                 // take all moves from left in order to gather the guards and negate them
                 CDD CDDFromMovesFromLeft = CDD.cddFalse();
-                for (Move moveLeft : movesFromLeft) {
+                for (Move moveLeft : t_moves) {
                     CDDFromMovesFromLeft = CDDFromMovesFromLeft.disjunction(moveLeft.getEnabledPart());
                 }
-                CDD negated = CDDFromMovesFromLeft.negation().removeNegative();
+                CDD negated = CDDFromMovesFromLeft.negation().removeNegative().reduce();
 
 
-                for (Move move : movesFromRight) {
-                    System.out.println("Rule 6");
+                for (Move move : s_moves) {
                     Move newMoveRule6 = new Move(location, inc, new ArrayList<>());
                     newMoveRule6.setGuards(move.getEnabledPart().conjunction(negated));
                     newMoveRule6.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
@@ -503,58 +477,45 @@ public class Quotient extends TransitionSystem {
                 }
             }
 
-            // rule 3+4
-            if (s.getOutputs().contains(channel)) {
-                List<Move> movesFromRight = s.getNextMoves(locRight, channel);
-                // take all moves from right in order to gather the guards and negate them
-                CDD CDDFromMovesFromRight = CDD.cddFalse();
-                for (Move move : movesFromRight) {
-                    CDDFromMovesFromRight = CDDFromMovesFromRight.disjunction(move.getEnabledPart());
-                }
-                CDDFromMovesFromRight = CDDFromMovesFromRight.negation().removeNegative();
+            // rule 7
+            if (Objects.equals(a.getName(), this.newChan.getName())) {
+                Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
+                // invariant is negation of invariant of left conjuncted with invariant of right
+                CDD negatedInvar = lt.getInvariant().negation();
+                CDD combined = negatedInvar.conjunction(ls.getInvariant());
 
-                System.out.println("Rule 3/4");
-                Move newMove4 = new Move(location, univ, new ArrayList<>());
-                newMove4.setGuards(CDDFromMovesFromRight);
-                resultMoves.add(newMove4);
+                newMoveRule7.setGuards(combined);
+                newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
+                resultMoves.add(newMoveRule7);
+                System.out.println("Rule 7");
             }
 
-            // rule 5
-            if (!s.getActions().contains(channel)) {
-                List<Move> movesFrom1 = t.getNextMoves(locLeft, channel);
-
-                for (Move move : movesFrom1) {
-                    System.out.println("Rule 5");
-                    SymbolicLocation newLoc = new ComplexLocation(new ArrayList<>(Arrays.asList(move.getTarget(), locRight)));
-                    ((ComplexLocation) newLoc).removeInvariants();
-                    Move newMove3 = new Move(location, newLoc, new ArrayList<>());
-                    CDD targetInvar = move.getTarget().getInvariant();
-                    targetInvar = targetInvar.transitionBack(move);
-                    newMove3.setGuards(move.getGuardCDD().conjunction(targetInvar));
-                    newMove3.setUpdates(move.getUpdates());
-                    resultMoves.add(newMove3);
+            // rule 8
+            if (in(a, difference(t.getActions(), s.getActions()))) {
+                List<Move> movesRight = new ArrayList<>();
+                movesRight.add(new Move(ls,ls,new ArrayList<>()));
+                List<Move> moveProduct = moveProduct(t_moves, movesRight, true,true);
+                for (Move move : moveProduct) {
+                    move.conjunctCDD(move.getEnabledPart());
                 }
-
+                resultMoves.addAll(moveProduct);
             }
+
             // Rule 10
         } else if (location instanceof InconsistentLocation) {
-            if (getInputs().contains(channel)) {
-                System.out.println("Rule 10");
+            if (getInputs().contains(a)) {
                 Move newMove = new Move(location, inc, new ArrayList<>());
                 newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove);
             }
             // Rule 9
         } else if (location instanceof UniversalLocation) {
-            if (getActions().contains(channel)) {
-                System.out.println("Rule 9");
+            if (getActions().contains(a)) {
                 Move newMove = new Move(location, univ, new ArrayList<>());
                 resultMoves.add(newMove);
             }
         }
-        System.out.println("result moves");
-        for (Move m : resultMoves)
-            System.out.println(m.getSource().getName() + " -> " + /*m.getEdges().get(0).getChannel() +*/ " -> " + m.getTarget().getName());
+
         return resultMoves;
     }
 
