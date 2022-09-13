@@ -5,20 +5,7 @@ import models.*;
 import java.util.*;
 
 public class Quotient extends TransitionSystem {
-
-
-
-    /*
-    Commands for compiling the DBM
-
-
-    g++ -shared -o DBM.dll -I"c:\Program Files\Java\jdk1.8.0_172\include" -I"C:\Program Files\Java\jdk1.8.0_172\include\win32" -fpermissive lib_DBMLib.cpp ../dbm/libs/libdbm.a ../dbm/libs/libbase.a ../dbm/libs/libdebug.a ../dbm/libs/libhash.a ../dbm/libs/libio.a
-    C:\PROGRA~1\Java\jdk1.8.0_172\bin\javac.exe DBMLib.java -h .
-
-    261
-    */
-
-    private final TransitionSystem left, right;
+    private final TransitionSystem t, s;
     private final Set<Channel> inputs, outputs;
     private final Channel newChan;
     private Clock newClock;
@@ -26,43 +13,33 @@ public class Quotient extends TransitionSystem {
     SymbolicLocation univ = new UniversalLocation();
     SymbolicLocation inc = new InconsistentLocation();
 
-    public Quotient(TransitionSystem left, TransitionSystem right) {
-        this.left = left;
-        this.right = right;
+    private final HashMap<Clock, Integer> maxBounds = new HashMap<>();
+
+    public Quotient(TransitionSystem t, TransitionSystem s) {
+        this.t = t;
+        this.s = s;
 
         //clocks should contain the clocks of ts1, ts2 and a new clock
         newClock = new Clock("quo_new", "quo"); //TODO: get ownerName in a better way
         clocks.add(newClock);
-        clocks.addAll(left.getClocks());
-        clocks.addAll(right.getClocks());
-        BVs.addAll(left.getBVs());
-        BVs.addAll(right.getBVs());
-        if (printComments)
-            System.out.println("Clocks of ts1 ( " + left.getClocks() + " ) and ts2 ( " + right.getClocks() + " ) merged to + " + clocks);
+        clocks.addAll(t.getClocks());
+        clocks.addAll(s.getClocks());
+        BVs.addAll(t.getBVs());
+        BVs.addAll(s.getBVs());
 
-
-        // inputs should contain inputs of ts1, outputs of ts2 and a new input
-        inputs = new HashSet<>(left.getInputs());
-        inputs.addAll(right.getOutputs());
+        // Act_i = Act_i^T ∪ Act_o^S
+        inputs = union(t.getInputs(), s.getOutputs());
         newChan = new Channel("i_new");
         inputs.add(newChan);
 
-        Set<Channel> outputsOfSpec = new HashSet<>(left.getOutputs());
-        Set<Channel> outputsOfComp = new HashSet<>(right.getOutputs());
+        // Act_o = Act_o^T \ Act_o^S ∪ Act_i^S \ Act_i^T
+        outputs = union(
+                difference(t.getOutputs(), s.getOutputs()),
+                difference(s.getInputs(), t.getInputs())
+        );
 
-        Set<Channel> inputsOfCompMinusInputsOfSpec = new HashSet<>(right.getInputs());
-        inputsOfCompMinusInputsOfSpec.removeAll(left.getInputs());
-        outputs = new HashSet<>(outputsOfSpec);
-        outputs.removeAll(outputsOfComp);
-        outputs.addAll(inputsOfCompMinusInputsOfSpec);
-
-        printComments =true;
-        if (printComments)
-            System.out.println("ts1.in = " + left.getInputs() + ", ts1.out = " + left.getOutputs());
-        if (printComments)
-            System.out.println("ts2.in = " + right.getInputs() + ", ts2.out = " + right.getOutputs());
-        if (printComments) System.out.println("quotient.in = " + inputs + ", quotioent.out = " + outputs);
-        printComments =false;
+        maxBounds.putAll(t.getMaxBounds());
+        maxBounds.putAll(s.getMaxBounds());
     }
 
     @Override
@@ -74,10 +51,10 @@ public class Quotient extends TransitionSystem {
     public SymbolicLocation getInitialLocation() {
         // the invariant of locations consisting of locations from each transition system should be true
         // which means the location has no invariants
-        SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{left, right});
+        SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{t, s});
         ((ComplexLocation) initLoc).removeInvariants();
         if (printComments)
-            System.out.println("ts1.init = " + left.getInitialLocation() + ", ts2.init= " + right.getInitialLocation());
+            System.out.println("ts1.init = " + t.getInitialLocation() + ", ts2.init= " + s.getInitialLocation());
         if (printComments) System.out.println("quotients.init = " + initLoc);
         return initLoc;
     }
@@ -104,11 +81,11 @@ public class Quotient extends TransitionSystem {
         //      Automaton spec = left.getSystems().get(0).getAutomaton();
         //      Automaton comp = right.getSystems().get(0).getAutomaton();
 
-        Automaton spec = left.getAutomaton();
-        Automaton comp = right.getAutomaton();
+        Automaton spec = t.getAutomaton();
+        Automaton comp = s.getAutomaton();
 
         boolean initialisedCdd = CDD.tryInit(clocks.getItems(), BVs.getItems());
-        String name = left.getSystems().get(0).getName() + "DIV" + right.getSystems().get(0).getName();
+        String name = t.getSystems().get(0).getName() + "DIV" + s.getSystems().get(0).getName();
 
         // create product of locations
         for (Location l_spec : spec.getLocations()) {
@@ -186,7 +163,7 @@ public class Quotient extends TransitionSystem {
                     //Rule 2: "channels in comp not in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the spec alphabet
-                        if (!left.getOutputs().contains(c) && !left.getInputs().contains(c)) {
+                        if (!t.getOutputs().contains(c) && !t.getInputs().contains(c)) {
                             // if the current location in comp has a transition with c
                             if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                                 for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
@@ -211,7 +188,7 @@ public class Quotient extends TransitionSystem {
 
                     System.out.println("RULE 3 and 4");
                     //Rule 3+4: "edge to univ for negated comp guards"
-                    for (Channel c : right.getOutputs()) {
+                    for (Channel c : s.getOutputs()) {
                         CDD collectedGuardsComp = CDD.cddFalse();
                         // collect all negated guards from c-transitions in  comp
                         for (Edge e_comp : comp.getEdgesFromLocationAndSignal(l_comp, c)) {
@@ -238,8 +215,8 @@ public class Quotient extends TransitionSystem {
 
                     System.out.println("RULE 6");
                     // Rule 6 "edge to inconsistent for common outputs blocked in spec"
-                    Set<Channel> combinedOutputs = new HashSet<>(right.getOutputs());
-                    combinedOutputs.retainAll(left.getOutputs());
+                    Set<Channel> combinedOutputs = new HashSet<>(s.getOutputs());
+                    combinedOutputs.retainAll(t.getOutputs());
                     for (Channel c : combinedOutputs) {
                         if (!comp.getEdgesFromLocationAndSignal(l_comp, c).isEmpty()) {
                             // collect all guards from spec transitions, negated
@@ -292,7 +269,7 @@ public class Quotient extends TransitionSystem {
                     //Rule 8: "independent action in spec"
                     for (Channel c : allChans) {
                         // for all channels that are not in the components alphabet
-                        if (!right.getOutputs().contains(c) && !right.getInputs().contains(c)) {
+                        if (!s.getOutputs().contains(c) && !s.getInputs().contains(c)) {
                             // if the current location in spec has a transition with c
                             if (!spec.getEdgesFromLocationAndSignal(l_spec, c).isEmpty()) {
                                 for (Edge e_spec : spec.getEdgesFromLocationAndSignal(l_spec, c)) {
@@ -409,14 +386,14 @@ public class Quotient extends TransitionSystem {
     public List<SimpleTransitionSystem> getSystems() {
         // no idea what this is for
         List<SimpleTransitionSystem> result = new ArrayList<>();
-        result.addAll(left.getSystems());
-        result.addAll(right.getSystems());
+        result.addAll(t.getSystems());
+        result.addAll(s.getSystems());
         return result;
     }
 
     @Override
     public String getName() {
-        return left.getName() + "//" + right.getName();
+        return t.getName() + "//" + s.getName();
     }
 
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
@@ -442,9 +419,9 @@ public class Quotient extends TransitionSystem {
 
 
             // rule 1 (cartesian product)
-            if (left.getActions().contains(channel) && right.getActions().contains(channel)) {
-                List<Move> movesLeft = left.getNextMoves(locLeft, channel);
-                List<Move> movesRight = right.getNextMoves(locRight, channel);
+            if (t.getActions().contains(channel) && s.getActions().contains(channel)) {
+                List<Move> movesLeft = t.getNextMoves(locLeft, channel);
+                List<Move> movesRight = s.getNextMoves(locRight, channel);
 
                 if (!movesLeft.isEmpty() && !movesRight.isEmpty()) {
                     List<Move> moveProduct = moveProduct(movesLeft, movesRight, true,true);
@@ -457,8 +434,8 @@ public class Quotient extends TransitionSystem {
             }
 
             // rule 2
-            if (!left.getActions().contains(channel) && right.getActions().contains(channel)) {
-                List<Move> movesRight = right.getNextMoves(locRight, channel);
+            if (!t.getActions().contains(channel) && s.getActions().contains(channel)) {
+                List<Move> movesRight = s.getNextMoves(locRight, channel);
                 List<Move> movesLeft = new ArrayList<>();
                 movesLeft.add(new Move(locLeft,locLeft,new ArrayList<>())); // TODO: check that this works
                 if (!movesRight.isEmpty()) {
@@ -472,8 +449,8 @@ public class Quotient extends TransitionSystem {
             }
 
             // rule 8
-            if (left.getActions().contains(channel) && !right.getActions().contains(channel)) {
-                List<Move> movesLeft = left.getNextMoves(locLeft, channel);
+            if (t.getActions().contains(channel) && !s.getActions().contains(channel)) {
+                List<Move> movesLeft = t.getNextMoves(locLeft, channel);
                 List<Move> movesRight = new ArrayList<>();
                 movesRight.add(new Move(locRight,locRight,new ArrayList<>())); // TODO: check that this works
                 if (!movesLeft.isEmpty()) {
@@ -512,9 +489,9 @@ public class Quotient extends TransitionSystem {
 
 
             // rule 6
-            if (left.getOutputs().contains(channel) && right.getOutputs().contains(channel)) {
-                List<Move> movesFromLeft = left.getNextMoves(locLeft, channel);
-                List<Move> movesFromRight = right.getNextMoves(locRight, channel);
+            if (t.getOutputs().contains(channel) && s.getOutputs().contains(channel)) {
+                List<Move> movesFromLeft = t.getNextMoves(locLeft, channel);
+                List<Move> movesFromRight = s.getNextMoves(locRight, channel);
 
                 // take all moves from left in order to gather the guards and negate them
                 CDD CDDFromMovesFromLeft = CDD.cddFalse();
@@ -534,8 +511,8 @@ public class Quotient extends TransitionSystem {
             }
 
             // rule 3+4
-            if (right.getOutputs().contains(channel)) {
-                List<Move> movesFromRight = right.getNextMoves(locRight, channel);
+            if (s.getOutputs().contains(channel)) {
+                List<Move> movesFromRight = s.getNextMoves(locRight, channel);
                 // take all moves from right in order to gather the guards and negate them
                 CDD CDDFromMovesFromRight = CDD.cddFalse();
                 for (Move move : movesFromRight) {
@@ -550,8 +527,8 @@ public class Quotient extends TransitionSystem {
             }
 
             // rule 5
-            if (!right.getActions().contains(channel)) {
-                List<Move> movesFrom1 = left.getNextMoves(locLeft, channel);
+            if (!s.getActions().contains(channel)) {
+                List<Move> movesFrom1 = t.getNextMoves(locLeft, channel);
 
                 for (Move move : movesFrom1) {
                     System.out.println("Rule 5");
@@ -588,5 +565,33 @@ public class Quotient extends TransitionSystem {
         return resultMoves;
     }
 
+    private boolean in(Channel element, Set<Channel> set) {
+        return set.contains(element);
+    }
 
+    private boolean disjoint(Set<Channel> set1, Set<Channel> set2) {
+        return empty(intersect(set1, set2));
+    }
+
+    private boolean empty(Set<Channel> set) {
+        return set.isEmpty();
+    }
+
+    private Set<Channel> intersect(Set<Channel> set1, Set<Channel> set2) {
+        Set<Channel> intersection = new HashSet<>(set1);
+        intersection.retainAll(set2);
+        return intersection;
+    }
+
+    private Set<Channel> difference(Set<Channel> set1, Set<Channel> set2) {
+        Set<Channel> difference = new HashSet<>(set1);
+        difference.removeAll(set2);
+        return difference;
+    }
+
+    private Set<Channel> union(Set<Channel> set1, Set<Channel> set2) {
+        Set<Channel> union = new HashSet<>(set1);
+        union.addAll(set2);
+        return union;
+    }
 }
