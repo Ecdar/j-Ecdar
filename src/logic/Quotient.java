@@ -9,9 +9,8 @@ public class Quotient extends TransitionSystem {
     private final Set<Channel> inputs, outputs;
     private final Channel newChan;
     private Clock newClock;
-    private boolean printComments = false;
-    SymbolicLocation univ = new UniversalLocation();
-    SymbolicLocation inc = new InconsistentLocation();
+    private SymbolicLocation univ = new UniversalLocation();
+    private SymbolicLocation inc = new InconsistentLocation();
 
     private final HashMap<Clock, Integer> maxBounds = new HashMap<>();
 
@@ -44,8 +43,7 @@ public class Quotient extends TransitionSystem {
 
     @Override
     public Automaton getAutomaton() {
-        Automaton res = calculateQuotientAutomaton().getAutomaton();
-        return res;
+        return calculateQuotientAutomaton().getAutomaton();
     }
 
     public SymbolicLocation getInitialLocation() {
@@ -53,9 +51,6 @@ public class Quotient extends TransitionSystem {
         // which means the location has no invariants
         SymbolicLocation initLoc = getInitialLocation(new TransitionSystem[]{t, s});
         ((ComplexLocation) initLoc).removeInvariants();
-        if (printComments)
-            System.out.println("ts1.init = " + t.getInitialLocation() + ", ts2.init= " + s.getInitialLocation());
-        if (printComments) System.out.println("quotients.init = " + initLoc);
         return initLoc;
     }
 
