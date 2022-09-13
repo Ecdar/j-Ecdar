@@ -9,8 +9,6 @@ public class Quotient extends TransitionSystem {
     private final Set<Channel> inputs, outputs;
     private final Channel newChan;
     private Clock newClock;
-    private SymbolicLocation univ = new UniversalLocation();
-    private SymbolicLocation inc = new InconsistentLocation();
 
     private final HashMap<Clock, Integer> maxBounds = new HashMap<>();
 
@@ -401,6 +399,9 @@ public class Quotient extends TransitionSystem {
     }
 
     public List<Move> getNextMoves(SymbolicLocation location, Channel a) {
+        SymbolicLocation univ = new UniversalLocation();
+        SymbolicLocation inc = new InconsistentLocation();
+
         List<Move> resultMoves = new ArrayList<>();
         System.out.println("gettingNextMove of " + location.getName());
         if (location instanceof ComplexLocation) {
