@@ -217,11 +217,28 @@ public class Quotient extends TransitionSystem {
         SymbolicLocation inc = new InconsistentLocation();
 
         List<Move> resultMoves = new ArrayList<>();
-        System.out.println("gettingNextMove of " + location.getName());
+        /*System.out.println("gettingNextMove of " + location.getName());
         System.out.println("Universal? " + location.getIsUniversal() + " instance of? " + (location instanceof UniversalLocation));
         System.out.println("Inconsistent? " + location.getIsInconsistent() + " instance of? " + (location instanceof InconsistentLocation));
         assert location.getIsUniversal() == (location instanceof UniversalLocation);
-        assert location.getIsInconsistent() == (location instanceof InconsistentLocation);
+        assert location.getIsInconsistent() == (location instanceof InconsistentLocation);*/
+
+        if (location instanceof InconsistentLocation || location.getIsInconsistent()) {
+            if (getInputs().contains(a)) {
+                System.out.println("Rule 10");
+                Move newMove = new Move(location, inc, new ArrayList<>());
+                newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
+                resultMoves.add(newMove);
+            }
+            // Rule 9
+        } else if (location instanceof UniversalLocation || location.getIsUniversal()) {
+            if (getActions().contains(a)) {
+                System.out.println("Rule 9");
+                Move newMove = new Move(location, univ, new ArrayList<>());
+                resultMoves.add(newMove);
+            }
+        }
+
         if (location instanceof ComplexLocation) {
             List<SymbolicLocation> locations = ((ComplexLocation) location).getLocations();
 
@@ -327,20 +344,6 @@ public class Quotient extends TransitionSystem {
             }
 
             // Rule 10
-        } else if (location instanceof InconsistentLocation || location.getIsInconsistent()) {
-            if (getInputs().contains(a)) {
-                System.out.println("Rule 10");
-                Move newMove = new Move(location, inc, new ArrayList<>());
-                newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
-                resultMoves.add(newMove);
-            }
-            // Rule 9
-        } else if (location instanceof UniversalLocation || location.getIsUniversal()) {
-            if (getActions().contains(a)) {
-                System.out.println("Rule 9");
-                Move newMove = new Move(location, univ, new ArrayList<>());
-                resultMoves.add(newMove);
-            }
         }
 
         return resultMoves;
