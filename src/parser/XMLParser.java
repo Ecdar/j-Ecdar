@@ -78,6 +78,10 @@ public class XMLParser {
         // edges
         List<Edge> edges = setEdges(element, clocks, BVs, locations);
 
+        for (Edge edge : edges) {
+            System.out.println(edge.getChannel());
+        }
+
         return new Automaton(name, locations, edges, clocks, BVs, makeInpEnabled);
     }
 
@@ -258,6 +262,10 @@ public class XMLParser {
                         }
                         break;
                 }
+            }
+
+            if (chan == null) {
+                throw new IllegalStateException("Requires a chan");
             }
 
             edgeList.add(new Edge(source, target, chan, isInput, guards, updates));
