@@ -111,76 +111,91 @@ public class UniversityTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest10() {
         assertTrue(refinement("refinement: (Administration || Machine || Researcher) <= (Administration || Machine || Researcher)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest11() {
         assertTrue(refinement("refinement: (Administration || Machine || Researcher) <= Spec"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest12() {
         assertTrue(refinement("refinement: (Administration || Researcher) <= (Administration || Researcher)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest13() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (HalfAdm1 && HalfAdm2))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest14() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest15() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest16() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest17() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest18() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest19() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest20() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest21() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest22() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTes23() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest24() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
@@ -192,16 +207,19 @@ public class UniversityTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest26() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest27() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest28() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher) && (Adm2 || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
@@ -213,6 +231,7 @@ public class UniversityTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest30() {
         assertTrue(refinement("refinement: Researcher <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm2) || Researcher) && ((HalfAdm1 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }
