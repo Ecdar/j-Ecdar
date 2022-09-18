@@ -66,46 +66,55 @@ public class UniversityTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest1() {
         assertTrue(refinement("refinement: ((HalfAdm1 && HalfAdm2) || Machine || Researcher) <= ((HalfAdm1 && HalfAdm2) || Machine || Researcher)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest2() {
         assertTrue(refinement("refinement: ((HalfAdm1 && HalfAdm2) || Machine || Researcher) <= (Adm2 || Machine || Researcher)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest3() {
         assertTrue(refinement("refinement: ((HalfAdm1 && HalfAdm2) || Researcher) <= ((HalfAdm1 && HalfAdm2) || Researcher)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest4() {
         assertTrue(refinement("refinement: ((HalfAdm1 && HalfAdm2) || Researcher) <= (Adm2 || Researcher)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest5() {
         assertTrue(refinement("refinement: (HalfAdm1 && HalfAdm2) <= (HalfAdm1 && HalfAdm2)"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest6() {
         assertTrue(refinement("refinement: (HalfAdm1 && HalfAdm2) <= HalfAdm2"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest7() {
         assertTrue(refinement("refinement: (HalfAdm1 && HalfAdm2) <= HalfAdm2"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest8() {
         assertTrue(refinement("refinement: (HalfAdm1 && HalfAdm2) <= Adm2"));
     }
 
     @Test
+    @Ignore // Uses a lot of memory but does not cause any errors (It passes Sep 18 2022)
     public void generatedTest9() {
         assertTrue(refinement("refinement: (HalfAdm1 && HalfAdm2) <= Adm2"));
     }
