@@ -79,7 +79,6 @@ public class CompositionTest {
     }
 
     @Test
-    @Ignore // Missing file for GitHub CI
     public void selfloopTest() {
 
         Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);
