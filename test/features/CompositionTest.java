@@ -81,7 +81,7 @@ public class CompositionTest {
     @Test
     public void selfloopTest() {
 
-        Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);
+        Automaton[] aut1 = XMLParser.parse("samples/xml/selfloopNonZeno.xml", false);
         Automaton copy = new Automaton(aut1[0]);
         SimpleTransitionSystem selfloop = new SimpleTransitionSystem(aut1[0]);
         SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(copy);
