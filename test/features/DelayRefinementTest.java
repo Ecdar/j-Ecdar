@@ -329,15 +329,15 @@ public class DelayRefinementTest {
         Refinement ref = new Refinement(Z2_1,  q);
 
         boolean res = ref.check(true);
-        System.out.println("inputs:");
-        System.out.println(Z2_1.getInputs());
-        System.out.println(q.getInputs());
+        Log.debug("inputs:");
+        Log.debug(Z2_1.getInputs());
+        Log.debug(q.getInputs());
 
-        System.out.println("outputs:");
-        System.out.println(Z2_1.getOutputs());
-        System.out.println(q.getOutputs());
+        Log.debug("outputs:");
+        Log.debug(Z2_1.getOutputs());
+        Log.debug(q.getOutputs());
 
-        System.out.println(ref.getErrMsg());
+        Log.debug(ref.getErrMsg());
         assertTrue(res);
         assertTrue(new Refinement(Z2_1,new Quotient(Z2, new Quotient(Z3,Z4))).check());
     }
@@ -441,8 +441,8 @@ public class DelayRefinementTest {
 
         Refinement ref = new Refinement(new SimpleTransitionSystem(quotient2.getAutomaton()),new SimpleTransitionSystem(quotient2New.getAutomaton()));
         boolean res = ref.check();
-        System.out.println(res);
-        System.out.println("error:" + ref.getErrMsg());
+        Log.debug(res);
+        Log.debug("error:" + ref.getErrMsg());
         assertTrue(new Refinement(quotient2New,quotient2).check());
         assertTrue(new Refinement(quotient2,quotient2New).check());*/
         Refinement ref2 = new Refinement(new Composition(T1_new, T2_new, T4_new), T3_new);
@@ -450,7 +450,7 @@ public class DelayRefinementTest {
 
         Refinement ref1 = new Refinement(T1_new, quotient2);
         boolean res1 = ref1.check(true);
-        //System.out.println(ref1.getTree().toDot());
+        //Log.debug(ref1.getTree().toDot());
         assertTrue(res1);
     }
 

@@ -174,7 +174,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void quotientSelfAdmAutomaton() {
         // refinement: spec \ adm <= spec \ amd
         TransitionSystem lhs = new SimpleTransitionSystem(new Quotient(getSpec(), getAdm()).getAutomaton());
@@ -182,7 +181,7 @@ public class UniversityTest {
         Refinement refinement = new Refinement(lhs, rhs);
 
         boolean refines = refinement.check();
-        System.out.println(refinement.getErrMsg());
+        Log.debug(refinement.getErrMsg());
         assertTrue(refines);
     }
 
@@ -282,8 +281,8 @@ public class UniversityTest {
         assertTrue(consistency.isFullyConsistent());
         Refinement ref = new Refinement(getAdm(),consistency);
         boolean res = ref.check(true);
-        System.out.println(ref.getErrMsg());
-        System.out.println(ref.getTree().toDot());
+        Log.debug(ref.getErrMsg());
+        Log.debug(ref.getTree().toDot());
         assertTrue(res);
 
     }
@@ -340,7 +339,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest1Automaton() {
         Composition composition = new Composition(getMachine(), getAdm());
         Quotient quotient = new Quotient(getSpec(), getResearcher());
@@ -376,7 +374,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4A() {
         // refinement: machine || researcher <= spec \ adm
         Composition lhs = new Composition(getMachine(), getResearcher());
@@ -385,24 +382,6 @@ public class UniversityTest {
 
         XMLFileWriter.toXML("./testOutput/specDIVadm.xml", lhs.getAutomaton());
         XMLFileWriter.toXML("./testOutput/comp.xml", rhs.getAutomaton());
-        boolean refines = refinement.check();
-
-        assertTrue(refines);
-    }
-
-    @Test
-    @Ignore
-    public void newQuotientTest4AAutomaton() {
-        /* This test is similar to "newQuotientTest4A".
-         *  But here we create a SimpleTransitionSystem for the Quotient,
-         *  As of now this creation results in a long-running time
-         *  ultimately leading to a timeout (ignore) of the test. */
-        // refinement: machine || researcher <= spec \ adm
-        Composition lhs = new Composition(getMachine(), getResearcher());
-        // This "SimpleTransitionSystem" creation is problematic.
-        TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSpec(), getAdm()).getAutomaton());
-        Refinement refinement = new Refinement(lhs, rhs);
-
         boolean refines = refinement.check();
 
         assertTrue(refines);
@@ -421,7 +400,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4BAutomaton() {
         // refinement: machine || adm <= spec \ researcher
         Composition lhs = new Composition(getMachine(), getAdm());
@@ -446,35 +424,9 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
-    public void newQuotientTest4CAutomaton() {
-        // refinement: researcher || adm <= spec \ machine
-        Composition lhs = new Composition(getResearcher(), getAdm());
-        TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSpec(), getMachine()).getAutomaton());
-        Refinement refinement = new Refinement(lhs, rhs);
-
-        boolean refines = refinement.check();
-
-        assertTrue(refines);
-    }
-
-    @Test
     public void newQuotientTest4D() {
         Composition lhs = new Composition(getResearcher(), getAdm());
         Quotient rhs = new Quotient(getSpec(), getMachine());
-        Refinement refinement = new Refinement(lhs, rhs);
-
-        boolean refines = refinement.check();
-
-        assertTrue(refines);
-    }
-
-    @Test
-    @Ignore
-    public void newQuotientTest4DAutomaton() {
-        // Refinement: researcher || adm <= spec \ machine
-        Composition lhs = new Composition(getResearcher(), getAdm());
-        TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSpec(), getMachine()).getAutomaton());
         Refinement refinement = new Refinement(lhs, rhs);
 
         boolean refines = refinement.check();
@@ -495,7 +447,6 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void simpliversityTest2() {
         // refinement: researcher <= spec \ adm
         TransitionSystem lhs = getSimpleResearcher();
@@ -512,15 +463,12 @@ public class UniversityTest {
     }
 
     @Test
-    @Ignore
     public void newQuotientTest3() {
         // refinement: machine || researcher <= spec \ adm
         Composition lhs = new Composition(getMachine(), getResearcher());
-        TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSpec(), getAdm()).getAutomaton());
+        TransitionSystem rhs = new Quotient(getSpec(), getAdm());
         Refinement refinement = new Refinement(lhs, rhs);
 
-        XMLFileWriter.toXML("./testOutput/admnew.xml", getAdm().getAutomaton());
-        XMLFileWriter.toXML("./testOutput/adm2new.xml", getAdm2().getAutomaton());
         boolean refines = refinement.check();
 
         assertTrue(refines);

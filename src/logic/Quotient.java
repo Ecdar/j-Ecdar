@@ -1,5 +1,6 @@
 package logic;
 
+import log.Log;
 import models.*;
 
 import java.util.*;
@@ -217,15 +218,15 @@ public class Quotient extends TransitionSystem {
         SymbolicLocation inc = new InconsistentLocation();
 
         List<Move> resultMoves = new ArrayList<>();
-        /*System.out.println("gettingNextMove of " + location.getName());
-        System.out.println("Universal? " + location.getIsUniversal() + " instance of? " + (location instanceof UniversalLocation));
-        System.out.println("Inconsistent? " + location.getIsInconsistent() + " instance of? " + (location instanceof InconsistentLocation));
+        /*Log.debug("gettingNextMove of " + location.getName());
+        Log.debug("Universal? " + location.getIsUniversal() + " instance of? " + (location instanceof UniversalLocation));
+        Log.debug("Inconsistent? " + location.getIsInconsistent() + " instance of? " + (location instanceof InconsistentLocation));
         assert location.getIsUniversal() == (location instanceof UniversalLocation);
         assert location.getIsInconsistent() == (location instanceof InconsistentLocation);*/
 
         if (location instanceof InconsistentLocation || location.getIsInconsistent()) {
             if (getInputs().contains(a)) {
-                System.out.println("Rule 10");
+                Log.debug("Rule 10");
                 Move newMove = new Move(location, inc, new ArrayList<>());
                 newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove);
@@ -233,7 +234,7 @@ public class Quotient extends TransitionSystem {
             // Rule 9
         } else if (location instanceof UniversalLocation || location.getIsUniversal()) {
             if (getActions().contains(a)) {
-                System.out.println("Rule 9");
+                Log.debug("Rule 9");
                 Move newMove = new Move(location, univ, new ArrayList<>());
                 resultMoves.add(newMove);
             }
@@ -251,7 +252,7 @@ public class Quotient extends TransitionSystem {
 
             // rule 1 (cartesian product)
             if (in(a, intersect(s.getActions(), t.getActions()))) {
-                System.out.println("Rule 1");
+                Log.debug("Rule 1");
                 List<Move> moveProduct = moveProduct(t_moves, s_moves, true,true);
                 for (Move move : moveProduct) {
                     move.conjunctCDD(move.getEnabledPart());
@@ -261,7 +262,7 @@ public class Quotient extends TransitionSystem {
 
             // rule 2
             if (in(a, difference(s.getActions(), t.getActions()))) {
-                System.out.println("Rule 2");
+                Log.debug("Rule 2");
                 List<Move> movesLeft = new ArrayList<>();
                 movesLeft.add(new Move(lt,lt, new ArrayList<>()));
 
@@ -276,7 +277,7 @@ public class Quotient extends TransitionSystem {
             // rule 4
             // rule 5
             if (in(a, s.getOutputs())) {
-                System.out.println("Rule 345 1");
+                Log.debug("Rule 345 1");
                 CDD guard_s = CDD.cddFalse();
                 for (Move s_move : s_moves) {
                     guard_s = guard_s.disjunction(s_move.getEnabledPart());
@@ -291,7 +292,7 @@ public class Quotient extends TransitionSystem {
                 move.conjunctCDD(combined);
                 resultMoves.add(move);
             } else {
-                System.out.println("Rule 345 2");
+                Log.debug("Rule 345 2");
                 CDD inv_neg_inv_loc_s = ls.getInvariant().negation().removeNegative().reduce();
 
                 Move move = new Move(location, univ);
@@ -301,7 +302,7 @@ public class Quotient extends TransitionSystem {
 
             // rule 6
             if (in(a, intersect(t.getOutputs(), s.getOutputs()))) {
-                System.out.println("Rule 6");
+                Log.debug("Rule 6");
                 // take all moves from left in order to gather the guards and negate them
                 CDD CDDFromMovesFromLeft = CDD.cddFalse();
                 for (Move moveLeft : t_moves) {
@@ -320,7 +321,7 @@ public class Quotient extends TransitionSystem {
 
             // rule 7
             if (Objects.equals(a.getName(), this.newChan.getName())) {
-                System.out.println("Rule 7");
+                Log.debug("Rule 7");
                 Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
                 // invariant is negation of invariant of left conjuncted with invariant of right
                 CDD negatedInvar = lt.getInvariant().negation();
@@ -333,7 +334,7 @@ public class Quotient extends TransitionSystem {
 
             // rule 8
             if (in(a, difference(t.getActions(), s.getActions()))) {
-                System.out.println("Rule 8");
+                Log.debug("Rule 8");
                 List<Move> movesRight = new ArrayList<>();
                 movesRight.add(new Move(ls,ls,new ArrayList<>()));
                 List<Move> moveProduct = moveProduct(t_moves, movesRight, true,true);

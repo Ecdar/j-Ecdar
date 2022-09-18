@@ -1,5 +1,6 @@
 package parser;
 
+import log.Log;
 import models.*;
 import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
@@ -79,7 +80,7 @@ public class XMLParser {
         List<Edge> edges = setEdges(element, clocks, BVs, locations);
 
         for (Edge edge : edges) {
-            System.out.println(edge.getChannel());
+            Log.debug(edge.getChannel());
         }
 
         return new Automaton(name, locations, edges, clocks, BVs, makeInpEnabled);

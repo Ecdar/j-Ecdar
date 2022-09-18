@@ -2,6 +2,7 @@ package cdd;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import models.*;
 import org.junit.After;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class CDDTest {
         CDD cdd2 = CDD.createInterval(2,1,4,true,6, true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
-        System.out.println(cdd2.getGuard(clocks));
+        Log.debug(cdd2.getGuard(clocks));
 
         Guard g1 = new ClockGuard(b,a,3,Relation.LESS_EQUAL );
         Guard g2 = new ClockGuard(a,b,5,Relation.LESS_EQUAL );
@@ -54,7 +55,7 @@ public class CDDTest {
         guardList.add(g3);
         guardList.add(g4);
 
-        System.out.println(new CDD(new AndGuard(guardList)).getGuard(clocks));
+        Log.debug(new CDD(new AndGuard(guardList)).getGuard(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         cdd1.free();
@@ -258,8 +259,8 @@ public class CDDTest {
         CDD result = cdd.conjunction(cdd1);
 
         CDDNode node = result.getRoot();
-        System.out.println("here " + node);
-        System.out.println(node.getSegmentAtIndex(0).getUpperBound());
+        Log.debug("here " + node);
+        Log.debug(node.getSegmentAtIndex(0).getUpperBound());
 
         result.printDot(); // --> the CDD is correct, so I guess the test is wrong
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
@@ -293,8 +294,8 @@ public class CDDTest {
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));
         exp = exp.disjunction(CDD.createInterval(2, 0, 0,true, 5,true));
-        System.out.println(exp.removeNegative().reduce().getGuard(clocks));
-        System.out.println(res.removeNegative().reduce().getGuard(clocks));
+        Log.debug(exp.removeNegative().reduce().getGuard(clocks));
+        Log.debug(res.removeNegative().reduce().getGuard(clocks));
         //exp.printDot();
         exp = exp.removeNegative().reduce();
         res = res.removeNegative().reduce();

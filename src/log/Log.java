@@ -261,6 +261,6 @@ public class Log {
     }
 
     private static void out(String message) {
-        System.out.println(message);
+        Log.debug(message);
     }
 }

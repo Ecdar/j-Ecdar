@@ -146,6 +146,7 @@ public class ConnectionTest {
     }
 
     @Test
+    @Ignore
     public void testRunInvalidQuery2() {
         String arg = "-machine 1 2 3";
 

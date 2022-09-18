@@ -2,6 +2,7 @@ package models;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import logic.*;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -55,7 +56,7 @@ public class VariousTest {
 
         z1.printDbm(true,true);
         ClockGuard g2 = new ClockGuard(y, 6,  Relation.GREATER_EQUAL);
-        System.out.println(g2);
+        Log.debug(g2);
         z2.buildConstraintsForGuard(g2,clocks);
         z2.printDbm(true,true);
 
@@ -66,10 +67,10 @@ public class VariousTest {
         Federation f1 = new Federation(zoneList1);
         Federation f2 = new Federation(zoneList2);
 
-        System.out.println(f1.isSubset(f2));
-        System.out.println(f2.isSubset(f1));
-        System.out.println(f1.isSubset(f1));
-        System.out.println(f2.isSubset(f2));
+        Log.debug(f1.isSubset(f2));
+        Log.debug(f2.isSubset(f1));
+        Log.debug(f1.isSubset(f1));
+        Log.debug(f2.isSubset(f2));
     }
 
     @Test
@@ -101,7 +102,7 @@ public class VariousTest {
 
         origin1 = origin1.delay();
         Guard origin1Guards = origin1.getGuard(clocks);
-        System.out.println(origin1Guards);
+        Log.debug(origin1Guards);
         assert(true);
 
     }
@@ -130,7 +131,7 @@ public class VariousTest {
         CDD origin1 = new CDD(new AndGuard(inner));
 
         Guard origin1Guards = origin1.getGuard(clocks);
-        System.out.println(origin1Guards);
+        Log.debug(origin1Guards);
 
 
 
@@ -140,7 +141,7 @@ public class VariousTest {
         origin1 = origin1.applyReset(list1);
 
         Guard origin2Guards = origin1.getGuard(clocks);
-        System.out.println(origin2Guards);
+        Log.debug(origin2Guards);
 
         assert(origin2Guards.toString().equals("(x==0 && y<=3 && y-x<=3 && x-y<=0)"));
 
@@ -152,7 +153,7 @@ public class VariousTest {
         int rawUpperBound = 43;
         int converted = rawUpperBound>>1;
         boolean included  =  (rawUpperBound & 1)==0 ? false : true;
-        System.out.println(converted + " " + included);
+        Log.debug(converted + " " + included);
     }
 
     @Test
@@ -168,7 +169,7 @@ public class VariousTest {
         // refinement: A <= ((A || G) \\ Q)
         Refinement ref = new Refinement(A, new Quotient(new Composition(A1,G),Q));
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.debug(ref.getErrMsg());
         assertTrue(res);
     }
 
@@ -181,9 +182,9 @@ public class VariousTest {
         Automaton[] list = XMLParser.parse("C:\\tools\\ecdar-test\\Ecdar-test\\samples\\xml\\extrapolation_test.xml",false);
         Inf = new SimpleTransitionSystem(list[0]);
         // refinement: A <= ((A || G) \\\\ Q)
-        System.out.println(Inf.isDeterministic());
+        Log.debug(Inf.isDeterministic());
         boolean res = Inf.isLeastConsistent();
-        System.out.println(Inf.getLastErr());
+        Log.debug(Inf.getLastErr());
         assertTrue(res);
     }
     @Test
@@ -200,8 +201,8 @@ public class VariousTest {
         // refinement: A2 <= (B \\ A1)
         Refinement ref = new Refinement(A2, new Quotient(B, A1));
         boolean res = ref.check();
-        System.out.println("ref.getErrMsg()");
-        System.out.println(ref.getErrMsg());
+        Log.debug("ref.getErrMsg()");
+        Log.debug(ref.getErrMsg());
         assertFalse(res);
     }
 
@@ -211,8 +212,8 @@ public class VariousTest {
         Automaton[] list = JSONParser.parse("samples/json/DelayAdd",true);
         C1 = new SimpleTransitionSystem(list[3]);
         C2 = new SimpleTransitionSystem(list[4]);
-        System.out.println(C1.getName());
-        System.out.println(C2.getName());
+        Log.debug(C1.getName());
+        Log.debug(C2.getName());
         assertFalse(new Refinement(C1,C2).check());
 
     }
@@ -240,7 +241,7 @@ public class VariousTest {
         clocks.add(x);clocks.add(y);
         CDD.addClocks(clocks);
         CDD test = CDD.createInterval(1,0,2,true,3,true);
-        System.out.println(test.getGuard(clocks));
+        Log.debug(test.getGuard(clocks));
         test.printDot();
         assert(true);
     }

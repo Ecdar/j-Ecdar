@@ -89,25 +89,22 @@ public class UniversitySimpleTest {
 
 
     @Test
-    @Ignore
+    // @Ignore
     public void newQuotientTest2() {
 
-        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
+        assertFalse(new Refinement(new Composition(machine,researcher), new Quotient(spec,adm2)).check());
     }
 
     @Test
-    @Ignore
+    // @Ignore
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
-        XMLFileWriter.toXML("./testOutput/specDIVadm.xml", new Automaton[]{q.getAutomaton()});
-        XMLFileWriter.toXML("./testOutput/comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
-        TransitionSystem comp = new SimpleTransitionSystem(new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton());
+        TransitionSystem comp = new SimpleTransitionSystem(new Composition(machine,researcher).getAutomaton());
         Refinement ref = new Refinement(comp, new SimpleTransitionSystem(q.getAutomaton()) );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
-/*
 
     @Test
     public void newQuotientTest4B() {
@@ -169,6 +166,7 @@ public class UniversitySimpleTest {
     }
 
     @Test
+    @Ignore // I believe this test to be incorrect
     public void newQuotientTest5() {
         Automaton quo = XMLParser.parse("samples/xml/staticSpecDIVAdm.xml",true)[0];
         Automaton comp = XMLParser.parse("comp.xml",true)[0];
@@ -191,8 +189,6 @@ public class UniversitySimpleTest {
         Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
-
-*/
 
     @Test
     public void testHalf2RefinesSelf() {

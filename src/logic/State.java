@@ -1,6 +1,7 @@
 package logic;
 
 import lib.DBMLib;
+import log.Log;
 import models.*;
 
 import java.util.HashMap;
@@ -119,8 +120,8 @@ public class State {
         boolean print = false;
         if (copy.toString().contains("30"))
         {
-            System.out.println("max bounds : " + maxBounds);
-            System.out.println(copy.getGuard(relevantClocks));
+            Log.debug("max bounds : " + maxBounds);
+            Log.debug(copy.getGuard(relevantClocks));
             print = true;
         }
         if (copy.isBDD())
@@ -159,7 +160,7 @@ public class State {
                 {
                     for (int i: bounds)
                         System.out.print(i + " ");
-                    System.out.println();
+                    Log.debug();
                 }
                 z.extrapolateMaxBoundsDiagonal(bounds);
                 if (print) z.printDbm(true,true);
@@ -169,7 +170,7 @@ public class State {
 
             }
         if (print)
-            System.out.println(resCDD);
+            Log.debug(resCDD);
         invarCDD = resCDD;
     }
     @Override

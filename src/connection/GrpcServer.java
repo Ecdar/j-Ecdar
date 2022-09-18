@@ -2,6 +2,7 @@ package connection;
 
 import io.grpc.Server;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
+import log.Log;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
