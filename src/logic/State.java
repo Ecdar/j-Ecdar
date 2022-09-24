@@ -32,11 +32,11 @@ public class State {
 
 
     public CDD getLocationInvariant() {
-        return location.getInvariant();
+        return location.getInvariantAsCdd();
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return location.getInvariant().getGuard(relevantClocks);
+        return location.getInvariantAsCdd().getGuard(relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -49,7 +49,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        CDD result = this.invarCDD.conjunction(location.getInvariant());
+        CDD result = this.invarCDD.conjunction(location.getInvariantAsCdd());
         this.invarCDD=result;
     }
 
@@ -175,7 +175,7 @@ public class State {
     }
     @Override
     public String toString() {
-        return "{" + location + ", " + invarCDD + '}';
+        return "{" + location.getName() + ", " + invarCDD + '}';
     }
 
     public void delay() {

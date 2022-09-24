@@ -31,7 +31,7 @@ public class DBMTest {
     @BeforeClass
     public static void setUpBeforeClass() {
         Location l1 = new Location("L0", new TrueGuard(), false, false, false, false);
-        SymbolicLocation sl1 = new SimpleLocation(l1);
+        SymbolicLocation sl1 = SymbolicLocation.createSimple(l1);
 
         x = new Clock("x", "AUT");
         y = new Clock("y", "AUT");
@@ -120,7 +120,7 @@ public class DBMTest {
         Guard initialZone = new AndGuard(g2,g3);
 
         Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);
-        State state1 = new State(new SimpleLocation(l1),new CDD(initialZone));
+        State state1 = new State(SymbolicLocation.createSimple(l1),new CDD(initialZone));
         //state1.delay();
         Log.trace(state1);
         state1.extrapolateMaxBounds(map,clockList);

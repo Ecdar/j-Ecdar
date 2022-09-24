@@ -142,7 +142,7 @@ public class Quotient extends TransitionSystem {
     private Location fromSymbolicLocation(SymbolicLocation location) {
         return new Location(
                 location.getName(),
-                location.getInvariant().getGuard(),
+                location.getInvariantAsGuard(),
                 location.getIsInitial(),
                 location.getIsUrgent(),
                 location.getIsUniversal(),
@@ -214,8 +214,8 @@ public class Quotient extends TransitionSystem {
     }
 
     public List<Move> getNextMoves(SymbolicLocation location, Channel a) {
-        SymbolicLocation univ = new UniversalLocation();
-        SymbolicLocation inc = new InconsistentLocation();
+        SymbolicLocation univ = SymbolicLocation.createUniversalLocation("universal", 0, 0);
+        SymbolicLocation inc = SymbolicLocation.createInconsistentLocation("inconsistent", 0, 0);
 
         List<Move> resultMoves = new ArrayList<>();
         /*Log.debug("gettingNextMove of " + location.getName());
@@ -224,15 +224,18 @@ public class Quotient extends TransitionSystem {
         assert location.getIsUniversal() == (location instanceof UniversalLocation);
         assert location.getIsInconsistent() == (location instanceof InconsistentLocation);*/
 
-        if (location instanceof InconsistentLocation || location.getIsInconsistent()) {
+        // Rule 10
+        if (location.getIsInconsistent()) {
             if (getInputs().contains(a)) {
                 Log.debug("Rule 10");
                 Move newMove = new Move(location, inc, new ArrayList<>());
                 newMove.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
                 resultMoves.add(newMove);
             }
-            // Rule 9
-        } else if (location instanceof UniversalLocation || location.getIsUniversal()) {
+        }
+
+        // Rule 9
+        if (location.getIsUniversal()) {
             if (getActions().contains(a)) {
                 Log.debug("Rule 9");
                 Move newMove = new Move(location, univ, new ArrayList<>());
@@ -240,8 +243,8 @@ public class Quotient extends TransitionSystem {
             }
         }
 
-        if (location instanceof ComplexLocation) {
-            List<SymbolicLocation> locations = ((ComplexLocation) location).getLocations();
+        if (location.isProduct()) {
+            List<SymbolicLocation> locations = location.getProductOf();
 
             // symbolic locations corresponding to each TS
             SymbolicLocation lt = locations.get(0);
@@ -284,7 +287,7 @@ public class Quotient extends TransitionSystem {
                 }
                 guard_s = guard_s.negation().removeNegative().reduce();
 
-                CDD inv_neg_inv_loc_s = ls.getInvariant().negation().removeNegative().reduce();
+                CDD inv_neg_inv_loc_s = ls.getInvariantAsCdd().negation().removeNegative().reduce();
 
                 CDD combined = guard_s.disjunction(inv_neg_inv_loc_s);
 
@@ -293,7 +296,7 @@ public class Quotient extends TransitionSystem {
                 resultMoves.add(move);
             } else {
                 Log.debug("Rule 345 2");
-                CDD inv_neg_inv_loc_s = ls.getInvariant().negation().removeNegative().reduce();
+                CDD inv_neg_inv_loc_s = ls.getInvariantAsCdd().negation().removeNegative().reduce();
 
                 Move move = new Move(location, univ);
                 move.conjunctCDD(inv_neg_inv_loc_s);
@@ -324,8 +327,8 @@ public class Quotient extends TransitionSystem {
                 Log.debug("Rule 7");
                 Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
                 // invariant is negation of invariant of left conjuncted with invariant of right
-                CDD negatedInvar = lt.getInvariant().negation();
-                CDD combined = negatedInvar.conjunction(ls.getInvariant());
+                CDD negatedInvar = lt.getInvariantAsCdd().negation();
+                CDD combined = negatedInvar.conjunction(ls.getInvariantAsCdd());
 
                 newMoveRule7.setGuards(combined);
                 newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));

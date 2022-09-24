@@ -91,13 +91,12 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         }
 
         // Check that the location is ComplexLocation
-        if (!(location instanceof ComplexLocation)) {
+        if (!location.isProduct()) {
             throw new IllegalArgumentException(
                     "The location type must be ComplexLocation as aggregated transition systems requires multiple locations"
             );
         }
-        ComplexLocation complexLocation = (ComplexLocation) location;
-        List<SymbolicLocation> locations = complexLocation.getLocations();
+        List<SymbolicLocation> locations = location.getProductOf();
 
         /* Check that the complex locations size is the same as the systems
          * This is because the index of the system,
