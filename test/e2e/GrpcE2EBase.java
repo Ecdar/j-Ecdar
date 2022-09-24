@@ -12,6 +12,7 @@ import org.junit.Before;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,34 +20,50 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class GrpcE2EBase {
-    private final String componentsFolder;
+    private final String root;
 
     private Server server;
     private ManagedChannel channel;
     private EcdarProtoBuf.EcdarBackendGrpc.EcdarBackendBlockingStub stub;
 
     public GrpcE2EBase(String componentsFolder) {
-        this.componentsFolder = componentsFolder;
+        this.root = componentsFolder;
+    }
+
+    private boolean isXml() {
+        return root.endsWith(".xml");
+    }
+
+    private boolean isJson() {
+        return !isXml();
     }
 
     @Before
     public void beforeEachTest()
             throws NullPointerException, IOException {
-        // Finds all the json components in the university component folder
-        File componentsFolder = new File(this.componentsFolder);
-        File[] componentFiles = componentsFolder.listFiles();
 
-        assertNotNull(componentFiles);
-        assertEquals(componentFiles.length, 9);
-
-        // Find all the components stored as json and create a component for it
         List<ComponentProtos.Component> components = new ArrayList<>();
-        for (File componentFile : componentFiles) {
-            String contents = Files.readString(componentFile.toPath());
 
+        if (isJson()) {
+            // Finds all the json components in the university component folder
+            File componentsFolder = new File(this.root);
+            File[] componentFiles = componentsFolder.listFiles();
+
+            // Find all the components stored as json and create a component for it
+            for (File componentFile : componentFiles) {
+                String contents = Files.readString(componentFile.toPath());
+
+                ComponentProtos.Component component = ComponentProtos.Component
+                        .newBuilder()
+                        .setJson(contents)
+                        .build();
+                components.add(component);
+            }
+        } else if (isXml()) {
+            String contents = Files.readString(Path.of(root));
             ComponentProtos.Component component = ComponentProtos.Component
                     .newBuilder()
-                    .setJson(contents)
+                    .setXml(contents)
                     .build();
             components.add(component);
         }

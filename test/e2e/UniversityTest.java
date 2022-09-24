@@ -3,6 +3,7 @@ package e2e;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UniversityTest extends GrpcE2EBase {
@@ -11,57 +12,174 @@ public class UniversityTest extends GrpcE2EBase {
     }
 
     @Test
-    public void compositionOfAdminMachResIsConsistent() {
-        assertTrue(consistency("consistency: (Administration || Machine || Researcher)"));
+    public void compositionOfTheConjoinedHalfAdministrationsResearcherMachineDoesNotRefineSpecification() {
+        assertFalse(refinement("refinement: (HalfAdm1 && HalfAdm2) || Researcher || Machine <= Spec"));
     }
 
     @Test
-    public void researcherRefinesSelf() {
-        assertTrue(refinement("refinement: Researcher <= Researcher"));
+    public void CompositionOfAdministrationResearcherMachineRefinesSelf() {
+        assertTrue(refinement("refinement: Administration || Researcher || Machine <=  Administration || Researcher || Machine"));
     }
 
     @Test
-    public void specificationRefinesSelf() {
-        assertTrue(refinement("refinement: Spec <= Spec"));
+    public void conjunctionOfHalfAdministration1And2RefinesAdministration2() {
+        assertTrue(refinement("refinement: HalfAdm1 && HalfAdm2 <= Adm2"));
     }
 
     @Test
-    public void administrationRefinesSelf() {
-        assertTrue(refinement("refinement: Administration <= Administration"));
+    public void administration2RefinesConjunctionOfHalfAdministration1And2() {
+        assertTrue(refinement("refinement: Adm2 <= HalfAdm1 && HalfAdm2"));
     }
 
     @Test
-    public void machineRefinesSelf() {
-        assertTrue(refinement("refinement: Machine <= Machine"));
-    }
-
-    @Test
-    public void machine2RefinesSelf() {
-        assertTrue(refinement("refinement: Machine2 <= Machine2"));
-    }
-
-    @Test
-    public void machine3RefinesSelf() {
-        assertTrue(refinement("refinement: Machine3 <= Machine3"));
-    }
-
-    @Test
-    public void Adm2RefinesSelf() {
+    public void administration2RefinesSelf() {
         assertTrue(refinement("refinement: Adm2 <= Adm2"));
     }
 
     @Test
-    public void halfAdm1RefinesSelf() {
+    public void HalfAdm1RefinesSelf() {
         assertTrue(refinement("refinement: HalfAdm1 <= HalfAdm1"));
     }
 
     @Test
-    public void halfAdm2RefinesSelf() {
+    public void HalfAdm2RefinesSelf() {
         assertTrue(refinement("refinement: HalfAdm2 <= HalfAdm2"));
     }
 
     @Test
-    public void compositionOfAdminMachineResearcherRefinesSpec() {
+    public void AdministrationRefinesSelf() {
+        assertTrue(refinement("refinement: Administration <= Administration"));
+    }
+
+    @Test
+    public void MachineRefinesSelf() {
+        assertTrue(refinement("refinement: Machine <= Machine"));
+    }
+
+    @Test
+    public void ResearcherRefinesSelf() {
+        assertTrue(refinement("refinement: Researcher <= Researcher"));
+    }
+
+    @Test
+    public void SpecificationRefinesSelf() {
+        assertTrue(refinement("refinement: Spec <= Spec"));
+    }
+
+    @Test
+    public void Machine3RefinesSelf() {
+        assertTrue(refinement("refinement: Machine3 <= Machine3"));
+    }
+
+    @Test
+    public void administrationDoesNotRefineMachine() {
+        assertFalse(refinement("refinement: Administration <= Machine"));
+    }
+
+    @Test
+    public void administrationDoesNotRefineResearcher() {
+        assertFalse(refinement("refinement: Administration <= Researcher"));
+    }
+
+    @Test
+    public void administrationDoesNotRefineSpecification() {
+        assertFalse(refinement("refinement: Administration <= Spec"));
+    }
+
+    @Test
+    public void administrationDoesNotRefineMachine3() {
+        assertFalse(refinement("refinement: Administration <= Machine3"));
+    }
+
+    @Test
+    public void machineDoesNotRefinesAdministration() {
+        assertFalse(refinement("refinement: Machine <= Administration"));
+    }
+
+    @Test
+    public void machineDoesNotRefinesResearcher() {
+        assertFalse(refinement("refinement: Machine <= Researcher"));
+    }
+
+    @Test
+    public void machineDoesNotRefinesSpecification() {
+        assertFalse(refinement("refinement: Machine <= Spec"));
+    }
+
+    @Test
+    public void machineDoesNotRefinesMachine3() {
+        assertFalse(refinement("refinement: Machine <= Machine3"));
+    }
+
+    @Test
+    public void researcherDoesNotRefineAdministration() {
+        assertFalse(refinement("refinement: Researcher <= Administration"));
+    }
+
+    @Test
+    public void researcherDoesNotRefineMachine() {
+        assertFalse(refinement("refinement: Researcher <= Machine"));
+    }
+
+    @Test
+    public void researcherDoesNotRefineSpecification() {
+        assertFalse(refinement("refinement: Researcher <= Spec"));
+    }
+
+    @Test
+    public void researcherDoesNotRefineMachine3() {
+        assertFalse(refinement("refinement: Researcher <= Machine3"));
+    }
+
+    @Test
+    public void specificationDoesNotRefineAdministration() {
+        assertFalse(refinement("refinement: Spec <= Administration"));
+    }
+
+    @Test
+    public void specificationDoesNotRefineMachine() {
+        assertFalse(refinement("refinement: Spec <= Machine"));
+    }
+
+    @Test
+    public void specificationDoesNotRefineResearcher() {
+        assertFalse(refinement("refinement: Spec <= Researcher"));
+    }
+
+    @Test
+    public void specificationDoesNotRefineMachine3() {
+        assertFalse(refinement("refinement: Spec <= Machine3"));
+    }
+
+    @Test
+    public void machine3DoesNotRefineAdministration() {
+        assertFalse(refinement("refinement: Machine3 <= Administration"));
+    }
+
+    @Test
+    public void machine3DoesNotRefineResearcher() {
+        assertFalse(refinement("refinement: Machine3 <= Researcher"));
+
+    }
+
+    @Test
+    public void machine3DoesNotRefineSpecification() {
+        assertFalse(refinement("refinement: Machine3 <= Spec"));
+
+    }
+
+    @Test
+    public void machine3DoesNotRefineMachine() {
+        assertTrue(refinement("refinement: Machine3 <= Machine"));
+    }
+
+    @Test
+    public void compositionOfAdministrationMachineResearcherIsConsistent() {
+        assertTrue(consistency("consistency: (Administration || Machine || Researcher)"));
+    }
+
+    @Test
+    public void compositionOfAdministrationMachineResearcherRefinesSpecification() {
         assertTrue(refinement("refinement: (Administration || Machine || Researcher) <= Spec"));
     }
 
