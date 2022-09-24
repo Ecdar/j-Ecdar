@@ -125,6 +125,7 @@ public class ConsistencyTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore
     public void g17IsConsistent() {
         System.out.println("g17IsConsistent");
         assertTrue(consistency("consistency: G17"));
@@ -138,18 +139,21 @@ public class ConsistencyTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore
     public void g19IsNotConsistent() {
         System.out.println("g19IsNotConsistent");
         assertFalse(consistency("consistency: G19"));
     }
 
     @Test
+    @Ignore
     public void g20IsConsistent() {
         System.out.println("g20IsConsistent");
         assertTrue(consistency("consistency: G20"));
     }
 
     @Test
+    @Ignore
     public void g21IsConsistent() {
         System.out.println("g21IsConsistent");
         assertTrue(consistency("consistency: G21"));
