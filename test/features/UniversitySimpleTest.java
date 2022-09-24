@@ -100,7 +100,7 @@ public class UniversitySimpleTest {
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
         TransitionSystem comp = new SimpleTransitionSystem(new Composition(machine,researcher).getAutomaton());
-        Refinement ref = new Refinement(comp, new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(comp, q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -109,7 +109,7 @@ public class UniversitySimpleTest {
     @Test
     public void newQuotientTest4B() {
         Quotient q = new Quotient(spec,researcher);
-        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -119,7 +119,7 @@ public class UniversitySimpleTest {
     @Test
     public void newQuotientTest4C() {
         Quotient q = new Quotient(spec,machine);
-        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -127,7 +127,7 @@ public class UniversitySimpleTest {
     @Test
     public void newQuotientTest4D() {
         Quotient q = new Quotient(spec,machine);
-        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -159,7 +159,7 @@ public class UniversitySimpleTest {
         SimpleTransitionSystem adm = new SimpleTransitionSystem(autAdm);
         SimpleTransitionSystem spec = new SimpleTransitionSystem(autSpec);
 
-        Refinement ref = new Refinement(researcher, new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton())  );
+        Refinement ref = new Refinement(researcher, new Quotient(spec,adm)  );
         boolean result = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(result);
@@ -182,7 +182,7 @@ public class UniversitySimpleTest {
         XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});
 
 
-        SimpleTransitionSystem st =  new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton());
+        Quotient st =  new Quotient(spec,adm);
 
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), st);
         boolean res = ref.check();
