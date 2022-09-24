@@ -6,38 +6,91 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Location {
-    private final String name;
+    protected String name;
+    protected int x, y;
 
-    private int x, y;
-    private Guard invariant;
-    private CDD inconsistentPart;
+    protected Guard invariantGuard;
+    protected CDD invariantCdd = null;
 
-    // Must be final as Automaton expects it to be constant through the lifetime
-    private final boolean isInitial;
-    private boolean isUrgent;
-    private boolean isUniversal;
-    private boolean isInconsistent;
+    protected CDD inconsistentPart;
 
-    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
+    protected boolean isInitial;
+    protected boolean isUrgent;
+    protected boolean isUniversal;
+    protected boolean isInconsistent;
+
+    protected List<SymbolicLocation> productOf = new ArrayList<>();
+    protected Location location;
+
+    public Location() {}
+
+    public Location(
+            String name,
+            Guard invariant,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent,
+            int x,
+            int y,
+            List<SymbolicLocation> productOf
+    ) {
         this.name = name;
-        this.invariant = invariant;
+        this.invariantGuard = invariant;
         this.isInitial = isInitial;
         this.isUrgent = isUrgent;
         this.isUniversal = isUniversal;
-        this.isInconsistent = isInconsistent || this.getName().equals("inc");
+        this.isInconsistent = isInconsistent;
         this.inconsistentPart = null;
         this.x = x;
         this.y = y;
+        this.productOf = productOf;
     }
 
-    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
+    public Location(
+            String name,
+            Guard invariant,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent,
+            int x,
+            int y
+    ) {
+        this(
+                name,
+                invariant,
+                isInitial,
+                isUrgent,
+                isUniversal,
+                isInconsistent,
+                x,
+                y,
+                new ArrayList<>()
+        );
+    }
+
+    public Location(
+            String name,
+            Guard invariant,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent
+    ) {
         this(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0);
     }
 
-    public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+    public Location(
+            Location copy,
+            List<Clock> newClocks,
+            List<Clock> oldClocks,
+            List<BoolVar> newBVs,
+            List<BoolVar> oldBVs
+    ) {
         this(
             copy.name,
-            copy.invariant.copy(
+            copy.invariantGuard.copy(
                 newClocks, oldClocks, newBVs, oldBVs
             ),
             copy.isInitial,
@@ -45,21 +98,19 @@ public class Location {
             copy.isUniversal,
             copy.isInconsistent,
             copy.x,
-            copy.y
+            copy.y,
+            copy.productOf
         );
     }
 
-    public Location(Collection<Location> locations) {
+    public Location(List<Location> locations) {
         if (locations.size() == 0) {
             throw new IllegalArgumentException("At least a single location is required");
         }
 
-        this.name = String.join(
-                "",
-                locations.stream()
-                        .map(Location::getName)
-                        .collect(Collectors.toList())
-        );
+        this.name = locations.stream()
+                .map(Location::getName)
+                .collect(Collectors.joining(""));
 
         this.isInitial = locations.stream().allMatch(location -> location.isInitial);
         this.isUrgent = locations.stream().anyMatch(location -> location.isUrgent);
@@ -68,33 +119,60 @@ public class Location {
 
         CDD invariant = CDD.cddTrue();
         for (Location location : locations) {
-            invariant = location.getInvariantCDD().conjunction(invariant);
+            invariant = location.getInvariantCdd().conjunction(invariant);
             this.x += location.x;
             this.y = location.y;
         }
 
-        this.invariant = invariant.getGuard();
+        this.invariantGuard = invariant.getGuard();
 
         // We use the average location coordinates
         this.x /= locations.size();
         this.y /= locations.size();
+
+        this.productOf = new ArrayList<>();
     }
 
     public Location(State state, List<Clock> clocks) {
         this(
                 state.getLocation().getName(),
                 state.getInvariants(clocks),
-                state.getLocation().getIsInitial(),
-                state.getLocation().getIsUrgent(),
-                state.getLocation().getIsUniversal(),
-                state.getLocation().getIsInconsistent(),
+                state.getLocation().isInitial(),
+                state.getLocation().isUrgent(),
+                state.getLocation().isUniversal(),
+                state.getLocation().isInconsistent(),
                 state.getLocation().getX(),
                 state.getLocation().getX()
         );
     }
 
+    public boolean isSimple() {
+        return location != null;
+    }
+
+    public Location getSimpleLocation() {
+        return location;
+    }
+
+    public boolean isProduct() {
+        return productOf.size() > 0;
+    }
+
+    public List<SymbolicLocation> getProductOf() {
+        return productOf;
+    }
+
+    public void removeInvariants() {
+        invariantGuard = new TrueGuard();
+        invariantCdd = CDD.cddTrue();
+    }
+
     public String getName() {
         return name;
+    }
+
+    public boolean isInitial() {
+        return isInitial;
     }
 
     public boolean isUrgent() {
@@ -105,20 +183,16 @@ public class Location {
         return isInconsistent;
     }
 
-    public CDD getInvariantCDD() {
-        return new CDD(invariant);
-    }
-
-    public void setInvariant(Guard invariant) {
-        this.invariant = invariant;
-    }
-
-    public int getX() {
-        return x;
+    public boolean isUniversal() {
+        return isUniversal;
     }
 
     public void setX(int x) {
         this.x = x;
+    }
+
+    public int getX() {
+        return x;
     }
 
     public int getY() {
@@ -129,12 +203,29 @@ public class Location {
         this.y = y;
     }
 
-    public void setUrgent(boolean urgent) {
-        isUrgent = urgent;
+    public Guard getInvariantGuard() {
+        if (isSimple()) {
+            return location.getInvariantGuard();
+        }
+
+        if (invariantGuard == null) {
+            invariantGuard = getInvariantCdd().getGuard();
+        }
+
+        return invariantGuard;
     }
 
-    public boolean isUniversal() {
-        return isUniversal;
+    public CDD getInvariantCdd() {
+        return new CDD(getInvariantGuard());
+    }
+
+    public void setInvariantGuard(Guard invariantAsGuard) {
+        this.invariantGuard = invariantAsGuard;
+        this.invariantCdd = new CDD(invariantAsGuard);
+    }
+
+    public void setUrgent(boolean urgent) {
+        isUrgent = urgent;
     }
 
     public void setUniversal(boolean universal) {
@@ -153,36 +244,8 @@ public class Location {
         this.inconsistentPart = inconsistentPart;
     }
 
-    public Guard getInvariant() {
-        return invariant;
-    }
-
-    public boolean isInitial() {
-        return isInitial;
-    }
-
     public int getMaxConstant(Clock clock) {
-        return invariant.getMaxConstant(clock);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof Location)) {
-            return false;
-        }
-
-        Location location = (Location) obj;
-
-        return isInitial == location.isInitial &&
-                isUrgent == location.isUrgent &&
-                isUniversal == location.isUniversal &&
-                isInconsistent == location.isInconsistent &&
-                name.equals(location.name) &&
-                invariant.equals(location.invariant);
+        return getInvariantGuard().getMaxConstant(clock);
     }
 
     @Override
@@ -191,9 +254,44 @@ public class Location {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location that = (Location) o;
+
+        if (isSimple() && that.isSimple()) {
+            return getSimpleLocation().equals(that.getSimpleLocation());
+        }
+
+        if (isProduct() && that.isProduct()) {
+            if (productOf.size() != that.productOf.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < productOf.size(); i++) {
+                if (!productOf.get(i).equals(that.productOf.get(i))) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return isInitial() == that.isInitial() &&
+                isUrgent() == that.isUrgent() &&
+                isUniversal() == that.isUniversal() &&
+                isInconsistent() == that.isInconsistent() &&
+                getX() == that.getX() &&
+                getY() == that.getY() &&
+                getName().equals(that.getName());
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(
-            name, isInitial, isUrgent, isUniversal, isInconsistent, invariant, inconsistentPart
-        );
+        if (isProduct()) {
+            return Objects.hash(productOf);
+        }
+
+        return Objects.hash(name, getInvariantGuard(), isInitial, isUrgent, isUniversal, isInconsistent, x, y);
     }
 }

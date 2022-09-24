@@ -99,7 +99,7 @@ public class UniversitySimpleTest {
     // @Ignore
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
-        TransitionSystem comp = new SimpleTransitionSystem(new Composition(machine,researcher).getAutomaton());
+        TransitionSystem comp = new Composition(machine,researcher);
         Refinement ref = new Refinement(comp, q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());

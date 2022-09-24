@@ -362,18 +362,6 @@ public class UniversityTest {
     }
 
     @Test
-    public void newQuotientTest2Automaton() {
-        Composition composition = new Composition(getMachine(), getResearcher());
-        Quotient quotient = new Quotient(getSpec(), getAdm2());
-        TransitionSystem quotientTransitionSystem = new SimpleTransitionSystem(new Automaton(quotient.getAutomaton()));
-        Refinement refinement = new Refinement(composition, quotientTransitionSystem);
-
-        boolean refines = refinement.check();
-
-        assertFalse(refines);
-    }
-
-    @Test
     public void newQuotientTest4A() {
         // refinement: machine || researcher <= spec \ adm
         Composition lhs = new Composition(getMachine(), getResearcher());
@@ -389,18 +377,6 @@ public class UniversityTest {
 
     @Test
     public void newQuotientTest4B() {
-        // refinement: machine || adm <= spec \ researcher
-        Composition lhs = new Composition(getMachine(), getAdm());
-        Quotient rhs = new Quotient(getSpec(), getResearcher());
-        Refinement refinement = new Refinement(lhs, rhs);
-
-        boolean refines = refinement.check();
-
-        assertTrue(refines);
-    }
-
-    @Test
-    public void newQuotientTest4BAutomaton() {
         // refinement: machine || adm <= spec \ researcher
         Composition lhs = new Composition(getMachine(), getAdm());
         Quotient rhs = new Quotient(getSpec(), getResearcher());

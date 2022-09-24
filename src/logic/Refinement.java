@@ -340,7 +340,7 @@ public class Refinement {
                 if (pair != null) {
                     pairFound = true;
 
-                    if (!pair.getRight().getLocation().getIsUniversal())
+                    if (!pair.getRight().getLocation().isUniversal())
                     {
                         if (!waitingContainsStatePair(pair) && !passedContainsStatePair(pair)) {
                             if (pair.getRight().getLocation().getName().contains("inc"))
@@ -493,8 +493,8 @@ public class Refinement {
     }
 
     public StatePair getInitialStatePair() {
-        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariantAsCdd());
-        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariantAsCdd());
+        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariantCdd());
+        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariantCdd());
         return new StatePair(left, right);
     }
 

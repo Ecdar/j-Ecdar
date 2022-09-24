@@ -1,36 +1,38 @@
 package models;
 
+import logic.State;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public final class SymbolicLocation {
-    private String name;
-    private Guard invariant;
-    private CDD invariantCdd;
-    private boolean isInitial;
-    private boolean isUrgent;
-    private boolean isUniversal;
-    private boolean isInconsistent;
-    private int x;
-    private int y;
-    private List<SymbolicLocation> productOf = new ArrayList<>();
-    private Location location;
+public class SymbolicLocation extends Location {
 
     public SymbolicLocation() { }
 
     public SymbolicLocation(
             String name,
-            Guard invariant,
+            Guard invariantGuard,
             boolean isInitial,
             boolean isUrgent,
             boolean isUniversal,
             boolean isInconsistent,
             int x,
-            int y
+            int y,
+            List<SymbolicLocation> productOf
     ) {
+        super(
+                name,
+                invariantGuard,
+                isInitial,
+                isUrgent,
+                isUniversal,
+                isInconsistent,
+                x,
+                y,
+                productOf
+        );
         this.name = name;
-        this.invariant = invariant;
+        this.invariantGuard = invariantGuard;
         this.isInitial = isInitial;
         this.isUrgent = isUrgent;
         this.isUniversal = isUniversal;
@@ -41,34 +43,59 @@ public final class SymbolicLocation {
 
     public SymbolicLocation(
             String name,
-            CDD invariant,
+            Guard invariantGuard,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent
+    ) {
+        this(name, invariantGuard, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0, new ArrayList<>());
+    }
+
+    public SymbolicLocation(
+            String name,
+            CDD invariantGuard,
             boolean isInitial,
             boolean isUrgent,
             boolean isUniversal,
             boolean isInconsistent,
             int x,
-            int y
+            int y,
+            List<SymbolicLocation> productOf
     ) {
         this.name = name;
-        this.invariantCdd = invariant;
+        this.invariantCdd = invariantGuard;
         this.isInitial = isInitial;
         this.isUrgent = isUrgent;
         this.isUniversal = isUniversal;
         this.isInconsistent = isInconsistent;
         this.x = x;
         this.y = y;
+        this.productOf = productOf;
+    }
+
+    public SymbolicLocation(
+            String name,
+            CDD invariantGuard,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent
+    ) {
+        this(name, invariantGuard, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0, new ArrayList<>());
     }
 
     public SymbolicLocation(Location location) {
         this(
                 location.getName(),
-                location.getInvariant(),
+                location.getInvariantGuard(),
                 location.isInitial(),
                 location.isUrgent(),
                 location.isUniversal(),
                 location.isInconsistent(),
                 location.getX(),
-                location.getY()
+                location.getY(),
+                new ArrayList<>()
         );
         this.location = location;
     }
@@ -76,29 +103,46 @@ public final class SymbolicLocation {
     public SymbolicLocation(List<SymbolicLocation> productOf) {
         this.productOf = productOf;
 
+    }
+
+    public static SymbolicLocation createProduct(List<SymbolicLocation> productOf) {
         StringBuilder nameBuilder = new StringBuilder();
-        this.isInitial = true;
-        this.isUniversal = true;
-        this.isUrgent = false;
-        this.isInconsistent = false;
-        this.x = 0;
-        this.y = 0;
+        boolean isInitial = true;
+        boolean isUniversal = true;
+        boolean isUrgent = false;
+        boolean isInconsistent = false;
+        int x = 0;
+        int y = 0;
+
         for (SymbolicLocation location : productOf) {
             nameBuilder.append(location.getName());
-            this.isInitial = isInitial && location.getIsInitial();
-            this.isUniversal = isUniversal && location.getIsUniversal();
-            this.isUrgent = isUrgent || location.getIsUrgent();
-            this.isInconsistent = isInconsistent || location.getIsInconsistent();
-            this.x += location.getX();
-            this.y += location.getY();
+            isInitial = isInitial && location.isInitial();
+            isUniversal = isUniversal && location.isUniversal();
+            isUrgent = isUrgent || location.isUrgent();
+            isInconsistent = isInconsistent || location.isInconsistent();
+            x += location.getX();
+            y += location.getY();
         }
 
         int amount = productOf.size();
-        this.x /= amount;
-        this.y /= amount;
-        this.name = nameBuilder.toString();
-    }
+        x /= amount;
+        y /= amount;
+        String name = nameBuilder.toString();
 
+        Guard invariant = null;
+
+        return new SymbolicLocation(
+                name,
+                invariant,
+                isInitial,
+                isUrgent,
+                isUniversal,
+                isInconsistent,
+                x,
+                y,
+                productOf
+        );
+    }
 
     public static SymbolicLocation createUniversalLocation(
             String name,
@@ -115,7 +159,44 @@ public final class SymbolicLocation {
                 true,
                 false,
                 x,
-                y
+                y,
+                new ArrayList<>()
+        );
+    }
+
+    public SymbolicLocation(
+            SymbolicLocation copy,
+            List<Clock> newClocks,
+            List<Clock> oldClocks,
+            List<BoolVar> newBVs,
+            List<BoolVar> oldBVs
+    ) {
+        this(
+                copy.getName(),
+                copy.getInvariantGuard().copy(
+                        newClocks, oldClocks, newBVs, oldBVs
+                ),
+                copy.isInitial(),
+                copy.isUrgent(),
+                copy.isUniversal(),
+                copy.isInconsistent(),
+                copy.getX(),
+                copy.getY(),
+                new ArrayList<>()
+        );
+    }
+
+    public SymbolicLocation(State state, List<Clock> clocks) {
+        this(
+                state.getLocation().getName(),
+                state.getInvariants(clocks),
+                state.getLocation().isInitial(),
+                state.getLocation().isUrgent(),
+                state.getLocation().isUniversal(),
+                state.getLocation().isInconsistent(),
+                state.getLocation().getX(),
+                state.getLocation().getX(),
+                new ArrayList<>()
         );
     }
 
@@ -139,7 +220,8 @@ public final class SymbolicLocation {
                 false,
                 true,
                 x,
-                y
+                y,
+                new ArrayList<>()
         );
     }
 
@@ -147,37 +229,13 @@ public final class SymbolicLocation {
         return SymbolicLocation.createInconsistentLocation(name, false, false, x, y);
     }
 
-    public static SymbolicLocation createProduct(List<SymbolicLocation> locations) {
-        return new SymbolicLocation(locations);
-    }
-
     public static SymbolicLocation createSimple(Location location) {
         return new SymbolicLocation(location);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Guard getInvariantAsGuard() {
+    public CDD getInvariantCdd() {
         if (isSimple()) {
-            return location.getInvariant();
-        }
-
-        if (invariant == null) {
-            if (isInconsistent || isUniversal) {
-                invariant = getInvariantAsCdd().getGuard();
-            } else {
-                invariant = invariantCdd.getGuard();
-            }
-        }
-
-        return invariant;
-    }
-
-    public CDD getInvariantAsCdd() {
-        if (isSimple()) {
-            return location.getInvariantCDD();
+            return location.getInvariantCdd();
         }
 
         if (invariantCdd == null) {
@@ -188,101 +246,13 @@ public final class SymbolicLocation {
             } else if (isProduct()) {
                 this.invariantCdd = CDD.cddTrue();
                 for (SymbolicLocation location : productOf) {
-                    this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantAsCdd());
+                    this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCdd());
                 }
             } else {
-                invariantCdd = new CDD(invariant);
+                invariantCdd = new CDD(getInvariantGuard());
             }
         }
 
         return invariantCdd;
-    }
-
-    public void removeInvariants() {
-        invariant = new TrueGuard();
-        invariantCdd = CDD.cddTrue();
-    }
-
-    public List<SymbolicLocation> getProductOf() {
-        return productOf;
-    }
-
-    public boolean isProduct() {
-        return productOf.size() > 0;
-    }
-
-    public boolean isSimple() {
-        return location != null;
-    }
-
-    public Location getSimpleLocation() {
-        return location;
-    }
-
-    public boolean getIsInitial() {
-        return isInitial;
-    }
-
-    public boolean getIsUrgent() {
-        return isUrgent;
-    }
-
-    public boolean getIsUniversal() {
-        return isUniversal;
-    }
-
-    public boolean getIsInconsistent() {
-        return isInconsistent;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SymbolicLocation that = (SymbolicLocation) o;
-
-        if (isSimple() && that.isSimple()) {
-            return getSimpleLocation().equals(that.getSimpleLocation());
-        }
-
-        if (isProduct() && that.isProduct()) {
-            if (productOf.size() != that.productOf.size()) {
-                return false;
-            }
-
-            for (int i = 0; i < productOf.size(); i++) {
-                if (!productOf.get(i).equals(that.productOf.get(i))) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return getIsInitial() == that.getIsInitial() &&
-                getIsUrgent() == that.getIsUrgent() &&
-                getIsUniversal() == that.getIsUniversal() &&
-                getIsInconsistent() == that.getIsInconsistent() &&
-                getX() == that.getX() &&
-                getY() == that.getY() &&
-                getName().equals(that.getName()) &&
-                getInvariantAsCdd().equals(that.getInvariantAsCdd());
-    }
-
-    @Override
-    public int hashCode() {
-        if (isProduct()) {
-            return Objects.hash(productOf);
-        }
-
-        return Objects.hash(name, invariant, invariantCdd, isInitial, isUrgent, isUniversal, isInconsistent, x, y);
     }
 }
