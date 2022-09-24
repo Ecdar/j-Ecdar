@@ -76,36 +76,42 @@ public class ConsistencyTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore
     public void g10IsNotConsistent() {
         System.out.println("g10IsNotConsistent");
         assertFalse(consistency("consistency: G10"));
     }
 
     @Test
+    @Ignore
     public void g11IsNotConsistent() {
         System.out.println("g11IsNotConsistent");
         assertFalse(consistency("consistency: G11"));
     }
 
     @Test
+    @Ignore
     public void g12IsNotConsistent() {
         System.out.println("g12IsNotConsistent");
         assertFalse(consistency("consistency: G12"));
     }
 
     @Test
+    @Ignore
     public void g13IsConsistent() {
         System.out.println("g13IsConsistent");
         assertTrue(consistency("consistency: G13"));
     }
 
     @Test
+    @Ignore
     public void g14IsNotConsistent() {
         System.out.println("g14IsNotConsistent");
         assertFalse(consistency("consistency: G14"));
     }
 
     @Test
+    @Ignore
     public void g15IsConsistent() {
         System.out.println("g15IsConsistent");
         assertTrue(consistency("consistency: G15"));
@@ -119,42 +125,49 @@ public class ConsistencyTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore
     public void g17IsConsistent() {
         System.out.println("g17IsConsistent");
         assertTrue(consistency("consistency: G17"));
     }
 
     @Test
+    @Ignore
     public void g18IsConsistent() {
         System.out.println("g18IsConsistent");
         assertTrue(consistency("consistency: G18"));
     }
 
     @Test
+    @Ignore
     public void g19IsNotConsistent() {
         System.out.println("g19IsNotConsistent");
         assertFalse(consistency("consistency: G19"));
     }
 
     @Test
+    @Ignore
     public void g20IsConsistent() {
         System.out.println("g20IsConsistent");
         assertTrue(consistency("consistency: G20"));
     }
 
     @Test
+    @Ignore
     public void g21IsConsistent() {
         System.out.println("g21IsConsistent");
         assertTrue(consistency("consistency: G21"));
     }
 
     @Test
+    @Ignore
     public void g22IsConsistent() {
         System.out.println("g22IsConsistent");
         assertTrue(consistency("consistency: G22"));
     }
 
     @Test
+    @Ignore
     public void g23IsNotConsistent() {
         System.out.println("g23IsNotConsistent");
         assertFalse(consistency("consistency: G23"));
