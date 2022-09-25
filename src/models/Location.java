@@ -1,5 +1,6 @@
 package models;
 
+import log.Log;
 import logic.State;
 
 import java.util.*;
@@ -36,6 +37,7 @@ public class Location {
             List<SymbolicLocation> productOf
     ) {
         this.name = name;
+        this.invariantCdd = null;
         this.invariantGuard = invariant;
         this.isInitial = isInitial;
         this.isUrgent = isUrgent;
@@ -124,8 +126,8 @@ public class Location {
             this.y = location.y;
         }
 
+        this.invariantCdd = invariant;
         this.invariantGuard = invariant.getGuard();
-
         // We use the average location coordinates
         this.x /= locations.size();
         this.y /= locations.size();
@@ -216,12 +218,16 @@ public class Location {
     }
 
     public CDD getInvariantCdd() {
+        if (isSimple()) {
+            return location.getInvariantCdd();
+        }
+
         return new CDD(getInvariantGuard());
     }
 
     public void setInvariantGuard(Guard invariantAsGuard) {
         this.invariantGuard = invariantAsGuard;
-        this.invariantCdd = new CDD(invariantAsGuard);
+        this.invariantCdd = null;
     }
 
     public void setUrgent(boolean urgent) {

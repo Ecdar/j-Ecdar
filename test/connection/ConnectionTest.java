@@ -1,5 +1,7 @@
 package connection;
 
+import log.Log;
+import log.Urgency;
 import logic.Controller;
 import logic.query.Query;
 import org.junit.After;
@@ -18,17 +20,6 @@ import static org.junit.Assert.*;
 
 public class ConnectionTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
-
-    @Before
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @After
-    public void restoreStreams() {
-        System.setOut(originalOut);
-    }
 
     public ArrayList<String> getResult(){
         try {

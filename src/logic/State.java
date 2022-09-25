@@ -97,7 +97,7 @@ public class State {
         else
             while (!bcddLeftToAnalyse.isTerminal())
             {
-                CddExtractionResult extractResult = bcddLeftToAnalyse.reduce().removeNegative().extract();
+                CddExtractionResult extractResult = bcddLeftToAnalyse.removeNegative().reduce().extract();
                 bcddLeftToAnalyse = extractResult.getCddPart().removeNegative().reduce();
 
                 Zone z = new Zone(extractResult.getDbm());

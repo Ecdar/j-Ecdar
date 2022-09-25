@@ -6,6 +6,8 @@ import EcdarProtoBuf.QueryProtos;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
+import log.Log;
+import log.Urgency;
 import models.Automaton;
 import org.json.simple.parser.ParseException;
 import org.junit.*;
