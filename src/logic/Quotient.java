@@ -47,7 +47,7 @@ public class Quotient extends TransitionSystem {
         return calculateQuotientAutomaton().getAutomaton();
     }
 
-    public SymbolicLocation getInitialLocation() {
+    public Location getInitialLocation() {
         // the invariant of locations consisting of locations from each transition system should be true
         // which means the location has no invariants
         return getInitialLocation(new TransitionSystem[]{t, s});
@@ -139,7 +139,7 @@ public class Quotient extends TransitionSystem {
         return new SimpleTransitionSystem(resAut);
     }
 
-    private Location fromSymbolicLocation(SymbolicLocation location) {
+    private Location fromSymbolicLocation(Location location) {
         return new Location(
                 location.getName(),
                 location.getInvariantGuard(),
@@ -208,14 +208,14 @@ public class Quotient extends TransitionSystem {
 
     public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
         // get possible transitions from current state, for a given channel
-        SymbolicLocation location = currentState.getLocation();
+        Location location = currentState.getLocation();
         List<Move> moves = getNextMoves(location, channel);
         return createNewTransitions(currentState, moves, allClocks);
     }
 
-    public List<Move> getNextMoves(SymbolicLocation location, Channel a) {
-        SymbolicLocation univ = SymbolicLocation.createUniversalLocation("universal", 0, 0);
-        SymbolicLocation inc = SymbolicLocation.createInconsistentLocation("inconsistent", 0, 0);
+    public List<Move> getNextMoves(Location location, Channel a) {
+        Location univ = Location.createUniversalLocation("universal", 0, 0);
+        Location inc = Location.createInconsistentLocation("inconsistent", 0, 0);
 
         List<Move> resultMoves = new ArrayList<>();
         /*Log.debug("gettingNextMove of " + location.getName());
@@ -244,11 +244,11 @@ public class Quotient extends TransitionSystem {
         }
 
         if (location.isProduct()) {
-            List<SymbolicLocation> locations = location.getProductOf();
+            List<Location> locations = location.getProductOf();
 
             // symbolic locations corresponding to each TS
-            SymbolicLocation lt = locations.get(0);
-            SymbolicLocation ls = locations.get(1);
+            Location lt = locations.get(0);
+            Location ls = locations.get(1);
 
             List<Move> t_moves = t.getNextMoves(lt, a);
             List<Move> s_moves = s.getNextMoves(ls, a);

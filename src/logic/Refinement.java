@@ -431,8 +431,8 @@ public class Refinement {
                     Log.debug("create pairs failed");
                     if (RET_REF)
                     {
-                        SymbolicLocation ll = SymbolicLocation.createInconsistentLocation("inconsistent", 0, 0);
-                        SymbolicLocation rl = SymbolicLocation.createInconsistentLocation("inconsistent", 0, 0);
+                        Location ll = Location.createInconsistentLocation("inconsistent", 0, 0);
+                        Location rl = Location.createInconsistentLocation("inconsistent", 0, 0);
                         StatePair refViolationStates = new StatePair(new State(ll,CDD.cddTrue()), new State(rl, CDD.cddTrue()));
                         currNode.constructSuccessor(refViolationStates, leaderEdges, followerEdges);
                     }

@@ -44,7 +44,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     @Override
-    public SymbolicLocation getInitialLocation() {
+    public Location getInitialLocation() {
         return getInitialLocation(systems);
     }
 
@@ -84,7 +84,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     @Override
-    public List<Move> getNextMoves(SymbolicLocation location, Channel channel) {
+    public List<Move> getNextMoves(Location location, Channel channel) {
         // Check if action belongs to this transition system at all before proceeding
         if (!getOutputs().contains(channel) && !getInputs().contains(channel)) {
             return new ArrayList<>();
@@ -96,7 +96,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
                     "The location type must be ComplexLocation as aggregated transition systems requires multiple locations"
             );
         }
-        List<SymbolicLocation> locations = location.getProductOf();
+        List<Location> locations = location.getProductOf();
 
         /* Check that the complex locations size is the same as the systems
          * This is because the index of the system,
@@ -111,7 +111,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         return computeResultMoves(locations, channel);
     }
 
-    protected abstract List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel);
+    protected abstract List<Move> computeResultMoves(List<Location> locations, Channel channel);
 
     protected List<TransitionSystem> getRootSystems() {
         return Arrays.asList(systems);

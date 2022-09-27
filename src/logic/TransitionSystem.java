@@ -67,13 +67,13 @@ public abstract class TransitionSystem {
         return actions;
     }
 
-    public SymbolicLocation getInitialLocation(TransitionSystem[] systems) {
+    public Location getInitialLocation(TransitionSystem[] systems) {
         // build ComplexLocation with initial location from each TransitionSystem
-        List<SymbolicLocation> initials = Arrays
+        List<Location> initials = Arrays
                 .stream(systems)
                 .map(TransitionSystem::getInitialLocation)
                 .collect(Collectors.toList());
-        return SymbolicLocation.createProduct(initials);
+        return Location.createProduct(initials);
     }
 
     private Transition createNewTransition(State state, Move move) {
@@ -219,13 +219,13 @@ public abstract class TransitionSystem {
 
         for (Move move1 : moves1) {
             for (Move move2 : moves2) {
-                SymbolicLocation q1s = move1.getSource();
-                SymbolicLocation q1t = move1.getTarget();
-                SymbolicLocation q2s = move2.getSource();
-                SymbolicLocation q2t = move2.getTarget();
+                Location q1s = move1.getSource();
+                Location q1t = move1.getTarget();
+                Location q2s = move2.getSource();
+                Location q2t = move2.getTarget();
 
-                List<SymbolicLocation> sources = new ArrayList<>();
-                List<SymbolicLocation> targets = new ArrayList<>();
+                List<Location> sources = new ArrayList<>();
+                List<Location> targets = new ArrayList<>();
 
                 /* Important!: The order of which the locations are added are important.
                  *   First we add q1 and then q2. This is VERY important as the for aggregated
@@ -243,8 +243,8 @@ public abstract class TransitionSystem {
                 sources.add(q2s);
                 targets.add(q2t);
 
-                SymbolicLocation source = SymbolicLocation.createProduct(sources);
-                SymbolicLocation target = SymbolicLocation.createProduct(targets);
+                Location source = Location.createProduct(sources);
+                Location target = Location.createProduct(targets);
 
                 // If true then we remove the conjoined invariant created from all "targets"
                 if (removeTargetLocationInvariant) {
@@ -316,8 +316,8 @@ public abstract class TransitionSystem {
     public abstract Set<Channel> getInputs();
     public abstract Set<Channel> getOutputs();
     public abstract List<SimpleTransitionSystem> getSystems();
-    protected abstract SymbolicLocation getInitialLocation();
+    protected abstract Location getInitialLocation();
     public abstract List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks);
 
-    protected abstract List<Move> getNextMoves(SymbolicLocation location, Channel channel);
+    protected abstract List<Move> getNextMoves(Location location, Channel channel);
 }

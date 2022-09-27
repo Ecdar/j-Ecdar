@@ -34,8 +34,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return automaton.getOutputAct();
     }
 
-    public SymbolicLocation getInitialLocation() {
-        return SymbolicLocation.createSimple(automaton.getInitial());
+    public Location getInitialLocation() {
+        return Location.createSimple(automaton.getInitial());
     }
 
     public List<SimpleTransitionSystem> getSystems() {
@@ -300,14 +300,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return createNewTransitions(currentState, moves, allClocks);
     }
 
-    protected List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+    protected List<Move> getNextMoves(Location symLocation, Channel channel) {
         List<Move> moves = new ArrayList<>();
 
         Location location = symLocation.getSimpleLocation();
         List<Edge> edges = automaton.getEdgesFromLocationAndSignal(location, channel);
 
         for (Edge edge : edges) {
-            SymbolicLocation target = SymbolicLocation.createSimple(edge.getTarget());
+            Location target = Location.createSimple(edge.getTarget());
             Move move = new Move(symLocation, target, Collections.singletonList(edge));
             moves.add(move);
         }

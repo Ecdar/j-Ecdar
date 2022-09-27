@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Move {
-    private SymbolicLocation source, target;
+    private Location source, target;
     private final List<Edge> edges;
     private CDD guardCDD;
     private List<Update> updates;
 
-    public Move(SymbolicLocation source, SymbolicLocation target, List<Edge> edges) {
+    public Move(Location source, Location target, List<Edge> edges) {
         this.source = source;
         this.target = target;
         this.edges = edges;
@@ -21,7 +21,7 @@ public class Move {
         }
     }
 
-    public Move(SymbolicLocation source, SymbolicLocation target) {
+    public Move(Location source, Location target) {
         this(source, target, new ArrayList<>());
     }
 
@@ -40,11 +40,11 @@ public class Move {
         guardCDD = guardCDD.conjunction(cdd);
     }
 
-    public SymbolicLocation getSource() {
+    public Location getSource() {
         return source;
     }
 
-    public SymbolicLocation getTarget() {
+    public Location getTarget() {
         return target;
     }
 
@@ -72,7 +72,7 @@ public class Move {
         this.updates = updates;
     }
 
-    public void setTarget(SymbolicLocation loc) {
+    public void setTarget(Location loc) {
         target = loc;
     }
 }

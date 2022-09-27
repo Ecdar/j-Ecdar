@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class State {
-    private final SymbolicLocation location;
+    private final Location location;
     private CDD invarCDD;
 
-    public State(SymbolicLocation location, CDD invarCDD) {
+    public State(Location location, CDD invarCDD) {
         this.location = location;
         this.invarCDD = new CDD(invarCDD.getPointer());
 
@@ -22,7 +22,7 @@ public class State {
         this.invarCDD = new CDD(oldState.getInvariant().getPointer());
     }
 
-    public SymbolicLocation getLocation() {
+    public Location getLocation() {
         return location;
     }
 

@@ -1,6 +1,5 @@
 package models;
 
-import log.Log;
 import logic.State;
 
 import java.util.*;
@@ -20,7 +19,7 @@ public class Location {
     protected boolean isUniversal;
     protected boolean isInconsistent;
 
-    protected List<SymbolicLocation> productOf = new ArrayList<>();
+    protected List<Location> productOf = new ArrayList<>();
     protected Location location;
 
     public Location() {}
@@ -34,7 +33,7 @@ public class Location {
             boolean isInconsistent,
             int x,
             int y,
-            List<SymbolicLocation> productOf
+            List<Location> productOf
     ) {
         this.name = name;
         this.invariantCdd = null;
@@ -148,6 +147,112 @@ public class Location {
         );
     }
 
+    private Location(Location location) {
+        this(
+                location.getName(),
+                location.getInvariantGuard(),
+                location.isInitial(),
+                location.isUrgent(),
+                location.isUniversal(),
+                location.isInconsistent(),
+                location.getX(),
+                location.getY(),
+                new ArrayList<>()
+        );
+        this.location = location;
+    }
+
+    public static Location createProduct(List<Location> productOf) {
+        StringBuilder nameBuilder = new StringBuilder();
+        boolean isInitial = true;
+        boolean isUniversal = true;
+        boolean isUrgent = false;
+        boolean isInconsistent = false;
+        int x = 0;
+        int y = 0;
+
+        for (Location location : productOf) {
+            nameBuilder.append(location.getName());
+            isInitial = isInitial && location.isInitial();
+            isUniversal = isUniversal && location.isUniversal();
+            isUrgent = isUrgent || location.isUrgent();
+            isInconsistent = isInconsistent || location.isInconsistent();
+            x += location.getX();
+            y += location.getY();
+        }
+
+        int amount = productOf.size();
+        x /= amount;
+        y /= amount;
+        String name = nameBuilder.toString();
+
+        Guard invariant = null;
+
+        return new Location(
+                name,
+                invariant,
+                isInitial,
+                isUrgent,
+                isUniversal,
+                isInconsistent,
+                x,
+                y,
+                productOf
+        );
+    }
+
+    public static Location createUniversalLocation(
+            String name,
+            boolean isInitial,
+            boolean isUrgent,
+            int x,
+            int y
+    ) {
+        return new Location(
+                name,
+                new TrueGuard(),
+                isInitial,
+                isUrgent,
+                true,
+                false,
+                x,
+                y,
+                new ArrayList<>()
+        );
+    }
+
+    public static Location createUniversalLocation(String name, int x, int y) {
+        return Location.createUniversalLocation(name, false, false, x, y);
+    }
+
+    public static Location createInconsistentLocation(
+            String name,
+            boolean isInitial,
+            boolean isUrgent,
+            int x,
+            int y
+    ) {
+        return new Location(
+                name,
+                new FalseGuard(),
+                isInitial,
+                isUrgent,
+                false,
+                true,
+                x,
+                y,
+                new ArrayList<>()
+        );
+    }
+
+    public static Location createInconsistentLocation(String name, int x, int y) {
+        return Location.createInconsistentLocation(name, false, false, x, y);
+    }
+
+    public static Location createSimple(Location location) {
+        return new Location(location);
+    }
+
     public boolean isSimple() {
         return location != null;
     }
@@ -160,7 +265,7 @@ public class Location {
         return productOf.size() > 0;
     }
 
-    public List<SymbolicLocation> getProductOf() {
+    public List<Location> getProductOf() {
         return productOf;
     }
 
@@ -233,7 +338,7 @@ public class Location {
                 invariantCdd = CDD.cddTrue();
             } else if (isProduct()) {
                 this.invariantCdd = CDD.cddTrue();
-                for (SymbolicLocation location : productOf) {
+                for (Location location : productOf) {
                     this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCddNew());
                 }
             } else {
