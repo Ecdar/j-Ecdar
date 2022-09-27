@@ -29,8 +29,8 @@ public class Move {
      * Return the enabled part of a move based on guard, source invariant and predated target invariant
      **/
     public CDD getEnabledPart() {
-        CDD targetInvariant = getTarget().getInvariantCdd();
-        CDD sourceInvariant = getSource().getInvariantCdd();
+        CDD targetInvariant = getTarget().getInvariantCddNew();
+        CDD sourceInvariant = getSource().getInvariantCddNew();
         return getGuardCDD()
                 .conjunction(targetInvariant.transitionBack(this))
                 .conjunction(sourceInvariant);

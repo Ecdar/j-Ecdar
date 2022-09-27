@@ -206,10 +206,6 @@ public class Location {
     }
 
     public Guard getInvariantGuard() {
-        if (isSimple()) {
-            return location.getInvariantGuard();
-        }
-
         if (invariantGuard == null) {
             invariantGuard = getInvariantCdd().getGuard();
         }
@@ -218,11 +214,34 @@ public class Location {
     }
 
     public CDD getInvariantCdd() {
+        if (invariantGuard == null) {
+            return getInvariantCddNew();
+        }
+
+        return new CDD(getInvariantGuard());
+    }
+
+    public CDD getInvariantCddNew() {
         if (isSimple()) {
             return location.getInvariantCdd();
         }
 
-        return new CDD(getInvariantGuard());
+        if (invariantCdd == null) {
+            if (isInconsistent) {
+                invariantCdd = CDD.cddZero();
+            } else if (isUniversal) {
+                invariantCdd = CDD.cddTrue();
+            } else if (isProduct()) {
+                this.invariantCdd = CDD.cddTrue();
+                for (SymbolicLocation location : productOf) {
+                    this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCddNew());
+                }
+            } else {
+                invariantCdd = new CDD(getInvariantGuard());
+            }
+        }
+
+        return invariantCdd;
     }
 
     public void setInvariantGuard(Guard invariantAsGuard) {

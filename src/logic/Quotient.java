@@ -287,7 +287,7 @@ public class Quotient extends TransitionSystem {
                 }
                 guard_s = guard_s.negation().removeNegative().reduce();
 
-                CDD inv_neg_inv_loc_s = ls.getInvariantCdd().negation().removeNegative().reduce();
+                CDD inv_neg_inv_loc_s = ls.getInvariantCddNew().negation().removeNegative().reduce();
 
                 CDD combined = guard_s.disjunction(inv_neg_inv_loc_s);
 
@@ -296,7 +296,7 @@ public class Quotient extends TransitionSystem {
                 resultMoves.add(move);
             } else {
                 Log.debug("Rule 345 2");
-                CDD inv_neg_inv_loc_s = ls.getInvariantCdd().negation().removeNegative().reduce();
+                CDD inv_neg_inv_loc_s = ls.getInvariantCddNew().negation().removeNegative().reduce();
 
                 Move move = new Move(location, univ);
                 move.conjunctCDD(inv_neg_inv_loc_s);
@@ -327,8 +327,8 @@ public class Quotient extends TransitionSystem {
                 Log.debug("Rule 7");
                 Move newMoveRule7 = new Move(location, inc, new ArrayList<>());
                 // invariant is negation of invariant of left conjuncted with invariant of right
-                CDD negatedInvar = lt.getInvariantCdd().negation();
-                CDD combined = negatedInvar.conjunction(ls.getInvariantCdd());
+                CDD negatedInvar = lt.getInvariantCddNew().negation();
+                CDD combined = negatedInvar.conjunction(ls.getInvariantCddNew());
 
                 newMoveRule7.setGuards(combined);
                 newMoveRule7.setUpdates(new ArrayList<>(Collections.singletonList(new ClockUpdate(newClock, 0))));
