@@ -111,10 +111,16 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         return computeResultMoves(locations, channel);
     }
 
-    protected abstract List<Move> computeResultMoves(List<Location> locations, Channel channel);
+    protected List<Move> computeResultMoves(List<Location> locations, Channel channel) {
+        return new ArrayList<>();
+    }
 
     protected List<TransitionSystem> getRootSystems() {
         return Arrays.asList(systems);
+    }
+
+    protected boolean in(Channel element, Set<Channel> set) {
+        return set.contains(element);
     }
 
     protected Set<Channel> intersect(Set<Channel> set1, Set<Channel> set2) {
@@ -144,11 +150,8 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         Set<Location> locations = new HashSet<>();
         Map<String, Location> locationMap = new HashMap<>();
 
-        List<Location> initials = new ArrayList<>();
-        for (Automaton aut : automata) {
-            initials.add(aut.getInitial());
-        }
-        Location initial = Location.createProduct(initials);
+        State initialState = getInitialState();
+        Location initial = initialState.getLocation();
         locations.add(initial);
         locationMap.put(initial.getName(), initial);
 

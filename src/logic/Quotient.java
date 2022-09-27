@@ -5,27 +5,21 @@ import models.*;
 
 import java.util.*;
 
-public class Quotient extends TransitionSystem {
+public class Quotient extends AggregatedTransitionSystem {
     private final TransitionSystem t, s;
     private final Set<Channel> inputs, outputs;
     private final Channel newChan;
     private Clock newClock;
 
-    private final HashMap<Clock, Integer> maxBounds = new HashMap<>();
-    private final HashSet<State> passed = new HashSet<>();
-    private final Queue<State> worklist = new ArrayDeque<>();
-
     public Quotient(TransitionSystem t, TransitionSystem s) {
+        super(t, s);
+
         this.t = t;
         this.s = s;
 
         //clocks should contain the clocks of ts1, ts2 and a new clock
         newClock = new Clock("quo_new", "quo"); //TODO: get ownerName in a better way
         clocks.add(newClock);
-        clocks.addAll(t.getClocks());
-        clocks.addAll(s.getClocks());
-        BVs.addAll(t.getBVs());
-        BVs.addAll(s.getBVs());
 
         // Act_i = Act_i^T ∪ Act_o^S
         inputs = union(t.getInputs(), s.getOutputs());
@@ -37,20 +31,6 @@ public class Quotient extends TransitionSystem {
                 difference(t.getOutputs(), s.getOutputs()),
                 difference(s.getInputs(), t.getInputs())
         );
-
-        maxBounds.putAll(t.getMaxBounds());
-        maxBounds.putAll(s.getMaxBounds());
-    }
-
-    @Override
-    public Automaton getAutomaton() {
-        return calculateQuotientAutomaton().getAutomaton();
-    }
-
-    public Location getInitialLocation() {
-        // the invariant of locations consisting of locations from each transition system should be true
-        // which means the location has no invariants
-        return getInitialLocation(new TransitionSystem[]{t, s});
     }
 
     public SimpleTransitionSystem calculateQuotientAutomaton() {
@@ -58,131 +38,9 @@ public class Quotient extends TransitionSystem {
     }
 
     public SimpleTransitionSystem calculateQuotientAutomaton(boolean prepareForBisimilarityReduction) {
-        boolean initialisedCdd = CDD.tryInit(getClocks(), BVs.getItems());
-
-        String name = getName();
-
-        Set<Edge> edges = new HashSet<>();
-        Set<Location> locations = new HashSet<>();
-        Map<String, Location> locationMap = new HashMap<>();
-
-        State initialState = getInitialState();
-        Location initial = fromSymbolicLocation(initialState.getLocation());
-        locations.add(initial);
-        locationMap.put(initial.getName(), initial);
-
-        Set<Channel> channels = new HashSet<>();
-        channels.addAll(getOutputs());
-        channels.addAll(getInputs());
-
-        worklist.add(
-                initialState
+        return new SimpleTransitionSystem(
+                getAutomaton()
         );
-
-        while (!worklist.isEmpty()) {
-            State state = worklist.remove();
-            passed.add(state);
-
-            for (Channel channel : channels) {
-                List<Transition> transitions = getNextTransitions(state, channel, clocks.getItems());
-
-                for (Transition transition : transitions) {
-                    /* Get the state following the transition and then extrapolate. If we have not
-                     *   already visited the location, this is equivalent to simulating the arrival
-                     *   at that location following this transition with the current "channel". */
-                    State targetState = transition.getTarget();
-                    if (!havePassed(targetState) && !isWaitingFor(targetState)) {
-                        targetState.extrapolateMaxBounds(maxBounds, getClocks());
-                        worklist.add(targetState);
-                    }
-
-                    /* If we don't already have the "targetState" location added
-                     *   To the set of locations for the conjunction then add it. */
-                    String targetName = targetState.getLocation().getName();
-                    locationMap.computeIfAbsent(
-                            targetName, key -> {
-                                Location newLocation = Location.createFromState(targetState, clocks.getItems());
-                                locations.add(newLocation);
-                                return newLocation;
-                            }
-                    );
-
-                    // Create and add the edge connecting the conjoined locations
-                    String sourceName = transition.getSource().getLocation().getName();
-
-                    assert locationMap.containsKey(sourceName);
-                    assert locationMap.containsKey(targetName);
-
-                    Edge edge = createEdgeFromTransition(
-                            transition,
-                            locationMap.get(sourceName),
-                            locationMap.get(targetName),
-                            channel
-                    );
-                    if (!containsEdge(edges, edge)) {
-                        edges.add(edge);
-                    }
-                }
-            }
-        }
-
-        List<Location> updatedLocations = updateLocations(
-                locations, getClocks(), getClocks(), getBVs(), getBVs()
-        );
-        List<Edge> edgesWithNewClocks = updateEdges(edges, clocks.getItems(), clocks.getItems(), BVs.getItems(), BVs.getItems());
-        Automaton resAut = new Automaton(name, updatedLocations, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
-
-        if (initialisedCdd) {
-            CDD.done();
-        }
-
-        return new SimpleTransitionSystem(resAut);
-    }
-
-    private Location fromSymbolicLocation(Location location) {
-        return Location.create(
-            location.getName(),
-            location.getInvariantGuard(),
-            location.isInitial(),
-            location.isUrgent(),
-            location.isUniversal(),
-            location.isInconsistent(),
-            location.getX(),
-            location.getY()
-        );
-    }
-
-    private boolean havePassed(State element) {
-        for (State state : passed) {
-            if (element.getLocation().getName().equals(state.getLocation().getName()) &&
-                    element.getInvariant().isSubset(state.getInvariant())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isWaitingFor(State element) {
-        for (State state : worklist) {
-            if (element.getLocation().getName().equals(state.getLocation().getName()) &&
-                    element.getInvariant().isSubset(state.getInvariant())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsEdge(Set<Edge> set, Edge edge) {
-        return set.stream().anyMatch(other -> other.equals(edge) &&
-                other.getGuardCDD().equals(edge.getGuardCDD())
-        );
-    }
-
-    private Edge createEdgeFromTransition(Transition transition, Location source, Location target, Channel channel) {
-        Guard guard = transition.getGuards(getClocks());
-        List<Update> updates = transition.getUpdates();
-        boolean isInput = getInputs().contains(channel);
-        return new Edge(source, target, channel, isInput, guard, updates);
     }
 
     public Set<Channel> getInputs() {
@@ -193,36 +51,17 @@ public class Quotient extends TransitionSystem {
         return outputs;
     }
 
-    public List<SimpleTransitionSystem> getSystems() {
-        // no idea what this is for
-        List<SimpleTransitionSystem> result = new ArrayList<>();
-        result.addAll(t.getSystems());
-        result.addAll(s.getSystems());
-        return result;
-    }
-
     @Override
     public String getName() {
         return t.getName() + "//" + s.getName();
     }
 
-    public List<Transition> getNextTransitions(State currentState, Channel channel, List<Clock> allClocks) {
-        // get possible transitions from current state, for a given channel
-        Location location = currentState.getLocation();
-        List<Move> moves = getNextMoves(location, channel);
-        return createNewTransitions(currentState, moves, allClocks);
-    }
-
+    @Override
     public List<Move> getNextMoves(Location location, Channel a) {
         Location univ = Location.createUniversalLocation("universal", 0, 0);
         Location inc = Location.createInconsistentLocation("inconsistent", 0, 0);
 
         List<Move> resultMoves = new ArrayList<>();
-        /*Log.debug("gettingNextMove of " + location.getName());
-        Log.debug("Universal? " + location.getIsUniversal() + " instance of? " + (location instanceof UniversalLocation));
-        Log.debug("Inconsistent? " + location.getIsInconsistent() + " instance of? " + (location instanceof InconsistentLocation));
-        assert location.getIsUniversal() == (location instanceof UniversalLocation);
-        assert location.getIsInconsistent() == (location instanceof InconsistentLocation);*/
 
         // Rule 10
         if (location.isInconsistent()) {
@@ -346,40 +185,8 @@ public class Quotient extends TransitionSystem {
                 }
                 resultMoves.addAll(moveProduct);
             }
-
-            // Rule 10
         }
 
         return resultMoves;
-    }
-
-    private boolean in(Channel element, Set<Channel> set) {
-        return set.contains(element);
-    }
-
-    private boolean disjoint(Set<Channel> set1, Set<Channel> set2) {
-        return empty(intersect(set1, set2));
-    }
-
-    private boolean empty(Set<Channel> set) {
-        return set.isEmpty();
-    }
-
-    private Set<Channel> intersect(Set<Channel> set1, Set<Channel> set2) {
-        Set<Channel> intersection = new HashSet<>(set1);
-        intersection.retainAll(set2);
-        return intersection;
-    }
-
-    private Set<Channel> difference(Set<Channel> set1, Set<Channel> set2) {
-        Set<Channel> difference = new HashSet<>(set1);
-        difference.removeAll(set2);
-        return difference;
-    }
-
-    private Set<Channel> union(Set<Channel> set1, Set<Channel> set2) {
-        Set<Channel> union = new HashSet<>(set1);
-        union.addAll(set2);
-        return union;
     }
 }

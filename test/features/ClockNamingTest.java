@@ -8,6 +8,7 @@ import org.junit.Test;
 import parser.JSONParser;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -116,8 +117,8 @@ public class ClockNamingTest {
         assertEquals("x",t4.getClocks().get(0).getOriginalName());
 
         assertEquals(3, quotient.getClocks().size());
-        assertEquals("Test1.x", quotient.getClocks().get(1).getUniqueName());
-        assertEquals("Test4.x", quotient.getClocks().get(2).getUniqueName());
+        assertTrue(quotient.getClocks().stream().anyMatch(clock -> Objects.equals(clock.getUniqueName(), "Test1.x")));
+        assertTrue(quotient.getClocks().stream().anyMatch(clock -> Objects.equals(clock.getUniqueName(), "Test4.x")));
 
     }
 
@@ -128,8 +129,8 @@ public class ClockNamingTest {
         assertEquals("x",t1.getClocks().get(0).getOriginalName());
 
         assertEquals(3, quotient.getClocks().size());
-        assertEquals("Test1.1.x", quotient.getClocks().get(1).getUniqueName());
-        assertEquals("Test1.2.x", quotient.getClocks().get(2).getUniqueName());
+        assertTrue(quotient.getClocks().stream().anyMatch(clock -> Objects.equals(clock.getUniqueName(), "Test1.1.x")));
+        assertTrue(quotient.getClocks().stream().anyMatch(clock -> Objects.equals(clock.getUniqueName(), "Test1.2.x")));
 
     }
 
@@ -140,8 +141,8 @@ public class ClockNamingTest {
         assertEquals("x",t1.getClocks().get(0).getOriginalName());
 
         assertEquals(2, con.getClocks().size());
-        assertEquals("Test1.1.x", con.getClocks().get(0).getUniqueName());
         assertEquals("Test1.2.x", con.getClocks().get(1).getUniqueName());
+        assertEquals("Test1.1.x", con.getClocks().get(0).getUniqueName());
 
     }
 
