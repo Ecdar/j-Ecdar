@@ -75,7 +75,7 @@ public class Automaton {
                 .map(boolVar -> new BoolVar(boolVar.getOriginalName() + "Copy", name, boolVar.getInitialValue()))
                 .collect(Collectors.toList());
         locations = automaton.locations.stream()
-                .map(location -> new Location(location, clocks, automaton.clocks, BVs, automaton.BVs))
+                .map(location -> location.copy(clocks, automaton.clocks, BVs, automaton.BVs))
                 .collect(Collectors.toList());
         edges = automaton.edges.stream()
                 .map(edge -> {
@@ -88,7 +88,7 @@ public class Automaton {
         inputAct = automaton.inputAct;
         outputAct = automaton.outputAct;
         actions = automaton.actions;
-        initial = new Location(automaton.initial, clocks, automaton.clocks, BVs, automaton.BVs);
+        initial = automaton.initial.copy(clocks, automaton.clocks, BVs, automaton.BVs);
     }
 
     public List<Location> getLocations() {

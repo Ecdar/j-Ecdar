@@ -10,7 +10,7 @@ public class Location {
     protected int x, y;
 
     protected Guard invariantGuard;
-    protected CDD invariantCdd = null;
+    protected CDD invariantCdd;
 
     protected CDD inconsistentPart;
 
@@ -19,36 +19,38 @@ public class Location {
     protected boolean isUniversal;
     protected boolean isInconsistent;
 
-    protected List<Location> productOf = new ArrayList<>();
+    protected List<Location> productOf;
     protected Location location;
 
-    public Location() {}
-
-    public Location(
+    private Location(
             String name,
-            Guard invariant,
+            int x,
+            int y,
+            Guard invariantGuard,
+            CDD invariantCdd,
+            CDD inconsistentPart,
             boolean isInitial,
             boolean isUrgent,
             boolean isUniversal,
             boolean isInconsistent,
-            int x,
-            int y,
-            List<Location> productOf
+            List<Location> productOf,
+            Location location
     ) {
         this.name = name;
-        this.invariantCdd = null;
-        this.invariantGuard = invariant;
+        this.x = x;
+        this.y = y;
+        this.invariantGuard = invariantGuard;
+        this.invariantCdd = invariantCdd;
+        this.inconsistentPart = inconsistentPart;
         this.isInitial = isInitial;
         this.isUrgent = isUrgent;
         this.isUniversal = isUniversal;
         this.isInconsistent = isInconsistent;
-        this.inconsistentPart = null;
-        this.x = x;
-        this.y = y;
         this.productOf = productOf;
+        this.location = location;
     }
 
-    public Location(
+    public static Location create(
             String name,
             Guard invariant,
             boolean isInitial,
@@ -58,108 +60,38 @@ public class Location {
             int x,
             int y
     ) {
-        this(
-                name,
-                invariant,
-                isInitial,
-                isUrgent,
-                isUniversal,
-                isInconsistent,
-                x,
-                y,
-                new ArrayList<>()
+        return new Location(
+            name,
+            x,
+            y,
+            invariant,
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            isUniversal,
+            isInconsistent,
+            new ArrayList<>(),
+            null
         );
     }
 
-    public Location(
-            String name,
-            Guard invariant,
-            boolean isInitial,
-            boolean isUrgent,
-            boolean isUniversal,
-            boolean isInconsistent
-    ) {
-        this(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0);
-    }
-
-    public Location(
-            Location copy,
-            List<Clock> newClocks,
-            List<Clock> oldClocks,
-            List<BoolVar> newBVs,
-            List<BoolVar> oldBVs
-    ) {
-        this(
-            copy.name,
-            copy.invariantGuard.copy(
-                newClocks, oldClocks, newBVs, oldBVs
-            ),
-            copy.isInitial,
-            copy.isUrgent,
-            copy.isUniversal,
-            copy.isInconsistent,
-            copy.x,
-            copy.y,
-            copy.productOf
+    public static Location createFromState(State state, List<Clock> clocks) {
+        Location location = state.getLocation();
+        return new Location(
+            location.getName(),
+            location.getX(),
+            location.getY(),
+            state.getInvariants(clocks),
+            null,
+            location.getInconsistentPart(),
+            location.isInitial(),
+            location.isUrgent(),
+            location.isUniversal(),
+            location.isInconsistent(),
+            location.getProductOf(),
+            location.getSimpleLocation()
         );
-    }
-
-    public Location(List<Location> locations) {
-        if (locations.size() == 0) {
-            throw new IllegalArgumentException("At least a single location is required");
-        }
-
-        this.name = locations.stream()
-                .map(Location::getName)
-                .collect(Collectors.joining(""));
-
-        this.isInitial = locations.stream().allMatch(location -> location.isInitial);
-        this.isUrgent = locations.stream().anyMatch(location -> location.isUrgent);
-        this.isUniversal = locations.stream().allMatch(location -> location.isUniversal);
-        this.isInconsistent = locations.stream().anyMatch(location -> location.isInconsistent);
-
-        CDD invariant = CDD.cddTrue();
-        for (Location location : locations) {
-            invariant = location.getInvariantCdd().conjunction(invariant);
-            this.x += location.x;
-            this.y = location.y;
-        }
-
-        this.invariantCdd = invariant;
-        this.invariantGuard = invariant.getGuard();
-        // We use the average location coordinates
-        this.x /= locations.size();
-        this.y /= locations.size();
-
-        this.productOf = new ArrayList<>();
-    }
-
-    public Location(State state, List<Clock> clocks) {
-        this(
-                state.getLocation().getName(),
-                state.getInvariants(clocks),
-                state.getLocation().isInitial(),
-                state.getLocation().isUrgent(),
-                state.getLocation().isUniversal(),
-                state.getLocation().isInconsistent(),
-                state.getLocation().getX(),
-                state.getLocation().getX()
-        );
-    }
-
-    private Location(Location location) {
-        this(
-                location.getName(),
-                location.getInvariantGuard(),
-                location.isInitial(),
-                location.isUrgent(),
-                location.isUniversal(),
-                location.isInconsistent(),
-                location.getX(),
-                location.getY(),
-                new ArrayList<>()
-        );
-        this.location = location;
     }
 
     public static Location createProduct(List<Location> productOf) {
@@ -171,6 +103,7 @@ public class Location {
         int x = 0;
         int y = 0;
 
+        List<Guard> guards = new ArrayList<>();
         for (Location location : productOf) {
             nameBuilder.append(location.getName());
             isInitial = isInitial && location.isInitial();
@@ -179,6 +112,7 @@ public class Location {
             isInconsistent = isInconsistent || location.isInconsistent();
             x += location.getX();
             y += location.getY();
+            guards.add(location.getInvariantGuard());
         }
 
         int amount = productOf.size();
@@ -186,18 +120,20 @@ public class Location {
         y /= amount;
         String name = nameBuilder.toString();
 
-        Guard invariant = null;
-
+        Guard invariant = new AndGuard(guards);
         return new Location(
                 name,
+                x,
+                y,
                 invariant,
+                null,
+                null,
                 isInitial,
                 isUrgent,
                 isUniversal,
                 isInconsistent,
-                x,
-                y,
-                productOf
+                productOf,
+                null
         );
     }
 
@@ -210,14 +146,17 @@ public class Location {
     ) {
         return new Location(
                 name,
+                x,
+                y,
                 new TrueGuard(),
+                null,
+                null,
                 isInitial,
                 isUrgent,
                 true,
                 false,
-                x,
-                y,
-                new ArrayList<>()
+                new ArrayList<>(),
+                null
         );
     }
 
@@ -234,14 +173,17 @@ public class Location {
     ) {
         return new Location(
                 name,
+                x,
+                y,
                 new FalseGuard(),
+                null,
+                null,
                 isInitial,
                 isUrgent,
                 false,
                 true,
-                x,
-                y,
-                new ArrayList<>()
+                new ArrayList<>(),
+                null
         );
     }
 
@@ -250,7 +192,61 @@ public class Location {
     }
 
     public static Location createSimple(Location location) {
-        return new Location(location);
+        return new Location(
+                location.getName(),
+                location.getX(),
+                location.getY(),
+                location.getInvariantGuard(),
+                null,
+                location.getInconsistentPart(),
+                location.isInitial(),
+                location.isUrgent(),
+                location.isUniversal(),
+                location.isInconsistent(),
+                new ArrayList<>(),
+                location
+        );
+    }
+
+    public Location copy() {
+        return new Location(
+            getName(),
+            getX(),
+            getY(),
+            getInvariantGuard(),
+                null,
+            getInconsistentPart(),
+            isInitial(),
+            isUrgent(),
+            isUniversal(),
+            isInconsistent(),
+            new ArrayList<>(),
+            null
+        );
+    }
+
+    public Location copy(
+            List<Clock> newClocks,
+            List<Clock> oldClocks,
+            List<BoolVar> newBVs,
+            List<BoolVar> oldBVs
+    ) {
+        return new Location(
+            name,
+            x,
+            y,
+            invariantGuard.copy(
+                newClocks, oldClocks, newBVs, oldBVs
+            ),
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            isUniversal,
+            isInconsistent,
+            productOf,
+            null
+        );
     }
 
     public boolean isSimple() {
@@ -258,7 +254,7 @@ public class Location {
     }
 
     public Location getSimpleLocation() {
-        return location;
+        return this;
     }
 
     public boolean isProduct() {
@@ -389,10 +385,6 @@ public class Location {
         if (o == null || getClass() != o.getClass()) return false;
         Location that = (Location) o;
 
-        if (isSimple() && that.isSimple()) {
-            return getSimpleLocation().equals(that.getSimpleLocation());
-        }
-
         if (isProduct() && that.isProduct()) {
             if (productOf.size() != that.productOf.size()) {
                 return false;
@@ -411,8 +403,6 @@ public class Location {
                 isUrgent() == that.isUrgent() &&
                 isUniversal() == that.isUniversal() &&
                 isInconsistent() == that.isInconsistent() &&
-                getX() == that.getX() &&
-                getY() == that.getY() &&
                 getName().equals(that.getName());
     }
 
@@ -422,6 +412,6 @@ public class Location {
             return Objects.hash(productOf);
         }
 
-        return Objects.hash(name, getInvariantGuard(), isInitial, isUrgent, isUniversal, isInconsistent, x, y);
+        return Objects.hash(name, getInvariantGuard(), isInitial, isUrgent, isUniversal, isInconsistent);
     }
 }

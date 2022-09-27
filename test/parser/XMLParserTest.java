@@ -57,9 +57,9 @@ public class XMLParserTest {
         ClockGuard inv0_0 = new ClockGuard(y, 50, Relation.LESS_EQUAL);
         ClockGuard inv0_1 = new ClockGuard(z, 40,  Relation.LESS_EQUAL);
 
-        Location l0 = new Location("id0", new AndGuard(inv0_0, inv0_1), false, false, false, false);
-        Location l1 = new Location("id1", new TrueGuard(), false, false, false, false);
-        Location l2 = new Location("id2", new TrueGuard(), true, false, false, false);
+        Location l0 = Location.create("id0", new AndGuard(inv0_0, inv0_1), false, false, false, false, 0, 0);
+        Location l1 = Location.create("id1", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l2 = Location.create("id2", new TrueGuard(), true, false, false, false, 0, 0);
         List<Location> locations = new ArrayList<>(Arrays.asList(l0, l1, l2));
 
         ClockGuard g2 = new ClockGuard(x, 4, Relation.EQUAL);

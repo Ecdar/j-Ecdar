@@ -188,8 +188,8 @@ public class XMLParser {
             }
 
             Location  newLoc;
-            if (xyDefined) newLoc= new Location(locName, invariants, isInitial, false, false, false, x, y);
-            else newLoc= new Location(locName, invariants, isInitial, false, false, false);
+            if (xyDefined) newLoc = Location.create(locName, invariants, isInitial, false, false, false, x, y);
+            else newLoc= Location.create(locName, invariants, isInitial, false, false, false, 0, 0);
 
 
             List<Element> names = loc.getChildren("name");
@@ -200,9 +200,9 @@ public class XMLParser {
                 if (name.getContent().get(0).getValue().toString().equals("inc")) {
                     //Log.trace("Parsed an inconsistent location");
                     if (xyDefined)
-                        newLoc = new Location(locName, invariants, isInitial, false, false, true, x,y);
+                        newLoc = Location.create(locName, invariants, isInitial, false, false, true, x,y);
                     else
-                        newLoc = new Location(locName, invariants, isInitial, false, false, true);
+                        newLoc = Location.create(locName, invariants, isInitial, false, false, true, 0, 0);
                 }
             }
 

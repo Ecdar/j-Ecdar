@@ -101,7 +101,7 @@ public class Quotient extends TransitionSystem {
                     String targetName = targetState.getLocation().getName();
                     locationMap.computeIfAbsent(
                             targetName, key -> {
-                                Location newLocation = new Location(targetState, clocks.getItems());
+                                Location newLocation = Location.createFromState(targetState, clocks.getItems());
                                 locations.add(newLocation);
                                 return newLocation;
                             }
@@ -140,15 +140,15 @@ public class Quotient extends TransitionSystem {
     }
 
     private Location fromSymbolicLocation(Location location) {
-        return new Location(
-                location.getName(),
-                location.getInvariantGuard(),
-                location.isInitial(),
-                location.isUrgent(),
-                location.isUniversal(),
-                location.isInconsistent(),
-                location.getX(),
-                location.getY()
+        return Location.create(
+            location.getName(),
+            location.getInvariantGuard(),
+            location.isInitial(),
+            location.isUrgent(),
+            location.isUniversal(),
+            location.isInconsistent(),
+            location.getX(),
+            location.getY()
         );
     }
 

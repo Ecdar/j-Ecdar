@@ -148,7 +148,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         for (Automaton aut : automata) {
             initials.add(aut.getInitial());
         }
-        Location initial = new Location(initials);
+        Location initial = Location.createProduct(initials);
         locations.add(initial);
         locationMap.put(initial.getName(), initial);
 
@@ -182,7 +182,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
                     String targetName = targetState.getLocation().getName();
                     locationMap.computeIfAbsent(
                             targetName, key -> {
-                                Location newLocation = new Location(targetState, clocks.getItems());
+                                Location newLocation = Location.createFromState(targetState, clocks.getItems());
                                 locations.add(newLocation);
                                 return newLocation;
                             }

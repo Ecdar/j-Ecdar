@@ -3,10 +3,12 @@ package features;
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import log.Log;
+import log.Urgency;
 import logic.*;
 import models.Automaton;
 import models.CDD;
 import models.Clock;
+import models.Location;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -91,7 +93,6 @@ public class UniversitySimpleTest {
     @Test
     // @Ignore
     public void newQuotientTest2() {
-
         assertFalse(new Refinement(new Composition(machine,researcher), new Quotient(spec,adm2)).check());
     }
 

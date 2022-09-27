@@ -267,7 +267,7 @@ public abstract class TransitionSystem {
     public List<Location> updateLocations(Set<Location> locations, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         return locations
                 .stream()
-                .map(location -> new Location(location, newClocks, oldClocks, newBVs, oldBVs))
+                .map(location -> location.copy(newClocks, oldClocks, newBVs, oldBVs))
                 .collect(Collectors.toList());
     }
 

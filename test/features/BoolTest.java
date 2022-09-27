@@ -176,8 +176,8 @@ public class BoolTest {
         inner1.addAll(boolGuards2);
         guards2.add(inner1);
 
-        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
-        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
@@ -289,8 +289,8 @@ public class BoolTest {
         CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
 
 
-        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
-        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
@@ -393,8 +393,8 @@ public class BoolTest {
         CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
 
 
-        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
-        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
@@ -667,8 +667,8 @@ public class BoolTest {
         inner1.addAll(boolGuards2);
         guards2.add(inner1);
 
-        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
-        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
