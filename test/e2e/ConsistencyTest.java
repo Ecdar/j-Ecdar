@@ -30,7 +30,6 @@ public class ConsistencyTest extends GrpcE2EBase {
     public void g3IsNotConsistent() {
         System.out.println("g3IsNotConsistent");
         assertFalse(consistency("consistency: G3"));
-
     }
 
     @Test

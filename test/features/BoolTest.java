@@ -609,8 +609,6 @@ public class BoolTest {
         CDD.done();
     }
 
-
-
     @Test
     @Ignore // No such file or directory
     public void testBoolSafeLoadXML() {
@@ -696,14 +694,11 @@ public class BoolTest {
         XMLFileWriter.toXML("testOutput/BoolAutomaton.xml",new Automaton[]{aut});
         Automaton newAut = XMLParser.parse("testOutput/boolAutomaton.xml",false)[0];
         XMLFileWriter.toXML("testOutput/BoolAutomatonNew.xml",new Automaton[]{newAut});
-        Log.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         // assert(new Refinement(new SimpleTransitionSystem(aut),new SimpleTransitionSystem(aut)).check());
         //  assert(new Refinement(new SimpleTransitionSystem(newAut),new SimpleTransitionSystem(newAut)).check());
 
-
         Log.debug(aut.toString());
-        Log.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         Log.debug(newAut.toString());
 
         XMLFileWriter.toXML("testOutput/same1.xml",new Automaton[]{aut});

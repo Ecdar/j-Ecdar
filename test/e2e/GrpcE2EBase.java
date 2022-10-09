@@ -6,6 +6,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import log.Log;
 import org.junit.After;
 import org.junit.Before;
 
@@ -15,9 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.Objects;
 
 public class GrpcE2EBase {
     private final String root;
@@ -35,7 +34,19 @@ public class GrpcE2EBase {
     }
 
     private boolean isJson() {
-        return !isXml();
+        File file = new File(root);
+        // The root must be a directory with all component files
+        if (!file.isDirectory()) {
+            return false;
+        }
+
+        for (File child : Objects.requireNonNull(file.listFiles())) {
+            // All children must be a json file
+            if (child.isFile() && !child.getPath().endsWith(".json")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Before

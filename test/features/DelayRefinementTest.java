@@ -318,7 +318,7 @@ public class DelayRefinementTest {
 
 
     @Test
-    @Ignore // I believe this test to be incorrect
+    @Ignore // This test might be incorrect
     public void Z2RefinesZ2Z3Z4() {
         SimpleTransitionSystem Z2 = new SimpleTransitionSystem(automata[47]);
         SimpleTransitionSystem Z3 = new SimpleTransitionSystem(automata[48]);
@@ -410,7 +410,7 @@ public class DelayRefinementTest {
 
 
     @Test
-    @Ignore // I believe this test to be incorrect
+    @Ignore // This test might be incorrect
     public void T0RefinesT3T1T2() {
         TransitionSystem T1_new = new SimpleTransitionSystem(automata[0]);
         TransitionSystem T2_new = new SimpleTransitionSystem(automata[1]);
@@ -437,20 +437,19 @@ public class DelayRefinementTest {
 
 
 
-        /*
 
         Refinement ref = new Refinement(new SimpleTransitionSystem(quotient2.getAutomaton()),new SimpleTransitionSystem(quotient2New.getAutomaton()));
         boolean res = ref.check();
         Log.debug(res);
         Log.debug("error:" + ref.getErrMsg());
         assertTrue(new Refinement(quotient2New,quotient2).check());
-        assertTrue(new Refinement(quotient2,quotient2New).check());*/
+        assertTrue(new Refinement(quotient2,quotient2New).check());
         Refinement ref2 = new Refinement(new Composition(T1_new, T2_new, T4_new), T3_new);
         assertTrue(ref2.check());
 
         Refinement ref1 = new Refinement(T1_new, quotient2);
         boolean res1 = ref1.check(true);
-        //Log.debug(ref1.getTree().toDot());
+        Log.debug(ref1.getTree().toDot());
         assertTrue(res1);
     }
 

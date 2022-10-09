@@ -32,11 +32,11 @@ public class State {
 
 
     public CDD getLocationInvariant() {
-        return location.getInvariantCddNew();
+        return location.getInvariantCddLazy();
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return location.getInvariantCddNew().getGuard(relevantClocks);
+        return location.getInvariantCddLazy().getGuard(relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -49,7 +49,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        CDD result = this.invarCDD.conjunction(location.getInvariantCddNew());
+        CDD result = this.invarCDD.conjunction(location.getInvariantCddLazy());
         this.invarCDD=result;
     }
 
@@ -158,9 +158,11 @@ public class State {
                 }
                 if (print)
                 {
-                    for (int i: bounds)
-                        System.out.print(i + " ");
-                    Log.debug();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (int i: bounds) {
+                        stringBuilder.append(i).append(" ");
+                    }
+                    Log.debug(stringBuilder.toString());
                 }
                 z.extrapolateMaxBoundsDiagonal(bounds);
                 if (print) z.printDbm(true,true);

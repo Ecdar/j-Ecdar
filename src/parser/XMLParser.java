@@ -188,8 +188,12 @@ public class XMLParser {
             }
 
             Location  newLoc;
-            if (xyDefined) newLoc = Location.create(locName, invariants, isInitial, false, false, false, x, y);
-            else newLoc= Location.create(locName, invariants, isInitial, false, false, false, 0, 0);
+            if (xyDefined) {
+                newLoc = Location.create(locName, invariants, isInitial, false, false, false, x, y);
+            }
+            else {
+                newLoc = Location.create(locName, invariants, isInitial, false, false, false, 0, 0);
+            }
 
 
             List<Element> names = loc.getChildren("name");
@@ -222,9 +226,9 @@ public class XMLParser {
             boolean isInput = true;
             for (Attribute o : edge.getAttributes()) {
                 try {
-                    if (o.getName().equals("controllable") && o.getBooleanValue()==false) isInput = false;
+                    if (o.getName().equals("controllable") && !o.getBooleanValue()) isInput = false;
                 } catch (DataConversionException e) {
-                    System.err.println("Controllable flag contains non-boolean value");
+                    Log.error("Controllable flag contains non-boolean value", o);
                     throw new RuntimeException(e);
                 }
 
@@ -266,7 +270,7 @@ public class XMLParser {
             }
 
             if (chan == null) {
-                throw new IllegalStateException("Requires a chan");
+                throw new IllegalStateException(edge + "is missing a channel");
             }
 
             edgeList.add(new Edge(source, target, chan, isInput, guards, updates));

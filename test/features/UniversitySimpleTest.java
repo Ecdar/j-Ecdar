@@ -91,13 +91,11 @@ public class UniversitySimpleTest {
 
 
     @Test
-    // @Ignore
     public void newQuotientTest2() {
         assertFalse(new Refinement(new Composition(machine,researcher), new Quotient(spec,adm2)).check());
     }
 
     @Test
-    // @Ignore
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
         TransitionSystem comp = new Composition(machine,researcher);
@@ -167,7 +165,7 @@ public class UniversitySimpleTest {
     }
 
     @Test
-    @Ignore // I believe this test to be incorrect
+    @Ignore // This test might be incorrect
     public void newQuotientTest5() {
         Automaton quo = XMLParser.parse("samples/xml/staticSpecDIVAdm.xml",true)[0];
         Automaton comp = XMLParser.parse("comp.xml",true)[0];

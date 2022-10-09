@@ -182,7 +182,7 @@ public class Refinement {
             // check that for every delay in TS 1 there is a corresponding delay in TS
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {
-                Log.debug("Delay violation");
+                Log.info("Delay violation");
                 if (initialisedCdd) {
                     CDD.done();
                 }
@@ -193,7 +193,7 @@ public class Refinement {
             boolean holds1 = checkOutputs(left, right);
             if (!holds1) {
 
-                Log.debug("Output violation");
+                Log.info("Output violation");
                 if (initialisedCdd) {
                     CDD.done();
                 }
@@ -204,7 +204,7 @@ public class Refinement {
             boolean holds2 = checkInputs(left, right);
             if (!holds2) {
                 //assert(false); // assuming everything is input enabled
-                Log.debug("Input violation");
+                Log.info("Input violation");
                 if (initialisedCdd) {
                     CDD.done();
                 }
@@ -317,8 +317,8 @@ public class Refinement {
 
         // If trans2 does not satisfy all solution of trans1, return empty list which should result in refinement failure
         if (!isInput && leftCDD.minus(rightCDD).isNotFalse()) {
-            Log.debug("trans 2 does not satisfiy all solutions of trans 1");
-//            Log.debug("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
+            Log.info("trans 2 does not satisfiy all solutions of trans 1");
+            Log.debug("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
             Log.debug(leftCDD);
             Log.debug(rightCDD);
             Log.debug(leftCDD.minus(rightCDD));
@@ -326,7 +326,7 @@ public class Refinement {
         }
 
         if (isInput && rightCDD.minus(leftCDD).isNotFalse()) {
-            Log.debug("trans 2 does not satisfiy all solutions of trans 1");
+            Log.info("trans 2 does not satisfiy all solutions of trans 1");
 //            Log.debug("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
             Log.debug(leftCDD);
             Log.debug(rightCDD);
@@ -493,8 +493,8 @@ public class Refinement {
     }
 
     public StatePair getInitialStatePair() {
-        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariantCddNew());
-        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariantCddNew());
+        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariantCddLazy());
+        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariantCddLazy());
         return new StatePair(left, right);
     }
 

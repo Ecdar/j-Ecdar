@@ -1,5 +1,7 @@
 package e2e;
 
+import log.Log;
+import log.Urgency;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -159,13 +161,11 @@ public class UniversityTest extends GrpcE2EBase {
     @Test
     public void machine3DoesNotRefineResearcher() {
         assertFalse(refinement("refinement: Machine3 <= Researcher"));
-
     }
 
     @Test
     public void machine3DoesNotRefineSpecification() {
         assertFalse(refinement("refinement: Machine3 <= Spec"));
-
     }
 
     @Test
@@ -328,7 +328,7 @@ public class UniversityTest extends GrpcE2EBase {
     }
 
     @Test
-    @Ignore // Causes memory errors (Persumably it passes)
+    @Ignore // Causes memory errors (presumably it passes)
     public void generatedTest25() {
         assertTrue(refinement("refinement: ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1)) <= ((((Adm2 && HalfAdm1 && HalfAdm2) || Researcher) && ((Adm2 && HalfAdm1) || Researcher) && ((Adm2 && HalfAdm2) || Researcher)) \\\\ (Adm2 && HalfAdm1))"));
     }

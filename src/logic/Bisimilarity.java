@@ -126,7 +126,7 @@ public class Bisimilarity {
                             List<Update> updates = edgeList.get(0).getUpdates();
                             CDD allCDDs = CDD.cddFalse();
                             for (Edge e : edgeList) {
-                                CDD targetFedAfterReset = e.getTarget().getInvariantCdd();
+                                CDD targetFedAfterReset = e.getTarget().getInvariantCddEager();
                                 targetFedAfterReset = targetFedAfterReset.applyReset(e.getUpdates());
                                 allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
 
@@ -157,7 +157,7 @@ public class Bisimilarity {
 
     public static boolean hasDifferentZone(Location l1, Location l2, List<Clock> clocks)
     {
-        if (l1.getInvariantCdd().equiv(l2.getInvariantCdd())) {
+        if (l1.getInvariantCddEager().equiv(l2.getInvariantCddEager())) {
             return false;
         }
         return true;
@@ -176,8 +176,8 @@ public class Bisimilarity {
                 edgesL2.add(e);
         }
 
-        CDD s1 = l1.getInvariantCdd();
-        CDD s2 = l2.getInvariantCdd();
+        CDD s1 = l1.getInvariantCddEager();
+        CDD s2 = l2.getInvariantCddEager();
 
         for (Edge e1 : edgesL1)
         {

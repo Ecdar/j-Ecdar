@@ -33,11 +33,11 @@ public class InputEnablednessTest {
 
         ClockGuard invL1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
 
-        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l1 = Location.create("L1", invL1, false, false, false, false, 0, 0);
-        Location l2 = Location.create("L2", new TrueGuard(), false, false, false, false, 0, 0);
-        Location l3 = Location.create("L3", new TrueGuard(), false, false, false, false, 0, 0);
-        Location l4 = Location.create("L4", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = Location.create("L1", invL1, false, false, false, false);
+        Location l2 = Location.create("L2", new TrueGuard(), false, false, false, false);
+        Location l3 = Location.create("L3", new TrueGuard(), false, false, false, false);
+        Location l4 = Location.create("L4", new TrueGuard(), false, false, false, false);
 
         Channel i1 = new Channel("i1");
         Channel i2 = new Channel("i2");

@@ -142,7 +142,7 @@ public class Pruning {
                     l.setInvariantGuard(new FalseGuard());
                 }
                 else {
-                    CDD invarMinusIncCDD = l.getInvariantCdd().minus(l.getInconsistentPart());
+                    CDD invarMinusIncCDD = l.getInvariantCddEager().minus(l.getInconsistentPart());
                     l.setInvariantGuard(invarMinusIncCDD.getGuard(clocks));
                 }
             }
@@ -158,9 +158,9 @@ public class Pruning {
         for (Edge e : edges) {
             if (!(e.getTarget().getInvariantGuard() instanceof TrueGuard)) {
                 if (!(e.getTarget().getInvariantGuard() instanceof FalseGuard)) {
-                    CDD target = e.getTarget().getInvariantCdd();
+                    CDD target = e.getTarget().getInvariantCddEager();
                     CDD cddBeforeEdge = target.transitionBack(e);
-                    e.setGuard(cddBeforeEdge.conjunction(e.getSource().getInvariantCdd()).getGuard(clocks));
+                    e.setGuard(cddBeforeEdge.conjunction(e.getSource().getInvariantCddEager()).getGuard(clocks));
                 }
             }
         }
@@ -225,7 +225,7 @@ public class Pruning {
                         // calculate and backtrack the part that is NOT inconsistent
 
                         CDD incPartOfTransThatSavesUs = new CDD(otherE.getTarget().getInconsistentPart().getPointer());
-                        CDD targetInvariantCDDOfTransThatSavesUs = otherE.getTarget().getInvariantCdd();
+                        CDD targetInvariantCDDOfTransThatSavesUs = otherE.getTarget().getInvariantCddEager();
                         CDD goodPart = targetInvariantCDDOfTransThatSavesUs.minus(incPartOfTransThatSavesUs);
 
                         CDD doubleCheck = goodPart.transitionBack(otherE);
@@ -237,7 +237,7 @@ public class Pruning {
                         assert(doubleCheck.equiv(goodPart));
 
                         goodPart = goodPart.past(); // TODO 05.02.21: is it okay to do that?
-                        goodPart = goodPart.conjunction(otherE.getSource().getInvariantCdd());
+                        goodPart = goodPart.conjunction(otherE.getSource().getInvariantCddEager());
 
                         if (printComments)
                             Log.debug("Guards done");
@@ -248,7 +248,7 @@ public class Pruning {
                         // simply apply guards
                         CDD cddOfGuard = otherE.getGuardCDD();
                         cddOfGuard = cddOfGuard.past(); // TODO 05.02.21: IMPORTANT!!!! Since invariants are not bound to start at 0 anymore, every time we use down we need to afterwards intersect with invariant
-                        cddOfGuard = cddOfGuard.conjunction(otherE.getSource().getInvariantCdd());
+                        cddOfGuard = cddOfGuard.conjunction(otherE.getSource().getInvariantCddEager());
                         cddThatSavesUs = cddOfGuard.disjunction(cddThatSavesUs);
 
                     }
@@ -257,7 +257,7 @@ public class Pruning {
             if (printComments)
                 Log.debug("Coming to the subtraction");
 
-            CDD newIncPart = e.getSource().getInvariantCdd().minus(cddThatSavesUs);
+            CDD newIncPart = e.getSource().getInvariantCddEager().minus(cddThatSavesUs);
             processSourceLocation(e,  newIncPart,passedPairs, inconsistentQueue);
 
 
@@ -285,7 +285,7 @@ public class Pruning {
         CDD incCDD = e.getTarget().getInconsistentPart();
 
         // apply target invariant
-        CDD invarCDD = e.getTarget().getInvariantCdd();
+        CDD invarCDD = e.getTarget().getInvariantCddEager();
         incCDD = invarCDD.conjunction(incCDD);
 
         incCDD = incCDD.transitionBack(e);
@@ -335,7 +335,7 @@ public class Pruning {
                 if (printComments)
                     Log.debug("Could not be saved by an output");
                 incCDD = incCDD.past(); // TODO: Check if this works
-                incCDD = incCDD.conjunction(e.getSource().getInvariantCdd());
+                incCDD = incCDD.conjunction(e.getSource().getInvariantCddEager());
             }
 
             if (printComments)
@@ -358,7 +358,7 @@ public class Pruning {
         incCDD = incCDD.past();
 
         // apply source invariant
-        CDD invarCDD1 = e.getSource().getInvariantCdd();
+        CDD invarCDD1 = e.getSource().getInvariantCddEager();
         incCDD = invarCDD1.conjunction(incCDD);
 
         if (printComments)
@@ -383,7 +383,7 @@ public class Pruning {
 
 
         // apply target invariant
-        CDD tartgetInvCDD= e.getTarget().getInvariantCdd();
+        CDD tartgetInvCDD= e.getTarget().getInvariantCddEager();
         testForSatEdgeCDD = tartgetInvCDD.conjunction(testForSatEdgeCDD);
 
         testForSatEdgeCDD = testForSatEdgeCDD.minus(e.getTarget().getInconsistentPart());
@@ -395,7 +395,7 @@ public class Pruning {
         CDD guardCDD1 = e.getGuardCDD();
         testForSatEdgeCDD = guardCDD1.conjunction(testForSatEdgeCDD);
 
-        CDD sourceInvCDD = e.getSource().getInvariantCdd();
+        CDD sourceInvCDD = e.getSource().getInvariantCddEager();
         testForSatEdgeCDD = sourceInvCDD.conjunction(testForSatEdgeCDD);
 
         // remove inconsistent part
@@ -463,7 +463,7 @@ public class Pruning {
                 Log.debug("found an output that might lead us to good");
 
             // Ged invariant Federation
-            CDD goodCDD = otherEdge.getTarget().getInvariantCdd();
+            CDD goodCDD = otherEdge.getTarget().getInvariantCddEager();
             goodCDD = goodCDD.minus(otherEdge.getTarget().getInconsistentPart());
 
             // constrain it by the guards and invariants  of the "good transition". TODO: IMPORTANT: Check if the order of doing the target invariant first, freeing, etc. is the correct one
@@ -472,7 +472,7 @@ public class Pruning {
                 goodCDD = goodCDD.transitionBack(otherEdge);
                 //goodCDD = CDD.applyReset(goodCDD, otherEdge.getUpdates());
 
-                CDD sourceInvFed = otherEdge.getSource().getInvariantCdd();
+                CDD sourceInvFed = otherEdge.getSource().getInvariantCddEager();
                 goodCDD = sourceInvFed.conjunction(goodCDD);
                 allGoodCDDs = allGoodCDDs.disjunction(goodCDD);
                 //Log.debug(incFederation.getZones().get(0).buildGuardsFromZone(clocks));

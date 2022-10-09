@@ -222,7 +222,7 @@ public class Automaton {
 
     public void makeInputEnabled() {
         for (Location loc : getLocations()) {
-            CDD sourceInvariantCDD = loc.getInvariantCdd();
+            CDD sourceInvariantCDD = loc.getInvariantCddEager();
             // loop through all inputs
             for (Channel input : getInputAct()) {
 
@@ -232,7 +232,7 @@ public class Automaton {
                 CDD cddOfAllEdgesWithCurrentInput = CDD.cddFalse();
                 if (!inputEdges.isEmpty()) {
                     for (Edge edge : inputEdges) {
-                        CDD target = edge.getTarget().getInvariantCdd();
+                        CDD target = edge.getTarget().getInvariantCddEager();
                         CDD preGuard1 = target.transitionBack(edge);
                         cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.disjunction(preGuard1);
                     }
@@ -255,7 +255,7 @@ public class Automaton {
 
     public void addTargetInvariantToEdges() {
         for (Edge edge : getEdges()) {
-            CDD targetCDD = edge.getTarget().getInvariantCdd();
+            CDD targetCDD = edge.getTarget().getInvariantCddEager();
             CDD past = targetCDD.transitionBack(edge);
             if (!past.equiv(CDD.cddTrue()))
                 edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));

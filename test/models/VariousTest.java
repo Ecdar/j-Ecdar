@@ -27,9 +27,7 @@ public class VariousTest {
     }
 
     @BeforeClass
-    public static void setUpBeforeClass() {
-
-    }
+    public static void setUpBeforeClass() { }
 
     @Test
     public void simple() throws CddAlreadyRunningException, CddNotRunningException {
@@ -83,13 +81,11 @@ public class VariousTest {
         ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
         ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
 
-
         List<Guard> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
         inner.add(g4);
-
 
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);
@@ -104,9 +100,7 @@ public class VariousTest {
         Guard origin1Guards = origin1.getGuard(clocks);
         Log.debug(origin1Guards);
         assert(true);
-
     }
-
 
     @Test
     public void testClockReset() {
@@ -144,7 +138,6 @@ public class VariousTest {
         Log.debug(origin2Guards);
 
         assert(origin2Guards.toString().equals("(x==0 && y<=3 && y-x<=3 && x-y<=0)"));
-
     }
 
     @Test
@@ -173,8 +166,6 @@ public class VariousTest {
         assertTrue(res);
     }
 
-
-
     @Test
     @Ignore // file not found
     public void testFromFramework2() throws FileNotFoundException {
@@ -187,6 +178,7 @@ public class VariousTest {
         Log.debug(Inf.getLastErr());
         assertTrue(res);
     }
+
     @Test
     @Ignore // This test might be incorrect
     public void testFromFramework3() throws FileNotFoundException {
@@ -215,9 +207,7 @@ public class VariousTest {
         Log.debug(C1.getName());
         Log.debug(C2.getName());
         assertFalse(new Refinement(C1,C2).check());
-
     }
-
 
     @Test
     @Ignore // Transition needs a synchronisation in misc_test.xml
@@ -227,13 +217,10 @@ public class VariousTest {
         GuardParan = new SimpleTransitionSystem(list[0]);
         assertTrue(GuardParan.isLeastConsistent());
         assertTrue(GuardParan.isFullyConsistent());
-
     }
 
-
     @Test
-    public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException
-    {
+    public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException  {
         CDD.init(100,100,100);
         Clock x = new Clock("x","Aut");
         Clock y = new Clock("y", "Aut");
@@ -248,7 +235,6 @@ public class VariousTest {
 
     @Test
     public void testCompOfCompRefinesSpec() throws CddAlreadyRunningException, CddNotRunningException {
-
         Automaton[] aut2 = XMLParser.parse("samples/xml/university-slice.xml", true);
 
         CDD.init(1000,1000,1000);
@@ -265,13 +251,7 @@ public class VariousTest {
         SimpleTransitionSystem spec = new SimpleTransitionSystem((aut2[2]));
 
         assertTrue(new Refinement(
-                new Composition(new TransitionSystem[]{adm,
-                        new Composition(new TransitionSystem[]{machine, researcher})}),
-                spec).check()
+                new Composition(adm, new Composition(machine, researcher)), spec).check()
         );
-
-
-
-
     }
 }

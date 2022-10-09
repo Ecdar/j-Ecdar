@@ -1,17 +1,12 @@
 package connection;
 
-import log.Log;
-import log.Urgency;
 import logic.Controller;
 import logic.query.Query;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
