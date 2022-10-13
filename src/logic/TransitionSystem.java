@@ -98,7 +98,7 @@ public abstract class TransitionSystem {
         );
         invariant = invariant.delay();
         invariant = invariant.conjunction(
-                move.getTarget().getInvariantCddLazy()
+                move.getTarget().getInvariantCdd()
         );
 
         // Create the state after traversing the edge

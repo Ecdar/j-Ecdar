@@ -32,11 +32,11 @@ public class State {
 
 
     public CDD getLocationInvariant() {
-        return location.getInvariantCddLazy();
+        return location.getInvariantCdd();
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return location.getInvariantCddLazy().getGuard(relevantClocks);
+        return location.getInvariantCdd().getGuard(relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -49,7 +49,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        CDD result = this.invarCDD.conjunction(location.getInvariantCddLazy());
+        CDD result = this.invarCDD.conjunction(location.getInvariantCdd());
         this.invarCDD=result;
     }
 

@@ -7,27 +7,28 @@ import logic.Pruning;
 import java.util.*;
 
 /**
- * {@link Location} is a class used by both {@link Automaton} and {@link TransitionSystem} to decribe a locaton.
- * It is named and has coordinates describing the position it should be drawn.
+ * {@link Location} is a class used by both {@link Automaton} and {@link TransitionSystem} to decribe a location.
+ * It is named and has coordinates describing the position where it should be drawn in the GUI.
  * A {@link Location} can be marked as initial, urgent, universal, and inconsistent.
  * In order to reduce the conversions between {@link Guard} and {@link CDD} the invariant is stored as both and only updated when required.
  * For {@link Pruning} it also stores the inconsistent part of its invariant.
  * <p>
- * A {@link Location} can also consist of multiple locations, if this is the case then it is a product.
+ * A {@link Location} can also consist of multiple locations. If this is the case, then it is a product.
  * This is the case when combining multiple locations e.g. when performing {@link logic.Conjunction}.
- * For the product it is assumed that the order of location also corresponds to the child {@link TransitionSystem}.
+ * For the product it is assumed that the order of locations also corresponds to the child {@link TransitionSystem}.
  * <p>
- * A {@link Location} can also be a simple location which is nearly the same as a product with one element.
- * However, if the location is simple then the lazy evaluation of its invariant will always be the invariant of the child.
+ * A {@link Location} can also be a simple location, which is nearly the same as a product with one element.
+ * The difference between a product with one element is that the simple location will always return the invariant of its child.
  * <p>
  * State overview:
  * <ul>
  *     <li>name
  *     <li>x and y coordinates
- *     <li>invariant both as {@link CDD} and {@link Guard}
+ *     <li>invariant both as {@link Guard} and {@link CDD}
  *     <li>inconsistent part for {@link Pruning}
  *     <li>whether it is initial, urgent, universal, inconsistent
  * </ul>
+ *
  * @see LocationPair
  */
 public final class Location {
@@ -86,18 +87,18 @@ public final class Location {
             int y
     ) {
         return new Location(
-                name,
-                invariant,
-                null,
-                null,
-                isInitial,
-                isUrgent,
-                isUniversal,
-                isInconsistent,
-                new ArrayList<>(),
-                null,
-                x,
-                y
+            name,
+            invariant,
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            isUniversal,
+            isInconsistent,
+            new ArrayList<>(),
+            null,
+            x,
+            y
         );
     }
 
@@ -149,18 +150,18 @@ public final class Location {
 
         Guard invariant = new AndGuard(guards);
         return new Location(
-                name,
-                invariant,
-                null,
-                null,
-                isInitial,
-                isUrgent,
-                isUniversal,
-                isInconsistent,
-                productOf,
-                null,
-                x,
-                y
+            name,
+            invariant,
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            isUniversal,
+            isInconsistent,
+            productOf,
+            null,
+            x,
+            y
         );
     }
 
@@ -172,18 +173,18 @@ public final class Location {
             int y
     ) {
         return new Location(
-                name,
-                new TrueGuard(),
-                null,
-                null,
-                isInitial,
-                isUrgent,
-                true,
-                false,
-                new ArrayList<>(),
-                null,
-                x,
-                y
+            name,
+            new TrueGuard(),
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            true,
+            false,
+            new ArrayList<>(),
+            null,
+            x,
+            y
         );
     }
 
@@ -199,18 +200,18 @@ public final class Location {
             int y
     ) {
         return new Location(
-                name,
-                new FalseGuard(),
-                null,
-                null,
-                isInitial,
-                isUrgent,
-                false,
-                true,
-                new ArrayList<>(),
-                null,
-                x,
-                y
+            name,
+            new FalseGuard(),
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            false,
+            true,
+            new ArrayList<>(),
+            null,
+            x,
+            y
         );
     }
 
@@ -220,18 +221,18 @@ public final class Location {
 
     public static Location createSimple(Location location) {
         return new Location(
-                location.getName(),
-                location.getInvariantGuard(),
-                null,
-                location.getInconsistentPart(),
-                location.isInitial(),
-                location.isUrgent(),
-                location.isUniversal(),
-                location.isInconsistent(),
-                new ArrayList<>(),
-                location,
-                location.getX(),
-                location.getY()
+            location.getName(),
+            location.getInvariantGuard(),
+            null,
+            location.getInconsistentPart(),
+            location.isInitial(),
+            location.isUrgent(),
+            location.isUniversal(),
+            location.isInconsistent(),
+            new ArrayList<>(),
+            location,
+            location.getX(),
+            location.getY()
         );
     }
 
@@ -247,8 +248,8 @@ public final class Location {
             isInconsistent(),
             new ArrayList<>(),
             null,
-                getX(),
-                getY()
+            getX(),
+            getY()
         );
     }
 
@@ -261,7 +262,7 @@ public final class Location {
         return new Location(
             getName(),
             getInvariantGuard().copy(
-                newClocks, oldClocks, newBVs, oldBVs
+                    newClocks, oldClocks, newBVs, oldBVs
             ),
             null,
             null,
@@ -271,8 +272,8 @@ public final class Location {
             isInconsistent(),
             getProductOf(),
             null,
-                getX(),
-                getY()
+            getX(),
+            getY()
         );
     }
 
@@ -331,19 +332,15 @@ public final class Location {
 
     public Guard getInvariantGuard() {
         if (invariantGuard == null) {
-            invariantGuard = getInvariantCddEager().getGuard();
+            invariantGuard = getInvariantCdd().getGuard();
         }
 
         return invariantGuard;
     }
 
-    public CDD getInvariantCddEager() {
-        return new CDD(getInvariantGuard());
-    }
-
-    public CDD getInvariantCddLazy() {
+    public CDD getInvariantCdd() {
         if (isSimple()) {
-            return location.getInvariantCddEager();
+            return new CDD(location.getInvariantGuard());
         }
 
         if (invariantCdd == null) {
@@ -354,7 +351,7 @@ public final class Location {
             } else if (isProduct()) {
                 this.invariantCdd = CDD.cddTrue();
                 for (Location location : productOf) {
-                    this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCddLazy());
+                    this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCdd());
                 }
             } else {
                 invariantCdd = new CDD(getInvariantGuard());

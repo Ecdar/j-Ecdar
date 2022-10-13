@@ -493,8 +493,8 @@ public class Refinement {
     }
 
     public StatePair getInitialStatePair() {
-        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariantCddLazy());
-        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariantCddLazy());
+        State left = ts1.getInitialState( ts2.getInitialLocation().getInvariantCdd());
+        State right = ts2.getInitialState(ts1.getInitialLocation().getInvariantCdd());
         return new StatePair(left, right);
     }
 

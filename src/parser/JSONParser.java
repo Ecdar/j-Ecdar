@@ -223,7 +223,7 @@ public class JSONParser {
             Guard invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueGuard() :
                     GuardParser.parse(jsonObject.get("invariant").toString(), componentClocks, BVs));
             Location loc = Location.create(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
-                    isUniversal, isInconsistent, 0, 0);
+                    isUniversal, isInconsistent);
 
             returnLocList.add(loc);
         }

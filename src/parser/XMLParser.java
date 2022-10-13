@@ -192,7 +192,7 @@ public class XMLParser {
                 newLoc = Location.create(locName, invariants, isInitial, false, false, false, x, y);
             }
             else {
-                newLoc = Location.create(locName, invariants, isInitial, false, false, false, 0, 0);
+                newLoc = Location.create(locName, invariants, isInitial, false, false, false);
             }
 
 
@@ -206,7 +206,7 @@ public class XMLParser {
                     if (xyDefined)
                         newLoc = Location.create(locName, invariants, isInitial, false, false, true, x,y);
                     else
-                        newLoc = Location.create(locName, invariants, isInitial, false, false, true, 0, 0);
+                        newLoc = Location.create(locName, invariants, isInitial, false, false, true);
                 }
             }
 
@@ -270,7 +270,7 @@ public class XMLParser {
             }
 
             if (chan == null) {
-                throw new IllegalStateException(edge + "is missing a channel");
+                throw new IllegalStateException(edge + " is missing a channel");
             }
 
             edgeList.add(new Edge(source, target, chan, isInput, guards, updates));
