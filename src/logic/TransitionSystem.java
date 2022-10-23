@@ -73,7 +73,7 @@ public abstract class TransitionSystem {
                 .stream(systems)
                 .map(TransitionSystem::getInitialLocation)
                 .collect(Collectors.toList());
-        return Location.createProduct(initials);
+        return Location.createComposition(initials);
     }
 
     private Transition createNewTransition(State state, Move move) {
@@ -235,16 +235,16 @@ public abstract class TransitionSystem {
                     sources.add(q1s);
                     targets.add(q1t);
                 } else {
-                    sources.addAll(q1s.getProductOf());
-                    targets.addAll(q1t.getProductOf());
+                    sources.addAll(q1s.getChildren());
+                    targets.addAll(q1t.getChildren());
                 }
 
                 // Always add q2 after q1
                 sources.add(q2s);
                 targets.add(q2t);
 
-                Location source = Location.createProduct(sources);
-                Location target = Location.createProduct(targets);
+                Location source = Location.createComposition(sources);
+                Location target = Location.createComposition(targets);
 
                 // If true then we remove the conjoined invariant created from all "targets"
                 if (removeTargetLocationInvariant) {

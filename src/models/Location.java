@@ -8,20 +8,34 @@ import java.util.*;
 
 /**
  * {@link Location} is a class used by both {@link Automaton} and {@link TransitionSystem} to decribe a location.
- * It is named and has coordinates describing the position where it should be drawn in the GUI.
- * A {@link Location} can be marked as initial, urgent, universal, and inconsistent.
- * In order to reduce the conversions between {@link Guard} and {@link CDD} the invariant is stored as both and only updated when required.
- * For {@link Pruning} it also stores the inconsistent part of its invariant.
+ *  It is named and has coordinates describing the position where it should be drawn in the GUI.
+ *  A {@link Location} can be marked as initial, urgent, universal, and inconsistent.
+ *  In order to reduce the conversions between {@link Guard} and {@link CDD}
+ *  the invariant is stored as both and only updated when required.
+ *  For {@link Pruning} it also stores the inconsistent part of its invariant.
  * <p>
- * A {@link Location} can also consist of multiple locations. If this is the case, then it is a product.
- * This is the case when combining multiple locations e.g. when performing {@link logic.Conjunction}.
- * For the product it is assumed that the order of locations also corresponds to the child {@link TransitionSystem}.
+ * A {@link Location} can also be <b>composed</b> of multiple locations (children).
+ *  A composed location is created when performing {@link logic.Conjunction} for multiple systems,
+ *  and it represents an n-tuple of locations correlated with the sequence of {@link TransitionSystem TransitionSystems}.
+ *  For this reason the composed location are directly addressable with the index of the systems.
+ *  The invariant of a composed location is lazily created as the conjunction of its children's invariants.
+ *  In this context lazily created means that the locally stored invariant value in this location is only
+ *  updated when a change in this composed location warrants an update to it.
+ *  This can be warranted when {@link #setInvariantGuard(Guard)} is invoked.
+ * </p>
  * <p>
- * A {@link Location} can also be a simple location, which is nearly the same as a product with one element.
- * The difference between a product with one element is that the simple location will always return the invariant of its child.
- * <p>
- * State overview:
+ * A {@link Location} can also be a <b>simple</b> location, which is a location with exactly one child.
+ *  A simple location is used when the {@link CDD CDD invariant} of this location
+ *  is not directly created from the {@link Guard Guard invariant}
+ *  meaning that the {@link CDD CDD invariant} of this location will always be the {@link CDD CDD invariant} of its child,
+ *  whilst the {@link Guard Guard invariant} of this location can be different from the {@link CDD CDD invariant}.
+ *  This is used when performing {@link Pruning} where the {@link CDD CDD invariant} is expected to
+ *  be constant whilst we are changing the {@link Guard Guard invariant}.
+ *  <b>Deprecation warning:</b> <i>simple</i> locations are planned to be deprecated and one should instead create
+ *      composed locations which have a more predictable specification
+ * </p>
  * <ul>
+ * State overview:
  *     <li>name
  *     <li>x and y coordinates
  *     <li>invariant both as {@link Guard} and {@link CDD}
@@ -45,8 +59,7 @@ public final class Location {
     private boolean isUniversal;
     private boolean isInconsistent;
 
-    private final List<Location> productOf;
-    private final Location location;
+    private final List<Location> children;
 
     private Location(
             String name,
@@ -57,11 +70,14 @@ public final class Location {
             boolean isUrgent,
             boolean isUniversal,
             boolean isInconsistent,
-            List<Location> productOf,
-            Location location,
+            List<Location> children,
             int x,
             int y
     ) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+
         this.name = name;
         this.invariantGuard = invariantGuard;
         this.invariantCdd = invariantCdd;
@@ -70,8 +86,7 @@ public final class Location {
         this.isUrgent = isUrgent;
         this.isUniversal = isUniversal;
         this.isInconsistent = isInconsistent;
-        this.productOf = productOf;
-        this.location = location;
+        this.children = children;
         this.x = x;
         this.y = y;
     }
@@ -96,7 +111,6 @@ public final class Location {
             isUniversal,
             isInconsistent,
             new ArrayList<>(),
-            null,
             x,
             y
         );
@@ -118,8 +132,8 @@ public final class Location {
         return location.copy();
     }
 
-    public static Location createProduct(List<Location> productOf) {
-        if (productOf.size() == 0) {
+    public static Location createComposition(List<Location> children) {
+        if (children.size() == 0) {
             throw new IllegalArgumentException("Requires at least one location to create a product");
         }
 
@@ -132,7 +146,7 @@ public final class Location {
         int y = 0;
 
         List<Guard> guards = new ArrayList<>();
-        for (Location location : productOf) {
+        for (Location location : children) {
             nameBuilder.append(location.getName());
             isInitial = isInitial && location.isInitial();
             isUniversal = isUniversal && location.isUniversal();
@@ -143,7 +157,7 @@ public final class Location {
             guards.add(location.getInvariantGuard());
         }
 
-        int amount = productOf.size();
+        int amount = children.size();
         x /= amount;
         y /= amount;
         String name = nameBuilder.toString();
@@ -158,8 +172,7 @@ public final class Location {
             isUrgent,
             isUniversal,
             isInconsistent,
-            productOf,
-            null,
+            children,
             x,
             y
         );
@@ -182,7 +195,6 @@ public final class Location {
             true,
             false,
             new ArrayList<>(),
-            null,
             x,
             y
         );
@@ -209,7 +221,6 @@ public final class Location {
             false,
             true,
             new ArrayList<>(),
-            null,
             x,
             y
         );
@@ -219,20 +230,22 @@ public final class Location {
         return Location.createInconsistentLocation(name, false, false, x, y);
     }
 
-    public static Location createSimple(Location location) {
+    public static Location createSimple(Location child) {
+        List<Location> children = new ArrayList<>();
+        children.add(child);
+
         return new Location(
-            location.getName(),
-            location.getInvariantGuard(),
+            child.getName(),
+            child.getInvariantGuard(),
             null,
-            location.getInconsistentPart(),
-            location.isInitial(),
-            location.isUrgent(),
-            location.isUniversal(),
-            location.isInconsistent(),
-            new ArrayList<>(),
-            location,
-            location.getX(),
-            location.getY()
+            child.getInconsistentPart(),
+            child.isInitial(),
+            child.isUrgent(),
+            child.isUniversal(),
+            child.isInconsistent(),
+            children,
+            child.getX(),
+            child.getY()
         );
     }
 
@@ -247,7 +260,6 @@ public final class Location {
             isUniversal(),
             isInconsistent(),
             new ArrayList<>(),
-            null,
             getX(),
             getY()
         );
@@ -270,23 +282,22 @@ public final class Location {
             isUrgent(),
             isUniversal(),
             isInconsistent(),
-            getProductOf(),
-            null,
+            getChildren(),
             getX(),
             getY()
         );
     }
 
     public boolean isSimple() {
-        return location != null;
+        return children.size() == 1;
     }
 
-    public boolean isProduct() {
-        return productOf.size() > 0;
+    public boolean isComposed() {
+        return children.size() > 1;
     }
 
-    public List<Location> getProductOf() {
-        return productOf;
+    public List<Location> getChildren() {
+        return children;
     }
 
     public void removeInvariants() {
@@ -340,7 +351,7 @@ public final class Location {
 
     public CDD getInvariantCdd() {
         if (isSimple()) {
-            return new CDD(location.getInvariantGuard());
+            return new CDD(children.get(0).getInvariantGuard());
         }
 
         if (invariantCdd == null) {
@@ -348,9 +359,9 @@ public final class Location {
                 invariantCdd = CDD.cddZero();
             } else if (isUniversal) {
                 invariantCdd = CDD.cddTrue();
-            } else if (isProduct()) {
+            } else if (children.size() > 0) {
                 this.invariantCdd = CDD.cddTrue();
-                for (Location location : productOf) {
+                for (Location location : children) {
                     this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCdd());
                 }
             } else {
@@ -364,14 +375,6 @@ public final class Location {
     public void setInvariantGuard(Guard invariantAsGuard) {
         this.invariantGuard = invariantAsGuard;
         this.invariantCdd = null;
-    }
-
-    public void setUrgent(boolean urgent) {
-        isUrgent = urgent;
-    }
-
-    public void setUniversal(boolean universal) {
-        isUniversal = universal;
     }
 
     public CDD getInconsistentPart() {
@@ -401,13 +404,13 @@ public final class Location {
         if (o == null || getClass() != o.getClass()) return false;
         Location that = (Location) o;
 
-        if (isProduct() && that.isProduct()) {
-            if (productOf.size() != that.productOf.size()) {
+        if (isComposed() && that.isComposed()) {
+            if (children.size() != that.children.size()) {
                 return false;
             }
 
-            for (int i = 0; i < productOf.size(); i++) {
-                if (!productOf.get(i).equals(that.productOf.get(i))) {
+            for (int i = 0; i < children.size(); i++) {
+                if (!children.get(i).equals(that.children.get(i))) {
                     return false;
                 }
             }
@@ -424,8 +427,8 @@ public final class Location {
 
     @Override
     public int hashCode() {
-        if (isProduct()) {
-            return Objects.hash(productOf);
+        if (isComposed()) {
+            return Objects.hash(children);
         }
 
         return Objects.hash(name, getInvariantGuard(), isInitial, isUrgent, isUniversal, isInconsistent);

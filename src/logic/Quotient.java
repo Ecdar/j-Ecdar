@@ -82,8 +82,8 @@ public class Quotient extends AggregatedTransitionSystem {
             }
         }
 
-        if (location.isProduct()) {
-            List<Location> locations = location.getProductOf();
+        if (location.isComposed()) {
+            List<Location> locations = location.getChildren();
 
             // Symbolic locations corresponding to each TS.
             Location lt = locations.get(0);
