@@ -33,16 +33,6 @@ public class Quotient extends AggregatedTransitionSystem {
         );
     }
 
-    public SimpleTransitionSystem calculateQuotientAutomaton() {
-        return calculateQuotientAutomaton(false);
-    }
-
-    public SimpleTransitionSystem calculateQuotientAutomaton(boolean prepareForBisimilarityReduction) {
-        return new SimpleTransitionSystem(
-                getAutomaton()
-        );
-    }
-
     public Set<Channel> getInputs() {
         return inputs;
     }

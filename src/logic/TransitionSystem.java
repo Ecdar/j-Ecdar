@@ -303,6 +303,10 @@ public abstract class TransitionSystem {
         }
     }
 
+    public SimpleTransitionSystem getTransitionSystem() {
+        return new SimpleTransitionSystem(getAutomaton());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

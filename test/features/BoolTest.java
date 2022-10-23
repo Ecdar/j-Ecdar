@@ -521,10 +521,10 @@ public class BoolTest {
         XMLFileWriter.toXML("testOutput/TInputEnabled.xml", new SimpleTransitionSystem(auts[0]));
         Log.debug("PARSING COMPLETE");
         Quotient q = new Quotient(new SimpleTransitionSystem(auts[1]),new SimpleTransitionSystem(auts[0]));
-        SimpleTransitionSystem sts = q.calculateQuotientAutomaton();
+        SimpleTransitionSystem sts = q.getTransitionSystem();
         XMLFileWriter.toXML("testOutput/quotient_bool.xml",sts);
 
-        SimpleTransitionSystem sts1 = q.calculateQuotientAutomaton(true);
+        SimpleTransitionSystem sts1 = q.getTransitionSystem();
         XMLFileWriter.toXML("testOutput/quotient_bool1.xml",sts1);
 
         Automaton finalAut = Bisimilarity.checkBisimilarity(sts1.getAutomaton());
