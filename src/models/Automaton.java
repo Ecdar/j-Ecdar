@@ -13,10 +13,14 @@ public class Automaton {
     private final List<BoolVar> BVs;
     private final List<Edge> edges;
     private final List<Clock> clocks;
-    private Set<Channel> inputAct, outputAct, actions;
+    private final Set<Channel> inputAct, outputAct, actions;
     private final Location initial;
 
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInputEnabled) {
+        if (locations.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Automaton %s must have at least one location.", name));
+        }
+
         this.name = name;
         this.locations = locations;
         this.clocks = clocks;
@@ -26,15 +30,16 @@ public class Automaton {
                 .filter(Location::isInitial)
                 .collect(Collectors.toList());
         if (initialLocations.size() > 1) {
-            throw new IllegalArgumentException("Cannot have more than one initial location");
+            throw new IllegalArgumentException(String.format("Automaton %s cannot have more than one initial location", name));
         }
         if (initialLocations.size() == 0) {
-            throw new IllegalArgumentException("Must have one initial location");
+            throw new IllegalArgumentException(String.format("Automaton %s must have at least one initial location", name));
         }
         initial = initialLocations.get(0);
 
         this.edges = edges;
 
+        // Retrieve the inputs and outputs
         inputAct = new HashSet<>();
         outputAct = new HashSet<>();
         for (Edge edge : this.edges) {
@@ -46,19 +51,31 @@ public class Automaton {
             }
         }
 
+        /* The finite set of actions must be partitioned into inputs and outputs.
+         *   Here we check whether they are partitioned by checking that the intersection of the
+         *   inputs and outputs are empty as an action can only be either an input xor an output.
+         *   We don't have to check whether an action is neither an input nor an output as the set
+         *   of actions is build as the union of the inputs and outputs and for this reason
+         *   guarantees to be in the set of actions. */
+        Set<Channel> intersection = new HashSet<>(inputAct);
+        intersection.retainAll(outputAct);
+        if (!intersection.isEmpty()) {
+            // Constructs a string with the names of the actions violating the partition property as "{a, b, c}"
+            String violatingActions = "{" + intersection
+                    .stream()
+                    .map(Channel::getName)
+                    .collect(Collectors.joining(", ")) + "}";
+            throw new IllegalArgumentException(String.format("The actions %s of specification automaton %s is not a partition.", violatingActions, name));
+        }
+
+        /* Since inputAct and outputAct are now disjoint, we can simply construct actions as the union of both sets. */
         actions = Sets.newHashSet(
                 Iterables.concat(inputAct, outputAct)
         );
 
         if (makeInputEnabled) {
-            boolean initialisedCdd = CDD.tryInit(clocks, BVs);
-
             addTargetInvariantToEdges();
             makeInputEnabled();
-
-            if (initialisedCdd) {
-                CDD.done();
-            }
         }
     }
 
@@ -89,6 +106,21 @@ public class Automaton {
         outputAct = automaton.outputAct;
         actions = automaton.actions;
         initial = automaton.initial.copy(clocks, automaton.clocks, BVs, automaton.BVs);
+    }
+
+    private void addTargetInvariantToEdges() {
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+
+        for (Edge edge : getEdges()) {
+            CDD targetCDD = edge.getTarget().getInvariantCDD();
+            CDD past = targetCDD.transitionBack(edge);
+            if (!past.equiv(CDD.cddTrue()))
+                edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
+        }
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
     }
 
     public List<Location> getLocations() {
@@ -221,6 +253,8 @@ public class Automaton {
     }
 
     public void makeInputEnabled() {
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+
         for (Location loc : getLocations()) {
             CDD sourceInvariantCDD = new CDD(loc.getInvariantGuard());
             // loop through all inputs
@@ -247,10 +281,8 @@ public class Automaton {
                     Edge newEdge = new Edge(loc, loc, input, true, resCDD.getGuard(getClocks()), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
-
             }
         }
-
     }
 
     public void addTargetInvariantToEdges() {
