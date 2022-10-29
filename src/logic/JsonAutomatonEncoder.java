@@ -81,7 +81,7 @@ public class JsonAutomatonEncoder {
             locationJson.put("y", l.getY());
 
 
-            String guardString =l.getInvariant().toString();
+            String guardString =l.getInvariantGuard().toString();
             /*int i= 0; int j=0;
             for (List<Guard> disjunction: l.getInvariant())
             {

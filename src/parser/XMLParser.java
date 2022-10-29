@@ -1,5 +1,6 @@
 package parser;
 
+import log.Log;
 import models.*;
 import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
@@ -77,6 +78,10 @@ public class XMLParser {
 
         // edges
         List<Edge> edges = setEdges(element, clocks, BVs, locations);
+
+        for (Edge edge : edges) {
+            Log.debug(edge.getChannel());
+        }
 
         return new Automaton(name, locations, edges, clocks, BVs, makeInpEnabled);
     }
@@ -183,8 +188,12 @@ public class XMLParser {
             }
 
             Location  newLoc;
-            if (xyDefined) newLoc= new Location(locName, invariants, isInitial, false, false, false, x, y);
-            else newLoc= new Location(locName, invariants, isInitial, false, false, false);
+            if (xyDefined) {
+                newLoc = Location.create(locName, invariants, isInitial, false, false, false, x, y);
+            }
+            else {
+                newLoc = Location.create(locName, invariants, isInitial, false, false, false);
+            }
 
 
             List<Element> names = loc.getChildren("name");
@@ -195,9 +204,9 @@ public class XMLParser {
                 if (name.getContent().get(0).getValue().toString().equals("inc")) {
                     //Log.trace("Parsed an inconsistent location");
                     if (xyDefined)
-                        newLoc = new Location(locName, invariants, isInitial, false, false, true, x,y);
+                        newLoc = Location.create(locName, invariants, isInitial, false, false, true, x,y);
                     else
-                        newLoc = new Location(locName, invariants, isInitial, false, false, true);
+                        newLoc = Location.create(locName, invariants, isInitial, false, false, true);
                 }
             }
 
@@ -217,9 +226,9 @@ public class XMLParser {
             boolean isInput = true;
             for (Attribute o : edge.getAttributes()) {
                 try {
-                    if (o.getName().equals("controllable") && o.getBooleanValue()==false) isInput = false;
+                    if (o.getName().equals("controllable") && !o.getBooleanValue()) isInput = false;
                 } catch (DataConversionException e) {
-                    System.err.println("Controllable flag contains non-boolean value");
+                    Log.error("Controllable flag contains non-boolean value", o);
                     throw new RuntimeException(e);
                 }
 
@@ -258,6 +267,10 @@ public class XMLParser {
                         }
                         break;
                 }
+            }
+
+            if (chan == null) {
+                throw new IllegalStateException(edge + " is missing a channel");
             }
 
             edgeList.add(new Edge(source, target, chan, isInput, guards, updates));

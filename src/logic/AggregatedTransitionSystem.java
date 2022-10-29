@@ -44,7 +44,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     @Override
-    public SymbolicLocation getInitialLocation() {
+    public Location getInitialLocation() {
         return getInitialLocation(systems);
     }
 
@@ -84,20 +84,19 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     @Override
-    public List<Move> getNextMoves(SymbolicLocation location, Channel channel) {
+    public List<Move> getNextMoves(Location location, Channel channel) {
         // Check if action belongs to this transition system at all before proceeding
         if (!getOutputs().contains(channel) && !getInputs().contains(channel)) {
             return new ArrayList<>();
         }
 
         // Check that the location is ComplexLocation
-        if (!(location instanceof ComplexLocation)) {
+        if (!location.isComposed()) {
             throw new IllegalArgumentException(
                     "The location type must be ComplexLocation as aggregated transition systems requires multiple locations"
             );
         }
-        ComplexLocation complexLocation = (ComplexLocation) location;
-        List<SymbolicLocation> locations = complexLocation.getLocations();
+        List<Location> locations = location.getChildren();
 
         /* Check that the complex locations size is the same as the systems
          * This is because the index of the system,
@@ -112,10 +111,16 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         return computeResultMoves(locations, channel);
     }
 
-    protected abstract List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel);
+    protected List<Move> computeResultMoves(List<Location> locations, Channel channel) {
+        return new ArrayList<>();
+    }
 
     protected List<TransitionSystem> getRootSystems() {
         return Arrays.asList(systems);
+    }
+
+    protected boolean in(Channel element, Set<Channel> set) {
+        return set.contains(element);
     }
 
     protected Set<Channel> intersect(Set<Channel> set1, Set<Channel> set2) {
@@ -145,11 +150,8 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         Set<Location> locations = new HashSet<>();
         Map<String, Location> locationMap = new HashMap<>();
 
-        List<Location> initials = new ArrayList<>();
-        for (Automaton aut : automata) {
-            initials.add(aut.getInitial());
-        }
-        Location initial = new Location(initials);
+        State initialState = getInitialState();
+        Location initial = initialState.getLocation();
         locations.add(initial);
         locationMap.put(initial.getName(), initial);
 
@@ -183,7 +185,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
                     String targetName = targetState.getLocation().getName();
                     locationMap.computeIfAbsent(
                             targetName, key -> {
-                                Location newLocation = new Location(targetState, clocks.getItems());
+                                Location newLocation = Location.createFromState(targetState, clocks.getItems());
                                 locations.add(newLocation);
                                 return newLocation;
                             }

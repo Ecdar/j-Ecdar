@@ -63,7 +63,7 @@ public class QuotientTest {
         test1Spec.toXML("testOutput/test1SpecCompleted.xml");
 
         Quotient quo = new Quotient(test1Spec,test1Comp0);
-        SimpleTransitionSystem out = quo.calculateQuotientAutomaton();
+        SimpleTransitionSystem out = quo.getTransitionSystem();
         out.toXML("testOutput/SimpleTimedQuotient.xml");
 
         SimpleTransitionSystem outPruned = Pruning.adversarialPruning(out);
@@ -88,7 +88,7 @@ public class QuotientTest {
     @Test
     public void QuotientSpec01Comp1() {
         Quotient quo = new Quotient(spec01,comp0);
-        SimpleTransitionSystem out = quo.calculateQuotientAutomaton();
+        SimpleTransitionSystem out = quo.getTransitionSystem();
         out.toXML("testOutput/quotient1-disj.xml");
 
         Log.trace("Built Quotient 1");
@@ -100,7 +100,7 @@ public class QuotientTest {
 
 
         Quotient quo1 = new Quotient(outPrunedReach,comp1);
-        SimpleTransitionSystem out1 = quo1.calculateQuotientAutomaton();
+        SimpleTransitionSystem out1 = quo1.getTransitionSystem();
         out1.toXML("testOutput/quotient2-disj.xml");
 
 
@@ -117,7 +117,7 @@ public class QuotientTest {
 
 
         Quotient quo2 = new Quotient(outPrunedReach1,comp2);
-        SimpleTransitionSystem out2 = quo2.calculateQuotientAutomaton();
+        SimpleTransitionSystem out2 = quo2.getTransitionSystem();
         Log.trace("Built Quotient 3");
         out2.toXML("testOutput/quotient3-disj.xml");
         SimpleTransitionSystem outPruned2 = Pruning.adversarialPruning(out2);
@@ -128,7 +128,7 @@ public class QuotientTest {
 
 
         Quotient quotient = new Quotient(spec01,comp2);
-        SimpleTransitionSystem output = quotient.calculateQuotientAutomaton();
+        SimpleTransitionSystem output = quotient.getTransitionSystem();
         output.toXML("testOutput/quotient-spec01-comp2-disj.xml");
 
         SimpleTransitionSystem outputPruned = Pruning.adversarialPruning(output);

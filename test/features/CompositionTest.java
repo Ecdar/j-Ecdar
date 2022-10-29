@@ -81,7 +81,7 @@ public class CompositionTest {
     @Test
     public void selfloopTest() {
 
-        Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);
+        Automaton[] aut1 = XMLParser.parse("samples/xml/selfloopNonZeno.xml", false);
         Automaton copy = new Automaton(aut1[0]);
         SimpleTransitionSystem selfloop = new SimpleTransitionSystem(aut1[0]);
         SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(copy);
@@ -98,9 +98,9 @@ public class CompositionTest {
         for (Location l : comp.getAutomaton().getLocations())
         {
             if (l.isInconsistent())
-                System.out.println("ISINC");
+                Log.debug("ISINC");
             if (l.isUniversal())
-                System.out.println("ISUNIV");
+                Log.debug("ISUNIV");
         }
         // TODO : for some reason this fails, now that I fixed the "isUniversal" of complex locations
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);

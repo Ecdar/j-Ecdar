@@ -317,12 +317,11 @@ public class Zone {
         for (int i = 0, j = 1; i < length; i++, j++) {
 
             toPrint = toConvert ? DBMLib.raw2bound(dbm[i]) : dbm[i];
-
-            System.out.print(toPrint);
+            Log.trace(toPrint);
 
             if (showStrictness) {
                 String strictness = DBMLib.dbm_rawIsStrict(dbm[i]) ? " < " : " <=";
-                System.out.print(strictness);
+                Log.trace(strictness);
             }
             if (j == dimension) {
                 Log.trace();
@@ -330,9 +329,11 @@ public class Zone {
                 j = 0;
             } else {
                 intLength = String.valueOf(toPrint).length();
+                StringBuilder stringBuilder = new StringBuilder();
                 for (int k = 0; k < 14 - intLength; k++) {
-                    System.out.print(" ");
+                    stringBuilder.append(" ");
                 }
+                Log.debug(stringBuilder.toString());
             }
         }
     }

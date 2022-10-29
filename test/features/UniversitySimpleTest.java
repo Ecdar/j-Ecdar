@@ -3,10 +3,12 @@ package features;
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import log.Log;
+import log.Urgency;
 import logic.*;
 import models.Automaton;
 import models.CDD;
 import models.Clock;
+import models.Location;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -89,30 +91,24 @@ public class UniversitySimpleTest {
 
 
     @Test
-    @Ignore
     public void newQuotientTest2() {
-
-        assertFalse(new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), new Quotient(spec,adm2)).check());
+        assertFalse(new Refinement(new Composition(machine,researcher), new Quotient(spec,adm2)).check());
     }
 
     @Test
-    @Ignore
     public void newQuotientTest4A() {
         Quotient q = new Quotient(spec,adm);
-        XMLFileWriter.toXML("./testOutput/specDIVadm.xml", new Automaton[]{q.getAutomaton()});
-        XMLFileWriter.toXML("./testOutput/comp.xml",  new Automaton[]{new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton()});
-        TransitionSystem comp = new SimpleTransitionSystem(new Composition(new TransitionSystem[]{machine,researcher}).getAutomaton());
-        Refinement ref = new Refinement(comp, new SimpleTransitionSystem(q.getAutomaton()) );
+        TransitionSystem comp = new Composition(machine,researcher);
+        Refinement ref = new Refinement(comp, q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
-/*
 
     @Test
     public void newQuotientTest4B() {
         Quotient q = new Quotient(spec,researcher);
-        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,adm}), q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -122,7 +118,7 @@ public class UniversitySimpleTest {
     @Test
     public void newQuotientTest4C() {
         Quotient q = new Quotient(spec,machine);
-        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -130,7 +126,7 @@ public class UniversitySimpleTest {
     @Test
     public void newQuotientTest4D() {
         Quotient q = new Quotient(spec,machine);
-        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), new SimpleTransitionSystem(q.getAutomaton()) );
+        Refinement ref = new Refinement(new Composition(new TransitionSystem[]{researcher,adm}), q );
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
@@ -162,13 +158,14 @@ public class UniversitySimpleTest {
         SimpleTransitionSystem adm = new SimpleTransitionSystem(autAdm);
         SimpleTransitionSystem spec = new SimpleTransitionSystem(autSpec);
 
-        Refinement ref = new Refinement(researcher, new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton())  );
+        Refinement ref = new Refinement(researcher, new Quotient(spec,adm)  );
         boolean result = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(result);
     }
 
     @Test
+    @Ignore // This test might be incorrect
     public void newQuotientTest5() {
         Automaton quo = XMLParser.parse("samples/xml/staticSpecDIVAdm.xml",true)[0];
         Automaton comp = XMLParser.parse("comp.xml",true)[0];
@@ -184,15 +181,13 @@ public class UniversitySimpleTest {
         XMLFileWriter.toXML("admnew.xml",new Automaton[]{adm.getAutomaton()});
 
 
-        SimpleTransitionSystem st =  new SimpleTransitionSystem(new Quotient(spec,adm).getAutomaton());
+        Quotient st =  new Quotient(spec,adm);
 
         Refinement ref = new Refinement(new Composition(new TransitionSystem[]{machine,researcher}), st);
         boolean res = ref.check();
         Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
-
-*/
 
     @Test
     public void testHalf2RefinesSelf() {

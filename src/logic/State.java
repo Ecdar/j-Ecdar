@@ -1,16 +1,17 @@
 package logic;
 
 import lib.DBMLib;
+import log.Log;
 import models.*;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class State {
-    private final SymbolicLocation location;
+    private final Location location;
     private CDD invarCDD;
 
-    public State(SymbolicLocation location, CDD invarCDD) {
+    public State(Location location, CDD invarCDD) {
         this.location = location;
         this.invarCDD = new CDD(invarCDD.getPointer());
 
@@ -21,7 +22,7 @@ public class State {
         this.invarCDD = new CDD(oldState.getInvariant().getPointer());
     }
 
-    public SymbolicLocation getLocation() {
+    public Location getLocation() {
         return location;
     }
 
@@ -31,11 +32,11 @@ public class State {
 
 
     public CDD getLocationInvariant() {
-        return location.getInvariant();
+        return location.getInvariantCdd();
     }
 
     public Guard getInvariants(List<Clock> relevantClocks) {
-        return location.getInvariant().getGuard(relevantClocks);
+        return location.getInvariantCdd().getGuard(relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -48,7 +49,7 @@ public class State {
     }
 
     public void applyInvariants() {
-        CDD result = this.invarCDD.conjunction(location.getInvariant());
+        CDD result = this.invarCDD.conjunction(location.getInvariantCdd());
         this.invarCDD=result;
     }
 
@@ -96,7 +97,7 @@ public class State {
         else
             while (!bcddLeftToAnalyse.isTerminal())
             {
-                CddExtractionResult extractResult = bcddLeftToAnalyse.reduce().removeNegative().extract();
+                CddExtractionResult extractResult = bcddLeftToAnalyse.removeNegative().reduce().extract();
                 bcddLeftToAnalyse = extractResult.getCddPart().removeNegative().reduce();
 
                 Zone z = new Zone(extractResult.getDbm());
@@ -119,8 +120,8 @@ public class State {
         boolean print = false;
         if (copy.toString().contains("30"))
         {
-            System.out.println("max bounds : " + maxBounds);
-            System.out.println(copy.getGuard(relevantClocks));
+            Log.debug("max bounds : " + maxBounds);
+            Log.debug(copy.getGuard(relevantClocks));
             print = true;
         }
         if (copy.isBDD())
@@ -157,9 +158,11 @@ public class State {
                 }
                 if (print)
                 {
-                    for (int i: bounds)
-                        System.out.print(i + " ");
-                    System.out.println();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (int i: bounds) {
+                        stringBuilder.append(i).append(" ");
+                    }
+                    Log.debug(stringBuilder.toString());
                 }
                 z.extrapolateMaxBoundsDiagonal(bounds);
                 if (print) z.printDbm(true,true);
@@ -169,12 +172,12 @@ public class State {
 
             }
         if (print)
-            System.out.println(resCDD);
+            Log.debug(resCDD);
         invarCDD = resCDD;
     }
     @Override
     public String toString() {
-        return "{" + location + ", " + invarCDD + '}';
+        return "{" + location.getName() + ", " + invarCDD + '}';
     }
 
     public void delay() {
