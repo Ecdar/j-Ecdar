@@ -26,11 +26,11 @@ import java.util.*;
  * <p>
  * A {@link Location} can also be a <b>simple</b> location, which is a location with exactly one child.
  *  A simple location is used when the {@link CDD CDD invariant} of this location
- *  is not directly created from the {@link Guard Guard invariant}
- *  meaning that the {@link CDD CDD invariant} of this location will always be the {@link CDD CDD invariant} of its child,
+ *  is not directly created from the {@link Guard Guard invariant}.
+ *  Instead the {@link CDD CDD invariant} of this location will always be the {@link CDD CDD invariant} of its child,
  *  whilst the {@link Guard Guard invariant} of this location can be different from the {@link CDD CDD invariant}.
- *  This is used when performing {@link Pruning} where the {@link CDD CDD invariant} is expected to
- *  be constant whilst we are changing the {@link Guard Guard invariant}.
+ *  For this reason a simple location can have a {@link Guard Guard invariant} and {@link CDD CDD invariant}
+ *  which is out of sync.
  *  <b>Deprecation warning:</b> <i>simple</i> locations are planned to be deprecated and one should instead create
  *      composed locations which have a more predictable specification
  * </p>
