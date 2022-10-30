@@ -1,18 +1,14 @@
 package features;
 
-import logic.Composition;
-import logic.Refinement;
-import logic.SimpleTransitionSystem;
-import logic.TransitionSystem;
+import log.Log;
+import logic.*;
 import models.Automaton;
 import models.CDD;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import parser.XMLFileWriter;
 import parser.XMLParser;
 
+import java.sql.Ref;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertTrue;
@@ -314,6 +310,39 @@ public class DelayRefinementTest {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[49]), new SimpleTransitionSystem(new Automaton(automata[49]))).check());
     }
 
+
+    @Test
+    public void Z2Z3Z4RefinesZ2() {
+        assertTrue(new Refinement(new Conjunction(new SimpleTransitionSystem(automata[47]),new SimpleTransitionSystem(automata[48]),new SimpleTransitionSystem(automata[49])), new SimpleTransitionSystem(new Automaton(automata[47]))).check());
+    }
+
+
+    @Test
+    @Ignore // This test might be incorrect
+    public void Z2RefinesZ2Z3Z4() {
+        SimpleTransitionSystem Z2 = new SimpleTransitionSystem(automata[47]);
+        SimpleTransitionSystem Z3 = new SimpleTransitionSystem(automata[48]);
+        SimpleTransitionSystem Z4 = new SimpleTransitionSystem(automata[49]);
+        SimpleTransitionSystem Z2_1 = new SimpleTransitionSystem(automata[47]);
+        assertTrue(new Refinement(new Conjunction(Z2_1,Z3), Z2).check());
+        Quotient q = new Quotient(Z2,Z3);
+        Refinement ref = new Refinement(Z2_1,  q);
+
+        boolean res = ref.check(true);
+        Log.debug("inputs:");
+        Log.debug(Z2_1.getInputs());
+        Log.debug(q.getInputs());
+
+        Log.debug("outputs:");
+        Log.debug(Z2_1.getOutputs());
+        Log.debug(q.getOutputs());
+
+        Log.debug(ref.getErrMsg());
+        assertTrue(res);
+        assertTrue(new Refinement(Z2_1,new Quotient(Z2, new Quotient(Z3,Z4))).check());
+    }
+
+
     @Test
     public void Z5RefinesSelf() {
         assertTrue(new Refinement(new SimpleTransitionSystem(automata[50]), new SimpleTransitionSystem(new Automaton(automata[50]))).check());
@@ -379,6 +408,52 @@ public class DelayRefinementTest {
         assertTrue(new Refinement(comp, new SimpleTransitionSystem(automata[2])).check());
     }
 
+
+    @Test
+    @Ignore // This test might be incorrect
+    public void T0RefinesT3T1T2() {
+        TransitionSystem T1_new = new SimpleTransitionSystem(automata[0]);
+        TransitionSystem T2_new = new SimpleTransitionSystem(automata[1]);
+        TransitionSystem T4_new = new SimpleTransitionSystem(automata[11]);
+        TransitionSystem T3_new = new SimpleTransitionSystem(automata[2]);
+
+        TransitionSystem T01 = new SimpleTransitionSystem(automata[0]);
+        TransitionSystem T11 = new SimpleTransitionSystem(automata[1]);
+        TransitionSystem T21 = new SimpleTransitionSystem(automata[11]);
+        TransitionSystem T31 = new SimpleTransitionSystem(automata[2]);
+
+
+        TransitionSystem quotient1 = new Quotient(
+                       T3_new,
+                        T4_new);
+        TransitionSystem quotient2 = new Quotient(quotient1,T2_new);
+
+        XMLFileWriter.toXML("testOutput/doublequotient.xml",quotient2.getAutomaton());
+
+        TransitionSystem quotient1New = new Quotient(
+                T31,
+                T21);
+        TransitionSystem quotient2New = new Quotient(new SimpleTransitionSystem(quotient1New.getAutomaton()),T11);
+
+
+
+
+        Refinement ref = new Refinement(new SimpleTransitionSystem(quotient2.getAutomaton()),new SimpleTransitionSystem(quotient2New.getAutomaton()));
+        boolean res = ref.check();
+        Log.debug(res);
+        Log.debug("error:" + ref.getErrMsg());
+        assertTrue(new Refinement(quotient2New,quotient2).check());
+        assertTrue(new Refinement(quotient2,quotient2New).check());
+        Refinement ref2 = new Refinement(new Composition(T1_new, T2_new, T4_new), T3_new);
+        assertTrue(ref2.check());
+
+        Refinement ref1 = new Refinement(T1_new, quotient2);
+        boolean res1 = ref1.check(true);
+        Log.debug(ref1.getTree().toDot());
+        assertTrue(res1);
+    }
+
+
     @Test
     public void F1F2RefinesF3() {
 
@@ -389,8 +464,8 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem(automata[8])});
         Refinement ref = new Refinement(comp, new SimpleTransitionSystem(automata[9]));
         boolean result =ref.check();
-        //System.out.println(comp.isImplementation());
-        System.out.println(ref.getErrMsg());
+        //Log.trace(comp.isImplementation());
+        Log.trace(ref.getErrMsg());
 
 
         assertTrue(result);
@@ -491,7 +566,7 @@ public class DelayRefinementTest {
                         new SimpleTransitionSystem((automata[39])),
                         new SimpleTransitionSystem((automata[40]))});
         boolean result = new Refinement(comp, new SimpleTransitionSystem((automata[41]))).check();
-        System.out.println(result);
+        Log.trace(result);
         assertFalse(result);
     }
 
@@ -538,7 +613,7 @@ public class DelayRefinementTest {
     public void M1RefinesM0() {
         Refinement ref = new Refinement(new SimpleTransitionSystem(automata[57]), new SimpleTransitionSystem(automata[56]));
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
     }
 

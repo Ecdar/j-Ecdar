@@ -1,83 +1,85 @@
 package models;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 public class BoolGuard extends Guard {
+    private final BoolVar var;
+    private final Relation relation;
+    private final boolean value;
 
+    public BoolGuard(BoolVar var, Relation relation, boolean value) {
+        // These are the only relation types allowed
+        if (relation != Relation.EQUAL && relation != Relation.NOT_EQUAL) {
+            throw new IllegalArgumentException("The relation of the clock guard is invalid");
+        }
+        this.var = var;
+        this.relation = relation;
+        this.value = value;
+    }
+
+    public BoolGuard(BoolVar var, String comparator, boolean value)
+            throws NoSuchElementException {
+        this(var, Relation.fromString(comparator), value);
+    }
+
+    public BoolGuard(BoolGuard copy, List<BoolVar> newBVs, List<BoolVar> oldBVs)
+            throws IndexOutOfBoundsException, NoSuchElementException {
+        this(newBVs.get(oldBVs.indexOf(copy.getVar())), copy.relation, copy.value);
+    }
 
     public BoolVar getVar() {
         return var;
-    } //boolvar is correct
-
-    public String getComperator() {
-        return comperator;
     }
 
     public boolean getValue() {
         return value;
     }
 
-    private final BoolVar var;
-    private final String comperator;
-    private final boolean value;
-
-    public BoolGuard(BoolVar var, String comperator, boolean value) {
-        this.var = var;
-        this.comperator = comperator;
-        this.value = value;
-    }
-
-    // Copy constructor
-    public BoolGuard(BoolGuard copy, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
-        System.out.println("old bvs" + oldBVs + " " + copy.getVar());
-        var = newBVs.get(oldBVs.indexOf(copy.getVar()));
-        comperator = copy.comperator;
-        value = copy.value;
-    }
-
-
-
-
     public BoolGuard negate() {
-        switch (comperator) {
-            case "==":
-                return new BoolGuard(var, "!=", value);
-            case "!=":
-                return new BoolGuard(var, "==", value);
-            default:
-                assert (false);
+        switch (relation) {
+            case EQUAL:
+                return new BoolGuard(var, Relation.NOT_EQUAL, value);
+            case NOT_EQUAL:
+                return new BoolGuard(var, Relation.EQUAL, value);
         }
-        return null;
+        throw new IllegalStateException("The relation of the boolean guard is invalid");
     }
 
     @Override
-    int getMaxConstant() {
+    int getMaxConstant(Clock clock) {
         return 0;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BoolGuard)) return false;
-        BoolGuard guard = (BoolGuard) o;
-        return var.equals(guard.var) &&
-                comperator.equals(guard.comperator) &&
-                value == guard.value;
+    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new BoolGuard(
+            this, newBVs, oldBVs
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof BoolGuard)) {
+            return false;
+        }
+
+        BoolGuard other = (BoolGuard) obj;
+
+        return var.equals(other.var) &&
+                relation == other.relation &&
+                value == other.value;
     }
 
     @Override
     public String toString() {
-        return "(" +
-                var.getOriginalName() +
-                comperator +
-                value +
-                ')';
+        return "(" + var.getOriginalName() + relation.toString() + value + ")";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(var, comperator, value);
+        return Objects.hash(var, relation, value);
     }
 }

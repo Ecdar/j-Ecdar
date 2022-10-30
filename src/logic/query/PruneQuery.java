@@ -14,7 +14,7 @@ public class PruneQuery extends Query{
     public void handle() {
         Automaton aut = getSystem1().getAutomaton();
 
-        SimpleTransitionSystem simp = Pruning.pruneIncTimed(new SimpleTransitionSystem(aut));
+        SimpleTransitionSystem simp = Pruning.adversarialPruning(new SimpleTransitionSystem(aut));
         aut = simp.pruneReachTimed().getAutomaton();
 
         Controller.saveAutomaton(aut, getComponentName());

@@ -4,90 +4,78 @@ import java.util.List;
 import java.util.Objects;
 
 public class ClockGuard extends Guard {
+    private final Clock clock, diagonalClock;
+    private final int bound;
+    private final Relation relation;
 
-    private final Clock clock_i,clock_j;
-    private int bound;
-    private Relation rel;
-
-    public ClockGuard(Clock clock_i, Clock clock_j, int bound, Relation rel) {
-        assert (clock_i != null);
-        this.clock_i = clock_i;
-        this.clock_j = clock_j;
-        this.rel = rel;
+    public ClockGuard(Clock main, Clock secondary, int bound, Relation relation) throws IllegalArgumentException {
+        if (main == null) {
+            throw new IllegalArgumentException("The main clock of the clock guard cannot be null");
+        }
+        // These are the only relation types allowed
+        if (relation != Relation.LESS_THAN &&
+            relation != Relation.LESS_EQUAL &&
+            relation != Relation.EQUAL &&
+            relation != Relation.GREATER_EQUAL &&
+            relation != Relation.GREATER_THAN) {
+            throw new IllegalArgumentException("The relation of the clock guard is invalid");
+        }
+        this.clock = main;
+        this.diagonalClock = secondary;
+        this.relation = relation;
         this.bound = bound;
     }
 
-    public ClockGuard(Clock clock_i, int bound, Relation rel) {
-        assert (clock_i != null);
-        this.clock_i = clock_i;
-        this.clock_j = null;
-        this.rel = rel;
-        this.bound = bound;
-    }
-    // Copy constructor
-    public ClockGuard(ClockGuard orig, List<Clock> newClocks, List<Clock> oldClocks) {
-        this.clock_i = newClocks.get(oldClocks.indexOf(orig.clock_i));
-        if (orig.clock_j==null)
-            this.clock_j = null;
-        else
-            this.clock_j = newClocks.get(oldClocks.indexOf(orig.clock_j));
-        this.rel = orig.rel;
-        this.bound = orig.bound;
+    public ClockGuard(Clock clock_i, int bound, Relation relation) throws IllegalArgumentException {
+        this(clock_i, null, bound, relation);
     }
 
-    public boolean isDiagonal()
-    {
-        if (clock_j==null)
-            return false;
-        else
-            return true;
+    public ClockGuard(ClockGuard orig, List<Clock> newClocks, List<Clock> oldClocks) throws IndexOutOfBoundsException, IllegalArgumentException {
+        this(newClocks.get(oldClocks.indexOf(orig.clock)), orig.diagonalClock == null ? null : newClocks.get(oldClocks.indexOf(orig.diagonalClock)), orig.getBound(), orig.getRelation());
     }
 
-    public Clock getClock_i() {
-        return clock_i;
-    }
-    public Clock getClock_j() {
-        return clock_j;
+    public boolean isDiagonal() {
+        return diagonalClock != null;
     }
 
-    public int getLowerBound() {
-        switch (rel) {
+    public Clock getClock() {
+        return clock;
+    }
+
+    public Clock getDiagonalClock() {
+        return diagonalClock;
+    }
+
+    public int getLowerBound() throws IllegalStateException {
+        /* Default case is not handled as the constructor
+         *   ensures that the relation cannot be none of these. */
+        switch (relation) {
             case EQUAL:
             case GREATER_EQUAL:
-            case GREATER_THAN:{
+            case GREATER_THAN: {
                 return bound;
             }
-            case NOT_EQUAL:// TODO: 2021-05-31 wtf?
             case LESS_EQUAL:
-            case LESS_THAN:{
+            case LESS_THAN: {
                 return 0;
             }
-            default: {
-                assert (false);
-            }
         }
-
-        return -1;
+        throw new IllegalStateException("The relation of the clock guard is invalid");
     }
 
-    public int getUpperBound() {
-        switch (rel) {
+    public int getUpperBound() throws IllegalStateException {
+        switch (relation) {
             case EQUAL:
             case LESS_EQUAL:
-            case LESS_THAN:
-            {
+            case LESS_THAN: {
                 return bound;
             }
-            case NOT_EQUAL:
             case GREATER_EQUAL:
-            case GREATER_THAN:{
+            case GREATER_THAN: {
                 return Integer.MAX_VALUE;
             }
-            default: {
-                assert (false);
-            }
         }
-        return -1;
+        throw new IllegalStateException("The relation of the clock guard is invalid");
     }
 
     // Returns a bound of a guard in the automaton
@@ -95,65 +83,61 @@ public class ClockGuard extends Guard {
         return bound;
     }
 
-    public Relation getRelation() {return rel;}
-
-
-
-    public ClockGuard negate() {
-        // never negate individual clock guards, the negation of == would lead to problems!
-        assert(false);
-        return null;
+    public Relation getRelation() {
+        return relation;
     }
 
     @Override
-    int getMaxConstant() {
-        if (isDiagonal())
-            return bound; // TODO: supposed to be bound or 0?
-        else
+    int getMaxConstant(Clock clock)
+        throws IllegalArgumentException {
+        if (clock == null) {
+            throw new IllegalArgumentException("Max constant for null clock is not supported");
+        }
+        if (clock.equals(this.clock) || clock.equals(this.diagonalClock)) {
             return bound;
+        }
+        return 0;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ClockGuard)) return false;
-        ClockGuard guard = (ClockGuard) o;
+    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new ClockGuard(this, newClocks, oldClocks);
+    }
 
-        if (isDiagonal()) {
-            return bound == guard.bound &&
-                    rel == guard.rel &&
-                    clock_i.equals(guard.clock_i) &&
-                    clock_j.equals(guard.clock_j);
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-        else {
-            return bound == guard.bound &&
-                    rel == guard.rel &&
-                    clock_i.equals(guard.clock_i) &&
-                    guard.clock_j==null;
+        if (!(obj instanceof ClockGuard)) {
+            return false;
         }
+
+        ClockGuard other = (ClockGuard) obj;
+
+        if (bound != other.bound ||
+            relation != other.relation ||
+            !clock.equals(other.clock)) {
+            return false;
+        }
+
+        return diagonalClock == null ||
+                diagonalClock.equals(other.diagonalClock);
     }
 
     @Override
     public String toString() {
-        if (isDiagonal())
-        {
-            String res = clock_i.getUniqueName() + "-" + clock_j.getUniqueName();
-            res += rel.toString();
-            res += bound;
-            return res;
-
+        String resultant = clock.getUniqueName();
+        if (isDiagonal()) {
+            resultant += "-" + diagonalClock.getUniqueName();
         }
-        else {
-            String res = clock_i.getUniqueName();
-            res += rel.toString();
-            res += bound;
-            return res;
-        }
+        resultant += relation.toString();
+        resultant += bound;
+        return resultant;
     }
-
 
     @Override
     public int hashCode() {
-        return Objects.hash(clock_i, bound, rel);
+        return Objects.hash(clock, bound, relation);
     }
 }

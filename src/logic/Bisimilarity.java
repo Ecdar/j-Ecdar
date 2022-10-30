@@ -25,9 +25,7 @@ public class Bisimilarity {
         bisimilarLocs.add(locs); // at the start we "assume all locs are bisimilar"
 
 
-        CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
-        CDD.addClocks(clocks);
-        CDD.addBddvar(BVs);
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
         thereWasAChange= true;
 
 
@@ -88,35 +86,64 @@ public class Bisimilarity {
         List<Edge> finalEdges = new ArrayList<>();
 
 
-        for (Location l: locs) // now we merge all the edges that have a similar source location, action and target
+        for (Location l: locs) // now we merge all the edges that have a similar source location, action, target and update
         {
             for (Channel c : copy.getActions())
             {
                 for (Location targetLoc : locs) {
-                    CDD allCDDs = CDD.cddFalse();
-                    boolean thereWasAnEdge= false;
-                    for (Edge e : edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc)).collect(Collectors.toList())) {
-                        thereWasAnEdge=true;
-                        CDD targetFedAfterReset = e.getTarget().getInvariantCDD();
-                        targetFedAfterReset = CDD.applyReset(targetFedAfterReset,e.getUpdates());
 
-                        allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
+                    boolean thereWasAnEdge= false;
+                    if (!edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc) ).collect(Collectors.toList()).isEmpty()) {
+                        thereWasAnEdge=true;
                     }
 
 
                     if (thereWasAnEdge) {
                         List<Edge> allEdges =edges.stream().filter(e -> e.getSource().equals(l) && e.getChannel().equals(c) && e.getTarget().equals(targetLoc)).collect(Collectors.toList());
-                        List<Update> updates = allEdges.get(0).getUpdates();
-                        for (Edge e : allEdges)
-                            assert(Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
-                        finalEdges.add(new Edge(l, targetLoc, c,  allEdges.get(0).isInput(), CDD.toGuardList(allCDDs, copy.getClocks()), allEdges.get(0).getUpdates()));
+
+                        List<List<Edge>> edgesWithSimilarUpdates = new ArrayList<>();
+                        for (Edge e: allEdges)
+                        {
+                            boolean foundAListWithSameUpdate = false;
+                            for (List<Edge> edgeList : edgesWithSimilarUpdates)
+                            {
+                                if (!edgeList.isEmpty() && Arrays.equals(edgeList.get(0).getUpdates().toArray(),e.getUpdates().toArray()))
+                                {
+                                    edgeList.add(e);
+                                    foundAListWithSameUpdate=true;
+                                }
+                            }
+                            if (!foundAListWithSameUpdate) {
+                                List<Edge> newEdgeList = new ArrayList<>() {{
+                                    add(e);
+                                }};
+                                edgesWithSimilarUpdates.add(newEdgeList);
+                            }
+
+                        }
+
+                        for (List<Edge> edgeList : edgesWithSimilarUpdates) {
+                            List<Update> updates = edgeList.get(0).getUpdates();
+                            CDD allCDDs = CDD.cddFalse();
+                            for (Edge e : edgeList) {
+                                CDD targetFedAfterReset = e.getTarget().getInvariantCdd();
+                                targetFedAfterReset = targetFedAfterReset.applyReset(e.getUpdates());
+                                allCDDs = allCDDs.disjunction(e.getGuardCDD().conjunction(targetFedAfterReset));
+
+                                assert (Arrays.equals(Arrays.stream(updates.toArray()).toArray(), Arrays.stream(e.getUpdates().toArray()).toArray()));
+                            }
+                            finalEdges.add(new Edge(l, targetLoc, c,  edgeList.get(0).isInput(), allCDDs.getGuard(copy.getClocks()), allEdges.get(0).getUpdates()));
+                        }
+
                     }
 
                 }
             }
         }
 
-        CDD.done();
+        if (initialisedCdd) {
+            CDD.done();
+        }
         return new Automaton(copy.getName()+"Bisimilar",locs,finalEdges,clocks, copy.getBVs());
 
     }
@@ -130,7 +157,7 @@ public class Bisimilarity {
 
     public static boolean hasDifferentZone(Location l1, Location l2, List<Clock> clocks)
     {
-        if (l1.getInvariantCDD().equiv(l2.getInvariantCDD())) {
+        if (l1.getInvariantCdd().equiv(l2.getInvariantCdd())) {
             return false;
         }
         return true;
@@ -149,8 +176,8 @@ public class Bisimilarity {
                 edgesL2.add(e);
         }
 
-        CDD s1 = l1.getInvariantCDD();
-        CDD s2 = l2.getInvariantCDD();
+        CDD s1 = l1.getInvariantCdd();
+        CDD s2 = l2.getInvariantCdd();
 
         for (Edge e1 : edgesL1)
         {
@@ -169,20 +196,20 @@ public class Bisimilarity {
                     else
                         e2CDD = s2.conjunction(e2.getGuardCDD()).disjunction(e2CDD);
                 }
-                if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
+                if (e1CDD.intersects(s2.conjunction(e2.getGuardCDD())) && !Arrays.equals(Arrays.stream(e1.getUpdates().toArray()).toArray(), Arrays.stream(e2.getUpdates().toArray()).toArray()))
                 {
                     return true;
                 }
 
 
-               if (CDD.intersects(e1CDD,s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+               if (e1CDD.intersects(s2.conjunction(e2.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(), bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
                     if (l1.getName().equals(l2.getName())) {
                     }
                     return true;
                 }
             }
-            if (!CDD.isSubset(e1CDD,e2CDD)) {
+            if (!e1CDD.isSubset(e2CDD)) {
                 return true;
             }
         }
@@ -191,9 +218,9 @@ public class Bisimilarity {
         for (Edge e2 : edgesL2)
         {
             Channel c = e2.getChan();
-           // System.out.println(c);
+           // Log.trace(c);
             //if (c.getName().equals("c[0]"))
-           //     System.out.println("this i did reach" + edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()) );
+           //     Log.trace("this i did reach" + edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()) );
             if (edgesL1.stream().filter(e->e.getChannel().equals(c)).collect(Collectors.toList()).isEmpty()) {
                 return true;
             }
@@ -209,7 +236,7 @@ public class Bisimilarity {
                         e1CDD = s1.conjunction(e1.getGuardCDD()).disjunction(e1CDD);
                 }
 
-                if (CDD.intersects(e2CDD,s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
+                if (e2CDD.intersects(s1.conjunction(e1.getGuardCDD())) && getIndexInBislimlarLocs(e1.getTarget(),bisimilarLocs)!=getIndexInBislimlarLocs(e2.getTarget(),bisimilarLocs))
                 {
 
                     return true;
@@ -217,7 +244,7 @@ public class Bisimilarity {
 
 
             }
-            if (!CDD.isSubset(e2CDD, e1CDD)) {
+            if (!e2CDD.isSubset(e1CDD)) {
                 return true;
             }
         }

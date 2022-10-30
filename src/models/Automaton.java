@@ -1,11 +1,112 @@
 package models;
 
-import java.security.URIParameter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Automaton {
     private String name;
+
+    private final List<Location> locations;
+    private final List<BoolVar> BVs;
+    private final List<Edge> edges;
+    private final List<Clock> clocks;
+    private final Set<Channel> inputAct, outputAct, actions;
+    private final Location initial;
+
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInputEnabled) {
+        if (locations.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Automaton %s must have at least one location.", name));
+        }
+
+        this.name = name;
+        this.locations = locations;
+        this.clocks = clocks;
+        this.BVs = BVs;
+
+        List<Location> initialLocations = locations.stream()
+                .filter(Location::isInitial)
+                .collect(Collectors.toList());
+        if (initialLocations.size() > 1) {
+            throw new IllegalArgumentException(String.format("Automaton %s cannot have more than one initial location", name));
+        }
+        if (initialLocations.size() == 0) {
+            throw new IllegalArgumentException(String.format("Automaton %s must have at least one initial location", name));
+        }
+        initial = initialLocations.get(0);
+
+        this.edges = edges;
+
+        // Retrieve the inputs and outputs
+        inputAct = new HashSet<>();
+        outputAct = new HashSet<>();
+        for (Edge edge : this.edges) {
+            Channel action = edge.getChannel();
+            if (edge.isInput()) {
+                this.inputAct.add(action);
+            } else {
+                this.outputAct.add(action);
+            }
+        }
+
+        /* The finite set of actions must be partitioned into inputs and outputs.
+         *   Here we check whether they are partitioned by checking that the intersection of the
+         *   inputs and outputs are empty as an action can only be either an input xor an output.
+         *   We don't have to check whether an action is neither an input nor an output as the set
+         *   of actions is build as the union of the inputs and outputs and for this reason
+         *   guarantees to be in the set of actions. */
+        Set<Channel> intersection = new HashSet<>(inputAct);
+        intersection.retainAll(outputAct);
+        if (!intersection.isEmpty()) {
+            // Constructs a string with the names of the actions violating the partition property as "{a, b, c}"
+            String violatingActions = "{" + intersection
+                    .stream()
+                    .map(Channel::getName)
+                    .collect(Collectors.joining(", ")) + "}";
+            throw new IllegalArgumentException(String.format("The actions %s of specification automaton %s is not a partition.", violatingActions, name));
+        }
+
+        /* Since inputAct and outputAct are now disjoint, we can simply construct actions as the union of both sets. */
+        actions = Sets.newHashSet(
+                Iterables.concat(inputAct, outputAct)
+        );
+
+        if (makeInputEnabled) {
+            addTargetInvariantToEdges();
+            makeInputEnabled();
+        }
+    }
+
+    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs) {
+        this(name, locations, edges, clocks, BVs, true);
+    }
+
+    public Automaton(Automaton automaton) {
+        name = automaton.name + "Copy";
+        clocks = automaton.clocks.stream()
+                .map(clock -> new Clock(clock.getOriginalName() + "Copy", name))
+                .collect(Collectors.toList());
+        BVs = automaton.BVs.stream()
+                .map(boolVar -> new BoolVar(boolVar.getOriginalName() + "Copy", name, boolVar.getInitialValue()))
+                .collect(Collectors.toList());
+        locations = automaton.locations.stream()
+                .map(location -> location.copy(clocks, automaton.clocks, BVs, automaton.BVs))
+                .collect(Collectors.toList());
+        edges = automaton.edges.stream()
+                .map(edge -> {
+                    int sourceIndex = automaton.locations.indexOf(edge.getSource());
+                    int targetIndex = automaton.locations.indexOf(edge.getTarget());
+                    Location source = locations.get(sourceIndex);
+                    Location target = locations.get(targetIndex);
+                    return new Edge(edge, clocks, BVs, source, target, automaton.clocks, automaton.BVs);
+                }).collect(Collectors.toList());
+        inputAct = new HashSet<>(automaton.inputAct);
+        outputAct = new HashSet<>(automaton.outputAct);
+        actions = new HashSet<>(automaton.actions);
+        initial = automaton.initial.copy(clocks, automaton.clocks, BVs, automaton.BVs);
+    }
 
     public List<Location> getLocations() {
         return locations;
@@ -23,147 +124,16 @@ public class Automaton {
         this.name = name;
     }
 
-    private final List<Location> locations;
-    private final List<BoolVar> BVs;
-    private final List<Edge> edges;
-    private final List<Clock> clocks;
-    private Set<Channel> inputAct, outputAct, actions;
-    private Location initLoc;
-
-    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs) {
-        this(name, locations, edges, clocks, BVs, true);
-    }
-
-    public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs, boolean makeInpEnabled) {
-        this.name = name;
-        this.locations = locations;
-
-        for (Location location : locations) {
-
-            if (location.isInitial()) {
-                initLoc = location;
-                break;
-            }
-        }
-
-        this.edges = edges;
-        setActions(edges);
-        this.clocks = clocks;
-        this.BVs = BVs;
-
-
-        if (makeInpEnabled) {
-            CDD.init(CDD.maxSize, CDD.cs, CDD.stackSize);
-            CDD.addClocks(clocks);
-            CDD.addBddvar(BVs);
-            addTargetInvariantToEdges();
-
-            makeInputEnabled();
-
-            CDD.done();
-        }
-    }
-
-    // Copy constructor
-    public Automaton(Automaton origin) {
-        this.name = origin.name + "Copy";
-
-        this.clocks = new ArrayList<>();
-        for (Clock c : origin.clocks) {
-            this.clocks.add(new Clock(c.getOriginalName()+"Copy", name));
-        }
-        this.BVs = new ArrayList<>();
-        for (BoolVar c : origin.BVs) {
-            this.BVs.add(new BoolVar(c.getOriginalName()+"Copy", name, c.getInitialValue()));
-        }
-        this.locations = new ArrayList<>();
-        for (Location loc : origin.locations) {
-            this.locations.add(new Location(loc, clocks, origin.clocks, BVs, origin.BVs));
-            if (loc.isInitial()) this.initLoc = this.locations.get(this.locations.size() - 1);
-        }
-        this.edges = new ArrayList<>();
-        for (Edge e : origin.edges) {
-            int sourceIndex = origin.locations.indexOf(e.getSource());
-            int targetIndex = origin.locations.indexOf(e.getTarget());
-            this.edges.add(new Edge(e, this.clocks, this.BVs, locations.get(sourceIndex), locations.get(targetIndex), origin.clocks, origin.BVs));
-        }
-
-        this.inputAct = origin.inputAct;
-        this.outputAct = origin.outputAct;
-        this.actions = origin.actions;
-    }
-
-    public HashMap<Clock, Integer> getMaxBoundsForAllClocks() {
-        HashMap<Clock, Integer> res = new HashMap<Clock, Integer>();
-
-        for (Clock clock : clocks) {
-            for (Edge edge : edges) {
-                int clockMaxBound = edge.getMaxConstant(clock);
-                if (!(res.containsKey(clock)))
-                    res.put(clock, clockMaxBound);
-                if (clockMaxBound > res.get(clock)) res.put(clock, clockMaxBound);
-            }
-
-            for (Location location : locations) {
-                int clockMaxBound = location.getMaxConstant(clock);
-                if (!(res.containsKey(clock)))
-                    res.put(clock, clockMaxBound);
-                if (clockMaxBound > res.get(clock))
-                    res.put(clock, clockMaxBound);
-            }
-            if (!res.containsKey(clock) | res.get(clock) == 0)
-                res.put(clock, 1);
-        }
-        return res;
-    }
-
-
     public String getName() {
         return name;
-    }
-
-    private List<Edge> getEdgesFromLocation(Location loc) {
-        if (loc.isUniversal()) {
-            List<Edge> resultEdges = new ArrayList<>();
-            for (Channel action : actions) {
-                resultEdges.add(new Edge(loc, loc, action, inputAct.contains(action), new TrueGuard(), new ArrayList<>()));
-            }
-            return resultEdges;
-        }
-
-        return edges.stream().filter(edge -> edge.getSource().equals(loc)).collect(Collectors.toList());
-    }
-
-    public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
-        List<Edge> resultEdges = getEdgesFromLocation(loc);
-
-        return resultEdges.stream().filter(edge -> edge.getChannel().getName().equals(signal.getName())).collect(Collectors.toList());
-    }
-
-    private void setActions(List<Edge> edges) {
-        inputAct = new HashSet<>();
-        outputAct = new HashSet<>();
-        actions = new HashSet<>();
-
-        for (Edge edge : edges) {
-            Channel action = edge.getChannel();
-
-            actions.add(action);
-
-            if (edge.isInput()) {
-                inputAct.add(action);
-            } else {
-                outputAct.add(action);
-            }
-        }
     }
 
     public List<Clock> getClocks() {
         return clocks;
     }
 
-    public Location getInitLoc() {
-        return initLoc;
+    public Location getInitial() {
+        return initial;
     }
 
     public Set<Channel> getInputAct() {
@@ -178,18 +148,64 @@ public class Automaton {
         return BVs;
     }
 
+    public HashMap<Clock, Integer> getMaxBoundsForAllClocks() {
+        HashMap<Clock, Integer> result = new HashMap<>();
+
+        for (Clock clock : clocks) {
+            for (Edge edge : edges) {
+                result.compute(
+                        clock,
+                        (key, value) -> {
+                            int clockMaxBound = edge.getMaxConstant(clock);
+                            return Math.max(value == null ? clockMaxBound : value, clockMaxBound);
+                        }
+                );
+            }
+
+            for (Location location : locations) {
+                result.compute(
+                        clock,
+                        (key, value) -> {
+                            int clockMaxBound = location.getMaxConstant(clock);
+                            return Math.max(value == null ? clockMaxBound : value, clockMaxBound);
+                        }
+                );
+            }
+
+            if (!result.containsKey(clock) || result.get(clock) == 0) {
+                result.put(clock, 1);
+            }
+        }
+        return result;
+    }
+
+    private List<Edge> getEdgesFromLocation(Location loc) {
+        if (loc.isUniversal()) {
+            return actions.stream()
+                    .map(action -> new Edge(loc, loc, action, inputAct.contains(action), new TrueGuard(), new ArrayList<>()))
+                    .collect(Collectors.toList());
+        }
+        return edges.stream().filter(edge -> edge.getSource().equals(loc)).collect(Collectors.toList());
+    }
+
+    public List<Edge> getEdgesFromLocationAndSignal(Location loc, Channel signal) {
+        List<Edge> resultEdges = getEdgesFromLocation(loc);
+        return resultEdges.stream()
+                .filter(edge -> edge.getChannel().getName().equals(signal.getName()))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Automaton)) return false;
-        Automaton automaton = (Automaton) o;
+        if (this == o) {
+            return true;
+        }
 
-        //System.out.println( name.equals(automaton.name));
-        //System.out.println( Arrays.equals(locations.toArray(), automaton.locations.toArray()));
-        //System.out.println( Arrays.equals(edges.toArray(), automaton.edges.toArray()));
-        //System.out.println( Arrays.equals(clocks.toArray(), automaton.clocks.toArray()) );
-        //System.out.println( Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()));
-        //System.out.println(  Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) );
+        if (!(o instanceof Automaton)) {
+            return false;
+        }
+
+        Automaton automaton = (Automaton) o;
 
         return name.equals(automaton.name) &&
                 Arrays.equals(locations.toArray(), automaton.locations.toArray()) &&
@@ -198,7 +214,7 @@ public class Automaton {
                 Arrays.equals(BVs.toArray(), automaton.BVs.toArray()) &&
                 Arrays.equals(inputAct.toArray(), automaton.inputAct.toArray()) &&
                 Arrays.equals(outputAct.toArray(), automaton.outputAct.toArray()) &&
-                initLoc.equals(automaton.initLoc);
+                initial.equals(automaton.initial);
     }
 
     @Override
@@ -212,19 +228,20 @@ public class Automaton {
                 ", inputAct=" + inputAct +
                 ", outputAct=" + outputAct +
                 ", actions=" + actions +
-                ", initLoc=" + initLoc +
+                ", initLoc=" + initial +
                 '}';
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, locations, edges, clocks, BVs, inputAct, outputAct, initLoc);
+        return Objects.hash(name, locations, edges, clocks, BVs, inputAct, outputAct, initial);
     }
 
-
     public void makeInputEnabled() {
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+
         for (Location loc : getLocations()) {
-            CDD sourceInvariantCDD = loc.getInvariantCDD();
+            CDD sourceInvariantCDD = loc.getInvariantCdd();
             // loop through all inputs
             for (Channel input : getInputAct()) {
 
@@ -234,7 +251,7 @@ public class Automaton {
                 CDD cddOfAllEdgesWithCurrentInput = CDD.cddFalse();
                 if (!inputEdges.isEmpty()) {
                     for (Edge edge : inputEdges) {
-                        CDD target = edge.getTarget().getInvariantCDD();
+                        CDD target = edge.getTarget().getInvariantCdd();
                         CDD preGuard1 = target.transitionBack(edge);
                         cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.disjunction(preGuard1);
                     }
@@ -246,22 +263,29 @@ public class Automaton {
                 }
 
                 if (resCDD.isNotFalse()) {
-                    Edge newEdge = new Edge(loc, loc, input, true, CDD.toGuardList(resCDD, getClocks()), new ArrayList<>());
+                    Edge newEdge = new Edge(loc, loc, input, true, resCDD.getGuard(getClocks()), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
-
             }
         }
 
-    }
-
-    public void addTargetInvariantToEdges() {
-        for (Edge edge : getEdges()) {
-            CDD targetCDD = edge.getTarget().getInvariantCDD();
-            CDD past = targetCDD.transitionBack(edge);
-            if (!past.equiv(CDD.cddTrue()))
-                edge.setGuards(CDD.toGuardList(past.conjunction(edge.getGuardCDD()), getClocks()));
+        if (initialisedCdd) {
+            CDD.done();
         }
     }
 
+    public void addTargetInvariantToEdges() {
+        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+
+        for (Edge edge : getEdges()) {
+            CDD targetCDD = new CDD(edge.getTarget().getInvariantGuard());
+            CDD past = targetCDD.transitionBack(edge);
+            if (!past.equiv(CDD.cddTrue()))
+                edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
+        }
+
+        if (initialisedCdd) {
+            CDD.done();
+        }
+    }
 }

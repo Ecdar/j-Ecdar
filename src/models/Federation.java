@@ -3,7 +3,9 @@ package models;
 import lib.DBMLib;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Federation {
     private List<Zone> zones;
@@ -11,49 +13,17 @@ public class Federation {
     private static final int DBM_INF = Integer.MAX_VALUE - 1;
 
     public Federation(int[][] dbms) {
-        this.zones = new ArrayList<>();
-
-        for (int[] dbm : dbms) {
-            Zone zone = new Zone(dbm);
-            this.zones.add(zone);
-        }
+        this.zones = Arrays.stream(dbms)
+                .map(Zone::new).collect(Collectors.toList());
     }
 
-    public Federation getCopy() {
-        ArrayList<Zone> zoneArrayList = new ArrayList<>();
-        for (Zone z : zones)
-            zoneArrayList.add(new Zone(z));
-        return new Federation(zoneArrayList);
-
+    public Federation(List<Zone> zones) {
+        this.zones = zones.stream()
+                .map(Zone::new).collect(Collectors.toList());
     }
 
-    public static Federation getUnrestrainedFed(List<Clock> clocks) {
-        List<Zone> emptyZoneList = new ArrayList<>();
-        Zone emptyZone = new Zone(clocks.size() + 1, true);
-        emptyZone.init();
-        for (int i=0; i< clocks.size(); i++)
-            emptyZone.freeClock(i);
-        emptyZoneList.add(emptyZone);
-        return new Federation(emptyZoneList);
-    }
-
-    public Guard turnFederationToGuards(List<Clock> clocks)
-    {
-        List<Guard> turnedBackIntoGuards = new ArrayList<>();  // make a function
-        for (Zone z : getZones()) {
-            turnedBackIntoGuards.add(z.buildGuardsFromZone(clocks,clocks));
-        }
-        return new OrGuard(turnedBackIntoGuards);
-    }
-
-    public boolean isUnrestrained(List<Clock> clocks)
-    {
-        if (Federation.fedMinusFed(Federation.getUnrestrainedFed(clocks),this).isEmpty())
-            return true;
-        else
-            return false;
-
-
+    public Federation(Zone zone) {
+        this(List.of(zone));
     }
 
     public boolean isEmpty() {
@@ -64,171 +34,168 @@ public class Federation {
         return zones.size();
     }
 
-    public Federation(List<Zone> zones) {
-        ArrayList<Zone> zoneArrayList = new ArrayList<>();
-        for (Zone z : zones)
-            zoneArrayList.add(new Zone(z));
-        this.zones = zoneArrayList;
-
-
-        //this.zones = new ArrayList<>(zones);
-    }
-
     public List<Zone> getZones() {
         return zones;
     }
 
+    public int[][] getDbms() {
+        return getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+    }
+
+    public Federation copy() {
+        List<Zone> zones = this.zones.stream()
+                .map(Zone::new).collect(Collectors.toList());
+        return new Federation(zones);
+    }
+
+    public Guard toGuards(List<Clock> clocks) {
+        List<Guard> turnedBackIntoGuards = new ArrayList<>();
+        for (Zone zone : getZones()) {
+            turnedBackIntoGuards.add(zone.buildGuardsFromZone(clocks, clocks));
+        }
+        return new OrGuard(turnedBackIntoGuards);
+    }
+
+    public boolean isUnrestrained(List<Clock> clocks) {
+        return Federation.subtract(Federation.createUnrestrainedFederation(clocks), this).isEmpty();
+    }
+
     public Federation down() {
-        int[][] zones = getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+        int[][] zones = getDbms();
         if (zones.length == 0) {
             return this;
         }
-        int dim = (int) Math.sqrt(zones[0].length);
+        int dimension = (int) Math.sqrt(zones[0].length);
 
-        return new Federation(DBMLib.fed_down(zones, dim));
+        return new Federation(DBMLib.fed_down(zones, dimension));
     }
 
-    // todo: is this the correct way?
     public boolean isValid() {
-        // System.out.println("reached isValid " + getZones().size());
-
-
-        boolean isValid = true;
-        for (Zone z : getZones()) {
-
-            //z.printDBM(true,true);
-            isValid = isValid && z.isValid();
-        }
-        //System.out.println("and exited it");
-
-        return isValid;
+        return zones.stream().allMatch(Zone::isValid);
     }
 
-    /*public boolean isSubset(Zone zone2) {
-        return DBMLib.dbm_isSubsetEq(this.dbm, zone2.dbm, size);
-    }*/
+    public boolean isSubset(Federation other) {
+        int[][] zones1 = this.getZones().stream()
+                .map(Zone::getDbm).toArray(int[][]::new);
+        int[][] zones2 = other.getZones().stream()
+                .map(Zone::getDbm).toArray(int[][]::new);
 
-    public boolean isSubset(Federation fed2) {
-
-
-        //System.out.println("reached: issubset 1");
-        int[][] zones1 = this.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        if (zones1.length == 0)
+        if (zones1.length == 0) {
             return true;
+        }
 
-        //System.out.println("reached: issubset 2");
-        int dim = (int) Math.sqrt(zones1[0].length);
-        // System.out.println("reached: issubset 3");
-        return DBMLib.fed_isSubsetEq(zones1, zones2, dim);  // TODO: Order of zones 1 and 2
+        int dimension = Zone.getDbmDimension(zones1[0]);
+        return DBMLib.fed_isSubsetEq(zones1, zones2, dimension);  // TODO: Order of zones 1 and 2
     }
 
     public boolean isUrgent() {
-        for (Zone z : this.getZones()) {
-            for (int i = 1; i < z.getSize(); i++) {
-                int currLower = z.getDbm()[i];
-                int currUpper = z.getDbm()[z.getSize() * i];
-                if (DBMLib.dbm_addRawRaw(currLower, currUpper) != 1)
+        for (Zone zone : this.getZones()) {
+            for (int i = 1; i < zone.getDimension(); i++) {
+                int currLower = zone.getDbm()[i];
+                int currUpper = zone.getDbm()[zone.getDimension() * i];
+                if (DBMLib.dbm_addRawRaw(currLower, currUpper) != 1) {
                     return false;
+                }
             }
         }
         return true;
     }
 
     public boolean canDelayIndefinitely() {
-
-        for (Zone z : this.getZones()) {
-            boolean indef = true;
-            for (int i = 1; i < z.getSize(); i++) {
-                int curr = z.getDbm()[z.getSize() * i];
-                if (curr < DBM_INF) indef = false;
+        for (Zone zone : this.getZones()) {
+            boolean indefinitely = true;
+            for (int i = 1; i < zone.getDimension(); i++) {
+                int upper = zone.getDbm()[zone.getDimension() * i];
+                if (upper < DBM_INF) {
+                    indefinitely = false;
+                }
             }
-            if (indef == true)
+            if (indefinitely) {
                 return true;
+            }
         }
-
-
         return false;
     }
 
-
     public void delay() {
-        int[][] zones = getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int dim = (int) Math.sqrt(zones[0].length);
-        Federation tempFed = new Federation(DBMLib.fed_up(zones, dim));
+        int[][] zones = getDbms();
+        int dimension = (int) Math.sqrt(zones[0].length);
+        Federation tempFed = new Federation(DBMLib.fed_up(zones, dimension));
         this.zones = tempFed.zones;
     }
 
     public Federation intersect(Federation fed) {
-        int[][] zones1 = this.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+        int[][] zones1 = this.getDbms();
+        int[][] zones2 = fed.getDbms();
         if (zones1.length == 0) {
             return this;
         }
-        int dim = (int) Math.sqrt(zones1[0].length);
-        return new Federation(DBMLib.fed_intersect_fed(zones1, zones2, dim));
+        int dimension = Zone.getDbmDimension(zones1[0]);
+        return new Federation(DBMLib.fed_intersect_fed(zones1, zones2, dimension));
     }
 
     public Federation free(int index) {
-        int[][] zones = getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+        int[][] zones = getDbms();
         if (zones.length == 0) {
             return this;
         }
-        int dim = (int) Math.sqrt(zones[0].length);
-        return new Federation(DBMLib.fed_freeClock(zones, dim, index));
+        int dimension = Zone.getDbmDimension(zones[0]);
+        return new Federation(DBMLib.fed_freeClock(zones, dimension, index));
     }
 
     public boolean intersects(Federation fed) {
-        int[][] zones1 = this.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+        int[][] zones1 = this.getDbms();
+        int[][] zones2 = fed.getDbms();
         if (zones1.length == 0) return false;
-        int dim = (int) Math.sqrt(zones1[0].length);
-        return DBMLib.fed_intersects_dbm(zones1, zones2, dim);
-
+        int dimension = Zone.getDbmDimension(zones1[0]);
+        return DBMLib.fed_intersects_dbm(zones1, zones2, dimension);
     }
 
-    public static Federation fedMinusFed(Federation fed1, Federation fed2) {
-        int[][] zones1 = fed1.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+    public static Federation createUnrestrainedFederation(List<Clock> clocks) {
+        Zone emptyZone = new Zone(clocks.size() + 1, true);
+        for (int i = 0; i < clocks.size(); i++) {
+            emptyZone.freeClock(i);
+        }
+        return new Federation(emptyZone);
+    }
+
+    public static Federation subtract(Federation fed1, Federation fed2) {
+        int[][] zones1 = fed1.getDbms();
+        int[][] zones2 = fed2.getDbms();
 
         if (fed1.isEmpty()) return fed1;
         if (fed2.isEmpty()) return fed1;
 
-        int dim = (int) Math.sqrt(zones1[0].length);
+        int dimension = Zone.getDbmDimension(zones1[0]);
 
-        int[][] result = DBMLib.fed_minus_fed(zones1, zones2, dim);
+        int[][] result = DBMLib.fed_minus_fed(zones1, zones2, dimension);
         return new Federation(result);
     }
 
-    public static boolean fedEqFed(Federation fed1, Federation fed2) {
+    public static boolean equals(Federation fed1, Federation fed2) {
         if (fed1 == null && fed2 == null) return true;
         if (fed1 == null || fed2 == null) return false;
 
-        int[][] zones1 = fed1.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        if (zones1.length == 0) {
-            if (zones2.length == 0)
-                return true;
-            else
-                return false;
+        int[][] zones1 = fed1.getDbms();
+        int[][] zones2 = fed2.getDbms();
 
+        if (zones1.length == 0) {
+            return zones2.length == 0;
         }
 
-        int dim = (int) Math.sqrt(zones1[0].length);
-
-        boolean result = DBMLib.fed_eq_fed(zones1, zones2, dim);
-        return result;
+        int dimension = Zone.getDbmDimension(zones1[0]);
+        return DBMLib.fed_eq_fed(zones1, zones2, dimension);
     }
 
-    public static Federation fedPlusFed(Federation fed1, Federation fed2) {
-        int[][] zones1 = fed1.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+    public static Federation add(Federation fed1, Federation fed2) {
+        int[][] zones1 = fed1.getDbms();
+        int[][] zones2 = fed2.getDbms();
         if (fed1.isEmpty())
             return fed2;
         if (fed2.isEmpty())
             return fed1;
 
-        int dim = (int) Math.sqrt(zones1[0].length);
+        int dim = Zone.getDbmDimension(zones1[0]);
 
         int[][] result = DBMLib.fed_plus_fed(zones1, zones2, dim);
         return new Federation(result);
@@ -236,22 +203,23 @@ public class Federation {
 
 
     public static Federation predt(Federation fed1, Federation fed2) {
-        int[][] zones1 = fed1.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
-        int[][] zones2 = fed2.getZones().stream().map(Zone::getDbm).toArray(int[][]::new);
+        int[][] zones1 = fed1.getDbms();
+        int[][] zones2 = fed2.getDbms();
 
         if (zones1.length == 0) {
             return fed1; // todo: fed2?
         }
 
-        int dim = (int) Math.sqrt(zones1[0].length);
-
-        int[][] result = DBMLib.fed_const_predt(zones1, zones2, dim);
+        int dimension = Zone.getDbmDimension(zones1[0]);
+        int[][] result = DBMLib.fed_const_predt(zones1, zones2, dimension);
         return new Federation(result);
     }
 
-    public static Federation dbmMinusDbm(Zone z1, Zone z2) {
-        if (z1.getSize() != z2.getSize()) throw new IllegalArgumentException("Zones must be of the same size");
-
-        return new Federation(DBMLib.dbm_minus_dbm(z1.getDbm(), z2.getDbm(), z1.getSize()));
+    public static Federation subtract(Zone z1, Zone z2)
+            throws IllegalArgumentException {
+        if (z1.getDimension() != z2.getDimension()) {
+            throw new IllegalArgumentException("Zones must be of the same size");
+        }
+        return new Federation(DBMLib.dbm_minus_dbm(z1.getDbm(), z2.getDbm(), z1.getDimension()));
     }
 }

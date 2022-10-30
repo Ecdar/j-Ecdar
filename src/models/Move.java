@@ -1,51 +1,50 @@
 package models;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Move {
-
-    private final SymbolicLocation source, target;
+    private Location source, target;
     private final List<Edge> edges;
     private CDD guardCDD;
     private List<Update> updates;
 
-    public Move(SymbolicLocation source, SymbolicLocation target, List<Edge> edges) {
-
+    public Move(Location source, Location target, List<Edge> edges) {
         this.source = source;
         this.target = target;
         this.edges = edges;
-        guardCDD = CDD.cddTrue();
         this.updates = new ArrayList<>();
-        for (Edge e : edges) {
-            CDD guardCDD1 = e.getGuardCDD();
-            guardCDD = guardCDD.conjunction(guardCDD1);
-            updates.addAll(e.getUpdates());
+        guardCDD = CDD.cddTrue();
+        for (Edge edge : edges) {
+            guardCDD = guardCDD.conjunction(edge.getGuardCDD());
+            updates.addAll(edge.getUpdates());
         }
+    }
 
+    public Move(Location source, Location target) {
+        this(source, target, new ArrayList<>());
     }
 
     /**
      * Return the enabled part of a move based on guard, source invariant and predated target invariant
      **/
     public CDD getEnabledPart() {
-        CDD sourceInvariant = getSource().getInvariantCDD();
-        CDD targetInvariant = getTarget().getInvariantCDD();
-        return getGuardCDD().conjunction(targetInvariant.transitionBack(this)).conjunction(sourceInvariant);
+        CDD targetInvariant = getTarget().getInvariantCdd();
+        CDD sourceInvariant = getSource().getInvariantCdd();
+        return getGuardCDD()
+                .conjunction(targetInvariant.transitionBack(this))
+                .conjunction(sourceInvariant);
     }
 
-    public void conjunctCDD(CDD cdd)
-    {
+    public void conjunctCDD(CDD cdd) {
         guardCDD = guardCDD.conjunction(cdd);
     }
 
-    public SymbolicLocation getSource() {
+    public Location getSource() {
         return source;
     }
 
-    public SymbolicLocation getTarget() {
+    public Location getTarget() {
         return target;
     }
 
@@ -53,13 +52,12 @@ public class Move {
         return edges;
     }
 
-
     public CDD getGuardCDD() {
         return (guardCDD);
     }
 
-    public Guard getGuards(List <Clock> relevantClocks) {
-        return CDD.toGuardList(guardCDD, relevantClocks);
+    public Guard getGuards(List<Clock> relevantClocks) {
+        return guardCDD.getGuard(relevantClocks);
     }
 
     public void setGuards(CDD guardCDD) {
@@ -72,5 +70,9 @@ public class Move {
 
     public void setUpdates(List<Update> updates) {
         this.updates = updates;
+    }
+
+    public void setTarget(Location loc) {
+        target = loc;
     }
 }

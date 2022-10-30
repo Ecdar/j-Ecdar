@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
 <nta>
 	<declaration>// Place global declarations here.
 
@@ -15,7 +15,7 @@ clock x,y;</declaration>
 			<name x="194" y="-17">inc</name>
 		</location>
 		<init ref="id0"/>
-		<transition controllable="false">
+		<transition id="id2" controllable="false">
 			<source ref="id0"/>
 			<target ref="id0"/>
 			<label kind="guard" x="-16" y="-85">x&lt;3</label>
@@ -23,7 +23,7 @@ clock x,y;</declaration>
 			<nail x="-34" y="-51"/>
 			<nail x="34" y="-51"/>
 		</transition>
-		<transition>
+		<transition id="id3">
 			<source ref="id0"/>
 			<target ref="id1"/>
 			<label kind="guard" x="93" y="-68">x&gt;4</label>
@@ -34,13 +34,13 @@ clock x,y;</declaration>
 	<template>
 		<name>ExpectedOutputSelfloopZeno</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id2" x="-93" y="0">
+		<location id="id4" x="-93" y="0">
 			<label kind="invariant" x="-103" y="17">x&lt;3</label>
 		</location>
-		<init ref="id2"/>
-		<transition controllable="false">
-			<source ref="id2"/>
-			<target ref="id2"/>
+		<init ref="id4"/>
+		<transition id="id5" controllable="false">
+			<source ref="id4"/>
+			<target ref="id4"/>
 			<label kind="guard" x="-109" y="-102">x&lt;3</label>
 			<label kind="synchronisation" x="-109" y="-85">o!</label>
 			<nail x="-127" y="-68"/>
@@ -50,24 +50,24 @@ clock x,y;</declaration>
 	<template>
 		<name>SelfloopNonZeno</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id3" x="-85" y="51">
+		<location id="id6" x="-85" y="51">
 		</location>
-		<location id="id4" x="119" y="51" color="#ff0000">
+		<location id="id7" x="119" y="51" color="#ff0000">
 			<name x="109" y="17">inc</name>
 		</location>
-		<init ref="id3"/>
-		<transition controllable="false">
-			<source ref="id3"/>
-			<target ref="id3"/>
+		<init ref="id6"/>
+		<transition id="id8" controllable="false">
+			<source ref="id6"/>
+			<target ref="id6"/>
 			<label kind="guard" x="-93" y="-77">x&lt;3</label>
 			<label kind="synchronisation" x="-93" y="-60">o!</label>
 			<label kind="assignment" x="-93" y="-43">x=0</label>
 			<nail x="-119" y="-17"/>
 			<nail x="-51" y="-17"/>
 		</transition>
-		<transition>
-			<source ref="id3"/>
-			<target ref="id4"/>
+		<transition id="id9">
+			<source ref="id6"/>
+			<target ref="id7"/>
 			<label kind="guard" x="17" y="0">x&gt;4</label>
 			<label kind="synchronisation" x="17" y="17">i?</label>
 		</transition>
@@ -75,13 +75,13 @@ clock x,y;</declaration>
 	<template>
 		<name>ExpectedOutputSelfloopNonZeno</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id5" x="-85" y="51">
+		<location id="id10" x="-85" y="51">
 			<label kind="invariant" x="-95" y="68">x&lt;3</label>
 		</location>
-		<init ref="id5"/>
-		<transition controllable="false">
-			<source ref="id5"/>
-			<target ref="id5"/>
+		<init ref="id10"/>
+		<transition id="id11" controllable="false">
+			<source ref="id10"/>
+			<target ref="id10"/>
 			<label kind="guard" x="-93" y="-77">x&lt;3</label>
 			<label kind="synchronisation" x="-93" y="-60">o!</label>
 			<label kind="assignment" x="-93" y="-43">x=0</label>
@@ -92,30 +92,30 @@ clock x,y;</declaration>
 	<template>
 		<name>Simple</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id6" x="-17" y="0">
+		<location id="id12" x="-17" y="0">
 		</location>
-		<location id="id7" x="153" y="0" color="#ff0000">
+		<location id="id13" x="153" y="0" color="#ff0000">
 			<name x="143" y="-34">inc</name>
 		</location>
-		<location id="id8" x="-17" y="-170">
+		<location id="id14" x="-17" y="-170">
 		</location>
-		<location id="id9" x="-212" y="0">
+		<location id="id15" x="-212" y="0">
 		</location>
-		<init ref="id9"/>
-		<transition controllable="false">
-			<source ref="id9"/>
-			<target ref="id6"/>
+		<init ref="id15"/>
+		<transition id="id16" controllable="false">
+			<source ref="id15"/>
+			<target ref="id12"/>
 			<label kind="synchronisation" x="-119" y="-25">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id6"/>
-			<target ref="id8"/>
+		<transition id="id17" controllable="false">
+			<source ref="id12"/>
+			<target ref="id14"/>
 			<label kind="guard" x="0" y="-119">x&lt;3</label>
 			<label kind="synchronisation" x="0" y="-102">o!</label>
 		</transition>
-		<transition>
-			<source ref="id6"/>
-			<target ref="id7"/>
+		<transition id="id18">
+			<source ref="id12"/>
+			<target ref="id13"/>
 			<label kind="guard" x="51" y="-42">x&gt;4</label>
 			<label kind="synchronisation" x="51" y="-25">i?</label>
 		</transition>
@@ -123,24 +123,23 @@ clock x,y;</declaration>
 	<template>
 		<name>ExpectedOutputSimple</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id10" x="93" y="85">
+		<location id="id19" x="93" y="85">
 			<label kind="invariant" x="85" y="102">x&lt;3</label>
 		</location>
-		<location id="id11" x="93" y="-85">
+		<location id="id20" x="93" y="-85">
 		</location>
-		<location id="id12" x="-102" y="85">
-			<label kind="invariant" x="-112" y="102">x&lt;3</label>
+		<location id="id21" x="-102" y="85">
 		</location>
-		<init ref="id12"/>
-		<transition controllable="false">
-			<source ref="id12"/>
-			<target ref="id10"/>
+		<init ref="id21"/>
+		<transition id="id22" controllable="false">
+			<source ref="id21"/>
+			<target ref="id19"/>
 			<label kind="guard" x="-25" y="59">x&lt;3</label>
 			<label kind="synchronisation" x="-25" y="42">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id10"/>
-			<target ref="id11"/>
+		<transition id="id23" controllable="false">
+			<source ref="id19"/>
+			<target ref="id20"/>
 			<label kind="guard" x="110" y="-34">x&lt;3</label>
 			<label kind="synchronisation" x="110" y="-17">o!</label>
 		</transition>
@@ -148,30 +147,30 @@ clock x,y;</declaration>
 	<template>
 		<name>Simple2</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id13" x="-637" y="-348">
+		<location id="id24" x="-637" y="-348">
 			<label kind="invariant" x="-645" y="-382">x&lt;4</label>
 		</location>
-		<location id="id14" x="-492" y="-212" color="#ff0000">
+		<location id="id25" x="-492" y="-212" color="#ff0000">
 			<name x="-501" y="-246">inc</name>
 		</location>
-		<location id="id15" x="-637" y="-212">
+		<location id="id26" x="-637" y="-212">
 		</location>
-		<init ref="id15"/>
-		<transition controllable="false">
-			<source ref="id13"/>
-			<target ref="id15"/>
+		<init ref="id26"/>
+		<transition id="id27" controllable="false">
+			<source ref="id24"/>
+			<target ref="id26"/>
 			<label kind="synchronisation" x="-654" y="-289">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id15"/>
-			<target ref="id13"/>
+		<transition id="id28" controllable="false">
+			<source ref="id26"/>
+			<target ref="id24"/>
 			<label kind="guard" x="-586" y="-306">x&lt;3</label>
 			<label kind="synchronisation" x="-586" y="-289">o!</label>
 			<nail x="-595" y="-280"/>
 		</transition>
-		<transition>
-			<source ref="id15"/>
-			<target ref="id14"/>
+		<transition id="id29">
+			<source ref="id26"/>
+			<target ref="id25"/>
 			<label kind="guard" x="-569" y="-255">x&gt;4</label>
 			<label kind="synchronisation" x="-569" y="-237">i?</label>
 		</transition>
@@ -179,22 +178,22 @@ clock x,y;</declaration>
 	<template>
 		<name>ExpectedOutputSimple2</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id16" x="-459" y="-297">
+		<location id="id30" x="-459" y="-297">
 			<label kind="invariant" x="-467" y="-331">x&lt;3</label>
 		</location>
-		<location id="id17" x="-459" y="-161">
+		<location id="id31" x="-459" y="-161">
 			<label kind="invariant" x="-469" y="-144">x&lt;3</label>
 		</location>
-		<init ref="id17"/>
-		<transition controllable="false">
-			<source ref="id16"/>
-			<target ref="id17"/>
+		<init ref="id31"/>
+		<transition id="id32" controllable="false">
+			<source ref="id30"/>
+			<target ref="id31"/>
 			<label kind="guard" x="-484" y="-255">x&lt;3</label>
 			<label kind="synchronisation" x="-476" y="-238">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id17"/>
-			<target ref="id16"/>
+		<transition id="id33" controllable="false">
+			<source ref="id31"/>
+			<target ref="id30"/>
 			<label kind="guard" x="-408" y="-255">x&lt;3</label>
 			<label kind="synchronisation" x="-408" y="-238">o!</label>
 			<nail x="-417" y="-229"/>
@@ -203,56 +202,55 @@ clock x,y;</declaration>
 	<template>
 		<name>Simple3</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id18" x="-263" y="-17">
+		<location id="id34" x="-263" y="-17">
 			<label kind="invariant" x="-280" y="0">x&lt;=5</label>
 		</location>
-		<location id="id19" x="-144" y="-17" color="#ff0000">
+		<location id="id35" x="-144" y="-17" color="#ff0000">
 			<name x="-154" y="-51">inc</name>
 		</location>
-		<location id="id20" x="-382" y="-17">
+		<location id="id36" x="-382" y="-17">
 		</location>
-		<location id="id21" x="-263" y="-110">
+		<location id="id37" x="-263" y="-110">
 		</location>
-		<init ref="id20"/>
-		<transition controllable="false">
-			<source ref="id18"/>
-			<target ref="id21"/>
+		<init ref="id36"/>
+		<transition id="id38" controllable="false">
+			<source ref="id34"/>
+			<target ref="id37"/>
 			<label kind="guard" x="-297" y="-76">x&lt;4</label>
 			<label kind="synchronisation" x="-289" y="-59">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id18"/>
-			<target ref="id19"/>
+		<transition id="id39" controllable="false">
+			<source ref="id34"/>
+			<target ref="id35"/>
 			<label kind="guard" x="-220" y="-60">x&gt;3</label>
 			<label kind="synchronisation" x="-220" y="-43">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id20"/>
-			<target ref="id18"/>
+		<transition id="id40" controllable="false">
+			<source ref="id36"/>
+			<target ref="id34"/>
 			<label kind="synchronisation" x="-331" y="-43">o!</label>
 		</transition>
 	</template>
 	<template>
 		<name>ExpectedOutputSimple3</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id22" x="-187" y="17">
+		<location id="id41" x="-187" y="17">
 			<label kind="invariant" x="-204" y="34">x&lt;4</label>
 		</location>
-		<location id="id23" x="-187" y="-76">
+		<location id="id42" x="-187" y="-76">
 		</location>
-		<location id="id24" x="-306" y="17">
-			<label kind="invariant" x="-316" y="34">x&lt;4</label>
+		<location id="id43" x="-306" y="17">
 		</location>
-		<init ref="id24"/>
-		<transition controllable="false">
-			<source ref="id22"/>
-			<target ref="id23"/>
+		<init ref="id43"/>
+		<transition id="id44" controllable="false">
+			<source ref="id41"/>
+			<target ref="id42"/>
 			<label kind="guard" x="-221" y="-42">x&lt;4</label>
 			<label kind="synchronisation" x="-213" y="-25">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id24"/>
-			<target ref="id22"/>
+		<transition id="id45" controllable="false">
+			<source ref="id43"/>
+			<target ref="id41"/>
 			<label kind="guard" x="-263" y="-25">x&lt;4</label>
 			<label kind="synchronisation" x="-255" y="-9">o!</label>
 		</transition>
@@ -260,101 +258,159 @@ clock x,y;</declaration>
 	<template>
 		<name>Simple4</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id25" x="-161" y="8">
+		<location id="id46" x="-161" y="8">
 			<label kind="invariant" x="-178" y="25">x&lt;=5</label>
 		</location>
-		<location id="id26" x="-161" y="-85">
+		<location id="id47" x="-161" y="-85">
 		</location>
-		<location id="id27" x="-42" y="8" color="#ff0000">
+		<location id="id48" x="-42" y="8" color="#ff0000">
 			<name x="-52" y="-26">inc</name>
 		</location>
-		<location id="id28" x="-280" y="8">
+		<location id="id49" x="-280" y="8">
 		</location>
-		<init ref="id28"/>
-		<transition controllable="false">
-			<source ref="id25"/>
-			<target ref="id26"/>
+		<init ref="id49"/>
+		<transition id="id50" controllable="false">
+			<source ref="id46"/>
+			<target ref="id47"/>
 			<label kind="guard" x="-195" y="-51">x&lt;4</label>
 			<label kind="synchronisation" x="-187" y="-34">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id25"/>
-			<target ref="id27"/>
+		<transition id="id51" controllable="false">
+			<source ref="id46"/>
+			<target ref="id48"/>
 			<label kind="guard" x="-118" y="-35">x&gt;3</label>
 			<label kind="synchronisation" x="-118" y="-18">o!</label>
 		</transition>
-		<transition>
-			<source ref="id28"/>
-			<target ref="id25"/>
+		<transition id="id52">
+			<source ref="id49"/>
+			<target ref="id46"/>
 			<label kind="synchronisation" x="-229" y="-18">i?</label>
 		</transition>
 	</template>
 	<template>
 		<name>ExpectedOutputSimple4</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id29" x="-119" y="8">
+		<location id="id53" x="-119" y="8">
 		</location>
-		<init ref="id29"/>
+		<init ref="id53"/>
 	</template>
 	<template>
 		<name>Simple4InpComp</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id30" x="-76" y="0">
+		<location id="id54" x="-76" y="0">
 			<label kind="invariant" x="-93" y="17">x&lt;=5</label>
 		</location>
-		<location id="id31" x="-76" y="-93">
+		<location id="id55" x="-76" y="-93">
 		</location>
-		<location id="id32" x="43" y="0" color="#ff0000">
+		<location id="id56" x="43" y="0" color="#ff0000">
 			<name x="33" y="-34">inc</name>
 		</location>
-		<location id="id33" x="-195" y="0">
+		<location id="id57" x="-195" y="0">
 		</location>
-		<init ref="id33"/>
-		<transition>
-			<source ref="id32"/>
-			<target ref="id32"/>
+		<init ref="id57"/>
+		<transition id="id58">
+			<source ref="id56"/>
+			<target ref="id56"/>
 			<label kind="synchronisation" x="93" y="-8">i?</label>
 			<nail x="85" y="-25"/>
 			<nail x="85" y="25"/>
 		</transition>
-		<transition>
-			<source ref="id31"/>
-			<target ref="id31"/>
+		<transition id="id59">
+			<source ref="id55"/>
+			<target ref="id55"/>
 			<label kind="synchronisation" x="-76" y="-153">i?</label>
 			<nail x="-102" y="-127"/>
 			<nail x="-51" y="-127"/>
 		</transition>
-		<transition>
-			<source ref="id30"/>
-			<target ref="id30"/>
+		<transition id="id60">
+			<source ref="id54"/>
+			<target ref="id54"/>
 			<label kind="synchronisation" x="-25" y="-93">i?</label>
 			<nail x="-51" y="-68"/>
 			<nail x="-25" y="-59"/>
 		</transition>
-		<transition controllable="false">
-			<source ref="id30"/>
-			<target ref="id31"/>
+		<transition id="id61" controllable="false">
+			<source ref="id54"/>
+			<target ref="id55"/>
 			<label kind="guard" x="-110" y="-59">x&lt;4</label>
 			<label kind="synchronisation" x="-102" y="-42">o!</label>
 		</transition>
-		<transition controllable="false">
-			<source ref="id30"/>
-			<target ref="id32"/>
+		<transition id="id62" controllable="false">
+			<source ref="id54"/>
+			<target ref="id56"/>
 			<label kind="guard" x="-33" y="-43">x&gt;3</label>
 			<label kind="synchronisation" x="-33" y="-26">o!</label>
 		</transition>
-		<transition>
-			<source ref="id33"/>
-			<target ref="id30"/>
+		<transition id="id63">
+			<source ref="id57"/>
+			<target ref="id54"/>
 			<label kind="synchronisation" x="-144" y="-26">i?</label>
 		</transition>
 	</template>
 	<template>
 		<name>ExpectedOutputSimple4InpComp</name>
 		<declaration>clock x,y;</declaration>
-		<location id="id34" x="0" y="0">
+		<location id="id64" x="0" y="0">
 		</location>
-		<init ref="id34"/>
+		<init ref="id64"/>
+	</template>
+	<template>
+		<name>Simple3Invar</name>
+		<declaration>clock x,y;</declaration>
+		<location id="id65" x="-263" y="-17">
+			<label kind="invariant" x="-280" y="0">x&lt;=5</label>
+		</location>
+		<location id="id66" x="-144" y="-17" color="#ff0000">
+			<name x="-154" y="-51">inc</name>
+		</location>
+		<location id="id67" x="-382" y="-17">
+			<label kind="invariant" x="-392" y="0">x&lt;10</label>
+		</location>
+		<location id="id68" x="-263" y="-110">
+		</location>
+		<init ref="id67"/>
+		<transition id="id69" controllable="false">
+			<source ref="id65"/>
+			<target ref="id68"/>
+			<label kind="guard" x="-297" y="-76">x&lt;4</label>
+			<label kind="synchronisation" x="-289" y="-59">o!</label>
+		</transition>
+		<transition id="id70" controllable="false">
+			<source ref="id65"/>
+			<target ref="id66"/>
+			<label kind="guard" x="-220" y="-60">x&gt;3</label>
+			<label kind="synchronisation" x="-220" y="-43">o!</label>
+		</transition>
+		<transition id="id71" controllable="false">
+			<source ref="id67"/>
+			<target ref="id65"/>
+			<label kind="synchronisation" x="-331" y="-43">o!</label>
+		</transition>
+	</template>
+	<template>
+		<name>ExpectedOutputSimple3Invar</name>
+		<declaration>clock x,y;</declaration>
+		<location id="id72" x="-187" y="17">
+			<label kind="invariant" x="-204" y="34">x&lt;4</label>
+		</location>
+		<location id="id73" x="-187" y="-76">
+		</location>
+		<location id="id74" x="-306" y="17">
+			<label kind="invariant" x="-316" y="34">x&lt;4</label>
+		</location>
+		<init ref="id74"/>
+		<transition id="id75" controllable="false">
+			<source ref="id72"/>
+			<target ref="id73"/>
+			<label kind="guard" x="-221" y="-42">x&lt;4</label>
+			<label kind="synchronisation" x="-213" y="-25">o!</label>
+		</transition>
+		<transition id="id76" controllable="false">
+			<source ref="id74"/>
+			<target ref="id72"/>
+			<label kind="guard" x="-263" y="-25">x&lt;4</label>
+			<label kind="synchronisation" x="-255" y="-9">o!</label>
+		</transition>
 	</template>
 	<system>system SelfloopZeno, ExpectedOutputSelfloopZeno, SelfloopNonZeno, ExpectedOutputSelfloopNonZeno,Simple, ExpectedOutputSimple,Simple4, ExpectedOutputSimple4,Simple2, ExpectedOutputSimple2,Simple3, ExpectedOutputSimple3, Simple4InpComp, ExpectedOutputSimple4InpComp;
 
@@ -374,8 +430,8 @@ IO Simple4InpComp { i?, o! }
 IO ExpectedSimple4InpComp {  }</system>
 	<queries>
 		<query>
-			<formula></formula>
-			<comment></comment>
+			<formula/>
+			<comment/>
 		</query>
 	</queries>
 </nta>

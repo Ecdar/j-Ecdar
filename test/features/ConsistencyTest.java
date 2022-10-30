@@ -1,5 +1,6 @@
 package features;
 
+import log.Log;
 import logic.*;
 import models.Automaton;
 import models.CDD;
@@ -36,9 +37,6 @@ public class ConsistencyTest {
         G10 = new SimpleTransitionSystem(automata[9]);
         G12 = new SimpleTransitionSystem(automata[11]);
         G21 = new SimpleTransitionSystem(automata[20]);
-
-        CDD.init(1000,1000,1000);
-        CDD.addClocks(G1.getClocks(),G3.getClocks(),G4.getClocks(),G5.getClocks(),G7.getClocks(),G8.getClocks(),G9.getClocks(),G10.getClocks(),G12.getClocks(),automata[5].getClocks(),automata[12].getClocks(),automata[13].getClocks(),automata[14].getClocks(),automata[15].getClocks(),automata[16].getClocks(),automata[17].getClocks(),automata[18].getClocks(),automata[19].getClocks(),automata[20].getClocks());
     }
 
     @Test
@@ -91,7 +89,7 @@ public class ConsistencyTest {
 
         TransitionSystem ts = new SimpleTransitionSystem(automata[5]);
 
-        ts.getAutomaton().getEdges().forEach(e->System.out.println(e));
+        ts.getAutomaton().getEdges().forEach(e->Log.trace(e));
         assertTrue(ts.isLeastConsistent());
     }
 
@@ -206,7 +204,7 @@ public class ConsistencyTest {
         Refinement ref = new Refinement(comp, G21);
 
         assertFalse(ref.check());
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertEquals("Automaton G9 is non-deterministic." + ", Automata G3, G4, G5, G7, G10, G12 are inconsistent.", ref.getErrMsg());
     }
 }

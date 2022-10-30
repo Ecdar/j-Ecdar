@@ -1,138 +1,121 @@
 package models;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class AndGuard extends Guard{
-
+public class AndGuard extends Guard {
     private List<Guard> guards;
 
-    public AndGuard(List<Guard> guards)
-    {
-        this.guards=guards;
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<this.guards.size(); i++)
-            if (this.guards.get(i) instanceof TrueGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            this.guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new TrueGuard());
-    }
-    public AndGuard(List<Guard>... guards)
-    {
-        this.guards= new ArrayList<>();
-        for (List<Guard> g: guards)
-            this.guards.addAll(g);
+    public AndGuard(List<Guard> guards) {
+        this.guards = guards;
 
+        /* If any of the guards are AndGuards themselves,
+         *   then we can decompose their guards to be contained in this */
+        List<AndGuard> worklist = this.guards
+                .stream()
+                .filter(guard -> guard instanceof AndGuard)
+                .map(guard -> (AndGuard) guard)
+                .collect(Collectors.toList());
+        while (!worklist.isEmpty()) {
+            AndGuard current = worklist.get(0);
+            worklist.remove(0);
 
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<this.guards.size(); i++)
-            if (this.guards.get(i) instanceof TrueGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            this.guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new TrueGuard());
-    }
-    public AndGuard(Guard... guards)
-    {
-        this.guards= new ArrayList<>();
-        for (Guard g : guards)
-           this.guards.add(g);
+            for (Guard guard : current.guards) {
+                if (guard instanceof AndGuard) {
+                    worklist.add((AndGuard) guard);
+                }
+                this.guards.add(guard);
+            }
 
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<this.guards.size(); i++)
-            if (this.guards.get(i) instanceof TrueGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            this.guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new TrueGuard());
-
-    }
-
-    public AndGuard(AndGuard copy, List<Clock> newClocks,List<Clock> oldClocks,   List<BoolVar> newBVs, List<BoolVar> oldBVs)
-    {
-        this.guards=new ArrayList<>();
-        for (Guard g : copy.guards)
-        {
-            if (g instanceof ClockGuard)
-                this.guards.add(new ClockGuard((ClockGuard) g,  newClocks,oldClocks));
-            if (g instanceof BoolGuard)
-                this.guards.add(new BoolGuard((BoolGuard) g, newBVs, oldBVs));
-            if (g instanceof FalseGuard)
-                this.guards.add(new FalseGuard());
-            if (g instanceof TrueGuard)
-                this.guards.add(new TrueGuard());
-            if (g instanceof AndGuard)
-                this.guards.add(new AndGuard( (AndGuard) g, newClocks, oldClocks, newBVs, oldBVs));
-            if (g instanceof OrGuard)
-                this.guards.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
+            this.guards.remove(current);
         }
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<guards.size(); i++)
-            if (guards.get(i) instanceof TrueGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new TrueGuard());
 
+        /* If the AndGuard contains a FalseGuard,
+         *   then remove all guards and just have a single
+         *   FalseGuard as it will always be false. */
+        boolean hasFalseGuard = this.guards.stream().anyMatch(guard -> guard instanceof FalseGuard);
+        if (hasFalseGuard) {
+            /* We just know that there is at least one FalseGuard for this
+             *   reason we clear all guard as it handle multiple FalseGuards
+             *   then we just add a FalseGuard to account for all of them.
+             *   If we left it empty then it would be interpreted as a tautology. */
+            this.guards.clear();
+            this.guards.add(new FalseGuard());
+        }
+
+        // Remove all ture guards
+        this.guards = this.guards.stream().filter(guard -> !(guard instanceof TrueGuard)).collect(Collectors.toList());
+
+        // If empty then it is a tautology
+        if (this.guards.size() == 0) {
+            this.guards.add(new TrueGuard());
+        }
     }
 
+    public AndGuard(List<Guard>... guards) {
+        this(Lists.newArrayList(Iterables.concat(guards)));
+    }
+
+    public AndGuard(Guard... guards) {
+        this(Arrays.asList(guards));
+    }
+
+    public AndGuard(AndGuard copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        // As this is the copy-constructor we need to create new instances of the guards
+        this(copy.guards.stream().map(guard ->
+            guard.copy(newClocks, oldClocks, newBVs, oldBVs)
+        ).collect(Collectors.toList()));
+    }
+
+    public List<Guard> getGuards() {
+        return guards;
+    }
 
     @Override
-    int getMaxConstant() {
+    int getMaxConstant(Clock clock) {
         int max = 0;
-        for (Guard g: guards)
-        {
-            if (g.getMaxConstant()>max)
-                max = g.getMaxConstant();
+        for (Guard guard : guards) {
+            max = Math.max(max, guard.getMaxConstant(clock));
         }
         return max;
     }
 
     @Override
-    public boolean equals(Object o) { // TODO: AND(G1,G2) != AND(G2,G1) => is that okay?
-        if (!(o instanceof AndGuard))
-            return false;
-        AndGuard other = (AndGuard) o;
-        if (other.guards.size()!=guards.size())
-            return  false;
-        if (guards.size()==0)
+    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new AndGuard(
+            this, newClocks, oldClocks, newBVs, oldBVs
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
-        for (int i =0; i< other.guards.size(); i++)
-            if (!guards.get(i).equals(other.guards.get(i)))
-                return false;
-        return true;
+        }
+        if (!(obj instanceof AndGuard)) {
+            return false;
+        }
+
+        AndGuard other = (AndGuard) obj;
+        return Arrays.equals(guards.toArray(), other.guards.toArray());
     }
 
     @Override
     public String toString() {
-
-
-
-
-        String ret = "(";
-        for (Guard g: guards)
-            ret += g.toString() + " && ";
-        if (guards.size()==0)
-            return "";
-        if (guards.size()==1)
+        if (guards.size() == 1) {
             return guards.get(0).toString();
-        return ret.substring(0,ret.length()-4) + ")";
+        }
+
+        return "(" +
+                guards.stream().map(Guard::toString).collect(Collectors.joining(" && "))
+                + ")";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(false);
-    }
-
-    public List<Guard> getGuards() {
-        return guards;
+        return Objects.hash(guards);
     }
 }

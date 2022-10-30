@@ -1,15 +1,14 @@
 package models;
 
 public class Segment {
-    private CDDNode child;
-    private int upperBound;
+    private final CDDNode child;
+    private final int upperBound;
     private boolean isUpperBoundIncluded;
 
     public Segment(CDDNode child, int rawUpperBound) {
         this.child = child;
-        this.upperBound = rawUpperBound>>1;
-        System.out.println("raw upper " + rawUpperBound + " " + " upper " + upperBound );
-        isUpperBoundIncluded =    (rawUpperBound & 1)==0 ? false : true;
+        this.upperBound = rawUpperBound >> 1;
+        isUpperBoundIncluded = (rawUpperBound & 1) != 0;
     }
 
     public CDDNode getChild() {

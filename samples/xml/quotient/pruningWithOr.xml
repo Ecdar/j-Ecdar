@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan i; chan o;</declaration>
+	<template>
+		<name x="5" y="5">Original</name>
+		<declaration>// Place local declarations here.
+clock x;</declaration>
+		<location id="id0" x="102" y="-144">
+		</location>
+		<location id="id1" x="-136" y="-51">
+		</location>
+		<location id="id2" x="8" y="-51">
+		</location>
+		<location id="id3" x="93" y="34" color="#ff0000">
+			<name x="83" y="0">inc</name>
+		</location>
+		<init ref="id1"/>
+		<transition id="id4" controllable="false">
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-25" y="-136">x&gt;2 &amp;&amp; x&lt;3</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id5" controllable="false">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-102" y="-76">o!</label>
+		</transition>
+		<transition id="id6">
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="guard" x="59" y="-51">x&gt;4 &amp;&amp; x&lt;7</label>
+			<label kind="synchronisation" x="59" y="-34">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name>Expected</name>
+		<declaration>clock x;</declaration>
+		<location id="id7" x="102" y="-144">
+		</location>
+		<location id="id8" x="8" y="-51">
+			<label kind="invariant" x="34" y="-59">x&lt;3 || x&gt;=7</label>
+		</location>
+		<location id="id9" x="-136" y="-51">
+		</location>
+		<init ref="id9"/>
+		<transition id="id10" controllable="false">
+			<source ref="id8"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-25" y="-136">x&gt;2 &amp;&amp; x&lt;3</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id11" controllable="false">
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-119" y="-76">x&lt;3 || x&gt;=7</label>
+			<label kind="synchronisation" x="-119" y="-93">o!</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Original1</name>
+		<declaration>// Place local declarations here.
+clock x;</declaration>
+		<location id="id12" x="102" y="-144">
+		</location>
+		<location id="id13" x="-136" y="-51">
+		</location>
+		<location id="id14" x="8" y="-51">
+		</location>
+		<location id="id15" x="93" y="34" color="#ff0000">
+			<name x="83" y="0">inc</name>
+		</location>
+		<init ref="id13"/>
+		<transition id="id16" controllable="false">
+			<source ref="id14"/>
+			<target ref="id12"/>
+			<label kind="guard" x="-161" y="-144">(x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7)</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id17" controllable="false">
+			<source ref="id13"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-76" y="-85">o!</label>
+		</transition>
+		<transition id="id18">
+			<source ref="id14"/>
+			<target ref="id15"/>
+			<label kind="guard" x="51" y="-51">(x&gt;4 &amp;&amp; x&lt;5) || (x&gt;8 &amp;&amp; x&lt;10)</label>
+			<label kind="synchronisation" x="59" y="-34">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Expected1</name>
+		<declaration>// Place local declarations here.
+clock x;</declaration>
+		<location id="id19" x="102" y="-144">
+		</location>
+		<location id="id20" x="-136" y="-51">
+		</location>
+		<location id="id21" x="8" y="-51">
+			<label kind="invariant" x="-17" y="-25">(x&lt;2) || (x&gt;=5 &amp;&amp; x&lt;7) || x&gt;=10</label>
+		</location>
+		<init ref="id20"/>
+		<transition id="id22" controllable="false">
+			<source ref="id21"/>
+			<target ref="id19"/>
+			<label kind="guard" x="-161" y="-144">(x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7)</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id23" controllable="false">
+			<source ref="id20"/>
+			<target ref="id21"/>
+			<label kind="guard" x="-263" y="-93">(x&lt;2) || (x&gt;=5 &amp;&amp; x&lt;7) || x&gt;=10</label>
+			<label kind="synchronisation" x="-76" y="-85">o!</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Original2</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id24" x="-662" y="-1028">
+		</location>
+		<location id="id25" x="-900" y="-935">
+		</location>
+		<location id="id26" x="-756" y="-935">
+		</location>
+		<location id="id27" x="-671" y="-850" color="#ff0000">
+			<name x="-681" y="-884">inc</name>
+		</location>
+		<init ref="id25"/>
+		<transition id="id28" controllable="false">
+			<source ref="id26"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-942" y="-1062">a == true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-789" y="-1003">o!</label>
+		</transition>
+		<transition id="id29" controllable="false">
+			<source ref="id25"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-840" y="-969">o!</label>
+		</transition>
+		<transition id="id30">
+			<source ref="id26"/>
+			<target ref="id27"/>
+			<label kind="guard" x="-951" y="-833">b==false &amp;&amp; ((x&gt;4 &amp;&amp; x&lt;7) || (x&gt;8 &amp;&amp; x&lt;10))</label>
+			<label kind="synchronisation" x="-705" y="-918">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Expected2</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id31" x="102" y="-144">
+		</location>
+		<location id="id32" x="-136" y="-51">
+		</location>
+		<location id="id33" x="8" y="-51">
+			<label kind="invariant" x="-17" y="34">((x&lt;2 &amp;&amp; ((a==true) or ((a==false) &amp;&amp; (b==true)))) or 
+((x&gt;=2 &amp;&amp; x&lt;10) &amp;&amp; (b==true)) or 
+x&gt;=10)</label>
+		</location>
+		<init ref="id32"/>
+		<transition id="id34" controllable="false">
+			<source ref="id33"/>
+			<target ref="id31"/>
+			<label kind="guard" x="-161" y="-144">a== true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-25" y="-119">o!</label>
+		</transition>
+		<transition id="id35" controllable="false">
+			<source ref="id32"/>
+			<target ref="id33"/>
+			<label kind="guard" x="-255" y="-34">((x&lt;2 &amp;&amp; ((a==true) or ((a==false) &amp;&amp; (b==true)))) or 
+((x&gt;=2 &amp;&amp; x&lt;10) &amp;&amp; (b==true)) or 
+x&gt;=10)</label>
+			<label kind="synchronisation" x="-76" y="-85">o!</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Original3</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id36" x="-323" y="-501">
+		</location>
+		<location id="id37" x="-467" y="-323">
+		</location>
+		<location id="id38" x="-323" y="-323">
+		</location>
+		<location id="id39" x="-238" y="-238" color="#ff0000">
+			<name x="-248" y="-272">inc</name>
+		</location>
+		<init ref="id37"/>
+		<transition id="id40" controllable="false">
+			<source ref="id38"/>
+			<target ref="id36"/>
+			<label kind="guard" x="-212" y="-459">a== false &amp;&amp; ((x&gt;2 &amp;&amp; x&lt;3) || (x&gt;7 &amp;&amp; x&lt;8))</label>
+			<label kind="synchronisation" x="-212" y="-433">o!</label>
+			<nail x="-221" y="-399"/>
+		</transition>
+		<transition id="id41" controllable="false">
+			<source ref="id38"/>
+			<target ref="id36"/>
+			<label kind="guard" x="-713" y="-442">a == true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-382" y="-416">o!</label>
+		</transition>
+		<transition id="id42" controllable="false">
+			<source ref="id37"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="-407" y="-357">o!</label>
+		</transition>
+		<transition id="id43">
+			<source ref="id38"/>
+			<target ref="id39"/>
+			<label kind="guard" x="-229" y="-306">b==false &amp;&amp; ((x&gt;4 &amp;&amp; x&lt;7) || (x&gt;8 &amp;&amp; x&lt;10))</label>
+			<label kind="synchronisation" x="-272" y="-306">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Expected3</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id44" x="8" y="-212">
+		</location>
+		<location id="id45" x="-136" y="-51">
+		</location>
+		<location id="id46" x="8" y="-51">
+			<label kind="invariant" x="85" y="-85">(x&lt;2 or 
+((x&gt;=2 &amp;&amp; x&lt;3) &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=3 &amp;&amp; x&lt;7) &amp;&amp; (b==true)) or 
+((x&gt;=7 &amp;&amp; x&lt;8) &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=8 &amp;&amp; x&lt;10) &amp;&amp; (b==true)) or 
+x&gt;=10)</label>
+		</location>
+		<init ref="id45"/>
+		<transition id="id47" controllable="false">
+			<source ref="id46"/>
+			<target ref="id44"/>
+			<label kind="guard" x="136" y="-153">a== false &amp;&amp; ((x&gt;2 &amp;&amp; x&lt;3) || (x&gt;7 &amp;&amp; x&lt;8))</label>
+			<label kind="synchronisation" x="136" y="-136">o!</label>
+			<nail x="119" y="-127"/>
+		</transition>
+		<transition id="id48" controllable="false">
+			<source ref="id46"/>
+			<target ref="id44"/>
+			<label kind="guard" x="-374" y="-170">a== true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-59" y="-127">o!</label>
+		</transition>
+		<transition id="id49" controllable="false">
+			<source ref="id45"/>
+			<target ref="id46"/>
+			<label kind="guard" x="-153" y="42">(x&lt;2 or 
+((x&gt;=2 &amp;&amp; x&lt;3) &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=3 &amp;&amp; x&lt;7) &amp;&amp; (b==true)) or 
+((x&gt;=7 &amp;&amp; x&lt;8) &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=8 &amp;&amp; x&lt;10) &amp;&amp; (b==true)) or 
+x&gt;=10)</label>
+			<label kind="synchronisation" x="-76" y="-85">o!</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Original4</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id50" x="-476" y="-663">
+		</location>
+		<location id="id51" x="-620" y="-485">
+		</location>
+		<location id="id52" x="-476" y="-485">
+		</location>
+		<location id="id53" x="-391" y="-400" color="#ff0000">
+			<name x="-401" y="-434">inc</name>
+		</location>
+		<init ref="id51"/>
+		<transition id="id54" controllable="false">
+			<source ref="id52"/>
+			<target ref="id50"/>
+			<label kind="guard" x="-391" y="-612">a== false &amp;&amp; b== false &amp;&amp; ((x&gt;2 &amp;&amp; x&lt;3) || (x&gt;7 &amp;&amp; x&lt;8))</label>
+			<label kind="synchronisation" x="-365" y="-595">o!</label>
+			<nail x="-374" y="-561"/>
+		</transition>
+		<transition id="id55" controllable="false">
+			<source ref="id52"/>
+			<target ref="id50"/>
+			<label kind="guard" x="-960" y="-612">a == true &amp;&amp; b==true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-535" y="-578">o!</label>
+		</transition>
+		<transition id="id56" controllable="false">
+			<source ref="id51"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-560" y="-519">o!</label>
+		</transition>
+		<transition id="id57">
+			<source ref="id52"/>
+			<target ref="id53"/>
+			<label kind="guard" x="-382" y="-468">b==false &amp;&amp; ((x&gt;4 &amp;&amp; x&lt;7) || (x&gt;8 &amp;&amp; x&lt;10))</label>
+			<label kind="synchronisation" x="-425" y="-468">i?</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Expected4</name>
+		<declaration>// Place local declarations here.
+clock x;
+bool a,b;</declaration>
+		<location id="id58" x="-323" y="-501">
+		</location>
+		<location id="id59" x="-467" y="-323">
+		</location>
+		<location id="id60" x="-323" y="-323">
+			<label kind="invariant" x="-297" y="-340">((x&lt;3 &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=3 &amp;&amp; x&lt;7) &amp;&amp; (b==true)) or 
+((x&gt;=7 &amp;&amp; x&lt;8) &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=8 &amp;&amp; x&lt;10) &amp;&amp; (b==true)) or 
+x&gt;=10)</label>
+		</location>
+		<init ref="id59"/>
+		<transition id="id61" controllable="false">
+			<source ref="id60"/>
+			<target ref="id58"/>
+			<label kind="guard" x="-238" y="-450">a== false &amp;&amp; b== false &amp;&amp; ((x&gt;2 &amp;&amp; x&lt;3) || (x&gt;7 &amp;&amp; x&lt;8))</label>
+			<label kind="synchronisation" x="-212" y="-433">o!</label>
+			<nail x="-221" y="-399"/>
+		</transition>
+		<transition id="id62" controllable="false">
+			<source ref="id60"/>
+			<target ref="id58"/>
+			<label kind="guard" x="-807" y="-450">a == true &amp;&amp; b==true &amp;&amp; ((x&gt;1 &amp;&amp; x&lt;2) || (x&gt;6 &amp;&amp; x&lt;7))</label>
+			<label kind="synchronisation" x="-382" y="-416">o!</label>
+		</transition>
+		<transition id="id63" controllable="false">
+			<source ref="id59"/>
+			<target ref="id60"/>
+			<label kind="guard" x="-578" y="-221">((x&lt;3 &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=3 &amp;&amp; x&lt;7) &amp;&amp; (b==true)) or 
+((x&gt;=7 &amp;&amp; x&lt;8) &amp;&amp; (((a==true) &amp;&amp; (b==true)) or (a==false))) or 
+((x&gt;=8 &amp;&amp; x&lt;10) &amp;&amp; (b==true)) or 
+x&gt;=10)</label>
+			<label kind="synchronisation" x="-407" y="-357">o!</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Process = Template();
+// List one or more processes to be composed into a system.
+system Process;
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>

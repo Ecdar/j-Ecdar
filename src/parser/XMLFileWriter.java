@@ -1,6 +1,5 @@
 package parser;
 
-import com.google.protobuf.BoolValueOrBuilder;
 import logic.SimpleTransitionSystem;
 import models.*;
 import org.jdom2.Document;
@@ -12,12 +11,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class XMLFileWriter {
 
-
+    public static void toXML(String filename, Automaton automaton) {
+        toXML(filename, new Automaton[]{automaton});
+    }
 
     public static void toXML(String filename, Automaton[] auts) {
 
@@ -58,7 +58,7 @@ public class XMLFileWriter {
         try {
             outter.output(doc, new FileWriter(new File(filename)));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 
@@ -97,7 +97,7 @@ public class XMLFileWriter {
             file.getParentFile().mkdirs();
             outter.output(doc, new FileWriter(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
@@ -140,7 +140,7 @@ public class XMLFileWriter {
 
             Element invarLabel = new Element("label");
             invarLabel.setAttribute("kind", "invariant");
-            String guardString = l.getInvariant().toString();
+            String guardString = l.getInvariantGuard().toString();
 /*            int j=0;
             for (List<Guard> list: l.getInvariant()) {
                 int i = 0;
@@ -150,7 +150,7 @@ public class XMLFileWriter {
 
                         ClockGuard g = (ClockGuard) g1;
 
-                    //System.out.println(g);
+                    //Log.trace(g);
                     String interm = g.toString();
 
                     if (i == 0)
@@ -200,7 +200,7 @@ public class XMLFileWriter {
             aut.addContent(loc);
         }
         Element init = new Element("init");
-        init.setAttribute("ref",automaton.getInitLoc().getName());
+        init.setAttribute("ref",automaton.getInitial().getName());
         aut.addContent(init);
         for (Edge e : automaton.getEdges())
         {
@@ -235,7 +235,7 @@ public class XMLFileWriter {
 
             Element guardlabel = new Element("label");
             guardlabel.setAttribute("kind", "guard");
-            String guardString = e.getGuards().toString();
+            String guardString = e.getGuard().toString();
 
 /*
             int i= 0; int j=0;
@@ -249,7 +249,7 @@ public class XMLFileWriter {
                     if (g1 instanceof ClockGuard) {
 
                         ClockGuard g = (ClockGuard) g1;
-                    //System.out.println(g);
+                    //Log.trace(g);
                     String interm = g.toString();
 
                     if (i == 0)

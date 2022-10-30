@@ -2,6 +2,7 @@ package models;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import org.junit.After;
@@ -28,15 +29,15 @@ public class InputEnablednessTest {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
 
-        System.out.println("started setup");
+        Log.trace("started setup");
 
         ClockGuard invL1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
 
-        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
-        Location l1 = new Location("L1", invL1, false, false, false, false);
-        Location l2 = new Location("L2", new TrueGuard(), false, false, false, false);
-        Location l3 = new Location("L3", new TrueGuard(), false, false, false, false);
-        Location l4 = new Location("L4", new TrueGuard(), false, false, false, false);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false);
+        Location l1 = Location.create("L1", invL1, false, false, false, false);
+        Location l2 = Location.create("L2", new TrueGuard(), false, false, false, false);
+        Location l3 = Location.create("L3", new TrueGuard(), false, false, false, false);
+        Location l4 = Location.create("L4", new TrueGuard(), false, false, false, false);
 
         Channel i1 = new Channel("i1");
         Channel i2 = new Channel("i2");
@@ -127,7 +128,7 @@ public class InputEnablednessTest {
         //SimpleTransitionSystem st = new SimpleTransitionSystem(actual);
        //  st.toXML("BASE.xml");
         actual = (actual);
-        System.out.println("fnished setup");
+        Log.trace("fnished setup");
     }
 
     @Test

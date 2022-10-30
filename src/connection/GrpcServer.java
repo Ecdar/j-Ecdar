@@ -20,7 +20,7 @@ public class GrpcServer {
     }
 
     private SocketAddress getSocketAddressFromString(String address) {
-        int port = 80;
+        int port = 9000;
         String host = null;
         if (address.indexOf(':') != -1) {
             String[] arr = address.split(":");
@@ -28,7 +28,7 @@ public class GrpcServer {
             try {
                 port = Integer.parseInt(arr[1]);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         } else {
             host = address;

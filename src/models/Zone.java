@@ -1,247 +1,238 @@
 package models;
 
-import lib.CDDLib;
 import lib.DBMLib;
+import log.Log;
 
-import models.Relation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Zone {
-    private int[] dbm;
-    private int size;
-    private int actualSize;
     private static final int DBM_INF = Integer.MAX_VALUE - 1;
 
-    public Zone(int size, boolean delay) {
-        this.size = size;
-        this.actualSize = size * size;
+    private int[] dbm;
+    private final int dimension;
+    private final int length;
 
-        int[] temp = new int[actualSize];
+    public Zone(int length, boolean delay) {
+        this.dimension = length;
+        this.length = length * length;
 
         // zone for initial state is dbm_zero with delay
-        this.dbm = DBMLib.dbm_zero(temp, size);
-        if(delay) delay();
+        this.dbm = DBMLib.dbm_zero(new int[this.length], length);
+        if (delay) {
+            delay();
+        }
     }
 
     public Zone(int[] dbm) {
         this.dbm = dbm.clone();
-        this.size = (int) Math.sqrt(dbm.length);
-        this.actualSize = dbm.length;
-
+        this.dimension = (int) Math.sqrt(dbm.length);
+        this.length = dbm.length;
     }
 
-
-
-    // copy constructor
-    public Zone(Zone oldZone) {
-        this.size = oldZone.size;
-        this.actualSize = oldZone.actualSize;
-        this.dbm = oldZone.dbm.clone();
-
+    public Zone(Zone zone) {
+        this.dimension = zone.dimension;
+        this.length = zone.length;
+        this.dbm = zone.dbm.clone();
     }
 
     private static int getIndexOfClock(Clock clock, List<Clock> clocks) {
+        int index = clocks.indexOf(clock);
+        return index == -1 ? 0 : index + 1;
+    }
 
-        for (int i = 0; i < clocks.size(); i++){
-            if(clock.hashCode() == clocks.get(i).hashCode()) return i+1;
+    public boolean isEmpty() {
+        return DBMLib.dbm_isEmpty(dbm, dimension);
+    }
+
+    public int getDimension() {
+        return dimension;
+    }
+
+    public void buildConstraintsForGuard(ClockGuard guard, List<Clock> clocks) {
+        if (guard.isDiagonal()) {
+            buildConstraintsForDiagonalConstraint(guard, clocks);
+        } else {
+            buildConstraintsForNormalGuard(guard, clocks);
         }
-        return 0;
     }
 
-    public boolean isEmpty() {return DBMLib.dbm_isEmpty(dbm, size);}
+    public void buildConstraintsForNormalGuard(ClockGuard guard, List<Clock> clocks) {
+        int index = getIndexOfClock(guard.getClock(), clocks);
+        Relation relation = guard.getRelation();
 
-    public int getSize() {
-        return size;
-    }
-
-    public int getElementAt(int i) {
-        return dbm[i];
-    }
-
-    public void buildConstraintsForGuard(ClockGuard g, List<Clock> clocks) {
-        if (g.isDiagonal())
-            buildConstraintsForDiagonalConstraint(g,clocks);
-        else
-            buildConstraintsForNormalGuard(g,clocks);
-    }
-
-    public void buildConstraintsForNormalGuard(ClockGuard g, List<Clock> clocks) {
-        int index = getIndexOfClock(g.getClock_i(),clocks);
-        Relation rel = g.getRelation();
-        int lowerBoundI = g.getLowerBound();
-        int upperBoundI = g.getUpperBound();
-        switch (rel) {
+        int lowerBoundI = guard.getLowerBound();
+        int upperBoundI = guard.getUpperBound();
+        switch (relation) {
             case EQUAL: {
-                constrain1(0, index, (-1) * lowerBoundI, false);
-                constrain1(index, 0, upperBoundI, false);
-                break;
-            }
-            case NOT_EQUAL: {
-                // TODO: Zones cannot do a non equal, we would need Federations for that
+                constrain(0, index, (-1) * lowerBoundI, false);
+                constrain(index, 0, upperBoundI, false);
                 break;
             }
             case LESS_THAN: {
-                constrain1(index, 0, upperBoundI, true);
+                constrain(index, 0, upperBoundI, true);
                 break;
             }
             case LESS_EQUAL: {
-                constrain1(index, 0, upperBoundI, false);
+                constrain(index, 0, upperBoundI, false);
                 break;
             }
             case GREATER_THAN: {
-                constrain1(0, index, (-1) * lowerBoundI, true);
+                constrain(0, index, (-1) * lowerBoundI, true);
                 break;
             }
             case GREATER_EQUAL: {
-                constrain1(0, index, (-1) * lowerBoundI, false);
+                constrain(0, index, (-1) * lowerBoundI, false);
                 break;
             }
         }
     }
 
-    public void buildConstraintsForDiagonalConstraint(ClockGuard dc, List<Clock> clocks) {
-        Relation rel = dc.getRelation();
-        Clock clock_i = dc.getClock_i();
-        Clock clock_j = dc.getClock_j();
-        int val = dc.getBound();
+    public void buildConstraintsForDiagonalConstraint(ClockGuard guard, List<Clock> clocks)
+            throws IllegalArgumentException {
+        Relation relation = guard.getRelation();
+        Clock clock_i = guard.getClock();
+        Clock clock_j = guard.getDiagonalClock();
+        int bound = guard.getBound();
 
-        int i= getIndexOfClock(clock_i,clocks);
-        int j= getIndexOfClock(clock_j,clocks);
+        int i = getIndexOfClock(clock_i, clocks);
+        int j = getIndexOfClock(clock_j, clocks);
 
-
-
-        switch (rel) {
+        switch (relation) {
             case LESS_THAN: {
-                constrain1(i, j, val, true);
+                constrain(i, j, bound, true);
                 break;
             }
             case LESS_EQUAL: {
-                constrain1(i, j, val, false);
+                constrain(i, j, bound, false);
                 break;
             }
             default: {
-                assert(false);
-                break;
+                throw new IllegalArgumentException("Guard relation can only be < or <=");
             }
         }
     }
 
     public void updateValue(int index, int value) {
-        dbm = DBMLib.dbm_updateValue(dbm, size, index, value);
+        dbm = DBMLib.dbm_updateValue(dbm, dimension, index, value);
     }
 
     public int[] delayNewDBM() {
-        return DBMLib.dbm_up(dbm, size);
+        return DBMLib.dbm_up(dbm, dimension);
     }
 
     public void delay() {
-        dbm = DBMLib.dbm_up(dbm, size);
+        dbm = DBMLib.dbm_up(dbm, dimension);
     }
 
-    public void extrapolateMaxBounds(int[] maxBounds){
-        dbm = DBMLib.dbm_extrapolateMaxBounds(dbm, size, maxBounds);
+    public void extrapolateMaxBounds(int[] maxBounds) {
+        dbm = DBMLib.dbm_extrapolateMaxBounds(dbm, dimension, maxBounds);
     }
-    public void extrapolateMaxBoundsDiag(int[] maxBounds){
-        dbm = DBMLib.dbm_extrapolateMaxBoundsDiag(dbm, size, maxBounds);
+
+    public void extrapolateMaxBoundsDiagonal(int[] maxBounds) {
+        dbm = DBMLib.dbm_extrapolateMaxBoundsDiag(dbm, dimension, maxBounds);
     }
 
     public boolean isSubset(Zone zone2) {
-        return DBMLib.dbm_isSubsetEq(this.dbm, zone2.dbm, size);
+        return DBMLib.dbm_isSubsetEq(this.dbm, zone2.dbm, dimension);
     }
 
     public boolean isValid() {
-        return DBMLib.dbm_isValid(dbm, size);
+        return DBMLib.dbm_isValid(dbm, dimension);
     }
 
-    // This zone and received zone MUST BE OF THE SAME SIZE!!!
-    public boolean intersects(Zone zone){
-        if(this.size != zone.size) throw new IllegalArgumentException("Zones must be of the same size");
-        return DBMLib.dbm_intersection(dbm, zone.dbm, size);
-    }
-
-    public boolean canDelayIndefinitely(){
-        for (int i = 1; i < size; i++) {
-            int curr = dbm[size * i];
-            if (curr < DBM_INF) return false;
+    public boolean intersects(Zone zone) {
+        if (this.dimension != zone.dimension) {
+            throw new IllegalArgumentException("Zones must be of the same size");
         }
-        return true;
+        return DBMLib.dbm_intersection(dbm, zone.dbm, dimension);
     }
 
-    public Zone close(){
-        return new Zone(DBMLib.dbm_close(dbm, size));
-    }
-
-    public Zone freeClock(int index)
-    {
-        return new Zone(DBMLib.dbm_freeClock(dbm, size, index));
-
-    }
-
-    public boolean isUrgent(){
-        for (int i = 1; i < size; i++) {
-            int currLower = dbm[i];
-            int currUpper = dbm[size * i];
-            if (DBMLib.dbm_addRawRaw(currLower, currUpper) != 1)
+    public boolean canDelayIndefinitely() {
+        for (int i = 1; i < dimension; i++) {
+            int curr = dbm[dimension * i];
+            if (curr < DBM_INF) {
                 return false;
+            }
         }
         return true;
     }
 
-    private static boolean relevantClocksContainsClock(Clock clock, List<Clock> relevantClocks) {
+    public Zone close() {
+        return new Zone(DBMLib.dbm_close(dbm, dimension));
+    }
 
-        for (int i = 0; i < relevantClocks.size(); i++){
-            if(clock.hashCode() == relevantClocks.get(i).hashCode()) return true;
+    public void freeClock(int index) {
+        DBMLib.dbm_freeClock(dbm, dimension, index);
+    }
+
+    public boolean isUrgent() {
+        for (int i = 1; i < dimension; i++) {
+            int currLower = dbm[i];
+            int currUpper = dbm[dimension * i];
+            if (DBMLib.dbm_addRawRaw(currLower, currUpper) != 1) {
+                return false;
+            }
         }
-        return false;
+        return true;
+    }
+
+    private static boolean containsClock(Clock clock, List<Clock> clocks) {
+        return clocks.contains(clock);
     }
 
     public Guard buildGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<Guard> guards = new ArrayList<>();
-        guards.addAll(buildNormalGuardsFromZone(clocks,relevantClocks));
-        guards.addAll(buildDiagonalConstraintsFromZone(clocks,relevantClocks));
+        guards.addAll(buildNormalGuardsFromZone(clocks, relevantClocks));
+        guards.addAll(buildDiagonalConstraintsFromZone(clocks, relevantClocks));
         return new AndGuard(guards);
     }
 
     public List<ClockGuard> buildNormalGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<ClockGuard> guards = new ArrayList<>();
 
-        for (int i = 1; i < size; i++) {
+        for (int i = 1; i < dimension; i++) {
             Clock clock = clocks.get(i - 1);
-            if (!relevantClocksContainsClock(clock, relevantClocks))
-                continue;
-            // values from first row, lower bounds
-            int lb = dbm[i];
-
-            // values from first column, upper bounds
-            int ub = dbm[size * i];
-
-            if (ub==lb && !DBMLib.dbm_rawIsStrict(lb) && !DBMLib.dbm_rawIsStrict(ub))
-            {
-                ClockGuard g1 = new ClockGuard(clock, (-1) * DBMLib.raw2bound(lb), Relation.EQUAL);
-                guards.add(g1);
+            if (!containsClock(clock, relevantClocks)) {
                 continue;
             }
 
-            if (lb != 1) {   // lower bound must be different from 1 (==0)
-                if (DBMLib.dbm_rawIsStrict(lb)) {
-                    ClockGuard g1 = new ClockGuard(clock, (-1) * DBMLib.raw2bound(lb), Relation.GREATER_THAN);
-                    guards.add(g1);
+            // values from first row, lower bounds
+            int lower = dbm[i];
+            // values from first column, upper bounds
+            int upper = dbm[dimension * i];
+
+            if (upper == lower && !DBMLib.dbm_rawIsStrict(lower) && !DBMLib.dbm_rawIsStrict(upper)) {
+                guards.add(
+                        new ClockGuard(clock, (-1) * DBMLib.raw2bound(lower), Relation.EQUAL)
+                );
+                continue;
+            }
+
+            // lower bound must be different from 1 (==0)
+            if (lower != 1) {
+                if (DBMLib.dbm_rawIsStrict(lower)) {
+                    guards.add(
+                            new ClockGuard(clock, (-1) * DBMLib.raw2bound(lower), Relation.GREATER_THAN)
+                    );
                 } else {
-                    ClockGuard g1 = new ClockGuard(clock, (-1) * DBMLib.raw2bound(lb), Relation.GREATER_EQUAL);
-                    guards.add(g1);
+                    guards.add(
+                            new ClockGuard(clock, (-1) * DBMLib.raw2bound(lower), Relation.GREATER_EQUAL)
+                    );
                 }
             }
 
             // upper bound must be different from infinity
-            if (ub != DBM_INF) {
-                if (DBMLib.dbm_rawIsStrict(ub)) {
-                    ClockGuard g2 = new ClockGuard(clock, DBMLib.raw2bound(ub), Relation.LESS_THAN);
-                    guards.add(g2);
+            if (upper != DBM_INF) {
+                if (DBMLib.dbm_rawIsStrict(upper)) {
+                    guards.add(
+                            new ClockGuard(clock, DBMLib.raw2bound(upper), Relation.LESS_THAN)
+                    );
                 } else {
-                    ClockGuard g2 = new ClockGuard(clock, DBMLib.raw2bound(ub),Relation.LESS_EQUAL);
-                    guards.add(g2);
+                    guards.add(
+                            new ClockGuard(clock, DBMLib.raw2bound(upper), Relation.LESS_EQUAL)
+                    );
                 }
 
             }
@@ -253,30 +244,32 @@ public class Zone {
     public List<ClockGuard> buildDiagonalConstraintsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
         List<ClockGuard> guards = new ArrayList<>();
 
-        for (int i = 1; i < size; i++) {
-            for (int j = 1; j < size; j++) {
-                if (i==j)
+        for (int i = 1; i < dimension; i++) {
+            for (int j = 1; j < dimension; j++) {
+                if (i == j) {
                     continue;
-                //if (i==1 || j==1)
-                //    continue;
+                }
+
                 Clock clock_i = clocks.get(i - 1);
                 Clock clock_j = clocks.get(j - 1);
-                if (!relevantClocksContainsClock(clock_i, relevantClocks) || !relevantClocksContainsClock(clock_j, relevantClocks) )
+                if (!containsClock(clock_i, relevantClocks) || !containsClock(clock_j, relevantClocks)) {
                     continue;
-                // values from first row, lower bounds
-                int currentValue = dbm[i+j*size];
-                if (currentValue==DBM_INF)
-                    continue;
+                }
 
-                if (DBMLib.dbm_rawIsStrict(currentValue))
-                {
-                    ClockGuard dc = new ClockGuard(clock_j,clock_i,DBMLib.raw2bound(currentValue), Relation.LESS_THAN);
-                    guards.add(dc);
-                } else
-                {
-                    ClockGuard dc = new ClockGuard(clock_j,clock_i,DBMLib.raw2bound(currentValue),Relation.LESS_EQUAL);
-                   // System.out.println("i: " + i + " j: " + j + " ci: + " + clock_i + " cj: " + clock_j + " " + dc + " clocks: " + clocks + " relevantClocks: " + relevantClocks);
-                    guards.add(dc);
+                // values from first row, lower bounds
+                int currentValue = dbm[i + j * dimension];
+                if (currentValue == DBM_INF) {
+                    continue;
+                }
+
+                if (DBMLib.dbm_rawIsStrict(currentValue)) {
+                    guards.add(
+                            new ClockGuard(clock_j, clock_i, DBMLib.raw2bound(currentValue), Relation.LESS_THAN)
+                    );
+                } else {
+                    guards.add(
+                            new ClockGuard(clock_j, clock_i, DBMLib.raw2bound(currentValue), Relation.LESS_EQUAL)
+                    );
                 }
 
             }
@@ -286,12 +279,12 @@ public class Zone {
     }
 
     // FURTHER METHODS ARE ONLY MEANT TO BE USED FOR TESTING. NEVER USE THEM DIRECTLY IN YOUR CODE
-    public void constrain1(int i, int j, int constraint, boolean isStrict) {
-        dbm = DBMLib.dbm_constrainBound(dbm, size, i, j, constraint, isStrict);
+    private void constrain(int i, int j, int constraint, boolean isStrict) {
+        dbm = DBMLib.dbm_constrainBound(dbm, dimension, i, j, constraint, isStrict);
     }
 
     public void init() {
-        dbm = DBMLib.dbm_init(dbm, size);
+        dbm = DBMLib.dbm_init(dbm, dimension);
     }
 
     public int[] getDbm() {
@@ -299,41 +292,48 @@ public class Zone {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Zone zone = (Zone) o;
-        return size == zone.size &&
-                actualSize == zone.actualSize &&
-                Arrays.equals(dbm, zone.dbm);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Zone)) {
+            return false;
+        }
+
+        Zone other = (Zone) obj;
+        return dimension == other.dimension &&
+                length == other.length &&
+                Arrays.equals(dbm, other.dbm);
     }
 
     // Method to nicely print DBM for testing purposes.
     // The boolean flag determines if values of the zone will be converted from DBM format to actual bound of constraint
-    public void printDBM(boolean toConvert, boolean showStrictness) {
+    public void printDbm(boolean toConvert, boolean showStrictness) {
         int intLength = 0;
         int toPrint = 0;
 
-        System.out.println("---------------------------------------");
-        for (int i = 0, j = 1; i < actualSize; i++, j++) {
+        Log.trace("---------------------------------------");
+        for (int i = 0, j = 1; i < length; i++, j++) {
 
             toPrint = toConvert ? DBMLib.raw2bound(dbm[i]) : dbm[i];
-
-            System.out.print(toPrint);
+            Log.trace(toPrint);
 
             if (showStrictness) {
                 String strictness = DBMLib.dbm_rawIsStrict(dbm[i]) ? " < " : " <=";
-                System.out.print(strictness);
+                Log.trace(strictness);
             }
-            if (j == size) {
-                System.out.println();
-                if (i == actualSize - 1) System.out.println("---------------------------------------");
+            if (j == dimension) {
+                Log.trace();
+                if (i == length - 1) Log.trace("---------------------------------------");
                 j = 0;
             } else {
                 intLength = String.valueOf(toPrint).length();
+                StringBuilder stringBuilder = new StringBuilder();
                 for (int k = 0; k < 14 - intLength; k++) {
-                    System.out.print(" ");
+                    stringBuilder.append(" ");
                 }
+                Log.debug(stringBuilder.toString());
             }
         }
     }
@@ -341,5 +341,9 @@ public class Zone {
     @Override
     public String toString() {
         return Arrays.toString(dbm);
+    }
+
+    public static int getDbmDimension(int[] dbm) {
+        return (int) Math.sqrt(dbm.length);
     }
 }

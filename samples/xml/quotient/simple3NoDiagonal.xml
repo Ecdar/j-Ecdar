@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.5//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_5.dtd'>
+<nta>
+	<declaration>chan o;</declaration>
+	<template>
+		<name>Simple3Copy</name>
+		<declaration>clock xCopy; clock yCopy;</declaration>
+		<location id="id0" x="195" y="-25" color="#a66c0f">
+			<name x="185" y="-55">id18</name>
+			<label kind="invariant" x="187" y="-8">xCopy&lt;4</label>
+		</location>
+		<location id="id1" x="93" y="-144" color="#a66c0f">
+			<name x="83" y="-174">id19</name>
+			<label kind="invariant" x="83" y="-129">false</label>
+		</location>
+		<location id="id2" x="-110" y="-25">
+			<name x="-120" y="-55">id20</name>
+		</location>
+		<location id="id3" x="195" y="-136">
+			<name x="185" y="-166">id21</name>
+			<label kind="invariant" x="185" y="-121">true</label>
+		</location>
+		<init ref="id2"/>
+		<transition id="id4" controllable="false">
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="guard" x="238" y="-93">xCopy&lt;4</label>
+			<label kind="synchronisation" x="238" y="-76">o!</label>
+		</transition>
+		<transition id="id5" controllable="false">
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-68" y="-51">xCopy&lt;4</label>
+			<label kind="synchronisation" x="-60" y="-15">o!</label>
+		</transition>
+	</template>
+	<system>system Simple3Copy;</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>

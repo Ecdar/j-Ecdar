@@ -1,6 +1,7 @@
 package features;
 
 import lib.DBMLib;
+import log.Log;
 
 public class Helpers {
 
@@ -14,26 +15,27 @@ public class Helpers {
         int intLength = 0;
         int toPrint = 0;
 
-        System.out.println("---------------------------------------");
+        Log.trace("---------------------------------------");
         for (int i = 0, j = 1; i < length; i++, j++) {
 
             toPrint = toConvert ? DBMLib.raw2bound(x[i]) : x[i];
-
-            System.out.print(toPrint);
+            Log.trace(toPrint);
 
             if (showStrictness) {
                 String strictness = DBMLib.dbm_rawIsStrict(x[i]) ? " < " : " <=";
-                System.out.print(strictness);
+                Log.trace(strictness);
             }
             if (j == dim) {
-                System.out.println();
-                if (i == length - 1) System.out.println("---------------------------------------");
+                Log.trace();
+                if (i == length - 1) Log.trace("---------------------------------------");
                 j = 0;
             } else {
                 intLength = String.valueOf(toPrint).length();
+                StringBuilder stringBuilder = new StringBuilder();
                 for (int k = 0; k < 14 - intLength; k++) {
-                    System.out.print(" ");
+                    stringBuilder.append(" ");
                 }
+                Log.trace(stringBuilder.toString());
             }
         }
     }

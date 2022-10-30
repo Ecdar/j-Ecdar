@@ -24,7 +24,7 @@ orExpression        : expression | and ;
 
 and                 : (expression AND)+ expression ;
 expression          : BOOLEAN | clockExpr | boolExpr | '(' guard ')';
-clockExpr           : VARIABLE ('-'VARIABLE)? OPERATOR INT ;
+clockExpr           : VARIABLE ('-'VARIABLE)? OPERATOR '-'? INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 
 /*

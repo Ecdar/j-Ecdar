@@ -1,13 +1,16 @@
 package features;
 
+import log.Log;
 import logic.Composition;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
+import models.Location;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import parser.JSONParser;
 import parser.XMLParser;
@@ -78,13 +81,13 @@ public class CompositionTest {
     @Test
     public void selfloopTest() {
 
-        Automaton[] aut1 = XMLParser.parse("testOutput/selfloopNonZeno.xml", false);
+        Automaton[] aut1 = XMLParser.parse("samples/xml/selfloopNonZeno.xml", false);
         Automaton copy = new Automaton(aut1[0]);
         SimpleTransitionSystem selfloop = new SimpleTransitionSystem(aut1[0]);
         SimpleTransitionSystem selfloop1 = new SimpleTransitionSystem(copy);
         Refinement ref = new Refinement(selfloop,selfloop1);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assert (res==true);
     }
 
@@ -92,10 +95,17 @@ public class CompositionTest {
     public void testCompRefinesSpecWeird() {
 
         Composition comp = new Composition(new TransitionSystem[]{adm, machine, researcher});
-        comp.getAutomaton();
+        for (Location l : comp.getAutomaton().getLocations())
+        {
+            if (l.isInconsistent())
+                Log.debug("ISINC");
+            if (l.isUniversal())
+                Log.debug("ISUNIV");
+        }
+        // TODO : for some reason this fails, now that I fixed the "isUniversal" of complex locations
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
 
     }
@@ -111,7 +121,7 @@ public class CompositionTest {
         assert(new Refinement(comp,spec).check());
         Refinement ref = new Refinement(new SimpleTransitionSystem(comp.getAutomaton()), spec);
         boolean res = ref.check();
-        System.out.println(ref.getErrMsg());
+        Log.trace(ref.getErrMsg());
         assertTrue(res);
 
     }

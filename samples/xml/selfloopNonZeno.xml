@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nta>
+  <declaration>chan o;</declaration>
+  <template>
+    <name>SelfloopNonZenoCopy</name>
+    <declaration>clock xCopy; clock yCopy;</declaration>
+    <location id="id6" x="-85" y="51" color="#A66C0F">
+      <name>id6</name>
+      <label kind="invariant">(xCopy&lt;3 &amp;&amp; xCopy-yCopy&lt;3)</label>
+    </location>
+    <location id="id7" x="119" y="51" color="#A66C0F">
+      <name>id7</name>
+      <label kind="invariant">false</label>
+    </location>
+    <init ref="id6" />
+    <transition controllable="false">
+      <source ref="id6" />
+      <target ref="id6" />
+      <label kind="synchronisation">o!</label>
+      <label kind="guard">(xCopy&lt;3 &amp;&amp; xCopy-yCopy&lt;3)</label>
+      <label kind="assignment">xCopy = 0</label>
+    </transition>
+  </template>
+  <system>system SelfloopNonZenoCopy;</system>
+</nta>

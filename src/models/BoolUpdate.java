@@ -1,12 +1,12 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-public class BoolUpdate extends Update{
-
-    private final BoolVar bv; // dont need to know the value here
+public class BoolUpdate extends Update {
+    // dont need to know the value here
+    private final BoolVar bv;
     private final boolean value;
 
     public BoolUpdate(BoolVar bv, boolean value) {
@@ -14,26 +14,10 @@ public class BoolUpdate extends Update{
         this.value = value;
     }
 
-    public BoolUpdate(BoolUpdate copy, List<BoolVar> bvs, List<BoolVar> oldBVs){
-        this.bv =bvs.get(oldBVs.indexOf(copy.getBV()));
+    public BoolUpdate(BoolUpdate copy, List<BoolVar> bvs, List<BoolVar> oldBVs)
+        throws IndexOutOfBoundsException {
+        this.bv = bvs.get(oldBVs.indexOf(copy.getBV()));
         this.value = copy.value;
-    }
-
-    public List<BoolVal> applyUpdate(List<BoolVal> list)
-    {
-        List<BoolVal> newList = new ArrayList<BoolVal>();
-        for (BoolVal bvl : list) {
-            if (bvl.getVar().equals(this.bv)) {
-                BoolVal copy = new BoolVal(bvl.getVar(), value);
-                newList.add(copy);
-            } else {
-                BoolVal copy = new BoolVal(bvl.getVar(), bvl.getValue());
-                newList.add(copy);
-            }
-        }
-        return newList;
-
-
     }
 
     public BoolVar getBV() {
@@ -44,11 +28,32 @@ public class BoolUpdate extends Update{
         return value;
     }
 
+    public List<BoolVal> update(List<BoolVal> list) {
+        return list
+            .stream()
+            .map(
+                boolVal -> new BoolVal(boolVal.getVar(), boolVal.getVar().equals(this.bv) ? value : boolVal.getValue())
+            )
+            .collect(Collectors.toList());
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BoolUpdate)) return false;
-        BoolUpdate update = (BoolUpdate) o;
+    Update copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new BoolUpdate(this, newBVs, oldBVs);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof BoolUpdate)) {
+            return false;
+        }
+
+        BoolUpdate update = (BoolUpdate) obj;
+
         return value == update.value &&
                 bv.equals(update.bv);
     }

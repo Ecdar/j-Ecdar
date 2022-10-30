@@ -1,35 +1,317 @@
 package models;
 
+import logic.State;
+import logic.TransitionSystem;
+import logic.Pruning;
+
 import java.util.*;
 
-public class Location {
+/**
+ * {@link Location} is a class used by both {@link Automaton} and {@link TransitionSystem} to decribe a location.
+ *  It is named and has coordinates describing the position where it should be drawn in the GUI.
+ *  A {@link Location} can be marked as initial, urgent, universal, and inconsistent.
+ *  In order to reduce the conversions between {@link Guard} and {@link CDD}
+ *  the invariant is stored as both and only updated when required.
+ *  For {@link Pruning} it also stores the inconsistent part of its invariant.
+ * <p>
+ * A {@link Location} can also be <b>composed</b> of multiple locations (children).
+ *  A composed location is created when performing {@link logic.Conjunction} for multiple systems,
+ *  and it represents an n-tuple of locations correlated with the sequence of {@link TransitionSystem TransitionSystems}.
+ *  For this reason the composed location are directly addressable with the index of the systems.
+ *  The invariant of a composed location is lazily created as the conjunction of its children's invariants.
+ *  In this context lazily created means that the locally stored invariant value in this location is only
+ *  updated when a change in this composed location warrants an update to it.
+ *  This can be warranted when {@link #setInvariantGuard(Guard)} is invoked.
+ * </p>
+ * <p>
+ * A {@link Location} can also be a <b>simple</b> location, which is a location with exactly one child.
+ *  A simple location is used when the {@link CDD CDD invariant} of this location
+ *  is not directly created from the {@link Guard Guard invariant}.
+ *  Instead the {@link CDD CDD invariant} of this location will always be the {@link CDD CDD invariant} of its child,
+ *  whilst the {@link Guard Guard invariant} of this location can be different from the {@link CDD CDD invariant}.
+ *  For this reason a simple location can have a {@link Guard Guard invariant} and {@link CDD CDD invariant}
+ *  which is out of sync.
+ *  <b>Deprecation warning:</b> <i>simple</i> locations are planned to be deprecated and one should instead create
+ *      composed locations which have a more predictable specification
+ * </p>
+ * <ul>
+ * State overview:
+ *     <li>name
+ *     <li>x and y coordinates
+ *     <li>invariant both as {@link Guard} and {@link CDD}
+ *     <li>inconsistent part for {@link Pruning}
+ *     <li>whether it is initial, urgent, universal, inconsistent
+ * </ul>
+ *
+ * @see LocationPair
+ */
+public final class Location {
+    private String name;
+    private int x, y;
 
-    private final String name;
-    private Guard invariant;
-    private int x,y;
-
-
-
-    public CDD getInconsistentPart() {
-        return inconsistentPart;
-    }
-
-    public void setInconsistentPart(CDD inconsistentPart) {
-        this.inconsistentPart = inconsistentPart;
-    }
-
-
-    public CDD getInvariantCDD()
-    {
-        return new CDD(invariant);
-    }
+    private Guard invariantGuard;
+    private CDD invariantCdd;
 
     private CDD inconsistentPart;
-    private boolean isInitial;
 
-    private  boolean isUrgent;
-    private  boolean isUniversal;
-    private  boolean isInconsistent;
+    private boolean isInitial;
+    private boolean isUrgent;
+    private boolean isUniversal;
+    private boolean isInconsistent;
+
+    private final List<Location> children;
+
+    private Location(
+            String name,
+            Guard invariantGuard,
+            CDD invariantCdd,
+            CDD inconsistentPart,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent,
+            List<Location> children,
+            int x,
+            int y
+    ) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+
+        this.name = name;
+        this.invariantGuard = invariantGuard;
+        this.invariantCdd = invariantCdd;
+        this.inconsistentPart = inconsistentPart;
+        this.isInitial = isInitial;
+        this.isUrgent = isUrgent;
+        this.isUniversal = isUniversal;
+        this.isInconsistent = isInconsistent;
+        this.children = children;
+        this.x = x;
+        this.y = y;
+    }
+
+    public static Location create(
+            String name,
+            Guard invariant,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent,
+            int x,
+            int y
+    ) {
+        return new Location(
+            name,
+            invariant,
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            isUniversal,
+            isInconsistent,
+            new ArrayList<>(),
+            x,
+            y
+        );
+    }
+
+    public static Location create(
+            String name,
+            Guard invariant,
+            boolean isInitial,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent
+    ) {
+        return create(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0);
+    }
+
+    public static Location createFromState(State state, List<Clock> clocks) {
+        Location location = state.getLocation();
+        return location.copy();
+    }
+
+    public static Location createComposition(List<Location> children) {
+        if (children.size() == 0) {
+            throw new IllegalArgumentException("Requires at least one location to create a product");
+        }
+
+        StringBuilder nameBuilder = new StringBuilder();
+        boolean isInitial = true;
+        boolean isUniversal = true;
+        boolean isUrgent = false;
+        boolean isInconsistent = false;
+        int x = 0;
+        int y = 0;
+
+        List<Guard> guards = new ArrayList<>();
+        for (Location location : children) {
+            nameBuilder.append(location.getName());
+            isInitial = isInitial && location.isInitial();
+            isUniversal = isUniversal && location.isUniversal();
+            isUrgent = isUrgent || location.isUrgent();
+            isInconsistent = isInconsistent || location.isInconsistent();
+            x += location.getX();
+            y += location.getY();
+            guards.add(location.getInvariantGuard());
+        }
+
+        int amount = children.size();
+        x /= amount;
+        y /= amount;
+        String name = nameBuilder.toString();
+
+        Guard invariant = new AndGuard(guards);
+        return new Location(
+            name,
+            invariant,
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            isUniversal,
+            isInconsistent,
+            children,
+            x,
+            y
+        );
+    }
+
+    public static Location createUniversalLocation(
+            String name,
+            boolean isInitial,
+            boolean isUrgent,
+            int x,
+            int y
+    ) {
+        return new Location(
+            name,
+            new TrueGuard(),
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            true,
+            false,
+            new ArrayList<>(),
+            x,
+            y
+        );
+    }
+
+    public static Location createUniversalLocation(String name, int x, int y) {
+        return Location.createUniversalLocation(name, false, false, x, y);
+    }
+
+    public static Location createInconsistentLocation(
+            String name,
+            boolean isInitial,
+            boolean isUrgent,
+            int x,
+            int y
+    ) {
+        return new Location(
+            name,
+            new FalseGuard(),
+            null,
+            null,
+            isInitial,
+            isUrgent,
+            false,
+            true,
+            new ArrayList<>(),
+            x,
+            y
+        );
+    }
+
+    public static Location createInconsistentLocation(String name, int x, int y) {
+        return Location.createInconsistentLocation(name, false, false, x, y);
+    }
+
+    public static Location createSimple(Location child) {
+        List<Location> children = new ArrayList<>();
+        children.add(child);
+
+        return new Location(
+            child.getName(),
+            child.getInvariantGuard(),
+            null,
+            child.getInconsistentPart(),
+            child.isInitial(),
+            child.isUrgent(),
+            child.isUniversal(),
+            child.isInconsistent(),
+            children,
+            child.getX(),
+            child.getY()
+        );
+    }
+
+    public Location copy() {
+        return new Location(
+            getName(),
+            getInvariantGuard(),
+            null,
+            getInconsistentPart(),
+            isInitial(),
+            isUrgent(),
+            isUniversal(),
+            isInconsistent(),
+            new ArrayList<>(),
+            getX(),
+            getY()
+        );
+    }
+
+    public Location copy(
+            List<Clock> newClocks,
+            List<Clock> oldClocks,
+            List<BoolVar> newBVs,
+            List<BoolVar> oldBVs
+    ) {
+        return new Location(
+            getName(),
+            getInvariantGuard().copy(
+                    newClocks, oldClocks, newBVs, oldBVs
+            ),
+            null,
+            null,
+            isInitial(),
+            isUrgent(),
+            isUniversal(),
+            isInconsistent(),
+            getChildren(),
+            getX(),
+            getY()
+        );
+    }
+
+    public boolean isSimple() {
+        return children.size() == 1;
+    }
+
+    public boolean isComposed() {
+        return children.size() > 1;
+    }
+
+    public List<Location> getChildren() {
+        return children;
+    }
+
+    public void removeInvariants() {
+        invariantGuard = new TrueGuard();
+        invariantCdd = CDD.cddTrue();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isInitial() {
+        return isInitial;
+    }
 
     public boolean isUrgent() {
         return isUrgent;
@@ -39,121 +321,76 @@ public class Location {
         return isInconsistent;
     }
 
-    public void setInvariant(Guard invariant) {
-        this.invariant = invariant;
-    }
-
-    public void setInitial(boolean initial) {
-        isInitial = initial;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-    public void setY(int y) {
-        this.y = y;
+    public boolean isUniversal() {
+        return isUniversal;
     }
 
     public int getX() {
         return x;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
     public int getY() {
         return y;
     }
 
-    public void setUrgent(boolean urgent) {
-        isUrgent = urgent;
+    public void setY(int y) {
+        this.y = y;
     }
 
-    public void setUniversal(boolean universal) {
-        isUniversal = universal;
+    public Guard getInvariantGuard() {
+        if (invariantGuard == null) {
+            invariantGuard = getInvariantCdd().getGuard();
+        }
+
+        return invariantGuard;
+    }
+
+    public CDD getInvariantCdd() {
+        if (isSimple()) {
+            return new CDD(children.get(0).getInvariantGuard());
+        }
+
+        if (invariantCdd == null) {
+            if (isInconsistent) {
+                invariantCdd = CDD.cddZero();
+            } else if (isUniversal) {
+                invariantCdd = CDD.cddTrue();
+            } else if (children.size() > 0) {
+                this.invariantCdd = CDD.cddTrue();
+                for (Location location : children) {
+                    this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCdd());
+                }
+            } else {
+                invariantCdd = new CDD(getInvariantGuard());
+            }
+        }
+
+        return invariantCdd;
+    }
+
+    public void setInvariantGuard(Guard invariantAsGuard) {
+        this.invariantGuard = invariantAsGuard;
+        this.invariantCdd = null;
+    }
+
+    public CDD getInconsistentPart() {
+        return inconsistentPart;
     }
 
     public void setInconsistent(boolean inconsistent) {
         isInconsistent = inconsistent;
     }
 
-
-
-    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent) {
-        this.name = name;
-        this.invariant = invariant;
-        this.isInitial = isInitial;
-        this.isUrgent = isUrgent;
-        this.isUniversal = isUniversal;
-        this.isInconsistent = isInconsistent || this.getName().equals("inc");
-        this.inconsistentPart = null;
-    }
-    public Location(String name, Guard invariant, boolean isInitial, boolean isUrgent, boolean isUniversal, boolean isInconsistent, int x, int y) {
-        this.name = name;
-        this.invariant = invariant;
-        this.isInitial = isInitial;
-        this.isUrgent = isUrgent;
-        this.isUniversal = isUniversal;
-        this.isInconsistent = isInconsistent || this.getName().equals("inc");
-        this.inconsistentPart = null;
-        this.x=x;
-        this.y=y;
+    public void setInconsistentPart(CDD inconsistentPart) {
+        this.inconsistentPart = inconsistentPart;
     }
 
-    public Location(Location copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs){
-        this.name = copy.name;
-
-
-        if (copy.getInvariant() instanceof  ClockGuard)
-            invariant = (new ClockGuard((ClockGuard) copy.getInvariant(), newClocks,oldClocks));
-        if (copy.getInvariant() instanceof  BoolGuard)
-            invariant = (new BoolGuard((BoolGuard) copy.getInvariant(), newBVs,oldBVs));
-        if (copy.getInvariant() instanceof AndGuard)
-            invariant = (new AndGuard( (AndGuard) copy.getInvariant(), newClocks, oldClocks, newBVs, oldBVs));
-        if (copy.getInvariant() instanceof OrGuard)
-            invariant = (new OrGuard( (OrGuard) copy.getInvariant(), newClocks, oldClocks, newBVs, oldBVs));
-        if (copy.getInvariant() instanceof FalseGuard)
-            invariant = (new FalseGuard());
-        if (copy.getInvariant() instanceof TrueGuard)
-            invariant = (new TrueGuard());
-
-        this.isInitial = copy.isInitial;
-        this.isUrgent = copy.isUrgent;
-        this.isUniversal = copy.isUniversal;
-        this.isInconsistent = copy.isInconsistent;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public Guard getInvariant() {
-        return invariant;
-    }
-
-    public boolean isInitial() {
-        return isInitial;
-    }
-
-    public boolean isUniversal() {
-        return isUniversal;
-    }
-
-    public int getMaxConstant(Clock clock){
-        int constant = 0;
-        constant = invariant.getMaxConstant();
-        return constant;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Location location = (Location) o;
-        return isInitial == location.isInitial &&
-                isUrgent == location.isUrgent &&
-                isUniversal == location.isUniversal &&
-                isInconsistent == location.isInconsistent &&
-                name.equals(location.name) &&
-                invariant.equals(location.invariant);
+    public int getMaxConstant(Clock clock) {
+        return getInvariantGuard().getMaxConstant(clock);
     }
 
     @Override
@@ -161,10 +398,39 @@ public class Location {
         return name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location that = (Location) o;
+
+        if (isComposed() && that.isComposed()) {
+            if (children.size() != that.children.size()) {
+                return false;
+            }
+
+            for (int i = 0; i < children.size(); i++) {
+                if (!children.get(i).equals(that.children.get(i))) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return isInitial() == that.isInitial() &&
+                isUrgent() == that.isUrgent() &&
+                isUniversal() == that.isUniversal() &&
+                isInconsistent() == that.isInconsistent() &&
+                getName().equals(that.getName());
+    }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isInitial, isUrgent, isUniversal, isInconsistent, name, invariant);
-    }
+        if (isComposed()) {
+            return Objects.hash(children);
+        }
 
+        return Objects.hash(name, getInvariantGuard(), isInitial, isUrgent, isUniversal, isInconsistent);
+    }
 }

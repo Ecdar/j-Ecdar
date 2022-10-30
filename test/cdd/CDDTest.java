@@ -2,6 +2,7 @@ package cdd;
 
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
+import log.Log;
 import models.*;
 import org.junit.After;
 import org.junit.Test;
@@ -36,11 +37,11 @@ public class CDDTest {
         clocks.add(a);
         clocks.add(b);
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(2,1,3, true,5, true);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,true,6, true);
+        CDD cdd1 = CDD.createInterval(2,1,3, true,5, true);
+        CDD cdd2 = CDD.createInterval(2,1,4,true,6, true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
-        System.out.println(CDD.toGuardList(cdd2,clocks));
+        Log.debug(cdd2.getGuard(clocks));
 
         Guard g1 = new ClockGuard(b,a,3,Relation.LESS_EQUAL );
         Guard g2 = new ClockGuard(a,b,5,Relation.LESS_EQUAL );
@@ -54,12 +55,12 @@ public class CDDTest {
         guardList.add(g3);
         guardList.add(g4);
 
-        System.out.println(CDD.toGuardList(new CDD(new AndGuard(guardList)),clocks));
+        Log.debug(new CDD(new AndGuard(guardList)).getGuard(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
-        CDD.free(cdd1);
-        CDD.free(cdd2);
-        CDD.free(cdd3);
+        cdd1.free();
+        cdd2.free();
+        cdd3.free();
     }
 
     @Test
@@ -69,8 +70,8 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         clocks.add(new Clock("b", "B"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(2,1,3, true,5,true);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,true,6,true);
+        CDD cdd1 = CDD.createInterval(2,1,3, true,5,true);
+        CDD cdd2 = CDD.createInterval(2,1,4,true,6,true);
 
         CDD cdd3 = cdd1.disjunction(cdd2);
         CDDNode node = cdd3.getRoot();
@@ -78,9 +79,9 @@ public class CDDTest {
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(CDD_INF>>1, node.getSegmentAtIndex(1).getUpperBound());
 
-        CDD.free(cdd1);
-        CDD.free(cdd2);
-        CDD.free(cdd3);
+        cdd1.free();
+        cdd2.free();
+        cdd3.free();
     }
 
     @Test
@@ -89,7 +90,7 @@ public class CDDTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
-        CDD cdd1 = CDD.allocateInterval(1,0,30, true,50,true);
+        CDD cdd1 = CDD.createInterval(1,0,30, true,50,true);
         CDDNode node = cdd1.getRoot();
         List<Segment> bounds = new ArrayList<>();
 
@@ -112,7 +113,7 @@ public class CDDTest {
 
         assertTrue(trueNode.getRoot().isTrueTerminal());
 
-        CDD.free(trueNode);
+        trueNode.free();
     }
 
     @Test
@@ -126,7 +127,7 @@ public class CDDTest {
 
         assertTrue(falseNode.getRoot().isFalseTerminal());
 
-        CDD.free(falseNode);
+        falseNode.free();
     }
 
     @Test
@@ -140,7 +141,7 @@ public class CDDTest {
 
         assertTrue(trueNode.isTerminal());
 
-        CDD.free(trueNode);
+        trueNode.free();
     }
 
     @Test
@@ -151,16 +152,16 @@ public class CDDTest {
         clocks.add(new Clock("b", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd1 = CDD.allocateInterval(2,1,3, true,5,true);
-        CDD cdd2 = CDD.allocateInterval(2,1,4,true,6,true);
+        CDD cdd1 = CDD.createInterval(2,1,3, true,5,true);
+        CDD cdd2 = CDD.createInterval(2,1,4,true,6,true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
 
         assertFalse(cdd3.isTerminal());
 
-        CDD.free(cdd1);
-        CDD.free(cdd2);
-        CDD.free(cdd3);
+        cdd1.free();
+        cdd2.free();
+        cdd3.free();
     }
 
     @Test
@@ -170,7 +171,7 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd1 = CDD.allocateFromDbm(new int[]{1, 0, 80, 1}, 2);
+        CDD cdd1 = CDD.createFromDbm(new int[]{1, 0, 80, 1}, 2);
         CDDNode node = cdd1.getRoot();
 
         cdd1.printDot();
@@ -180,7 +181,7 @@ public class CDDTest {
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(40, node.getSegmentAtIndex(1).getUpperBound());
 
-        CDD.free(cdd1);
+        cdd1.free();
     }
 
     @Test(expected = CddNotRunningException.class)
@@ -204,8 +205,8 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
-        CDD.free(cdd);
+        CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
+        cdd.free();
 
         cdd = cdd.reduce();
         cdd.isNotFalse();
@@ -218,10 +219,10 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateFromDbm(new int[]{1, 1, 11, 1}, 2);
-        CDD.free(cdd);
+        CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
+        cdd.free();
 
-        CDD.free(cdd);
+        cdd.free();
     }
 
     @Test
@@ -231,7 +232,7 @@ public class CDDTest {
         clocks.add(new Clock("a", "A"));
         CDD.addClocks(clocks);
 
-        CDD cdd = CDD.allocateLower(1,0,3, true);
+        CDD cdd = CDD.createLower(1,0,3, true);
         CDDNode node = cdd.getRoot();
 
         cdd.printDot();
@@ -239,7 +240,7 @@ public class CDDTest {
         assertEquals(3, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(CDD_INF>>1, node.getSegmentAtIndex(1).getUpperBound());
 
-        CDD.free(cdd);
+        cdd.free();
 
     }
 
@@ -252,21 +253,21 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
         //CDD interval = CDD.allocateInterval(1,0,3, true,7, true);
-        CDD cdd = CDD.allocateUpper(1,0,6,true);
-        CDD cdd1 = CDD.allocateUpper(2,0,4,true);
+        CDD cdd = CDD.createUpper(1,0,6,true);
+        CDD cdd1 = CDD.createUpper(2,0,4,true);
         //CDD result = interval.conjunction(cdd);
         CDD result = cdd.conjunction(cdd1);
 
         CDDNode node = result.getRoot();
-        System.out.println("here " + node);
-        System.out.println(node.getSegmentAtIndex(0).getUpperBound());
+        Log.debug("here " + node);
+        Log.debug(node.getSegmentAtIndex(0).getUpperBound());
 
         result.printDot(); // --> the CDD is correct, so I guess the test is wrong
         assertEquals(0, node.getSegmentAtIndex(0).getUpperBound());
         assertEquals(6, node.getSegmentAtIndex(1).getUpperBound());
         assertEquals(CDD_INF>>1, node.getSegmentAtIndex(2).getUpperBound());
 
-        CDD.free(cdd);
+        cdd.free();
     }
 
     @Test
@@ -285,16 +286,16 @@ public class CDDTest {
         Guard e2_g2 = new ClockGuard(y, null, 5,  Relation.LESS_EQUAL);
 
         List<Guard> g1 = new ArrayList<>();
-      //  g1.add(new AndGuard(e2_g1, e2_g3));
+        //  g1.add(new AndGuard(e2_g1, e2_g3));
         g1.add(e2_g1);
         g1.add(e2_g2);
         CDD res = new CDD(new OrGuard(g1));
         //res.printDot();
         CDD exp = CDD.cddTrue();
-        exp = exp.conjunction(CDD.allocateInterval(1, 0, 3, true, CDD_INF/2, false));
-        exp = exp.disjunction(CDD.allocateInterval(2, 0, 0,true, 5,true));
-         System.out.println(CDD.toGuardList(exp.removeNegative().reduce(),clocks));
-        System.out.println(CDD.toGuardList(res.removeNegative().reduce(),clocks));
+        exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));
+        exp = exp.disjunction(CDD.createInterval(2, 0, 0,true, 5,true));
+        Log.debug(exp.removeNegative().reduce().getGuard(clocks));
+        Log.debug(res.removeNegative().reduce().getGuard(clocks));
         //exp.printDot();
         exp = exp.removeNegative().reduce();
         res = res.removeNegative().reduce();
@@ -317,12 +318,12 @@ public class CDDTest {
         BVs.add(new BoolVar("d", "aut", true));
         BVs.add(new BoolVar("c", "aut", true));
         BVs.add(new BoolVar("e", "aut", true));
-        int level = CDD.addBddvar(BVs);
+        int level = CDD.addBooleans(BVs);
         assertEquals(1, level);
         BVs.clear();
         BVs.add(new BoolVar("f", "aut", true));
         BVs.add(new BoolVar("g", "aut", true));
-        level = CDD.addBddvar(BVs);
+        level = CDD.addBooleans(BVs);
         assertEquals(6, level);
     }
 

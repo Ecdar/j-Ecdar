@@ -5,6 +5,7 @@ import QueryGrammar.QueryGrammarBaseVisitor;
 import QueryGrammar.QueryGrammarLexer;
 import logic.*;
 import logic.query.Query;
+import models.Automaton;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -15,10 +16,10 @@ import java.util.List;
 
 public class QueryParser {
 
-    private static List<SimpleTransitionSystem> transitionSystems;
+    private static List<Automaton> automata;
 
-    public static List<Query> parse(String queryString, List<SimpleTransitionSystem> systems){
-        transitionSystems = systems;
+    public static List<Query> parse(String queryString, List<Automaton> systems){
+        automata = systems;
         CharStream charStream = CharStreams.fromString(queryString);
         QueryGrammarLexer lexer = new QueryGrammarLexer(charStream);
         lexer.addErrorListener(new ErrorListener());
@@ -109,9 +110,9 @@ public class QueryParser {
     public static class SystemVisitor extends QueryGrammarBaseVisitor<TransitionSystem>{
 
         private TransitionSystem findComponent(String name){
-            for (SimpleTransitionSystem ts : transitionSystems){
-                if (ts.getName().equalsIgnoreCase(name))
-                    return ts;
+            for (Automaton aut : automata){
+                if (aut.getName().equalsIgnoreCase(name))
+                    return new SimpleTransitionSystem(aut);
             }
             throw new RuntimeException("Automaton does not exist  " + name);
         }

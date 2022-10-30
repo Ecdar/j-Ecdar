@@ -6,7 +6,6 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 public class JsonAutomatonEncoder {
 
@@ -64,7 +63,7 @@ public class JsonAutomatonEncoder {
             globalDec.writeJSONString(writer);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 
@@ -82,7 +81,7 @@ public class JsonAutomatonEncoder {
             locationJson.put("y", l.getY());
 
 
-            String guardString =l.getInvariant().toString();
+            String guardString =l.getInvariantGuard().toString();
             /*int i= 0; int j=0;
             for (List<Guard> disjunction: l.getInvariant())
             {
@@ -92,7 +91,7 @@ public class JsonAutomatonEncoder {
                 for (Guard g1: disjunction) {
                     if (g1 instanceof ClockGuard) {
                         ClockGuard g = (ClockGuard) g1;
-                        //System.out.println(g);
+                        //Log.trace(g);
                         String interm = g.toString();
 
                         if (i == 0)
@@ -105,7 +104,7 @@ public class JsonAutomatonEncoder {
                     {
                         if (g1 instanceof BoolGuard) {
                             BoolGuard g = (BoolGuard) g1;
-                            //System.out.println(g);
+                            //Log.trace(g);
                             String interm = g.toString();
                             if (i == 0)
                                 guardString += interm;
@@ -149,7 +148,7 @@ public class JsonAutomatonEncoder {
                 edgeJson.put("status", "OUTPUT");
             edgeJson.put("select", "");
 
-            String guardString = e.getGuards().toString();
+            String guardString = e.getGuard().toString();
             /*int i= 0; int j=0;
             for (List<Guard> disjunction: e.getGuards())
             {
@@ -160,7 +159,7 @@ public class JsonAutomatonEncoder {
                     if (g1 instanceof ClockGuard) {
 
                         ClockGuard g = (ClockGuard) g1;
-                        //System.out.println(g);
+                        //Log.trace(g);
                         String interm = g.toString();
 
                         if (i == 0)

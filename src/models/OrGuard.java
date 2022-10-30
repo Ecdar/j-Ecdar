@@ -1,120 +1,122 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
-public class OrGuard extends Guard{
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class OrGuard extends Guard {
 
     private List<Guard> guards;
 
-    public OrGuard(List<Guard> guards)
-    {
-        this.guards=guards;
-    }
-    public OrGuard(List<Guard>... guards)
-    {
-        this.guards= new ArrayList<>();
-        for (List<Guard> g: guards)
-            this.guards.addAll(g);
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<this.guards.size(); i++)
-            if (this.guards.get(i) instanceof OrGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            this.guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new FalseGuard());
-    }
-    public OrGuard(Guard... guards)
-    {
-        this.guards= new ArrayList<>();
-        for (Guard g: guards)
-            this.guards.add(g);
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<this.guards.size(); i++)
-            if (this.guards.get(i) instanceof FalseGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            this.guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new FalseGuard());
+    public OrGuard(List<Guard> guards) {
+        this.guards = guards;
 
-    }
+        /* If any of the guards are OrGuards themselves,
+         *   then we can decompose their guards to be contained in this */
+        List<OrGuard> worklist = this.guards
+                .stream()
+                .filter(guard -> guard instanceof OrGuard)
+                .map(guard -> (OrGuard) guard)
+                .collect(Collectors.toList());
+        while (!worklist.isEmpty()) {
+            OrGuard current = worklist.get(0);
+            worklist.remove(0);
 
-    public OrGuard(OrGuard copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs)
-    {
-        this.guards=new ArrayList<>();
-        for (Guard g : copy.guards)
-        {
-            if (g instanceof ClockGuard)
-                this.guards.add(new ClockGuard((ClockGuard) g,  newClocks,oldClocks));
-            if (g instanceof BoolGuard)
-                this.guards.add(new BoolGuard((BoolGuard) g, newBVs, oldBVs));
-            if (g instanceof FalseGuard)
-                this.guards.add(new FalseGuard());
-            if (g instanceof AndGuard)
-                this.guards.add(new AndGuard( (AndGuard) g, newClocks, oldClocks, newBVs, oldBVs));
-            if (g instanceof OrGuard)
-                this.guards.add(new OrGuard( (OrGuard) g, newClocks, oldClocks, newBVs, oldBVs));
+            for (Guard guard : current.guards) {
+                if (guard instanceof OrGuard) {
+                    worklist.add((OrGuard) guard);
+                }
+                this.guards.add(guard);
+            }
+
+            this.guards.remove(current);
         }
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i<guards.size(); i++)
-            if (guards.get(i) instanceof FalseGuard)
-                indices.add(i);
-        Collections.reverse(indices);
-        for (int i : indices)
-            guards.remove(i);
-        if (this.guards.isEmpty())
-            this.guards.add(new FalseGuard());
+
+        // Remove all guards if there is a true guard
+        boolean hasTrueGuard = this.guards.stream().anyMatch(guard -> guard instanceof TrueGuard);
+        if (hasTrueGuard) {
+            /* If there are one or more TrueGuards then we just need a single TrueGuard.
+             *   It would be possible to just clear it and let the last predicate,
+             *   ensure that the empty OrGuard is a tautology.
+             *   However, this is more robust towards changes */
+            this.guards.clear();
+            this.guards.add(new TrueGuard());
+        }
+
+        // Remove all false guards
+        this.guards = this.guards.stream().filter(guard -> !(guard instanceof FalseGuard)).collect(Collectors.toList());
+
+        // If there are no guards then it is a tautology
+        if (this.guards.size() == 0) {
+            this.guards.add(new TrueGuard());
+        }
     }
 
+    public OrGuard(List<Guard>... guards) {
+        this(Lists.newArrayList(Iterables.concat(guards)));
+    }
+
+    public OrGuard(Guard... guards) {
+        this(Arrays.asList(guards));
+    }
+
+    public OrGuard(OrGuard copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        // As this is the copy-constructor we need to create new instances of the guards
+        this(copy.guards.stream().map(guard ->
+            guard.copy(newClocks, oldClocks, newBVs, oldBVs)
+        ).collect(Collectors.toList()));
+    }
+
+    public List<Guard> getGuards() {
+        return guards;
+    }
 
     @Override
-    int getMaxConstant() {
+    int getMaxConstant(Clock clock) {
         int max = 0;
-        for (Guard g: guards)
-        {
-            if (g.getMaxConstant()>max)
-                max = g.getMaxConstant();
+        for (Guard guard : guards) {
+            max = Math.max(max, guard.getMaxConstant(clock));
         }
         return max;
     }
 
     @Override
-    public boolean equals(Object o) { // TODO: AND(G1,G2) != AND(G2,G1) => is that okay?
-        if (!(o instanceof OrGuard))
+    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new OrGuard(
+            this, newClocks, oldClocks, newBVs, oldBVs
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof OrGuard)) {
             return false;
-        OrGuard other = (OrGuard) o;
-        if (other.guards.size()!=guards.size())
-            return  false;
-        for (int i =0; i< other.guards.size(); i++)
-            if (!guards.get(i).equals(other.guards.get(i)))
-                return false;
-        return true;
+        }
+
+        OrGuard other = (OrGuard) obj;
+        return Arrays.equals(guards.toArray(), other.guards.toArray());
     }
 
     @Override
     public String toString() {
-        String ret = "(";
-        for (Guard g: guards)
-            ret += g.toString() + " or ";
-        if (guards.size()==0)
-            return "";
-        if (guards.size()==1)
+        if (guards.size() == 1) {
             return guards.get(0).toString();
-        return ret.substring(0,ret.length()-4) + ")";
+        }
+
+        return "(" +
+                guards.stream()
+                    .map(Guard::toString)
+                    .collect(Collectors.joining(" or "))
+                + ")";
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(false);
-    }
-
-    public List<Guard> getGuards() {
-        return guards;
     }
 }

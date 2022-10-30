@@ -8,10 +8,13 @@ import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import logic.Controller;
 import logic.query.Query;
+import models.CDD;
 
 import java.util.List;
 
 public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
+
+
 
     @Override
     public void updateComponents(QueryProtos.ComponentsUpdateRequest request,
@@ -26,8 +29,8 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
             }
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
-        } catch (Exception e){
-            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(e.getClass().getName() + ": " + e.getMessage()).asRuntimeException());
+        } catch (Throwable e){
+            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(tryEnsureDone(e)).asRuntimeException());
         }
     }
 
@@ -73,12 +76,22 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
                 default:
                     responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Query has an invalid type").asRuntimeException());
             }
-
             responseObserver.onNext(queryResponseBuilder.build());
             responseObserver.onCompleted();
-        } catch (Exception e) {
-            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(e.getClass().getName() + ": " + e.getMessage()).asRuntimeException());
+        } catch (Throwable e) {
+            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(tryEnsureDone(e)).asRuntimeException());
         }
+    }
+
+    private String tryEnsureDone(Throwable e) {
+        String description = e.getClass().getName() + ": " + e.getMessage();
+
+        try {CDD.ensureDone(); }
+        catch (Throwable ee) {
+            description += "\n" + ee.getClass().getName() + ": " + ee.getMessage();
+        }
+
+        return description;
     }
 
     private void getComponent(Query response, QueryProtos.QueryResponse.Builder queryResponseBuilder) {

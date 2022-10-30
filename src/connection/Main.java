@@ -1,5 +1,7 @@
 package connection;
 
+import log.Log;
+import log.Urgency;
 import logic.*;
 import logic.query.Query;
 import models.Automaton;
@@ -45,6 +47,8 @@ public class Main {
 
 
     public static void main(String[] args) {
+        Log.setUrgency(Urgency.Info);
+
         options.addOption(proto);
         options.addOption(outputFolder);
         options.addOption(inputFolder);
@@ -69,7 +73,7 @@ public class Main {
                     server.start();
                     server.blockUntilShutdown();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -93,13 +97,13 @@ public class Main {
                     queries = Controller.handleRequest("-json " + inputFolderPath, queryString, false);
                 }
                 for (Query query: queries) {
-                    System.out.println(query.getResult());
-                    System.out.println(query.getResultStrings());
+                    Log.info(query.getResult());
+                    Log.info(query.getResultStrings());
                 }
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-                e.printStackTrace();
+                Log.error(e.getMessage());
+                throw new RuntimeException(e);
             }
 
             if(cmd.hasOption("save-to-disk")){
@@ -108,7 +112,7 @@ public class Main {
             }
 
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
+            Log.fatal(e.getMessage());
             printHelp(formatter,options);
         }
 

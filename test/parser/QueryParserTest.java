@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class QueryParserTest {
     private static SimpleTransitionSystem adm, machine, researcher, spec, machine3, adm2, half1, half2;
 
-    private ArrayList<SimpleTransitionSystem> transitionSystems;
+    private ArrayList<Automaton> automataList;
 
     @Before
     public void beforeEachTest() throws FileNotFoundException {
@@ -48,15 +48,15 @@ public class QueryParserTest {
 
         Controller.parseComponents(base, true);
 
-        transitionSystems = new ArrayList<>();
-        transitionSystems.add(adm);
-        transitionSystems.add(machine);
-        transitionSystems.add(researcher);
-        transitionSystems.add(spec);
-        transitionSystems.add(machine3);
-        transitionSystems.add(adm2);
-        transitionSystems.add(half1);
-        transitionSystems.add(half2);
+        automataList = new ArrayList<>();
+        automataList.add(adm.getAutomaton());
+        automataList.add(machine.getAutomaton());
+        automataList.add(researcher.getAutomaton());
+        automataList.add(spec.getAutomaton());
+        automataList.add(machine3.getAutomaton());
+        automataList.add(adm2.getAutomaton());
+        automataList.add(half1.getAutomaton());
+        automataList.add(half2.getAutomaton());
     }
 
     private TransitionSystem testVisitSystem(String systemString) throws Exception{
@@ -68,9 +68,9 @@ public class QueryParserTest {
         QueryGrammar.QueryGrammarParser parser = new QueryGrammar.QueryGrammarParser(tokens);
         parser.addErrorListener(new ErrorListener());
         QueryParser.SystemVisitor visitor = new QueryParser.SystemVisitor();
-        Field field = QueryParser.class.getDeclaredField("transitionSystems");
+        Field field = QueryParser.class.getDeclaredField("automata");
         field.setAccessible(true);
-        field.set(null, transitionSystems);
+        field.set(null, automataList);
         return visitor.visit(parser.queries().query(0).saveSystem().expression());
     }
 
@@ -177,17 +177,17 @@ public class QueryParserTest {
 
     @Test
     public void testSpecNotRefinesSpec() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Spec)<=(Spec)", false).get(0).getResult(), false);
+        assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Spec)<=(Spec)", false).get(0).getResult());
     }
 
     @Test
     public void testMachNotRefinesMach() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0).getResult(), false);
+        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine<=Machine", false).get(0).getResult(), true);
     }
 
     @Test
     public void testMach3NotRefinesMach3() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine3<=Machine3", false).get(0).getResult(), false);
+        assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Machine3<=Machine3", false).get(0).getResult());
     }
 
     @Test
@@ -217,7 +217,7 @@ public class QueryParserTest {
 
     @Test
     public void testCompNotRefinesComp() throws Exception {
-        assertEquals(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)", false).get(0).getResult(), false);
+        assertTrue(Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=(Administration||Machine||Researcher)", false).get(0).getResult());
     }
 
     @Test
@@ -309,13 +309,15 @@ public class QueryParserTest {
     @Test
     public void testSeveralQueries1() throws Exception {
         List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:Spec<=Spec; refinement:Machine<=Machine", false);
-        assertTrue(!result.get(0).getResult() && !result.get(1).getResult());
+        assertTrue(result.get(0).getResult()); // refinement:Spec<=Spec
+        assertTrue(result.get(1).getResult()); // refinement:Spec<=Spec
     }
 
     @Test
     public void testSeveralQueries2() throws Exception {
         List<Query> result = Controller.handleRequest("-json ./samples/json/EcdarUniversity", "refinement:(Administration||Machine||Researcher)<=Spec; refinement:Machine3<=Machine3", false);
-        assertTrue(result.get(0).getResult() && !result.get(1).getResult());
+        assertTrue(result.get(0).getResult()); // refinement:(Administration||Machine||Researcher)<=Spec
+        assertTrue(result.get(1).getResult()); // refinement:Machine3<=Machine3
     }
 
     @Test
@@ -327,63 +329,63 @@ public class QueryParserTest {
 
     @Test
     public void testQueryValid1() {
-        QueryParser.parse("refinement:Adm2<=(HalfAdm1&&HalfAdm2)", transitionSystems);
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1&&HalfAdm2)", automataList);
     }
 
     @Test
     public void testQueryValid2() {
-        QueryParser.parse("refinement:(Administration||Researcher||Machine)<=Spec", transitionSystems);
+        QueryParser.parse("refinement:(Administration||Researcher||Machine)<=Spec", automataList);
     }
 
     @Test
     public void testQueryValid3() {
-        QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec", transitionSystems);
+        QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||Machine)<=Spec", automataList);
     }
 
     @Test
     public void testQueryValid4() {
-        QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine&&Machine3))<=Spec", transitionSystems);
+        QueryParser.parse("refinement:((HalfAdm1&&HalfAdm2)||Researcher||(Machine&&Machine3))<=Spec", automataList);
     }
 
-    @Test
+    @Test (expected = IllegalArgumentException.class)
     public void testQueryValid5() {
-        QueryParser.parse("refinement:((HalfAdm1&&(HalfAdm1||HalfAdm2))||Researcher||(Machine&&Machine3))<=Spec", transitionSystems);
+        QueryParser.parse("refinement:((HalfAdm1&&(HalfAdm1||HalfAdm2))||Researcher||(Machine&&Machine3))<=Spec", automataList);
     }
 
     @Test
     public void testQueryValidSaveAs() {
-        QueryParser.parse("get-component:Adm2 save-as Adm3; refinement:Adm3<=(HalfAdm1&&HalfAdm2)", transitionSystems);
+        QueryParser.parse("get-component:Adm2 save-as Adm3; refinement:Adm3<=(HalfAdm1&&HalfAdm2)", automataList);
     }
 
     @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid1() {
-        QueryParser.parse("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)", transitionSystems);
+        QueryParser.parse("refinsdfement:Adm2<=(HalfAdm1&&HalfAdm2)", automataList);
     }
 
     @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid2() {
-        QueryParser.parse("refinement:Adm2(<=(HalfAdm1&&HalfAdm2)", transitionSystems);
+        QueryParser.parse("refinement:Adm2(<=(HalfAdm1&&HalfAdm2)", automataList);
     }
 
     @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid3() {
-        QueryParser.parse("refinement:Adm2<=(HalfAdm1&&HalfAdm2)<=Spec", transitionSystems);
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1&&HalfAdm2)<=Spec", automataList);
     }
 
     @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid4() {
-        QueryParser.parse("refinement:Adm2<=(HalfAdm1(&&HalfAdm2))", transitionSystems);
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1(&&HalfAdm2))", automataList);
     }
 
     @Test(expected = ParseCancellationException.class)
     public void testQueryNotValid5() {
 
-        QueryParser.parse("refinement:Adm2<=(HalfAdm1||(&&HalfAdm2))", transitionSystems);
+        QueryParser.parse("refinement:Adm2<=(HalfAdm1||(&&HalfAdm2))", automataList);
     }
 
     @Test
     public void testQueryParsingSaveAs(){
-        Query query = QueryParser.parse("get-component: HalfAdm1 && HalfAdm2 save-as TestMachine", transitionSystems).get(0);
+        Query query = QueryParser.parse("get-component: HalfAdm1 && HalfAdm2 save-as TestMachine", automataList).get(0);
 
         assertEquals("TestMachine", query.getComponentName());
         assertEquals(Query.QueryType.GET_COMPONENT, query.getType());
@@ -391,7 +393,7 @@ public class QueryParserTest {
 
     @Test
     public void testQueryParsingMultiple(){
-        List<Query> queries = QueryParser.parse("get-component: Machine && Machine3 save-as TestMachine; refinement: Machine <= Machine3", transitionSystems);
+        List<Query> queries = QueryParser.parse("get-component: Machine && Machine3 save-as TestMachine; refinement: Machine <= Machine3", automataList);
 
         assertEquals("TestMachine", queries.get(0).getComponentName());
         assertEquals(Query.QueryType.GET_COMPONENT, queries.get(0).getType());
@@ -401,14 +403,14 @@ public class QueryParserTest {
 
     @Test
     public void testComponentName() throws Exception {
-        Query query = QueryParser.parse("get-component: Machine save-as TestMachine", transitionSystems).get(0);
+        Query query = QueryParser.parse("get-component: Machine save-as TestMachine", automataList).get(0);
 
         assertEquals("TestMachine", query.getComponentName());
     }
 
     @Test
     public void testDefaultComponentName() throws Exception {
-        List<Query> queries = QueryParser.parse("get-component: Machine; get-component: Researcher", transitionSystems);
+        List<Query> queries = QueryParser.parse("get-component: Machine; get-component: Researcher", automataList);
 
         assertTrue(queries.get(0).getComponentName().startsWith("automaton"));
         assertTrue(queries.get(1).getComponentName().startsWith("automaton"));

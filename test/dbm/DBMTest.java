@@ -1,6 +1,7 @@
 package dbm;
 
 import lib.DBMLib;
+import log.Log;
 import logic.State;
 import models.*;
 import org.junit.After;
@@ -29,8 +30,8 @@ public class DBMTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        Location l1 = new Location("L0", new TrueGuard(), false, false, false, false);
-        SymbolicLocation sl1 = new SimpleLocation(l1);
+        Location l1 = Location.create("L0", new TrueGuard(), false, false, false, false, 0, 0);
+        Location sl1 = l1.copy();
 
         x = new Clock("x", "AUT");
         y = new Clock("y", "AUT");
@@ -42,22 +43,22 @@ public class DBMTest {
         // STATES----------------------
         // From 0 to inf
         Zone z1 = new Zone(new int[]{1, 1, 10, 20});
-        CDD cdd1 = CDD.allocateFromDbm(z1.getDbm(),clockList.size()+1);
+        CDD cdd1 = CDD.createFromDbm(z1.getDbm(),clockList.size()+1);
         state1 = new State(sl1, cdd1);
 
         // From 2 to inf
         Zone z2 = new Zone(new int[]{1, -3, DBM_INF, 1});
-        CDD cdd2 = CDD.allocateFromDbm(z2.getDbm(),clockList.size()+1);
+        CDD cdd2 = CDD.createFromDbm(z2.getDbm(),clockList.size()+1);
         state2 = new State(sl1, cdd2);
 
         // From 0 to 5
         Zone z3 = new Zone(new int[]{1, 1, 11, 1});
-        CDD cdd3 = CDD.allocateFromDbm(z3.getDbm(),clockList.size()+1);
+        CDD cdd3 = CDD.createFromDbm(z3.getDbm(),clockList.size()+1);
         state3 = new State(sl1, cdd3);
 
         // From 3 to 12
         Zone z4 = new Zone(new int[]{1, -5, 25, 1});
-        CDD cdd4 = CDD.allocateFromDbm(z4.getDbm(),clockList.size()+1);
+        CDD cdd4 = CDD.createFromDbm(z4.getDbm(),clockList.size()+1);
         state4 = new State(sl1, cdd4);
 
 
@@ -106,24 +107,25 @@ public class DBMTest {
     @Test
     public void testExtrapolate() {
         CDD.init(100,100,100);
+        List<Clock> clockList = new ArrayList<>();
+        clockList.add(x);
+        clockList.add(y);
         CDD.addClocks(clockList);
         HashMap<Clock,Integer> map = new HashMap<>();
-        map.put(x,10);
-        map.put(y,30);
-        map.put(z,10);
+        map.put(x,12);
+        map.put(y,10);
 
-        Guard g1 = new ClockGuard(x, y, 40, Relation.LESS_THAN );  //x>4
-        List<Guard> disj1 = new ArrayList<>();
-        disj1.add(g1);
-        Guard dis1 = new AndGuard(disj1);
+        Guard g2 = new ClockGuard(x,null, 20,Relation.LESS_EQUAL);
+        Guard g3 = new ClockGuard(y,null, 2,Relation.LESS_EQUAL);
+        Guard initialZone = new AndGuard(g2,g3);
 
-        Location l1 = new Location("L1",new TrueGuard(),true,false,false,false);
-        State state1 = new State(new SimpleLocation(l1),new CDD(dis1));
-        state1.delay();
-        System.out.println(state1);
+        Location l1 = Location.create("L1",new TrueGuard(),true,false,false,false, 0, 0);
+        State state1 = new State(l1.copy(), new CDD(initialZone));
+        //state1.delay();
+        Log.trace(state1);
         state1.extrapolateMaxBounds(map,clockList);
-        System.out.println(state1);
-        assertEquals(state1.toString(), "{L1, (x>1 && y>2 && y-x<1)}");
+        Log.trace(state1);
+        assertEquals("{L1, (y<=2 && y-x<=2)}", state1.toString());
         CDD.done();
     }
 
@@ -138,15 +140,18 @@ public class DBMTest {
                 121,9,105,33,59,1};
         Zone z = new Zone(arr);
         z= z.close();
-        z.printDBM(true,true);
-        System.out.println(z.isValid());
+        z.printDbm(true,true);
+        Log.trace(z.isValid());
+
         int[] bounds = new int[] {0, 12, 31, 41, 41, 21};
         z.extrapolateMaxBounds(bounds);
-        z.printDBM(true,true);
+        Zone copy = new Zone(z);
+        z.printDbm(true,true);
         z.extrapolateMaxBounds(bounds);
-        z.printDBM(true,true);
+        z.printDbm(true,true);
         z.extrapolateMaxBounds(bounds);
-        z.printDBM(true,true);
+        z.printDbm(true,true);
+        assert(z.equals(copy));
     }
 
     @Test
@@ -159,11 +164,13 @@ public class DBMTest {
                 1,1,1,1,1,1,
                 121,1,1,1,1,1,};
         Zone z = new Zone(arr);
-        z.printDBM(true,true);
-        System.out.println(z.isValid());
+
+        z.printDbm(true,true);
+        Log.trace(z.isValid());
+
         int[] bounds = new int[] {0, 12, 31, 41, 41, 41};
         z.extrapolateMaxBounds(bounds);
-        z.printDBM(true,true);
+        z.printDbm(true,true);
     }
 
 
