@@ -872,4 +872,11 @@ public class CDD {
             throw new CddNotRunningException("CDD.init() has not been called");
         }
     }
+
+    public String prettyPrint() {
+        return clocks.stream().limit(clocks.size()-1)
+                .map(c -> c + ", ")
+                .collect(Collectors.joining())
+                + clocks.get(clocks.size()-1);
+    }
 }

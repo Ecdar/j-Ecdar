@@ -1,5 +1,7 @@
 package logic;
 
+import models.CDD;
+
 public class StatePair {
     private final State left, right;
     private GraphNode node;
@@ -32,7 +34,9 @@ public class StatePair {
     }
 
     public String prettyPrint() {
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getInvariant() + " " + right.getInvariant();
+        return "(" + left.getLocation() + ", " +
+                right.getLocation() + ") [" +
+                left.getInvariant().prettyPrint() + "]";
     }
 
     @Override
