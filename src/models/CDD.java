@@ -3,6 +3,7 @@ package models;
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import lib.CDDLib;
+import log.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;

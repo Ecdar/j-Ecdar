@@ -9,7 +9,7 @@ public class Quotient extends AggregatedTransitionSystem {
     private final TransitionSystem t, s;
     private final Set<Channel> inputs, outputs;
     private final Channel newChan;
-    private Clock newClock;
+    private final Clock newClock;
 
     public Quotient(TransitionSystem t, TransitionSystem s) {
         super(t, s);
@@ -18,8 +18,13 @@ public class Quotient extends AggregatedTransitionSystem {
         this.s = s;
 
         // Clocks should contain the clocks of t, s, and the new clock.
-        newClock = new Clock("quo_new", "quo"); //TODO: get ownerName in a better way
-        clocks.add(newClock);
+        Optional<Clock> existingClock = clocks.findAnyWithOriginalName("quo_new");
+        if (existingClock.isPresent()) {
+            newClock = existingClock.get();
+        } else {
+            newClock = new Clock("quo_new", "quo");
+            clocks.add(newClock);
+        }
 
         // Act_i = Act_i^T ∪ Act_o^S
         inputs = union(t.getInputs(), s.getOutputs());
@@ -30,6 +35,13 @@ public class Quotient extends AggregatedTransitionSystem {
         outputs = union(
                 difference(t.getOutputs(), s.getOutputs()),
                 difference(s.getInputs(), t.getInputs())
+        );
+    }
+
+    public Quotient(Automaton t, Automaton s) {
+        this(
+                new SimpleTransitionSystem(t),
+                new SimpleTransitionSystem(s)
         );
     }
 

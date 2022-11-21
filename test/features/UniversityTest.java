@@ -314,6 +314,7 @@ public class UniversityTest {
 
         assertFalse(refines);
     }
+
     @Test
     public void doubleQuotientTest3() {
         // refinement: res <= spec \ adm2 \ machine

@@ -21,12 +21,6 @@ public abstract class UniquelyNamed {
         }
     }
 
-    public void setUniqueName() {
-        if (ownerName != null) {
-            uniqueName = ownerName + "." + originalName;
-        }
-    }
-
     public String getOwnerName() {
         return ownerName;
     }

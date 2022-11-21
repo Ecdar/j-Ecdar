@@ -10,9 +10,7 @@ public class Clock extends UniquelyNamed {
     }
 
     public Clock(Clock copy) {
-        this.uniqueName = copy.originalName;
-        this.originalName = copy.originalName;
-        this.ownerName = copy.ownerName;
+        this(copy.getOriginalName(), copy.getOwnerName());
     }
 
     @Override

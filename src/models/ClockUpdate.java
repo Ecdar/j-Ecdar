@@ -8,6 +8,10 @@ public class ClockUpdate extends Update {
     private final int value;
 
     public ClockUpdate(Clock clock, int value) {
+        if (clock == null) {
+            throw new IllegalArgumentException("The clock used in a clock update cannot be null");
+        }
+
         this.clock = clock;
         this.value = value;
     }

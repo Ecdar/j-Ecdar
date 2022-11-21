@@ -2,48 +2,48 @@ package logic;
 
 import models.UniquelyNamed;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UniqueNamedContainer<T extends UniquelyNamed> {
-    private List<T> items;
+    private final List<T> items;
 
     public UniqueNamedContainer(List<T> items) {
         this.items = items;
     }
 
     public UniqueNamedContainer() {
-        this.items = new ArrayList<>();
+        this(new ArrayList<>());
     }
 
     public void add(T item) {
-        T newItem = (T) item.getCopy();
+        // Unique name naming rules:
+        //   Same owner and different name: Keep it as is
+        //   Same owner and original name: Keep it as is
+        //   Different owner and name: Keep it as is
+        //   Different owner and same original name: Add owner to name "owner.n.name" where n is a counter value
+        List<T> similar = items.stream()
+                .filter(current ->
+                        !Objects.equals(current.getOwnerName(), item.getOwnerName()) &&
+                                Objects.equals(current.getOriginalName(), item.getOriginalName())
+                ).collect(Collectors.toList());
+        similar.add(item);
+        int similarCount = similar.size();
 
-        List<T> sameName = items.stream()
-                .filter(it -> sameName(it, item))
-                .collect(Collectors.toList());
-        if (sameName.size() != 0){
-            List<T> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(item.getOwnerName())).collect(Collectors.toList());
-            if(sameOwner.size() != 0){          // Same name, same owner
-                for(int i = 0; i < sameOwner.size(); i++){
-                    sameOwner.get(i).setUniqueName(i+1);
-                }
-                newItem.setUniqueName(sameOwner.size()+1);
-            }else{                              // Same name, different owner
-                for(int i = 0; i < sameName.size(); i++){
-                    sameName.get(i).setUniqueName();
-                }
-                newItem.setUniqueName();
-            }
+        for (T current : similar) {
+            current.setUniqueName(similarCount);
+            similarCount -= 1;
         }
-        items.add(newItem);
 
+        // If the unique name is not present in the set of items then add it
+        Optional<T> existing = findFirstByUniqueName(item.getUniqueName());
+        if (existing.isEmpty()) {
+            items.add(item);
+        }
     }
 
-    private boolean sameName(UniquelyNamed item1, UniquelyNamed item2){
-        return item1.getOriginalName().equals(item2.getOriginalName());
+    private Optional<T> findFirstByUniqueName(String uniqueName) {
+        return items.stream().filter(item -> Objects.equals(item.getUniqueName(), uniqueName)).findFirst();
     }
 
     public List<T> getItems() {
@@ -51,9 +51,13 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     }
 
     public void addAll(List<T> newItems) {
-        for (T item: newItems) {
+        for (T item : newItems) {
             add(item);
         }
+    }
+
+    public Optional<T> findAnyWithOriginalName(String name) {
+        return items.stream().filter(item -> Objects.equals(item.getOriginalName(), name)).findFirst();
     }
 
     @Override
