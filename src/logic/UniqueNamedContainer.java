@@ -17,28 +17,43 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     }
 
     public void add(T item) {
-        // Unique name naming rules:
-        //   Same owner and different name: Keep it as is
-        //   Same owner and original name: Keep it as is
-        //   Different owner and name: Keep it as is
-        //   Different owner and same original name: Add owner to name "owner.n.name" where n is a counter value
-        List<T> similar = items.stream()
-                .filter(current ->
-                        !Objects.equals(current.getOwnerName(), item.getOwnerName()) &&
-                                Objects.equals(current.getOriginalName(), item.getOriginalName())
-                ).collect(Collectors.toList());
-        similar.add(item);
-        int similarCount = similar.size();
+        T newItem = (T) item.getCopy();
 
-        for (T current : similar) {
-            current.setUniqueName(similarCount);
-            similarCount -= 1;
+        if (!Objects.equals(item.getUniqueName(), "quo_new")) {
+            // Unique name naming rules:
+            //   Same owner and different name: Keep it as is
+            //   Same owner and original name: Add owner to name "owner.n.name" where n is a counter value
+            // Motivation: Machine <= Machine || Machine. Here the owner is Machine but their clocks are different.
+            //   Different owner and name: Keep it as is
+            //   Different owner and same original name: Add owner to name "owner.n.name" where n is a counter value
+            List<T> similarOriginalName = items.stream()
+                    .filter(current -> Objects.equals(current.getOriginalName(), newItem.getOriginalName()))
+                    .collect(Collectors.toList());
+
+            if (similarOriginalName.size() != 0) {
+
+                List<T> similarOwner = similarOriginalName.stream()
+                        .filter(current -> Objects.equals(current.getOwnerName(), newItem.getOwnerName()))
+                        .collect(Collectors.toList());
+
+                if (similarOwner.size() > 0) {
+                    for (int i = 0; i < similarOwner.size(); i++) {
+                        similarOwner.get(i).setUniqueName(i + 1);
+                    }
+                    newItem.setUniqueName(similarOwner.size() + 1);
+                } else {
+                    for (T current : similarOriginalName) {
+                        current.setUniqueName();
+                    }
+                    newItem.setUniqueName();
+                }
+            }
         }
 
         // If the unique name is not present in the set of items then add it
-        Optional<T> existing = findFirstByUniqueName(item.getUniqueName());
+        Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
         if (existing.isEmpty()) {
-            items.add(item);
+            items.add(newItem);
         }
     }
 
