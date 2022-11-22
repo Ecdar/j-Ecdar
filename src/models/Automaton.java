@@ -86,7 +86,7 @@ public class Automaton {
     public Automaton(Automaton automaton) {
         name = automaton.name + "Copy";
         clocks = automaton.clocks.stream()
-                .map(clock -> new Clock(clock.getOriginalName() + "Copy", name))
+                .map(clock -> new Clock(clock.getOriginalName() + "Copy", name, clock.isGlobal()))
                 .collect(Collectors.toList());
         BVs = automaton.BVs.stream()
                 .map(boolVar -> new BoolVar(boolVar.getOriginalName() + "Copy", name, boolVar.getInitialValue()))

@@ -22,7 +22,7 @@ public class Quotient extends AggregatedTransitionSystem {
         if (existingClock.isPresent()) {
             newClock = existingClock.get();
         } else {
-            newClock = new Clock("quo_new", "quo");
+            newClock = new Clock("quo_new", "quo", true);
             clocks.add(newClock);
         }
 
