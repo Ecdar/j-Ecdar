@@ -12,7 +12,7 @@ public class AutomatonTest {
     public void testActionIsBothAnInputAndOutputThrowsException() {
         // Arrange
         Channel channel = new Channel("channel");
-        Location location = new Location("Location", new TrueGuard(), true, false, false, false, 0, 0);
+        Location location = Location.create("Location", new TrueGuard(), true, false, false, false);
         List<Location> locations = new ArrayList<>();
         locations.add(location);
         List<Edge> edges = new ArrayList<>();
@@ -60,7 +60,7 @@ public class AutomatonTest {
         // Arrange
         List<Location> locations = new ArrayList<>();
         locations.add(
-                new Location("Location", new TrueGuard(), false, false, false, false, 0, 0)
+                Location.create("Location", new TrueGuard(), false, false, false, false)
         );
         List<Edge> edges = new ArrayList<>();
         List<Clock> clocks = new ArrayList<>();
@@ -82,10 +82,10 @@ public class AutomatonTest {
         // Arrange
         List<Location> locations = new ArrayList<>();
         locations.add(
-                new Location("Location", new TrueGuard(), true, false, false, false, 0, 0)
+                Location.create("Location", new TrueGuard(), true, false, false, false)
         );
         locations.add(
-                new Location("Location", new TrueGuard(), true, false, false, false, 0, 0)
+                Location.create("Location", new TrueGuard(), true, false, false, false)
         );
         List<Edge> edges = new ArrayList<>();
         List<Clock> clocks = new ArrayList<>();
@@ -107,7 +107,7 @@ public class AutomatonTest {
         // Arrange
         List<Location> locations = new ArrayList<>();
         locations.add(
-                new Location("Location", new TrueGuard(), true, false, false, false, 0, 0)
+                Location.create("Location", new TrueGuard(), true, false, false, false)
         );
         List<Edge> edges = new ArrayList<>();
         List<Clock> clocks = new ArrayList<>();

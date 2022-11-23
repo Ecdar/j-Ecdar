@@ -1,5 +1,6 @@
 package logic;
 
+import log.Log;
 import models.*;
 import parser.XMLFileWriter;
 
@@ -33,8 +34,8 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return automaton.getOutputAct();
     }
 
-    public SymbolicLocation getInitialLocation() {
-        return new SimpleLocation(automaton.getInitial());
+    public Location getInitialLocation() {
+        return Location.createSimple(automaton.getInitial());
     }
 
     public List<SimpleTransitionSystem> getSystems() {
@@ -51,7 +52,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
     public void setMaxBounds()
     {
-        // System.out.println("Max bounds: " + automaton.getMaxBoundsForAllClocks());
+        Log.debug("Max bounds: " + automaton.getMaxBoundsForAllClocks());
         HashMap<Clock,Integer> res = new HashMap<>();
 
         res.putAll(automaton.getMaxBoundsForAllClocks());
@@ -84,9 +85,9 @@ public class SimpleTransitionSystem extends TransitionSystem{
                 List<Transition> tempTrans = getNextTransitions(currState, action);
                 if (checkMovesOverlap(tempTrans)) {
                     for (Transition t: tempTrans) {
-                        System.out.println("next trans");
+                        Log.debug("next trans");
                         for (Edge e : t.getEdges())
-                            System.out.println(e);
+                            Log.debug(e);
                     }
                     return false;
                 }
@@ -105,7 +106,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
     // Check if zones of moves for the same action overlap, that is if there is non-determinism
     public boolean checkMovesOverlap(List<Transition> trans) {
         if (trans.size() < 2) return false;
-        //System.out.println("check moves overlap -------------------------------------------------------------------");
+        Log.debug("check moves overlap -------------------------------------------------------------------");
         for (int i = 0; i < trans.size(); i++) {
             for (int j = i + 1; j < trans.size(); j++) {
                 if (trans.get(i).getTarget().getLocation().equals(trans.get(j).getTarget().getLocation())
@@ -124,17 +125,17 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 if (state1.getInvariant().isNotFalse() && state2.getInvariant().isNotFalse()) {
                     if(state1.getInvariant().intersects(state2.getInvariant())) {
-                        /*System.out.println(CDD.toGuardList(trans.get(i).getGuardCDD(),clocks));
-                        System.out.println(CDD.toGuardList(trans.get(j).getGuardCDD(),clocks));
-                        System.out.println(trans.get(0).getEdges().get(0).getChannel());
-                        System.out.println(trans.get(0).getEdges().get(0));
-                        System.out.println(trans.get(1).getEdges().get(0));
-                        System.out.println(CDD.toGuardList(state1.getInvarCDD(),clocks));
-                        System.out.println(CDD.toGuardList(state2.getInvarCDD(),clocks));
-                        // trans.get(j).getGuardCDD().printDot();
-                        System.out.println(CDD.toGuardList(trans.get(i).getEdges().get(0).getGuardCDD(),clocks));
-                        System.out.println(CDD.toGuardList(trans.get(j).getEdges().get(0).getGuardCDD(),clocks));
-                        System.out.println("they intersect??!");*/
+                        Log.debug(trans.get(i).getGuardCDD().getGuard(clocks.getItems()));
+                        Log.debug(trans.get(j).getGuardCDD().getGuard(clocks.getItems()));
+                        Log.debug(trans.get(0).getEdges().get(0).getChannel());
+                        Log.debug(trans.get(0).getEdges().get(0));
+                        Log.debug(trans.get(1).getEdges().get(0));
+                        Log.debug(state1.getInvariant().getGuard(clocks.getItems()));
+                        Log.debug(state2.getInvariant().getGuard(clocks.getItems()));
+                        trans.get(j).getGuardCDD().printDot();
+                        Log.debug(trans.get(i).getEdges().get(0).getGuardCDD().getGuard(clocks.getItems()));
+                        Log.debug(trans.get(j).getEdges().get(0).getGuardCDD().getGuard(clocks.getItems()));
+                        Log.debug("they intersect??!");
                         return true;
                     }
                 }
@@ -161,7 +162,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         State toStore = new State(currState);
 
         toStore.extrapolateMaxBounds(getMaxBounds(),clocks.getItems());
-        System.out.println(getMaxBounds());
+        Log.debug(getMaxBounds());
         //if (passedContainsState(toStore))
         //    return true;
         passed.add(toStore);
@@ -171,7 +172,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
             for (Transition ts : tempTrans) {
                 boolean inputConsistent = checkConsistency(ts.getTarget(), inputs, outputs, canPrune);
                 if (!inputConsistent) {
-                    System.out.println("Input inconsistent");
+                    Log.debug("Input inconsistent");
                     return false;
                 }
             }
@@ -268,7 +269,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
         for (State passedState : passed) {
-            //    System.out.print(" "+passedState.getLocation() + " " + CDD.toGuardList(passedState.getInvarCDD(),clocks));
+            Log.debug(" " + passedState.getLocation() + " " + passedState.getInvariant().getGuard(clocks.getItems()));
             if (state.getLocation().equals(passedState.getLocation()) &&
                     state.getInvariant().isSubset((passedState.getInvariant()))) {
                 return true;
@@ -299,15 +300,14 @@ public class SimpleTransitionSystem extends TransitionSystem{
         return createNewTransitions(currentState, moves, allClocks);
     }
 
-    protected List<Move> getNextMoves(SymbolicLocation symLocation, Channel channel) {
+    protected List<Move> getNextMoves(Location location, Channel channel) {
         List<Move> moves = new ArrayList<>();
 
-        Location location = ((SimpleLocation) symLocation).getActualLocation();
         List<Edge> edges = automaton.getEdgesFromLocationAndSignal(location, channel);
 
         for (Edge edge : edges) {
-            SymbolicLocation target = new SimpleLocation(edge.getTarget());
-            Move move = new Move(symLocation, target, Collections.singletonList(edge));
+            Location target = Location.createSimple(edge.getTarget());
+            Move move = new Move(location, target, Collections.singletonList(edge));
             moves.add(move);
         }
 
@@ -347,7 +347,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         while (!waiting.isEmpty()) {
             State currState = new State(waiting.pop());
             passed.add(new State(currState));
-            metLocations.add(((SimpleLocation) currState.getLocation()).getActualLocation());
+            metLocations.add(currState.getLocation());
             for (Channel action : actions){
                 List<Transition> tempTrans = getNextTransitions(currState, action);
                 for (Transition t: tempTrans)

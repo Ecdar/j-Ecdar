@@ -80,7 +80,7 @@ public class Composition extends AggregatedTransitionSystem {
     }
 
     @Override
-    protected List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
+    protected List<Move> computeResultMoves(List<Location> locations, Channel channel) {
         if (locations.size() != getRootSystems().size()) {
             throw new IllegalArgumentException("There must be exactly the same amount of locations as systems");
         }
@@ -93,7 +93,7 @@ public class Composition extends AggregatedTransitionSystem {
              *   the one of the composition meaning that the i'th
              *   location is also for the i'th system. */
             TransitionSystem system = getRootSystems().get(i);
-            SymbolicLocation location = locations.get(i);
+            Location location = locations.get(i);
 
             /* By iterating through all systems and then getting the next moves
              *   for each system we get a set of all next moves for all systems. */

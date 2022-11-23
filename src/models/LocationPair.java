@@ -3,9 +3,9 @@ package models;
 import java.util.Objects;
 
 public class LocationPair {
-    public SymbolicLocation leftLocation, rightLocation;
+    public Location leftLocation, rightLocation;
 
-    public LocationPair(SymbolicLocation leftLocation, SymbolicLocation rightLocation) {
+    public LocationPair(Location leftLocation, Location rightLocation) {
         this.leftLocation = leftLocation;
         this.rightLocation = rightLocation;
     }

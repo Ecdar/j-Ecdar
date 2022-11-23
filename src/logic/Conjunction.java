@@ -39,7 +39,7 @@ public class Conjunction extends AggregatedTransitionSystem {
     }
 
     @Override
-    protected List<Move> computeResultMoves(List<SymbolicLocation> locations, Channel channel) {
+    protected List<Move> computeResultMoves(List<Location> locations, Channel channel) {
         if (locations.size() != getRootSystems().size()) {
             throw new IllegalArgumentException("There must be exactly the same amount of locations as systems");
         }
@@ -52,7 +52,7 @@ public class Conjunction extends AggregatedTransitionSystem {
              *   the one of the composition meaning that the i'th
              *   location is also for the i'th system. */
             TransitionSystem system = getRootSystems().get(i);
-            SymbolicLocation location = locations.get(i);
+            Location location = locations.get(i);
 
             List<Move> moves = system.getNextMoves(location, channel);
 

@@ -33,12 +33,12 @@ public class JSONParserTest {
                 "Components/Imp.json"};
         machines = JSONParser.parse(base, components, false);
 
-        Location l0 = new Location("L0", new TrueGuard(), true, false, false, false);
-        Location l1 = new Location("L1", new TrueGuard(), false, false, false, false);
-        Location l2 = new Location("L2", new TrueGuard(), true, false, false, false);
-        Location l3 = new Location("L3", new TrueGuard(), true, false, false, false);
-        Location l5 = new Location("L5", new TrueGuard(), true, false, false, false);
-        Location u0 = new Location("U0", new TrueGuard(), false, false, true, false);
+        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l2 = Location.create("L2", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l3 = Location.create("L3", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l5 = Location.create("L5", new TrueGuard(), true, false, false, false, 0, 0);
+        Location u0 = Location.create("U0", new TrueGuard(), false, false, true, false, 0, 0);
 
         Channel button1 = new Channel("button1");
         Channel button2 = new Channel("button2");
@@ -94,13 +94,13 @@ public class JSONParserTest {
 
         ClockUpdate u1 = new ClockUpdate(x, 0);
 
-        Location l12 = new Location("L12", new TrueGuard(), true, false, false, false);
-        Location l13 = new Location("L13", new TrueGuard(), false, false, false, false);
-        Location l14 = new Location("L14", new TrueGuard(), false, false, false, false);
-        Location l15 = new Location("L15", inv_l15, false, false, false, false);
-        Location l16 = new Location("L16", new TrueGuard(), false, false, false, false);
-        Location l17 = new Location("L17", new TrueGuard(), false, false, false, false);
-        Location l18 = new Location("L18", new TrueGuard(), false, false, false, false);
+        Location l12 = Location.create("L12", new TrueGuard(), true, false, false, false, 0, 0);
+        Location l13 = Location.create("L13", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l14 = Location.create("L14", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l15 = Location.create("L15", inv_l15, false, false, false, false, 0, 0);
+        Location l16 = Location.create("L16", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l17 = Location.create("L17", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l18 = Location.create("L18", new TrueGuard(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
         Channel i2 = new Channel("i2");

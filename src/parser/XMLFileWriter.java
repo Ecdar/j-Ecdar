@@ -140,7 +140,7 @@ public class XMLFileWriter {
 
             Element invarLabel = new Element("label");
             invarLabel.setAttribute("kind", "invariant");
-            String guardString = l.getInvariant().toString();
+            String guardString = l.getInvariantGuard().toString();
 /*            int j=0;
             for (List<Guard> list: l.getInvariant()) {
                 int i = 0;
