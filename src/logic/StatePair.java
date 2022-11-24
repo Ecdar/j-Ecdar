@@ -35,13 +35,13 @@ public class StatePair {
 
     public String prettyPrint() {
         return "(" + left.getLocation() + ", " +
-                right.getLocation() + ") [" +
-                left.getInvariant().prettyPrint() + "]";
+                right.getLocation() + ") [ " +
+                left.getInvariant().getGuard().prettyPrint() + " ]";
     }
 
     @Override
     public String toString() {
         //return "L=" + left + ", R=" + right;
-        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getInvariant() + " " + right.getInvariant();
+        return "L=(" + left.getLocation() + ", " + right.getLocation() + ")  CDDs=" + left.getInvariant().getGuard();
     }
 }

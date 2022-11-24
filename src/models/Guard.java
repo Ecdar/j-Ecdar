@@ -16,4 +16,8 @@ public abstract class Guard {
 
     @Override
     public abstract int hashCode();
+
+    public String prettyPrint() {
+        return toString();
+    }
 }

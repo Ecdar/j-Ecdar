@@ -118,4 +118,18 @@ public class AndGuard extends Guard {
     public int hashCode() {
         return Objects.hash(guards);
     }
+
+    @Override
+    public String prettyPrint() {
+        return guards.stream()
+                .limit(guards.size()-1)
+                .map(g -> {
+                    if (g instanceof OrGuard || g instanceof AndGuard)
+                        return "(" + g.prettyPrint() + ") && ";
+                    else
+                        return g.prettyPrint() + " && ";
+                })
+                .collect(Collectors.joining())
+                + guards.get(guards.size()-1).prettyPrint();
+    }
 }
