@@ -9,7 +9,7 @@ public class ClockUpdate extends Update {
 
     public ClockUpdate(Clock clock, int value) {
         if (clock == null) {
-            throw new IllegalArgumentException("The clock used in a clock update cannot be null");
+            throw new IllegalArgumentException("The clock used in a clock update cannot be null.");
         }
 
         this.clock = clock;
@@ -18,19 +18,19 @@ public class ClockUpdate extends Update {
 
     public ClockUpdate(ClockUpdate copy, List<Clock> newClocks, List<Clock> oldClocks) {
         if (copy == null) {
-            throw new IllegalArgumentException("The instance to copy cannot be null");
+            throw new IllegalArgumentException("The instance to copy cannot be null.");
         }
 
         if (newClocks == null) {
-            throw new IllegalArgumentException("The new clocks for the clock update cannot be null");
+            throw new IllegalArgumentException("The new clocks for the clock update cannot be null.");
         }
 
         if (oldClocks == null) {
-            throw new IllegalArgumentException("The old clocks for the clock update cannot be null");
+            throw new IllegalArgumentException("The old clocks for the clock update cannot be null.");
         }
 
         if (newClocks.size() != oldClocks.size()) {
-            throw new IllegalArgumentException("The size of the list with new clocks must be the same as the ones with the old clocks");
+            throw new IllegalArgumentException("The size of the list with new clocks must be the same as the ones with the old clocks.");
         }
 
         this.clock = newClocks.get(oldClocks.indexOf(copy.clock));
