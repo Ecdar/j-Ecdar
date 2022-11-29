@@ -69,10 +69,11 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
                         .filter(current -> Objects.equals(current.getOwnerName(), newItem.getOwnerName()))
                         .collect(Collectors.toList());
 
+                if (sameOwner.size() == 1) {
+                    sameOwner.get(0).setUniqueName(1);
+                }
+
                 if (!sameOwner.isEmpty()) {
-                    for (int i = 0; i < sameOwner.size(); i++) {
-                        sameOwner.get(i).setUniqueName(i + 1);
-                    }
                     newItem.setUniqueName(sameOwner.size() + 1);
                 } else {
                     for (T current : sameOriginalName) {
@@ -81,12 +82,13 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
                     newItem.setUniqueName();
                 }
             }
-        }
 
-        // If the unique name is not present in the set of items then add it
-        Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
-        if (existing.isEmpty()) {
             items.add(newItem);
+        } else {
+            Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
+            if (existing.isEmpty()) {
+                items.add(newItem);
+            }
         }
     }
 
