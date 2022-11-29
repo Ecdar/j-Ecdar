@@ -6,16 +6,17 @@ import EcdarProtoBuf.QueryProtos;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
+import logic.Refinement;
+import logic.SimpleTransitionSystem;
 import models.Automaton;
 import org.json.simple.parser.ParseException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import parser.JSONParser;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class EcdarServiceTest {
@@ -102,9 +103,14 @@ public class EcdarServiceTest {
         QueryProtos.QueryResponse queryResponse = blockingStub.sendQuery(query);
         shutdown();
 
-        Automaton expected = JSONParser.parseJsonString(jsonTest1, false);
+        Automaton expected = JSONParser.parseJsonString(jsonTest1, true);
         Automaton actual = JSONParser.parseJsonString(queryResponse.getComponent().getComponent().getJson(), false);
-        assertEquals(expected, actual);
+
+        Refinement right = new Refinement(new SimpleTransitionSystem(expected), new SimpleTransitionSystem(actual));
+        Refinement left = new Refinement(new SimpleTransitionSystem(actual), new SimpleTransitionSystem(expected));
+
+        assertTrue(right.check());
+        assertTrue(left.check());
     }
 
 

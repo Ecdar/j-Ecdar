@@ -240,30 +240,42 @@ public class Automaton {
     public void makeInputEnabled() {
         boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
-        for (Location loc : getLocations()) {
-            CDD sourceInvariantCDD = loc.getInvariantCdd();
-            // loop through all inputs
-            for (Channel input : getInputAct()) {
+        for (Location location : getLocations()) {
+            CDD invariant = location.getInvariantCdd();
 
-                // build CDD of zones from edges
-                List<Edge> inputEdges = getEdgesFromLocationAndSignal(loc, input);
-                CDD resCDD;
-                CDD cddOfAllEdgesWithCurrentInput = CDD.cddFalse();
-                if (!inputEdges.isEmpty()) {
-                    for (Edge edge : inputEdges) {
-                        CDD target = edge.getTarget().getInvariantCdd();
-                        CDD preGuard1 = target.transitionBack(edge);
-                        cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.disjunction(preGuard1);
+            for (Channel input : getInputAct()) {
+                // The part which is already handled by existing edges.
+                CDD enabledPart = CDD.cddFalse();
+                // The part which requires an edge to be input enabled.
+                CDD disabledPart = invariant;
+
+                // Calculate the enabled CDD.
+                List<Edge> edges = getEdgesFromLocationAndSignal(location, input);
+                if (!edges.isEmpty()) {
+                    for (Edge edge : edges) {
+                        CDD targetInvariant = edge.getTarget().getInvariantCdd();
+                        CDD preGuard = targetInvariant.transitionBack(edge);
+                        enabledPart = enabledPart.disjunction(preGuard);
                     }
-                    cddOfAllEdgesWithCurrentInput = cddOfAllEdgesWithCurrentInput.removeNegative().reduce();
-                    // subtract the federation of zones from the original fed
-                    resCDD = sourceInvariantCDD.minus(cddOfAllEdgesWithCurrentInput);
-                } else {
-                    resCDD = sourceInvariantCDD;
+
+                    if (enabledPart.isTerminal()) {
+                        continue;
+                    }
                 }
 
-                if (resCDD.isNotFalse()) {
-                    Edge newEdge = new Edge(loc, loc, input, true, resCDD.getGuard(getClocks()), new ArrayList<>());
+                // If the enabled part is true then the disabled part will be false
+                if (enabledPart.isTrue()) {
+                    continue;
+                }
+
+                // If there is any solution to the enabled CDD then subtract it from the invariant.
+                if (enabledPart.isNotFalse()) {
+                    disabledPart = disabledPart.minus(enabledPart);
+                }
+
+                // If there is any solution to the disabled CDD then create an edge.
+                if (disabledPart.isNotFalse()) {
+                    Edge newEdge = new Edge(location, location, input, true, disabledPart.getGuard(), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
             }
