@@ -7,8 +7,7 @@ import java.util.Objects;
 public class Clock extends UniquelyNamed {
     /**
      * If {@code true} then this clock is used in the scope of multiple {@link TransitionSystem} or {@link Automaton}.
-     * As an example, quotients creates a new "quo_new" clock unless one already exists.
-     * Instead of creating a new and different clock the same clock is reused.
+     * As an example, the quotient creates or reuses the new "quo_new" clock that is shared across the {@link TransitionSystem TransitionSystems}.
      */
     private final boolean isGlobal;
 
