@@ -57,7 +57,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
             // Unique name naming rules:
             //   Same owner and different name: keep it as is.
             //   Different owner and name: keep it as is.
-            //   Different or the same owner but the same original name: add owner to name "owner.n.name" where n is a counter value.
+            //   Different or the same owner and the same original name: add owner to name "owner.n.name" where n is a counter value.
             // Motivation: Machine <= Machine || Machine. Here the owner is Machine but their clocks are different.
             List<T> similarOriginalName = items.stream()
                     .filter(current -> Objects.equals(current.getOriginalName(), newItem.getOriginalName()))
