@@ -28,7 +28,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     /**
      * Constructs a container with an initial set of items.
      *
-     * @param items the initial set of items.
+     * @param items The initial set of items.
      */
     public UniqueNamedContainer(List<T> items) {
         this.items = items;
@@ -48,7 +48,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
      *   There is another item with the same owner and the same original name.
      *   There is another item with a different owner and the same original name.
      *
-     * @param item item to be added to the end of this container.
+     * @param item Item to be added to the end of this container.
      */
     public void add(T item) {
         T newItem = (T) item.getCopy();
@@ -112,7 +112,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     }
 
     /**
-     * @return the internal list representation of this container.
+     * @return The internal list representation of this container.
      */
     public List<T> getItems() {
         return items;
