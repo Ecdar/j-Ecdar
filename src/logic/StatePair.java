@@ -45,14 +45,14 @@ public class StatePair {
      * </p>
      * <p>
      *     Since <code>left.getInvariant()</code> is equal to <code>right.getInvariant()</code>,
-     *     we only need to print the guard of one them.
+     *     only one is printed.
      * </p>
      * @return String
      */
     public String prettyPrint() {
-        return "(" + left.getLocation() + ", " +
-                right.getLocation() + ") [ " +
-                left.getInvariant().getGuard() + " ]";
+        return String.format("(%s %s) [ %s ]",
+                left.getLocation(), right.getLocation(),
+                left.getInvariant().getGuard().prettyPrint());
     }
 
     @Override
