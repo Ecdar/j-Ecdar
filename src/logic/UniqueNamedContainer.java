@@ -85,21 +85,21 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
 
             items.add(newItem);
         } else {
-            Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
-            if (existing.isEmpty()) {
+            // If the unique name of the global item is not present in the set of items then add it.
+            Optional<T> existing = findFirstWithUniqueName(newItem.getUniqueName());
+            if (!existing.isPresent()) {
                 items.add(newItem);
             }
         }
     }
 
-
     /**
      * Finds the first item in this container with the specified unique name.
      *
      * @param uniqueName The unique name to look for.
-     * @return An optional item which is empty if an item with the unique name could not be found.
+     * @return An optional item which is present if an item with the unique name is found.
      */
-    private Optional<T> findFirstByUniqueName(String uniqueName) {
+    private Optional<T> findFirstWithUniqueName(String uniqueName) {
         return items.stream().filter(item -> Objects.equals(item.getUniqueName(), uniqueName)).findFirst();
     }
 
@@ -109,7 +109,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
      * @param originalName The original name to look for.
      * @return An optional item which is empty if an item with the original name could not be found.
      */
-    public Optional<T> findAnyWithOriginalName(String originalName) {
+    public Optional<T> findFirstWithOriginalName(String originalName) {
         return items.stream().filter(item -> Objects.equals(item.getOriginalName(), originalName)).findFirst();
     }
 
@@ -122,7 +122,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
 
     /**
      * Appends all the elements in the specified iterable to the end of this container,
-     *   in the order that they are returned by the specified collection's iterator.
+     * in the order that they are returned by the supplied collection's iterator.
      *
      * @param items The iterable with items which should be added to this container.
      */

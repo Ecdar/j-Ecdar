@@ -1,5 +1,7 @@
 package logic;
 
+import log.Log;
+import log.Urgency;
 import models.*;
 import org.junit.Test;
 
@@ -67,24 +69,20 @@ public class QuotientTest {
         Channel b = new Channel("a");
 
         Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
-        List<Location> t_locations = new ArrayList<>();
-        t_locations.add(t_initial_location);
 
         Edge t_initial_location_looping_edge = new Edge(t_initial_location, t_initial_location, a, true, new TrueGuard(), new ArrayList<>());
         List<Edge> t_edges = new ArrayList<>();
         t_edges.add(t_initial_location_looping_edge);
 
-        Automaton t = new Automaton("t", t_locations, t_edges, new ArrayList<>(), new ArrayList<>(), false);
+        Automaton t = new Automaton("t", t_initial_location, t_edges);
 
         Location s_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
-        List<Location> s_locations = new ArrayList<>();
-        s_locations.add(s_initial_location);
 
         Edge s_initial_location_looping_edge = new Edge(s_initial_location, s_initial_location, b, true, new TrueGuard(), new ArrayList<>());
         List<Edge> s_edges = new ArrayList<>();
         s_edges.add(s_initial_location_looping_edge);
 
-        Automaton s = new Automaton("s", s_locations, s_edges, new ArrayList<>(), new ArrayList<>(), false);
+        Automaton s = new Automaton("s", s_initial_location, s_edges);
 
         // Act
         Quotient quotient = new Quotient(t, s);
@@ -96,7 +94,7 @@ public class QuotientTest {
     }
 
     @Test
-    public void quotientShouldHaveCorrectOutputs() {
+    public void quotientShouldHaveCorrectChannels() {
         // Arrange
         Channel a = new Channel("a");
         Channel b = new Channel("b");
@@ -116,7 +114,7 @@ public class QuotientTest {
         t_edges.add(t_edge_out_b);
         t_edges.add(t_edge_in_d);
 
-        Automaton t = new Automaton("t", t_locations, t_edges, new ArrayList<>(), new ArrayList<>(), false);
+        Automaton t = new Automaton("t", t_locations, t_edges);
 
         Location s_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
         List<Location> s_locations = new ArrayList<>();
@@ -132,7 +130,7 @@ public class QuotientTest {
         s_edges.add(s_edge_in_d);
         s_edges.add(s_edge_in_e);
 
-        Automaton s = new Automaton("s", s_locations, s_edges, new ArrayList<>(), new ArrayList<>(), false);
+        Automaton s = new Automaton("s", s_locations, s_edges);
 
         // Act
         Quotient quotient = new Quotient(t, s);
@@ -145,6 +143,15 @@ public class QuotientTest {
         assertTrue(quotient.getOutputs().contains(a));
         assertTrue(quotient.getOutputs().contains(e));
         assertEquals(quotient.getOutputs().size(), 2);
+
+        // Act_i = Act_i^T ∪ Act_o^S ∪ i_new
+        // Act_i = {d}     ∪ {b, c}  ∪ i_new
+        // Act_i = {d, b, c, i_new}
+        assertTrue(quotient.getInputs().contains(d));
+        assertTrue(quotient.getInputs().contains(b));
+        assertTrue(quotient.getInputs().contains(c));
+        assertTrue(quotient.getInputs().stream().anyMatch(channel -> Objects.equals(channel.getName(), "i_new")));
+        assertEquals(quotient.getInputs().size(), 4);
     }
 
     @Test
