@@ -59,23 +59,23 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
             //   Different owner and name: keep it as is.
             //   Different or the same owner and the same original name: add owner to name "owner.n.name" where n is a counter value.
             // Motivation: Machine <= Machine || Machine. Here the owner is Machine but their clocks are different.
-            List<T> similarOriginalName = items.stream()
+            List<T> sameOriginalName = items.stream()
                     .filter(current -> Objects.equals(current.getOriginalName(), newItem.getOriginalName()))
                     .collect(Collectors.toList());
 
-            if (similarOriginalName.size() != 0) {
+            if (sameOriginalName.size() != 0) {
 
-                List<T> similarOwner = similarOriginalName.stream()
+                List<T> sameOwner = sameOriginalName.stream()
                         .filter(current -> Objects.equals(current.getOwnerName(), newItem.getOwnerName()))
                         .collect(Collectors.toList());
 
-                if (similarOwner.size() > 0) {
-                    for (int i = 0; i < similarOwner.size(); i++) {
-                        similarOwner.get(i).setUniqueName(i + 1);
+                if (sameOwner.size() > 0) {
+                    for (int i = 0; i < sameOwner.size(); i++) {
+                        sameOwner.get(i).setUniqueName(i + 1);
                     }
-                    newItem.setUniqueName(similarOwner.size() + 1);
+                    newItem.setUniqueName(sameOwner.size() + 1);
                 } else {
-                    for (T current : similarOriginalName) {
+                    for (T current : sameOriginalName) {
                         current.setUniqueName();
                     }
                     newItem.setUniqueName();
