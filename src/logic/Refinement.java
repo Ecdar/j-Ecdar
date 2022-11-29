@@ -180,6 +180,7 @@ public class Refinement {
 
             // assert(passedContainsStatePair(curr));
             Log.debug("Picked state pair " + pair.prettyPrint());
+            System.out.println(pair.prettyPrint());
             // check that for every delay in TS 1 there is a corresponding delay in TS
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {
