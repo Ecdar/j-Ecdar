@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Clock extends UniquelyNamed {
     /**
-     * If true then this clock is used in the scope of multiple {@link TransitionSystem} or {@link Automaton}.
+     * If {@code true} then this clock is used in the scope of multiple {@link TransitionSystem} or {@link Automaton}.
      * As an example, quotients creates a new "quo_new" clock unless one already exists.
      * Instead of creating a new and different clock the same clock is reused.
      */
@@ -17,7 +17,7 @@ public class Clock extends UniquelyNamed {
      *
      * @param name The original name and initial unique name of the clock.
      * @param ownerName The owner of the clock. E.g. the name of the {@link Automaton}.
-     * @param isGlobal if the true the clock will be used across all {@link Automaton Automata}.
+     * @param isGlobal If {@code true} the clock can be used across all {@link Automaton Automata}.
      */
     public Clock(String name, String ownerName, boolean isGlobal) {
         this.uniqueName = name;
@@ -46,12 +46,12 @@ public class Clock extends UniquelyNamed {
     }
 
     /**
-     * Returns true if this clock is meant to be used in the scope of other {@link TransitionSystem TransitionSystems} or {@link Automaton Automata}.
+     * Returns {@code true} if this clock is meant to be used in the scope of other {@link TransitionSystem TransitionSystems} or {@link Automaton Automata}.
      *
      * Additionally, if the {@link Clock} is global then global naming rules will be applied in the {@link logic.UniqueNamedContainer}.
      * As an example, this is used for the "quo_new", because the generated clock is global amongst all quotients.
      *
-     * @return true if it can be used in the scope of other {@link TransitionSystem} or {@link Automaton}.
+     * @return {@code true} if it can be used in the scope of other {@link TransitionSystem} or {@link Automaton}.
      */
     @Override
     public boolean isGlobal() {
