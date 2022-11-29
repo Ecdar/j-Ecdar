@@ -7,14 +7,18 @@ import java.util.Objects;
 public class Clock extends UniquelyNamed {
     /**
      * If true then this clock is used in the scope of multiple {@link TransitionSystem} or {@link Automaton}.
-     * As an example, quotients adds a new "quo_new" clock unless there already is one created
-     * in one of its operands. Instead of creating a new and different clock the same clock is reused.
-     * This is used to tell the {@link logic.UniqueNamedContainer} that this clock is a singleton.
-     * Where in that context a singleton is an instance of a {@link UniquelyNamed} instance which should
-     * only be present once (Identified by its unique name).
+     * As an example, quotients creates a new "quo_new" clock unless one already exists.
+     * Instead of creating a new and different clock the same clock is reused.
      */
     private final boolean isGlobal;
 
+    /**
+     * Constructs a new clock.
+     *
+     * @param name The original name and initial unique name of the clock.
+     * @param ownerName The owner of the clock. E.g. the name of the {@link Automaton}.
+     * @param isGlobal if the true the clock will be used across all {@link Automaton Automata}.
+     */
     public Clock(String name, String ownerName, boolean isGlobal) {
         this.uniqueName = name;
         this.originalName = name;
@@ -22,33 +26,35 @@ public class Clock extends UniquelyNamed {
         this.isGlobal = isGlobal;
     }
 
+    /**
+     * Constructs a local clock.
+     *
+     * @param name The original name and initial unique name of the clock.
+     * @param ownerName The owner of the clock. E.g. the name of the {@link Automaton}.
+     */
     public Clock(String name, String ownerName) {
         this(name, ownerName, false);
     }
 
+    /**
+     * Copy constructor for a clock.
+     *
+     * @param copy The clock instance to copy.
+     */
     public Clock(Clock copy) {
         this(copy.getOriginalName(), copy.getOwnerName(), copy.isGlobal);
     }
 
     /**
-     * Returns true if this clock is meant to be used in the scope of other {@link TransitionSystem} or {@link Automaton}.
+     * Returns true if this clock is meant to be used in the scope of other {@link TransitionSystem TransitionSystems} or {@link Automaton Automata}.
+     *
+     * Additionally, if the {@link Clock} is global then global naming rules will be applied in the {@link logic.UniqueNamedContainer}.
+     * As an example, this is used for the "quo_new", because the generated clock is global amongst all quotients.
      *
      * @return true if it can be used in the scope of other {@link TransitionSystem} or {@link Automaton}.
      */
-    public boolean isGlobal() {
-        return isGlobal;
-    }
-
-    /**
-     * Returns true if the {@link logic.UniqueNamedContainer} should apply the singleton
-     * renaming rules on the unique name of this clock. As an example, this is used for the "quo_new"
-     * where only a single instance of that clock is expected to be in {@link logic.UniqueNamedContainer}
-     * as it is reused across other {@link logic.Quotient}.
-     *
-     * @return true if the singleton renaming rules should be applied on the unique name of this clock.
-     */
     @Override
-    public boolean isSingleton() {
+    public boolean isGlobal() {
         return isGlobal;
     }
 

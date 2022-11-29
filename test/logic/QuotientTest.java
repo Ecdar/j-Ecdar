@@ -149,27 +149,33 @@ public class QuotientTest {
 
     @Test
     public void doubleQuotientShouldReuseQuotientClock() {
+        // Arrange
         Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
         Automaton automaton = new Automaton("t", t_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
         TransitionSystem transitionSystem = new SimpleTransitionSystem(automaton);
 
+        // Act
         Quotient quotient = new Quotient(new Quotient(transitionSystem, transitionSystem), new Quotient(transitionSystem, transitionSystem));
 
+        // Assert
         assertEquals(quotient.getClocks().size(), 1);
     }
 
     @Test
     public void doubleQuotientShouldReuseQuotientInputAction() {
+        // Arrange
         Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
         Automaton automaton = new Automaton("t", t_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
         TransitionSystem transitionSystem = new SimpleTransitionSystem(automaton);
 
+        // Act
         Quotient quotient = new Quotient(new Quotient(transitionSystem, transitionSystem), new Quotient(transitionSystem, transitionSystem));
 
+        // Assert
         assertEquals(quotient.getInputs().size(), 1);
     }
 }

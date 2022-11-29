@@ -4,7 +4,7 @@ public abstract class UniquelyNamed {
     protected String originalName;
     protected String uniqueName;
     protected String ownerName;
-    protected boolean isSingleton = false;
+    protected final boolean isGlobal = false;
 
     public abstract UniquelyNamed getCopy();
 
@@ -32,7 +32,7 @@ public abstract class UniquelyNamed {
         return ownerName;
     }
 
-    public boolean isSingleton() {
-        return isSingleton;
+    public boolean isGlobal() {
+        return isGlobal;
     }
 }

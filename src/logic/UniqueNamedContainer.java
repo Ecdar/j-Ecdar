@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
  * This container handles the uniquely renaming of items that aren't global.
  * The renaming is defined by the {@link UniquelyNamed} implementation, and
  * for this reason this container does not ensure that the unique names are
- * unique. This is strictly handled by the implementation of {@link UniquelyNamed}
- * which mus utilise that the passed index is unique to the item.
+ * in fact unique to the collection. This is handled by the implementation of {@link UniquelyNamed}
+ * which must utilise that the unique index provided to the renaming function.
  *
  * Global items on the other hand are never renamed and only a singe instance
- * with the same unique name can be in this container. This is used for clocks
+ * with the same unique name can be in the container. This is used for clocks
  * like the "quo_new" which are reused between quotients.
  *
  * @param <T> The type of items in this container.
@@ -53,7 +53,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     public void add(T item) {
         T newItem = (T) item.getCopy();
 
-        if (!item.isSingleton()) {
+        if (!item.isGlobal()) {
             // Unique name naming rules:
             //   Same owner and different name: Keep it as is
             //   Same owner and original name: Add owner to name "owner.n.name" where n is a counter value
