@@ -61,7 +61,7 @@ public class Quotient extends AggregatedTransitionSystem {
     @Override
     public List<Move> getNextMoves(Location location, Channel a) {
         Location univ = Location.createUniversalLocation("universal", 0, 0);
-        Location inc = Location.createInconsistentLocation("inconsistent", 0, 0);
+        Location inc = Location.createInconsistentLocation("inconsistent", 0, 0, newClock);
 
         List<Move> resultMoves = new ArrayList<>();
 
