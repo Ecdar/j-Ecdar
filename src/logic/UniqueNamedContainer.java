@@ -63,13 +63,13 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
                     .filter(current -> Objects.equals(current.getOriginalName(), newItem.getOriginalName()))
                     .collect(Collectors.toList());
 
-            if (sameOriginalName.size() != 0) {
+            if (!sameOriginalName.isEmpty()) {
 
                 List<T> sameOwner = sameOriginalName.stream()
                         .filter(current -> Objects.equals(current.getOwnerName(), newItem.getOwnerName()))
                         .collect(Collectors.toList());
 
-                if (sameOwner.size() > 0) {
+                if (!sameOwner.isEmpty()) {
                     for (int i = 0; i < sameOwner.size(); i++) {
                         sameOwner.get(i).setUniqueName(i + 1);
                     }
@@ -89,6 +89,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
             items.add(newItem);
         }
     }
+
 
     /**
      * Finds the first item in this container with the specified unique name.
