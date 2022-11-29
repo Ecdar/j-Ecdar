@@ -127,7 +127,7 @@ public final class Location {
         return create(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0);
     }
 
-    public static Location createFromState(State state, List<Clock> clocks) {
+    public static Location createFromState(State state) {
         Location location = state.getLocation();
         return location.copy();
     }

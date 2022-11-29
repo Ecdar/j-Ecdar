@@ -185,7 +185,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
                     String targetName = targetState.getLocation().getName();
                     locationMap.computeIfAbsent(
                             targetName, key -> {
-                                Location newLocation = Location.createFromState(targetState, clocks.getItems());
+                                Location newLocation = Location.createFromState(targetState);
                                 locations.add(newLocation);
                                 return newLocation;
                             }
