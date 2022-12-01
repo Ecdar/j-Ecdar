@@ -41,21 +41,21 @@ public class CDDTest {
         CDD cdd2 = CDD.createInterval(2,1,4,true,6, true);
 
         CDD cdd3 = cdd1.conjunction(cdd2);
-        Log.debug(cdd2.getGuard(clocks));
+        Log.debug(cdd2.getExpression(clocks));
 
-        Guard g1 = new ClockGuard(b,a,3,Relation.LESS_EQUAL );
-        Guard g2 = new ClockGuard(a,b,5,Relation.LESS_EQUAL );
+        Expression g1 = new ClockExpression(b,a,3,Relation.LESS_EQUAL );
+        Expression g2 = new ClockExpression(a,b,5,Relation.LESS_EQUAL );
 
-        Guard g3 = new ClockGuard(b,a,4,Relation.LESS_EQUAL );
-        Guard g4 = new ClockGuard(a,b,6,Relation.LESS_EQUAL );
+        Expression g3 = new ClockExpression(b,a,4,Relation.LESS_EQUAL );
+        Expression g4 = new ClockExpression(a,b,6,Relation.LESS_EQUAL );
 
-        List<Guard> guardList = new ArrayList<>();
-        guardList.add(g1);
-        guardList.add(g2);
-        guardList.add(g3);
-        guardList.add(g4);
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.add(g1);
+        expressionList.add(g2);
+        expressionList.add(g3);
+        expressionList.add(g4);
 
-        Log.debug(new CDD(new AndGuard(guardList)).getGuard(clocks));
+        Log.debug(new CDD(new AndExpression(expressionList)).getExpression(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         cdd1.free();
@@ -281,21 +281,21 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
 
-        Guard e2_g1 = new ClockGuard(x, null, 3,  Relation.GREATER_EQUAL);
+        Expression e2_g1 = new ClockExpression(x, null, 3,  Relation.GREATER_EQUAL);
         //Guard e2_g3 = new ClockGuard(x, null, 999,  Relation.LESS_THAN);
-        Guard e2_g2 = new ClockGuard(y, null, 5,  Relation.LESS_EQUAL);
+        Expression e2_g2 = new ClockExpression(y, null, 5,  Relation.LESS_EQUAL);
 
-        List<Guard> g1 = new ArrayList<>();
+        List<Expression> g1 = new ArrayList<>();
         //  g1.add(new AndGuard(e2_g1, e2_g3));
         g1.add(e2_g1);
         g1.add(e2_g2);
-        CDD res = new CDD(new OrGuard(g1));
+        CDD res = new CDD(new OrExpression(g1));
         //res.printDot();
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));
         exp = exp.disjunction(CDD.createInterval(2, 0, 0,true, 5,true));
-        Log.debug(exp.removeNegative().reduce().getGuard(clocks));
-        Log.debug(res.removeNegative().reduce().getGuard(clocks));
+        Log.debug(exp.removeNegative().reduce().getExpression(clocks));
+        Log.debug(res.removeNegative().reduce().getExpression(clocks));
         //exp.printDot();
         exp = exp.removeNegative().reduce();
         res = res.removeNegative().reduce();

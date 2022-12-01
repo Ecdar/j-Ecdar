@@ -16,7 +16,7 @@ clock y;</declaration>
 		<transition id="id2" controllable="false">
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="guard" x="-186" y="-161">x&lt;=3</label>
+			<label kind="expression" x="-186" y="-161">x&lt;=3</label>
 			<label kind="synchronisation" x="-161" y="-152">o0!</label>
 			<label kind="assignment" x="-161" y="-118">x=0</label>
 		</transition>

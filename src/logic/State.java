@@ -35,8 +35,8 @@ public class State {
         return location.getInvariantCdd();
     }
 
-    public Guard getInvariants(List<Clock> relevantClocks) {
-        return location.getInvariantCdd().getGuard(relevantClocks);
+    public Expression getInvariants(List<Clock> relevantClocks) {
+        return location.getInvariantCdd().getExpression(relevantClocks);
     }
 
     // TODO: I think this is finally done correctly. Check that that is true!
@@ -121,7 +121,7 @@ public class State {
         if (copy.toString().contains("30"))
         {
             Log.debug("max bounds : " + maxBounds);
-            Log.debug(copy.getGuard(relevantClocks));
+            Log.debug(copy.getExpression(relevantClocks));
             print = true;
         }
         if (copy.isBDD())

@@ -49,11 +49,11 @@ public class VariousTest {
         Zone z2 = new Zone(clocks.size()+1,true);
         z2.init();
 
-        ClockGuard g1 = new ClockGuard(y, 5,  Relation.GREATER_EQUAL);
+        ClockExpression g1 = new ClockExpression(y, 5,  Relation.GREATER_EQUAL);
         z1.buildConstraintsForGuard(g1,clocks);
 
         z1.printDbm(true,true);
-        ClockGuard g2 = new ClockGuard(y, 6,  Relation.GREATER_EQUAL);
+        ClockExpression g2 = new ClockExpression(y, 6,  Relation.GREATER_EQUAL);
         Log.debug(g2);
         z2.buildConstraintsForGuard(g2,clocks);
         z2.printDbm(true,true);
@@ -76,12 +76,12 @@ public class VariousTest {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
 
-        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
-        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
-        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+        ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
+        ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
+        ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
+        ClockExpression g4 = new ClockExpression(y, 2, Relation.GREATER_EQUAL);
 
-        List<Guard> inner = new ArrayList<>();
+        List<Expression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -93,11 +93,11 @@ public class VariousTest {
         CDD.init(100,100,100);
         CDD.addClocks(clocks);
 
-        CDD origin1 = new CDD(new AndGuard(inner));
+        CDD origin1 = new CDD(new AndExpression(inner));
 
 
         origin1 = origin1.delay();
-        Guard origin1Guards = origin1.getGuard(clocks);
+        Expression origin1Guards = origin1.getExpression(clocks);
         Log.debug(origin1Guards);
         assert(true);
     }
@@ -107,11 +107,11 @@ public class VariousTest {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
 
-        ClockGuard g1 = new ClockGuard(x, 10, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
+        ClockExpression g1 = new ClockExpression(x, 10, Relation.GREATER_EQUAL);
+        ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
 
-        List<List<Guard>> guards1 = new ArrayList<>();
-        List<Guard> inner = new ArrayList<>();
+        List<List<Expression>> guards1 = new ArrayList<>();
+        List<Expression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g3);
         guards1.add(inner);
@@ -122,9 +122,9 @@ public class VariousTest {
         CDD.init(100,100,100);
         CDD.addClocks(clocks);
 
-        CDD origin1 = new CDD(new AndGuard(inner));
+        CDD origin1 = new CDD(new AndExpression(inner));
 
-        Guard origin1Guards = origin1.getGuard(clocks);
+        Expression origin1Guards = origin1.getExpression(clocks);
         Log.debug(origin1Guards);
 
 
@@ -134,7 +134,7 @@ public class VariousTest {
         list1.add(clockUpdate);
         origin1 = origin1.applyReset(list1);
 
-        Guard origin2Guards = origin1.getGuard(clocks);
+        Expression origin2Guards = origin1.getExpression(clocks);
         Log.debug(origin2Guards);
 
         assert(origin2Guards.toString().equals("(x==0 && y<=3 && y-x<=3 && x-y<=0)"));
@@ -229,7 +229,7 @@ public class VariousTest {
         clocks.add(x);clocks.add(y);
         CDD.addClocks(clocks);
         CDD test = CDD.createInterval(1,0,2,true,3,true);
-        Log.debug(test.getGuard(clocks));
+        Log.debug(test.getExpression(clocks));
         test.printDot();
         assert(true);
     }

@@ -125,16 +125,16 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
                 if (state1.getInvariant().isNotFalse() && state2.getInvariant().isNotFalse()) {
                     if(state1.getInvariant().intersects(state2.getInvariant())) {
-                        Log.debug(trans.get(i).getGuardCDD().getGuard(clocks.getItems()));
-                        Log.debug(trans.get(j).getGuardCDD().getGuard(clocks.getItems()));
+                        Log.debug(trans.get(i).getGuardCDD().getExpression(clocks.getItems()));
+                        Log.debug(trans.get(j).getGuardCDD().getExpression(clocks.getItems()));
                         Log.debug(trans.get(0).getEdges().get(0).getChannel());
                         Log.debug(trans.get(0).getEdges().get(0));
                         Log.debug(trans.get(1).getEdges().get(0));
-                        Log.debug(state1.getInvariant().getGuard(clocks.getItems()));
-                        Log.debug(state2.getInvariant().getGuard(clocks.getItems()));
+                        Log.debug(state1.getInvariant().getExpression(clocks.getItems()));
+                        Log.debug(state2.getInvariant().getExpression(clocks.getItems()));
                         trans.get(j).getGuardCDD().printDot();
-                        Log.debug(trans.get(i).getEdges().get(0).getGuardCDD().getGuard(clocks.getItems()));
-                        Log.debug(trans.get(j).getEdges().get(0).getGuardCDD().getGuard(clocks.getItems()));
+                        Log.debug(trans.get(i).getEdges().get(0).getGuardCDD().getExpression(clocks.getItems()));
+                        Log.debug(trans.get(j).getEdges().get(0).getGuardCDD().getExpression(clocks.getItems()));
                         Log.debug("they intersect??!");
                         return true;
                     }
@@ -269,7 +269,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
         for (State passedState : passed) {
-            Log.debug(" " + passedState.getLocation() + " " + passedState.getInvariant().getGuard(clocks.getItems()));
+            Log.debug(" " + passedState.getLocation() + " " + passedState.getInvariant().getExpression(clocks.getItems()));
             if (state.getLocation().equals(passedState.getLocation()) &&
                     state.getInvariant().isSubset((passedState.getInvariant()))) {
                 return true;

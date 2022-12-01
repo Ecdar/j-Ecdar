@@ -167,7 +167,7 @@ public class XMLParser {
             String locName = loc.getAttributeValue("id");
             boolean isInitial = locName.equals(initId);
             List<Element> labels = loc.getChildren("label");
-            Guard invariants = new TrueGuard();
+            Expression invariants = new TrueExpression();
             int x=0,y=0;
             boolean xyDefined = false;
 
@@ -181,9 +181,9 @@ public class XMLParser {
             for (Element label : labels) {
                 if (label.getAttributeValue("kind").equals("invariant")) {
                     if (!label.getText().isEmpty())
-                        invariants = GuardParser.parse(label.getText(), clocks, BVs);
+                        invariants = ExpressionParser.parse(label.getText(), clocks, BVs);
                     else
-                        invariants = new TrueGuard();
+                        invariants = new TrueExpression();
                 }
             }
 
@@ -238,7 +238,7 @@ public class XMLParser {
             Location target = findLocations(locations, edge.getChild("target").getAttributeValue("ref"));
 
             List<Element> labels = edge.getChildren("label");
-            Guard guards = new TrueGuard();
+            Expression guards = new TrueExpression();
             List<Update> updates = new ArrayList<>();
             Channel chan = null;
 
@@ -249,7 +249,7 @@ public class XMLParser {
                 switch (kind) {
                     case "guard":
                         if (!text.isEmpty()) {
-                            guards = GuardParser.parse(text, clocks, BVs);
+                            guards = ExpressionParser.parse(text, clocks, BVs);
                         }
                         break;
                     case "synchronisation":

@@ -3,14 +3,14 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public class ClockGuard extends Guard {
+public class ClockExpression extends Expression {
     private final Clock clock, diagonalClock;
     private final int bound;
     private final Relation relation;
 
-    public ClockGuard(Clock main, Clock secondary, int bound, Relation relation) throws IllegalArgumentException {
+    public ClockExpression(Clock main, Clock secondary, int bound, Relation relation) throws IllegalArgumentException {
         if (main == null) {
-            throw new IllegalArgumentException("The main clock of the clock guard cannot be null");
+            throw new IllegalArgumentException("The main clock of the clock expression cannot be null");
         }
         // These are the only relation types allowed
         if (relation != Relation.LESS_THAN &&
@@ -18,7 +18,7 @@ public class ClockGuard extends Guard {
             relation != Relation.EQUAL &&
             relation != Relation.GREATER_EQUAL &&
             relation != Relation.GREATER_THAN) {
-            throw new IllegalArgumentException("The relation of the clock guard is invalid");
+            throw new IllegalArgumentException("The relation of the clock expression is invalid");
         }
         this.clock = main;
         this.diagonalClock = secondary;
@@ -26,11 +26,11 @@ public class ClockGuard extends Guard {
         this.bound = bound;
     }
 
-    public ClockGuard(Clock clock_i, int bound, Relation relation) throws IllegalArgumentException {
+    public ClockExpression(Clock clock_i, int bound, Relation relation) throws IllegalArgumentException {
         this(clock_i, null, bound, relation);
     }
 
-    public ClockGuard(ClockGuard orig, List<Clock> newClocks, List<Clock> oldClocks) throws IndexOutOfBoundsException, IllegalArgumentException {
+    public ClockExpression(ClockExpression orig, List<Clock> newClocks, List<Clock> oldClocks) throws IndexOutOfBoundsException, IllegalArgumentException {
         this(newClocks.get(oldClocks.indexOf(orig.clock)), orig.diagonalClock == null ? null : newClocks.get(oldClocks.indexOf(orig.diagonalClock)), orig.getBound(), orig.getRelation());
     }
 
@@ -60,7 +60,7 @@ public class ClockGuard extends Guard {
                 return 0;
             }
         }
-        throw new IllegalStateException("The relation of the clock guard is invalid");
+        throw new IllegalStateException("The relation of the clock expression is invalid");
     }
 
     public int getUpperBound() throws IllegalStateException {
@@ -75,10 +75,10 @@ public class ClockGuard extends Guard {
                 return Integer.MAX_VALUE;
             }
         }
-        throw new IllegalStateException("The relation of the clock guard is invalid");
+        throw new IllegalStateException("The relation of the clock expression is invalid");
     }
 
-    // Returns a bound of a guard in the automaton
+    // Returns a bound of an expression in the automaton
     public int getBound() {
         return bound;
     }
@@ -100,8 +100,8 @@ public class ClockGuard extends Guard {
     }
 
     @Override
-    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
-        return new ClockGuard(this, newClocks, oldClocks);
+    Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new ClockExpression(this, newClocks, oldClocks);
     }
 
     @Override
@@ -109,11 +109,11 @@ public class ClockGuard extends Guard {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof ClockGuard)) {
+        if (!(obj instanceof ClockExpression)) {
             return false;
         }
 
-        ClockGuard other = (ClockGuard) obj;
+        ClockExpression other = (ClockExpression) obj;
 
         if (bound != other.bound ||
             relation != other.relation ||

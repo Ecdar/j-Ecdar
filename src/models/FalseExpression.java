@@ -3,7 +3,7 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public class TrueGuard extends Guard{
+public class FalseExpression extends Expression {
 
     @Override
     int getMaxConstant(Clock clock) {
@@ -11,22 +11,22 @@ public class TrueGuard extends Guard{
     }
 
     @Override
-    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
-        return new TrueGuard();
+    Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new FalseExpression();
     }
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof TrueGuard;
+        return o instanceof FalseExpression;
     }
 
     @Override
     public String toString() {
-        return "true";
+        return "false";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(true);
+        return Objects.hash(false);
     }
 }

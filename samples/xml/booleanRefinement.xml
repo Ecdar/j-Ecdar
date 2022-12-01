@@ -42,13 +42,13 @@ bool a=false;</declaration>
 		<transition id="id7" controllable="false">
 			<source ref="id5"/>
 			<target ref="id6"/>
-			<label kind="guard" x="-119" y="-136">a==true</label>
+			<label kind="expression" x="-119" y="-136">a==true</label>
 			<label kind="synchronisation" x="-119" y="-119">o1!</label>
 		</transition>
 		<transition id="id8" controllable="false">
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="guard" x="-229" y="-212">a==false</label>
+			<label kind="expression" x="-229" y="-212">a==false</label>
 			<label kind="synchronisation" x="-229" y="-229">o!</label>
 			<label kind="assignment" x="-229" y="-195">a=true, x=0</label>
 			<nail x="-229" y="-170"/>
@@ -70,7 +70,7 @@ bool a=false;</declaration>
 		<transition id="id12">
 			<source ref="id10"/>
 			<target ref="id10"/>
-			<label kind="guard" x="-110" y="-153">a==false</label>
+			<label kind="expression" x="-110" y="-153">a==false</label>
 			<label kind="synchronisation" x="-110" y="-136">i?</label>
 			<label kind="assignment" x="-110" y="-119">a=true</label>
 			<nail x="-119" y="-161"/>
@@ -79,7 +79,7 @@ bool a=false;</declaration>
 		<transition id="id13" controllable="false">
 			<source ref="id10"/>
 			<target ref="id11"/>
-			<label kind="guard" x="-204" y="-51">a==true</label>
+			<label kind="expression" x="-204" y="-51">a==true</label>
 			<label kind="synchronisation" x="-204" y="-34">o!</label>
 		</transition>
 		<transition id="id14">
@@ -110,7 +110,7 @@ bool a = false;</declaration>
 		<transition id="id19">
 			<source ref="id15"/>
 			<target ref="id15"/>
-			<label kind="guard" x="-254" y="-238">a==true</label>
+			<label kind="expression" x="-254" y="-238">a==true</label>
 			<label kind="synchronisation" x="-254" y="-221">i?</label>
 			<nail x="-272" y="-204"/>
 			<nail x="-161" y="-204"/>
@@ -118,7 +118,7 @@ bool a = false;</declaration>
 		<transition id="id20">
 			<source ref="id17"/>
 			<target ref="id17"/>
-			<label kind="guard" x="-442" y="-238">x&gt;10</label>
+			<label kind="expression" x="-442" y="-238">x&gt;10</label>
 			<label kind="synchronisation" x="-433" y="-221">i?</label>
 			<nail x="-459" y="-187"/>
 			<nail x="-374" y="-187"/>
@@ -126,7 +126,7 @@ bool a = false;</declaration>
 		<transition id="id21">
 			<source ref="id15"/>
 			<target ref="id15"/>
-			<label kind="guard" x="-110" y="-153">a==false</label>
+			<label kind="expression" x="-110" y="-153">a==false</label>
 			<label kind="synchronisation" x="-110" y="-136">i?</label>
 			<label kind="assignment" x="-110" y="-119">a=true</label>
 			<nail x="-119" y="-161"/>
@@ -135,13 +135,13 @@ bool a = false;</declaration>
 		<transition id="id22" controllable="false">
 			<source ref="id15"/>
 			<target ref="id16"/>
-			<label kind="guard" x="-204" y="-51">a==true</label>
+			<label kind="expression" x="-204" y="-51">a==true</label>
 			<label kind="synchronisation" x="-204" y="-34">o!</label>
 		</transition>
 		<transition id="id23">
 			<source ref="id17"/>
 			<target ref="id15"/>
-			<label kind="guard" x="-398" y="-153">x&lt;=10</label>
+			<label kind="expression" x="-398" y="-153">x&lt;=10</label>
 			<label kind="synchronisation" x="-357" y="-144">i?</label>
 		</transition>
 	</template>

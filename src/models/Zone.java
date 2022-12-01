@@ -50,7 +50,7 @@ public class Zone {
         return dimension;
     }
 
-    public void buildConstraintsForGuard(ClockGuard guard, List<Clock> clocks) {
+    public void buildConstraintsForGuard(ClockExpression guard, List<Clock> clocks) {
         if (guard.isDiagonal()) {
             buildConstraintsForDiagonalConstraint(guard, clocks);
         } else {
@@ -58,7 +58,7 @@ public class Zone {
         }
     }
 
-    public void buildConstraintsForNormalGuard(ClockGuard guard, List<Clock> clocks) {
+    public void buildConstraintsForNormalGuard(ClockExpression guard, List<Clock> clocks) {
         int index = getIndexOfClock(guard.getClock(), clocks);
         Relation relation = guard.getRelation();
 
@@ -89,7 +89,7 @@ public class Zone {
         }
     }
 
-    public void buildConstraintsForDiagonalConstraint(ClockGuard guard, List<Clock> clocks)
+    public void buildConstraintsForDiagonalConstraint(ClockExpression guard, List<Clock> clocks)
             throws IllegalArgumentException {
         Relation relation = guard.getRelation();
         Clock clock_i = guard.getClock();
@@ -182,15 +182,15 @@ public class Zone {
         return clocks.contains(clock);
     }
 
-    public Guard buildGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
-        List<Guard> guards = new ArrayList<>();
-        guards.addAll(buildNormalGuardsFromZone(clocks, relevantClocks));
-        guards.addAll(buildDiagonalConstraintsFromZone(clocks, relevantClocks));
-        return new AndGuard(guards);
+    public Expression buildExpressionFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+        List<Expression> expressions = new ArrayList<>();
+        expressions.addAll(buildNormalGuardsFromZone(clocks, relevantClocks));
+        expressions.addAll(buildDiagonalConstraintsFromZone(clocks, relevantClocks));
+        return new AndExpression(expressions);
     }
 
-    public List<ClockGuard> buildNormalGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
-        List<ClockGuard> guards = new ArrayList<>();
+    public List<ClockExpression> buildNormalGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+        List<ClockExpression> guards = new ArrayList<>();
 
         for (int i = 1; i < dimension; i++) {
             Clock clock = clocks.get(i - 1);
@@ -205,7 +205,7 @@ public class Zone {
 
             if (upper == lower && !DBMLib.dbm_rawIsStrict(lower) && !DBMLib.dbm_rawIsStrict(upper)) {
                 guards.add(
-                        new ClockGuard(clock, (-1) * DBMLib.raw2bound(lower), Relation.EQUAL)
+                        new ClockExpression(clock, (-1) * DBMLib.raw2bound(lower), Relation.EQUAL)
                 );
                 continue;
             }
@@ -214,11 +214,11 @@ public class Zone {
             if (lower != 1) {
                 if (DBMLib.dbm_rawIsStrict(lower)) {
                     guards.add(
-                            new ClockGuard(clock, (-1) * DBMLib.raw2bound(lower), Relation.GREATER_THAN)
+                            new ClockExpression(clock, (-1) * DBMLib.raw2bound(lower), Relation.GREATER_THAN)
                     );
                 } else {
                     guards.add(
-                            new ClockGuard(clock, (-1) * DBMLib.raw2bound(lower), Relation.GREATER_EQUAL)
+                            new ClockExpression(clock, (-1) * DBMLib.raw2bound(lower), Relation.GREATER_EQUAL)
                     );
                 }
             }
@@ -227,11 +227,11 @@ public class Zone {
             if (upper != DBM_INF) {
                 if (DBMLib.dbm_rawIsStrict(upper)) {
                     guards.add(
-                            new ClockGuard(clock, DBMLib.raw2bound(upper), Relation.LESS_THAN)
+                            new ClockExpression(clock, DBMLib.raw2bound(upper), Relation.LESS_THAN)
                     );
                 } else {
                     guards.add(
-                            new ClockGuard(clock, DBMLib.raw2bound(upper), Relation.LESS_EQUAL)
+                            new ClockExpression(clock, DBMLib.raw2bound(upper), Relation.LESS_EQUAL)
                     );
                 }
 
@@ -241,8 +241,8 @@ public class Zone {
         return guards;
     }
 
-    public List<ClockGuard> buildDiagonalConstraintsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
-        List<ClockGuard> guards = new ArrayList<>();
+    public List<ClockExpression> buildDiagonalConstraintsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+        List<ClockExpression> guards = new ArrayList<>();
 
         for (int i = 1; i < dimension; i++) {
             for (int j = 1; j < dimension; j++) {
@@ -264,11 +264,11 @@ public class Zone {
 
                 if (DBMLib.dbm_rawIsStrict(currentValue)) {
                     guards.add(
-                            new ClockGuard(clock_j, clock_i, DBMLib.raw2bound(currentValue), Relation.LESS_THAN)
+                            new ClockExpression(clock_j, clock_i, DBMLib.raw2bound(currentValue), Relation.LESS_THAN)
                     );
                 } else {
                     guards.add(
-                            new ClockGuard(clock_j, clock_i, DBMLib.raw2bound(currentValue), Relation.LESS_EQUAL)
+                            new ClockExpression(clock_j, clock_i, DBMLib.raw2bound(currentValue), Relation.LESS_EQUAL)
                     );
                 }
 

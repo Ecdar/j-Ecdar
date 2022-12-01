@@ -182,7 +182,7 @@ public class Automaton {
     private List<Edge> getEdgesFromLocation(Location loc) {
         if (loc.isUniversal()) {
             return actions.stream()
-                    .map(action -> new Edge(loc, loc, action, inputAct.contains(action), new TrueGuard(), new ArrayList<>()))
+                    .map(action -> new Edge(loc, loc, action, inputAct.contains(action), new TrueExpression(), new ArrayList<>()))
                     .collect(Collectors.toList());
         }
         return edges.stream().filter(edge -> edge.getSource().equals(loc)).collect(Collectors.toList());
@@ -263,7 +263,7 @@ public class Automaton {
                 }
 
                 if (resCDD.isNotFalse()) {
-                    Edge newEdge = new Edge(loc, loc, input, true, resCDD.getGuard(getClocks()), new ArrayList<>());
+                    Edge newEdge = new Edge(loc, loc, input, true, resCDD.getExpression(getClocks()), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
             }
@@ -278,10 +278,10 @@ public class Automaton {
         boolean initialisedCdd = CDD.tryInit(clocks, BVs);
 
         for (Edge edge : getEdges()) {
-            CDD targetCDD = new CDD(edge.getTarget().getInvariantGuard());
+            CDD targetCDD = new CDD(edge.getTarget().getInvariant());
             CDD past = targetCDD.transitionBack(edge);
             if (!past.equiv(CDD.cddTrue()))
-                edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
+                edge.setGuard(past.conjunction(edge.getGuardCDD()).getExpression(getClocks()));
         }
 
         if (initialisedCdd) {

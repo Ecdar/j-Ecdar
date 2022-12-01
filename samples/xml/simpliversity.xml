@@ -17,7 +17,7 @@ broadcast chan coin, cof, tea, pub, grant, patent;</declaration>
 		<transition id="id2" controllable="false">
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="guard" x="-336" y="-240">x&gt;=2</label>
+			<label kind="expression" x="-336" y="-240">x&gt;=2</label>
 			<label kind="synchronisation" x="-360" y="-216">pub!</label>
 			<label kind="assignment" x="-392" y="-192">x=0</label>
 			<nail x="-384" y="-160"/>

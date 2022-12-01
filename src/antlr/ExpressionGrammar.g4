@@ -1,9 +1,9 @@
-grammar GuardGrammar;
+grammar ExpressionGrammar;
 
 import CommonLexerRules;
 
 @header {
-package GuardGrammar;
+package ExpressionGrammar;
 }
 
 options { caseInsensitive = true; }
@@ -12,9 +12,9 @@ options { caseInsensitive = true; }
  * Parser Rules
  */
 
-guards              : guard EOF ;
+constraints              : contstraint EOF ;
 
-guard               : expression
+contstraint         : expression
                     | or ';'?
                     | and
                     ;
@@ -23,7 +23,7 @@ or                  : (orExpression OR)+ orExpression;
 orExpression        : expression | and ;
 
 and                 : (expression AND)+ expression ;
-expression          : BOOLEAN | clockExpr | boolExpr | '(' guard ')';
+expression          : BOOLEAN | clockExpr | boolExpr | '(' contstraint ')';
 clockExpr           : VARIABLE ('-'VARIABLE)? OPERATOR '-'? INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 

@@ -18,7 +18,7 @@ public class DisjunctionTest {
 
     private static Automaton expected, actual;
     private static Update[] noUpdate = new Update[]{};
-    private static List<List<Guard>> noguard = new ArrayList<>();
+    private static List<List<Expression>> noguard = new ArrayList<>();
 
 
     static Automaton[] automata;
@@ -72,27 +72,27 @@ public class DisjunctionTest {
     @Test
     public void testGuardNegation() {
         Clock x = new Clock("x", "Aut");
-        Guard g1 = new ClockGuard(x, null, 4, Relation.GREATER_THAN);  //x>4
-        Guard g2 = new ClockGuard(x, null, 5, Relation.LESS_THAN); //x<5
-        Guard g3 = new ClockGuard(x, null, 7, Relation.LESS_THAN); //x<7
-        Guard g4 = new ClockGuard(x, null, 3, Relation.GREATER_THAN); //x>3
-        Guard g5 = new ClockGuard(x, null, 6, Relation.GREATER_THAN); //x>6
-        Guard g6 = new ClockGuard(x, null, 8, Relation.GREATER_THAN); //x>8
-        Guard g7 = new ClockGuard(x, null, 9, Relation.GREATER_EQUAL); //x>9
+        Expression g1 = new ClockExpression(x, null, 4, Relation.GREATER_THAN);  //x>4
+        Expression g2 = new ClockExpression(x, null, 5, Relation.LESS_THAN); //x<5
+        Expression g3 = new ClockExpression(x, null, 7, Relation.LESS_THAN); //x<7
+        Expression g4 = new ClockExpression(x, null, 3, Relation.GREATER_THAN); //x>3
+        Expression g5 = new ClockExpression(x, null, 6, Relation.GREATER_THAN); //x>6
+        Expression g6 = new ClockExpression(x, null, 8, Relation.GREATER_THAN); //x>8
+        Expression g7 = new ClockExpression(x, null, 9, Relation.GREATER_EQUAL); //x>9
 
-        List<Guard> disj1 = new ArrayList<>();
+        List<Expression> disj1 = new ArrayList<>();
         disj1.add(g1);
         disj1.add(g2);
-        Guard dis1 = new AndGuard(disj1);
-        List<Guard> disj2 = new ArrayList<>();
+        Expression dis1 = new AndExpression(disj1);
+        List<Expression> disj2 = new ArrayList<>();
         disj2.add(g3);
         disj2.add(g4);
-        Guard dis2 = new AndGuard(disj2);
-        List<Guard> disj3 = new ArrayList<>();
+        Expression dis2 = new AndExpression(disj2);
+        List<Expression> disj3 = new ArrayList<>();
         disj3.add(g5);
         disj3.add(g6);
         disj3.add(g7);
-        Guard dis3 = new AndGuard(disj3);
+        Expression dis3 = new AndExpression(disj3);
 
 
         CDD.done();
@@ -106,7 +106,7 @@ public class DisjunctionTest {
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis2));
         disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis3));
         CDD neg = disjunctedGuards.negation();
-        Guard out = neg.getGuard(clocks);
+        Expression out = neg.getExpression(clocks);
 
 
         Log.trace(out);

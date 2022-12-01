@@ -18,7 +18,7 @@ bool a=false;</declaration>
 		<transition id="id3">
 			<source ref="id1"/>
 			<target ref="id1"/>
-			<label kind="guard" x="-110" y="-153">a==false</label>
+			<label kind="expression" x="-110" y="-153">a==false</label>
 			<label kind="synchronisation" x="-110" y="-136">i?</label>
 			<label kind="assignment" x="-110" y="-119">a=true</label>
 			<nail x="-119" y="-161"/>
@@ -27,7 +27,7 @@ bool a=false;</declaration>
 		<transition id="id4" controllable="false">
 			<source ref="id1"/>
 			<target ref="id2"/>
-			<label kind="guard" x="-204" y="-51">a==true</label>
+			<label kind="expression" x="-204" y="-51">a==true</label>
 			<label kind="synchronisation" x="-204" y="-34">o!</label>
 		</transition>
 		<transition id="id5">

@@ -56,8 +56,8 @@ public class Move {
         return (guardCDD);
     }
 
-    public Guard getGuards(List<Clock> relevantClocks) {
-        return guardCDD.getGuard(relevantClocks);
+    public Expression getGuards(List<Clock> relevantClocks) {
+        return guardCDD.getExpression(relevantClocks);
     }
 
     public void setGuards(CDD guardCDD) {

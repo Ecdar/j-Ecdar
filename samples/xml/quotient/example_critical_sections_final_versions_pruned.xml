@@ -614,7 +614,7 @@ broadcast chan i[N], c[N], g[N];
 		<transition controllable="false">
 			<source ref="id9"/>
 			<target ref="id9"/>
-			<label kind="guard" x="-622" y="-2">x&lt;10</label>
+			<label kind="expression" x="-622" y="-2">x&lt;10</label>
 			<label kind="synchronisation" x="-616" y="8">i[0]!</label>
 			<nail x="-640" y="32"/>
 			<nail x="-576" y="32"/>

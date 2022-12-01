@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class DBMTest {
     private static final int DBM_INF = 2147483646;
     private static State state1, state2, state3, state4, state5;
-    private static Guard g1, g2, g3, g4, g5, g6, g7, g8;
+    private static Expression g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
     private static Clock x,y,z;
 
@@ -30,7 +30,7 @@ public class DBMTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        Location l1 = Location.create("L0", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l1 = Location.create("L0", new TrueExpression(), false, false, false, false, 0, 0);
         Location sl1 = l1.copy();
 
         x = new Clock("x", "AUT");
@@ -63,13 +63,13 @@ public class DBMTest {
 
 
         // GUARDS---------------------
-        g1 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        g2 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
-        g3 = new ClockGuard(x, 7, Relation.LESS_EQUAL);
-        g4 = new ClockGuard(x, 14, Relation.LESS_EQUAL);
+        g1 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
+        g2 = new ClockExpression(x, 1, Relation.GREATER_EQUAL);
+        g3 = new ClockExpression(x, 7, Relation.LESS_EQUAL);
+        g4 = new ClockExpression(x, 14, Relation.LESS_EQUAL);
 
-        g5 = new ClockGuard(x, 505, Relation.GREATER_EQUAL);
-        g6 = new ClockGuard(y, 8, Relation.GREATER_EQUAL);
+        g5 = new ClockExpression(x, 505, Relation.GREATER_EQUAL);
+        g6 = new ClockExpression(y, 8, Relation.GREATER_EQUAL);
         CDD.done();
     }
 
@@ -115,11 +115,11 @@ public class DBMTest {
         map.put(x,12);
         map.put(y,10);
 
-        Guard g2 = new ClockGuard(x,null, 20,Relation.LESS_EQUAL);
-        Guard g3 = new ClockGuard(y,null, 2,Relation.LESS_EQUAL);
-        Guard initialZone = new AndGuard(g2,g3);
+        Expression g2 = new ClockExpression(x,null, 20,Relation.LESS_EQUAL);
+        Expression g3 = new ClockExpression(y,null, 2,Relation.LESS_EQUAL);
+        Expression initialZone = new AndExpression(g2,g3);
 
-        Location l1 = Location.create("L1",new TrueGuard(),true,false,false,false, 0, 0);
+        Location l1 = Location.create("L1",new TrueExpression(),true,false,false,false, 0, 0);
         State state1 = new State(l1.copy(), new CDD(initialZone));
         //state1.delay();
         Log.trace(state1);

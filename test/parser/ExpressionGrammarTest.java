@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class GuardGrammarTest {
+public class ExpressionGrammarTest {
 
     private List<Token> getTokensFromText(String txt){
         CharStream charStream = CharStreams.fromString(txt);

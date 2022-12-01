@@ -276,7 +276,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id53" controllable="false">
 			<source ref="id49"/>
 			<target ref="id48"/>
-			<label kind="guard" x="-416" y="-216">x&lt;=4</label>
+			<label kind="expression" x="-416" y="-216">x&lt;=4</label>
 			<label kind="synchronisation" x="-464" y="-272">i!</label>
 			<label kind="assignment" x="-392" y="-272">x=0</label>
 			<nail x="-456" y="-248"/>
@@ -354,7 +354,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id69" controllable="false">
 			<source ref="id67"/>
 			<target ref="id65"/>
-			<label kind="guard" x="0" y="-16">y&lt;=3</label>
+			<label kind="expression" x="0" y="-16">y&lt;=3</label>
 			<label kind="synchronisation" x="40" y="-16">go!</label>
 			<label kind="assignment" x="64" y="-16">y=0</label>
 		</transition>
@@ -746,13 +746,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id147" controllable="false">
 			<source ref="id145"/>
 			<target ref="id144"/>
-			<label kind="guard" x="-32" y="24">x&gt;=500</label>
+			<label kind="expression" x="-32" y="24">x&gt;=500</label>
 			<label kind="synchronisation" x="-56" y="24">o!</label>
 		</transition>
 		<transition id="id148" controllable="false">
 			<source ref="id146"/>
 			<target ref="id145"/>
-			<label kind="guard" x="-152" y="24">x&gt;=250</label>
+			<label kind="expression" x="-152" y="24">x&gt;=250</label>
 			<label kind="synchronisation" x="-176" y="24">o!</label>
 			<nail x="-184" y="48"/>
 		</transition>
@@ -770,13 +770,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id152" controllable="false">
 			<source ref="id150"/>
 			<target ref="id149"/>
-			<label kind="guard" x="-32" y="24">x&gt;=250</label>
+			<label kind="expression" x="-32" y="24">x&gt;=250</label>
 			<label kind="synchronisation" x="-56" y="24">o!</label>
 		</transition>
 		<transition id="id153" controllable="false">
 			<source ref="id151"/>
 			<target ref="id150"/>
-			<label kind="guard" x="-152" y="24">x&gt;=250</label>
+			<label kind="expression" x="-152" y="24">x&gt;=250</label>
 			<label kind="synchronisation" x="-176" y="24">o!</label>
 			<label kind="assignment" x="-152" y="48">x=0</label>
 			<nail x="-184" y="48"/>
@@ -795,13 +795,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id157" controllable="false">
 			<source ref="id155"/>
 			<target ref="id154"/>
-			<label kind="guard" x="-32" y="24">x&lt;=500</label>
+			<label kind="expression" x="-32" y="24">x&lt;=500</label>
 			<label kind="synchronisation" x="-56" y="24">o!</label>
 		</transition>
 		<transition id="id158" controllable="false">
 			<source ref="id156"/>
 			<target ref="id155"/>
-			<label kind="guard" x="-152" y="24">x&lt;=250</label>
+			<label kind="expression" x="-152" y="24">x&lt;=250</label>
 			<label kind="synchronisation" x="-176" y="24">o!</label>
 			<label kind="assignment" x="-160" y="48">x=0</label>
 			<nail x="-184" y="48"/>
@@ -820,13 +820,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id162" controllable="false">
 			<source ref="id160"/>
 			<target ref="id159"/>
-			<label kind="guard" x="-32" y="24">x&lt;=500</label>
+			<label kind="expression" x="-32" y="24">x&lt;=500</label>
 			<label kind="synchronisation" x="-56" y="24">o!</label>
 		</transition>
 		<transition id="id163" controllable="false">
 			<source ref="id161"/>
 			<target ref="id160"/>
-			<label kind="guard" x="-152" y="24">x&lt;=250</label>
+			<label kind="expression" x="-152" y="24">x&lt;=250</label>
 			<label kind="synchronisation" x="-176" y="24">o!</label>
 			<nail x="-184" y="48"/>
 		</transition>
@@ -851,7 +851,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id168" controllable="false">
 			<source ref="id166"/>
 			<target ref="id165"/>
-			<label kind="guard" x="-112" y="32">x&gt;=3 &amp;&amp; x&lt;=6</label>
+			<label kind="expression" x="-112" y="32">x&gt;=3 &amp;&amp; x&lt;=6</label>
 			<label kind="synchronisation" x="-72" y="0">o!</label>
 		</transition>
 	</template>
@@ -874,7 +874,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id173" controllable="false">
 			<source ref="id171"/>
 			<target ref="id170"/>
-			<label kind="guard" x="-112" y="32">x&gt;=3 &amp;&amp; x&lt;=6</label>
+			<label kind="expression" x="-112" y="32">x&gt;=3 &amp;&amp; x&lt;=6</label>
 			<label kind="synchronisation" x="-72" y="0">o!</label>
 		</transition>
 	</template>
@@ -891,13 +891,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id177" controllable="false">
 			<source ref="id175"/>
 			<target ref="id174"/>
-			<label kind="guard" x="56" y="-96">y&lt;=20</label>
+			<label kind="expression" x="56" y="-96">y&lt;=20</label>
 			<label kind="synchronisation" x="40" y="-112">o!</label>
 		</transition>
 		<transition id="id178" controllable="false">
 			<source ref="id176"/>
 			<target ref="id175"/>
-			<label kind="guard" x="-136" y="-160">x&gt;=2</label>
+			<label kind="expression" x="-136" y="-160">x&gt;=2</label>
 			<label kind="synchronisation" x="-88" y="-160">o!</label>
 		</transition>
 	</template>
@@ -914,13 +914,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id182" controllable="false">
 			<source ref="id180"/>
 			<target ref="id179"/>
-			<label kind="guard" x="56" y="-96">y&lt;=20</label>
+			<label kind="expression" x="56" y="-96">y&lt;=20</label>
 			<label kind="synchronisation" x="40" y="-112">o!</label>
 		</transition>
 		<transition id="id183" controllable="false">
 			<source ref="id181"/>
 			<target ref="id180"/>
-			<label kind="guard" x="-136" y="-160">x&gt;=2</label>
+			<label kind="expression" x="-136" y="-160">x&gt;=2</label>
 			<label kind="synchronisation" x="-88" y="-160">o!</label>
 		</transition>
 	</template>
@@ -937,13 +937,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id187" controllable="false">
 			<source ref="id185"/>
 			<target ref="id184"/>
-			<label kind="guard" x="56" y="-96">y&lt;=7</label>
+			<label kind="expression" x="56" y="-96">y&lt;=7</label>
 			<label kind="synchronisation" x="40" y="-112">o!</label>
 		</transition>
 		<transition id="id188">
 			<source ref="id186"/>
 			<target ref="id185"/>
-			<label kind="guard" x="-136" y="-160">x&lt;=4</label>
+			<label kind="expression" x="-136" y="-160">x&lt;=4</label>
 			<label kind="synchronisation" x="-88" y="-160">i?</label>
 		</transition>
 	</template>
@@ -960,13 +960,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id192" controllable="false">
 			<source ref="id190"/>
 			<target ref="id189"/>
-			<label kind="guard" x="56" y="-96">y&lt;=8</label>
+			<label kind="expression" x="56" y="-96">y&lt;=8</label>
 			<label kind="synchronisation" x="40" y="-112">o!</label>
 		</transition>
 		<transition id="id193">
 			<source ref="id191"/>
 			<target ref="id190"/>
-			<label kind="guard" x="-136" y="-160">x&lt;=3</label>
+			<label kind="expression" x="-136" y="-160">x&lt;=3</label>
 			<label kind="synchronisation" x="-88" y="-160">i?</label>
 		</transition>
 	</template>
@@ -997,7 +997,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id199" controllable="false">
 			<source ref="id195"/>
 			<target ref="id194"/>
-			<label kind="guard" x="24" y="40">y&lt;2</label>
+			<label kind="expression" x="24" y="40">y&lt;2</label>
 			<label kind="synchronisation" x="24" y="8">o!</label>
 		</transition>
 		<transition id="id200">
@@ -1024,7 +1024,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id204">
 			<source ref="id202"/>
 			<target ref="id202"/>
-			<label kind="guard" x="-168" y="-16">x&lt;2</label>
+			<label kind="expression" x="-168" y="-16">x&lt;2</label>
 			<label kind="synchronisation" x="-176" y="8">i?</label>
 			<nail x="-120" y="-16"/>
 			<nail x="-168" y="40"/>
@@ -1032,7 +1032,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id205">
 			<source ref="id202"/>
 			<target ref="id201"/>
-			<label kind="guard" x="-32" y="16">x&gt;=2</label>
+			<label kind="expression" x="-32" y="16">x&gt;=2</label>
 			<label kind="synchronisation" x="-80" y="16">i?</label>
 		</transition>
 	</template>
@@ -1049,14 +1049,14 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id209" controllable="false">
 			<source ref="id208"/>
 			<target ref="id206"/>
-			<label kind="guard" x="-104" y="72">x&gt;=300 &amp;&amp; x&lt;=500</label>
+			<label kind="expression" x="-104" y="72">x&gt;=300 &amp;&amp; x&lt;=500</label>
 			<label kind="synchronisation" x="-48" y="40">o!</label>
 			<nail x="-120" y="64"/>
 		</transition>
 		<transition id="id210" controllable="false">
 			<source ref="id208"/>
 			<target ref="id207"/>
-			<label kind="guard" x="-64" y="-64">x&lt;=250</label>
+			<label kind="expression" x="-64" y="-64">x&lt;=250</label>
 			<label kind="synchronisation" x="-48" y="-96">o!</label>
 			<nail x="-120" y="-72"/>
 		</transition>
@@ -1076,20 +1076,20 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id215" controllable="false">
 			<source ref="id214"/>
 			<target ref="id211"/>
-			<label kind="guard" x="-96" y="8">x&gt;=300 &amp;&amp; x&lt;=350</label>
+			<label kind="expression" x="-96" y="8">x&gt;=300 &amp;&amp; x&lt;=350</label>
 			<label kind="synchronisation" x="-40" y="-24">o!</label>
 		</transition>
 		<transition id="id216" controllable="false">
 			<source ref="id214"/>
 			<target ref="id212"/>
-			<label kind="guard" x="-96" y="72">x&gt;350 &amp;&amp; x&lt;=500</label>
+			<label kind="expression" x="-96" y="72">x&gt;350 &amp;&amp; x&lt;=500</label>
 			<label kind="synchronisation" x="-40" y="40">o!</label>
 			<nail x="-120" y="64"/>
 		</transition>
 		<transition id="id217" controllable="false">
 			<source ref="id214"/>
 			<target ref="id213"/>
-			<label kind="guard" x="-64" y="-64">x&lt;=250</label>
+			<label kind="expression" x="-64" y="-64">x&lt;=250</label>
 			<label kind="synchronisation" x="-40" y="-96">o!</label>
 			<nail x="-120" y="-72"/>
 		</transition>
@@ -1107,7 +1107,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id221" controllable="false">
 			<source ref="id219"/>
 			<target ref="id218"/>
-			<label kind="guard" x="-8" y="16">x&lt;5</label>
+			<label kind="expression" x="-8" y="16">x&lt;5</label>
 			<label kind="synchronisation" x="32" y="16">ro!</label>
 		</transition>
 		<transition id="id222" controllable="false">
@@ -1127,7 +1127,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id225">
 			<source ref="id224"/>
 			<target ref="id223"/>
-			<label kind="guard" x="-80" y="-40">x&gt;=5</label>
+			<label kind="expression" x="-80" y="-40">x&gt;=5</label>
 			<label kind="synchronisation" x="-72" y="-64">o?</label>
 		</transition>
 	</template>
@@ -1142,7 +1142,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id228" controllable="false">
 			<source ref="id227"/>
 			<target ref="id226"/>
-			<label kind="guard" x="-88" y="-32">x==500</label>
+			<label kind="expression" x="-88" y="-32">x==500</label>
 			<label kind="synchronisation" x="-72" y="-64">ro!</label>
 		</transition>
 	</template>
@@ -1167,13 +1167,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id234" controllable="false">
 			<source ref="id230"/>
 			<target ref="id232"/>
-			<label kind="guard" x="-128" y="-16">x&gt;400</label>
+			<label kind="expression" x="-128" y="-16">x&gt;400</label>
 			<label kind="synchronisation" x="-112" y="-40">o!</label>
 		</transition>
 		<transition id="id235" controllable="false">
 			<source ref="id232"/>
 			<target ref="id231"/>
-			<label kind="guard" x="-16" y="-8">x&lt;=402</label>
+			<label kind="expression" x="-16" y="-8">x&lt;=402</label>
 			<label kind="synchronisation" x="0" y="-40">o!</label>
 		</transition>
 	</template>
@@ -1198,13 +1198,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id241" controllable="false">
 			<source ref="id237"/>
 			<target ref="id239"/>
-			<label kind="guard" x="-128" y="-16">x&gt;3</label>
+			<label kind="expression" x="-128" y="-16">x&gt;3</label>
 			<label kind="synchronisation" x="-120" y="-40">o!</label>
 		</transition>
 		<transition id="id242" controllable="false">
 			<source ref="id239"/>
 			<target ref="id238"/>
-			<label kind="guard" x="-16" y="-8">x&lt;=5</label>
+			<label kind="expression" x="-16" y="-8">x&lt;=5</label>
 			<label kind="synchronisation" x="0" y="-40">o!</label>
 		</transition>
 	</template>
@@ -1219,7 +1219,7 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id245" controllable="false">
 			<source ref="id244"/>
 			<target ref="id243"/>
-			<label kind="guard" x="-80" y="8">x&gt;=7</label>
+			<label kind="expression" x="-80" y="8">x&gt;=7</label>
 			<label kind="synchronisation" x="-72" y="-16">o!</label>
 		</transition>
 	</template>
@@ -1236,13 +1236,13 @@ broadcast chan ri, ro, i, o, rand, n1, n2, err1, err2, go, dio,
 		<transition id="id249">
 			<source ref="id247"/>
 			<target ref="id246"/>
-			<label kind="guard" x="48" y="-8">x&lt;=6</label>
+			<label kind="expression" x="48" y="-8">x&lt;=6</label>
 			<label kind="synchronisation" x="56" y="-32">i?</label>
 		</transition>
 		<transition id="id250" controllable="false">
 			<source ref="id248"/>
 			<target ref="id247"/>
-			<label kind="guard" x="-120" y="-8">x&gt;=3</label>
+			<label kind="expression" x="-120" y="-8">x&gt;=3</label>
 			<label kind="synchronisation" x="-112" y="-32">o!</label>
 		</transition>
 	</template>
