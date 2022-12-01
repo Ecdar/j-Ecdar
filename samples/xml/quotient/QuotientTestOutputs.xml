@@ -18,7 +18,7 @@ clock x,y;</declaration>
 		<transition id="id2" controllable="false">
 			<source ref="id0"/>
 			<target ref="id0"/>
-			<label kind="expression" x="-16" y="-85">x&lt;3</label>
+			<label kind="guard" x="-16" y="-85">x&lt;3</label>
 			<label kind="synchronisation" x="-16" y="-68">o!</label>
 			<nail x="-34" y="-51"/>
 			<nail x="34" y="-51"/>
@@ -26,7 +26,7 @@ clock x,y;</declaration>
 		<transition id="id3">
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="expression" x="93" y="-68">x&gt;4</label>
+			<label kind="guard" x="93" y="-68">x&gt;4</label>
 			<label kind="synchronisation" x="93" y="-51">i?</label>
 			<nail x="127" y="17"/>
 		</transition>
@@ -41,7 +41,7 @@ clock x,y;</declaration>
 		<transition id="id5" controllable="false">
 			<source ref="id4"/>
 			<target ref="id4"/>
-			<label kind="expression" x="-109" y="-102">x&lt;3</label>
+			<label kind="guard" x="-109" y="-102">x&lt;3</label>
 			<label kind="synchronisation" x="-109" y="-85">o!</label>
 			<nail x="-127" y="-68"/>
 			<nail x="-59" y="-68"/>
@@ -59,7 +59,7 @@ clock x,y;</declaration>
 		<transition id="id8" controllable="false">
 			<source ref="id6"/>
 			<target ref="id6"/>
-			<label kind="expression" x="-93" y="-77">x&lt;3</label>
+			<label kind="guard" x="-93" y="-77">x&lt;3</label>
 			<label kind="synchronisation" x="-93" y="-60">o!</label>
 			<label kind="assignment" x="-93" y="-43">x=0</label>
 			<nail x="-119" y="-17"/>
@@ -68,7 +68,7 @@ clock x,y;</declaration>
 		<transition id="id9">
 			<source ref="id6"/>
 			<target ref="id7"/>
-			<label kind="expression" x="17" y="0">x&gt;4</label>
+			<label kind="guard" x="17" y="0">x&gt;4</label>
 			<label kind="synchronisation" x="17" y="17">i?</label>
 		</transition>
 	</template>
@@ -82,7 +82,7 @@ clock x,y;</declaration>
 		<transition id="id11" controllable="false">
 			<source ref="id10"/>
 			<target ref="id10"/>
-			<label kind="expression" x="-93" y="-77">x&lt;3</label>
+			<label kind="guard" x="-93" y="-77">x&lt;3</label>
 			<label kind="synchronisation" x="-93" y="-60">o!</label>
 			<label kind="assignment" x="-93" y="-43">x=0</label>
 			<nail x="-119" y="-17"/>
@@ -110,13 +110,13 @@ clock x,y;</declaration>
 		<transition id="id17" controllable="false">
 			<source ref="id12"/>
 			<target ref="id14"/>
-			<label kind="expression" x="0" y="-119">x&lt;3</label>
+			<label kind="guard" x="0" y="-119">x&lt;3</label>
 			<label kind="synchronisation" x="0" y="-102">o!</label>
 		</transition>
 		<transition id="id18">
 			<source ref="id12"/>
 			<target ref="id13"/>
-			<label kind="expression" x="51" y="-42">x&gt;4</label>
+			<label kind="guard" x="51" y="-42">x&gt;4</label>
 			<label kind="synchronisation" x="51" y="-25">i?</label>
 		</transition>
 	</template>
@@ -134,13 +134,13 @@ clock x,y;</declaration>
 		<transition id="id22" controllable="false">
 			<source ref="id21"/>
 			<target ref="id19"/>
-			<label kind="expression" x="-25" y="59">x&lt;3</label>
+			<label kind="guard" x="-25" y="59">x&lt;3</label>
 			<label kind="synchronisation" x="-25" y="42">o!</label>
 		</transition>
 		<transition id="id23" controllable="false">
 			<source ref="id19"/>
 			<target ref="id20"/>
-			<label kind="expression" x="110" y="-34">x&lt;3</label>
+			<label kind="guard" x="110" y="-34">x&lt;3</label>
 			<label kind="synchronisation" x="110" y="-17">o!</label>
 		</transition>
 	</template>
@@ -164,14 +164,14 @@ clock x,y;</declaration>
 		<transition id="id28" controllable="false">
 			<source ref="id26"/>
 			<target ref="id24"/>
-			<label kind="expression" x="-586" y="-306">x&lt;3</label>
+			<label kind="guard" x="-586" y="-306">x&lt;3</label>
 			<label kind="synchronisation" x="-586" y="-289">o!</label>
 			<nail x="-595" y="-280"/>
 		</transition>
 		<transition id="id29">
 			<source ref="id26"/>
 			<target ref="id25"/>
-			<label kind="expression" x="-569" y="-255">x&gt;4</label>
+			<label kind="guard" x="-569" y="-255">x&gt;4</label>
 			<label kind="synchronisation" x="-569" y="-237">i?</label>
 		</transition>
 	</template>
@@ -188,13 +188,13 @@ clock x,y;</declaration>
 		<transition id="id32" controllable="false">
 			<source ref="id30"/>
 			<target ref="id31"/>
-			<label kind="expression" x="-484" y="-255">x&lt;3</label>
+			<label kind="guard" x="-484" y="-255">x&lt;3</label>
 			<label kind="synchronisation" x="-476" y="-238">o!</label>
 		</transition>
 		<transition id="id33" controllable="false">
 			<source ref="id31"/>
 			<target ref="id30"/>
-			<label kind="expression" x="-408" y="-255">x&lt;3</label>
+			<label kind="guard" x="-408" y="-255">x&lt;3</label>
 			<label kind="synchronisation" x="-408" y="-238">o!</label>
 			<nail x="-417" y="-229"/>
 		</transition>
@@ -216,13 +216,13 @@ clock x,y;</declaration>
 		<transition id="id38" controllable="false">
 			<source ref="id34"/>
 			<target ref="id37"/>
-			<label kind="expression" x="-297" y="-76">x&lt;4</label>
+			<label kind="guard" x="-297" y="-76">x&lt;4</label>
 			<label kind="synchronisation" x="-289" y="-59">o!</label>
 		</transition>
 		<transition id="id39" controllable="false">
 			<source ref="id34"/>
 			<target ref="id35"/>
-			<label kind="expression" x="-220" y="-60">x&gt;3</label>
+			<label kind="guard" x="-220" y="-60">x&gt;3</label>
 			<label kind="synchronisation" x="-220" y="-43">o!</label>
 		</transition>
 		<transition id="id40" controllable="false">
@@ -245,13 +245,13 @@ clock x,y;</declaration>
 		<transition id="id44" controllable="false">
 			<source ref="id41"/>
 			<target ref="id42"/>
-			<label kind="expression" x="-221" y="-42">x&lt;4</label>
+			<label kind="guard" x="-221" y="-42">x&lt;4</label>
 			<label kind="synchronisation" x="-213" y="-25">o!</label>
 		</transition>
 		<transition id="id45" controllable="false">
 			<source ref="id43"/>
 			<target ref="id41"/>
-			<label kind="expression" x="-263" y="-25">x&lt;4</label>
+			<label kind="guard" x="-263" y="-25">x&lt;4</label>
 			<label kind="synchronisation" x="-255" y="-9">o!</label>
 		</transition>
 	</template>
@@ -272,13 +272,13 @@ clock x,y;</declaration>
 		<transition id="id50" controllable="false">
 			<source ref="id46"/>
 			<target ref="id47"/>
-			<label kind="expression" x="-195" y="-51">x&lt;4</label>
+			<label kind="guard" x="-195" y="-51">x&lt;4</label>
 			<label kind="synchronisation" x="-187" y="-34">o!</label>
 		</transition>
 		<transition id="id51" controllable="false">
 			<source ref="id46"/>
 			<target ref="id48"/>
-			<label kind="expression" x="-118" y="-35">x&gt;3</label>
+			<label kind="guard" x="-118" y="-35">x&gt;3</label>
 			<label kind="synchronisation" x="-118" y="-18">o!</label>
 		</transition>
 		<transition id="id52">
@@ -332,13 +332,13 @@ clock x,y;</declaration>
 		<transition id="id61" controllable="false">
 			<source ref="id54"/>
 			<target ref="id55"/>
-			<label kind="expression" x="-110" y="-59">x&lt;4</label>
+			<label kind="guard" x="-110" y="-59">x&lt;4</label>
 			<label kind="synchronisation" x="-102" y="-42">o!</label>
 		</transition>
 		<transition id="id62" controllable="false">
 			<source ref="id54"/>
 			<target ref="id56"/>
-			<label kind="expression" x="-33" y="-43">x&gt;3</label>
+			<label kind="guard" x="-33" y="-43">x&gt;3</label>
 			<label kind="synchronisation" x="-33" y="-26">o!</label>
 		</transition>
 		<transition id="id63">
@@ -372,13 +372,13 @@ clock x,y;</declaration>
 		<transition id="id69" controllable="false">
 			<source ref="id65"/>
 			<target ref="id68"/>
-			<label kind="expression" x="-297" y="-76">x&lt;4</label>
+			<label kind="guard" x="-297" y="-76">x&lt;4</label>
 			<label kind="synchronisation" x="-289" y="-59">o!</label>
 		</transition>
 		<transition id="id70" controllable="false">
 			<source ref="id65"/>
 			<target ref="id66"/>
-			<label kind="expression" x="-220" y="-60">x&gt;3</label>
+			<label kind="guard" x="-220" y="-60">x&gt;3</label>
 			<label kind="synchronisation" x="-220" y="-43">o!</label>
 		</transition>
 		<transition id="id71" controllable="false">
@@ -402,13 +402,13 @@ clock x,y;</declaration>
 		<transition id="id75" controllable="false">
 			<source ref="id72"/>
 			<target ref="id73"/>
-			<label kind="expression" x="-221" y="-42">x&lt;4</label>
+			<label kind="guard" x="-221" y="-42">x&lt;4</label>
 			<label kind="synchronisation" x="-213" y="-25">o!</label>
 		</transition>
 		<transition id="id76" controllable="false">
 			<source ref="id74"/>
 			<target ref="id72"/>
-			<label kind="expression" x="-263" y="-25">x&lt;4</label>
+			<label kind="guard" x="-263" y="-25">x&lt;4</label>
 			<label kind="synchronisation" x="-255" y="-9">o!</label>
 		</transition>
 	</template>

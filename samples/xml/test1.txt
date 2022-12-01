@@ -18,28 +18,28 @@
       <source ref="L0L5L7" />
       <target ref="L0L5L6" />
       <label kind="synchronisation">pub!</label>
-      <label kind="expression">x&gt;=4</label>
+      <label kind="guard">x&gt;=4</label>
       <label kind="assignment">x = 0</label>
     </transition>
 	<transition controllable="false">
       <source ref="L0L5L7" />
       <target ref="L0L5L7" />
       <label kind="synchronisation">tea!</label>
-      <label kind="expression">y&gt;=2 &amp;&amp; x&lt;=8 &amp;&amp; x-z&lt;=8 &amp;&amp; x-y&lt;=6</label>
+      <label kind="guard">y&gt;=2 &amp;&amp; x&lt;=8 &amp;&amp; x-z&lt;=8 &amp;&amp; x-y&lt;=6</label>
       <label kind="assignment" />
     </transition>
 	    <transition>
       <source ref="L0L5L7" />
       <target ref="L1L5L7" />
       <label kind="synchronisation">grant?</label>
-      <label kind="expression" />
+      <label kind="guard" />
       <label kind="assignment">z = 0</label>
     </transition>
 	    <transition controllable="false">
       <source ref="L0L5L6" />
       <target ref="L0L5L7" />
       <label kind="synchronisation">tea!</label>
-      <label kind="expression">y&gt;=2 &amp;&amp; x&lt;=15 &amp;&amp; x-z&lt;=15 &amp;&amp; x-y&lt;=13</label>
+      <label kind="guard">y&gt;=2 &amp;&amp; x&lt;=15 &amp;&amp; x-z&lt;=15 &amp;&amp; x-y&lt;=13</label>
       <label kind="assignment">x = 0</label>
     </transition>
 	  </template>

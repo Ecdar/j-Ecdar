@@ -24,13 +24,13 @@
 		<transition id="id4" controllable="false">
 			<source ref="id0"/>
 			<target ref="id3"/>
-			<label kind="expression" x="238" y="-93">xCopy&lt;4</label>
+			<label kind="guard" x="238" y="-93">xCopy&lt;4</label>
 			<label kind="synchronisation" x="238" y="-76">o!</label>
 		</transition>
 		<transition id="id5" controllable="false">
 			<source ref="id2"/>
 			<target ref="id0"/>
-			<label kind="expression" x="-68" y="-51">xCopy&lt;4</label>
+			<label kind="guard" x="-68" y="-51">xCopy&lt;4</label>
 			<label kind="synchronisation" x="-60" y="-15">o!</label>
 		</transition>
 	</template>

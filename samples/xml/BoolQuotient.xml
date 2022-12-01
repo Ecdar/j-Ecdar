@@ -23,7 +23,7 @@ bool f=false;</declaration>
 		<transition id="id3" controllable="false">
 			<source ref="id1"/>
 			<target ref="id0"/>
-			<label kind="expression" x="-127" y="-136">f==true</label>
+			<label kind="guard" x="-127" y="-136">f==true</label>
 			<label kind="synchronisation" x="-119" y="-119">k!</label>
 		</transition>
 		<transition id="id4">

@@ -1,7 +1,7 @@
 package parser;
 
-import GuardGrammar.GuardGrammarLexer;
-import GuardGrammar.GuardGrammarParser;
+import ExpressionGrammar.ExpressionGrammarLexer;
+import ExpressionGrammar.ExpressionGrammarParser;
 import org.antlr.v4.runtime.*;
 import org.junit.Test;
 
@@ -13,16 +13,16 @@ public class ExpressionGrammarTest {
 
     private List<Token> getTokensFromText(String txt){
         CharStream charStream = CharStreams.fromString(txt);
-        GuardGrammar.GuardGrammarLexer lexer = new GuardGrammar.GuardGrammarLexer(charStream);
+        ExpressionGrammarLexer lexer = new ExpressionGrammarLexer(charStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         tokenStream.fill();
         return tokenStream.getTokens();
     }
 
-    private GuardGrammar.GuardGrammarParser createParserNoError(List<Token> tokens){
+    private ExpressionGrammarParser createParserNoError(List<Token> tokens){
         ListTokenSource tokenSource = new ListTokenSource(tokens);
         CommonTokenStream tokenStream = new CommonTokenStream(tokenSource);
-        GuardGrammar.GuardGrammarParser parser = new GuardGrammar.GuardGrammarParser(tokenStream);
+        ExpressionGrammarParser parser = new ExpressionGrammarParser(tokenStream);
         parser.addErrorListener(new NoErrorListener());
         return parser;
     }
@@ -32,9 +32,9 @@ public class ExpressionGrammarTest {
         List<Token> tokens = getTokensFromText("x>=5");
 
         assertEquals(4, tokens.size());
-        assertEquals(GuardGrammarLexer.VARIABLE, tokens.get(0).getType());
-        assertEquals(GuardGrammar.GuardGrammarLexer.OPERATOR, tokens.get(1).getType());
-        assertEquals(GuardGrammarLexer.INT, tokens.get(2).getType());
+        assertEquals(ExpressionGrammarLexer.VARIABLE, tokens.get(0).getType());
+        assertEquals(ExpressionGrammarLexer.OPERATOR, tokens.get(1).getType());
+        assertEquals(ExpressionGrammarLexer.INT, tokens.get(2).getType());
     }
 
     @Test
@@ -42,13 +42,13 @@ public class ExpressionGrammarTest {
         List<Token> tokens = getTokensFromText("x<=5 && y==3");
 
         assertEquals(8, tokens.size());
-        assertEquals(GuardGrammarLexer.VARIABLE, tokens.get(0).getType());
-        assertEquals(GuardGrammar.GuardGrammarLexer.OPERATOR, tokens.get(1).getType());
-        assertEquals(GuardGrammarLexer.INT, tokens.get(2).getType());
+        assertEquals(ExpressionGrammarLexer.VARIABLE, tokens.get(0).getType());
+        assertEquals(ExpressionGrammarLexer.OPERATOR, tokens.get(1).getType());
+        assertEquals(ExpressionGrammarLexer.INT, tokens.get(2).getType());
 
-        assertEquals(GuardGrammarLexer.VARIABLE, tokens.get(4).getType());
-        assertEquals(GuardGrammar.GuardGrammarLexer.OPERATOR, tokens.get(5).getType());
-        assertEquals(GuardGrammarLexer.INT, tokens.get(6).getType());
+        assertEquals(ExpressionGrammarLexer.VARIABLE, tokens.get(4).getType());
+        assertEquals(ExpressionGrammarLexer.OPERATOR, tokens.get(5).getType());
+        assertEquals(ExpressionGrammarLexer.INT, tokens.get(6).getType());
     }
 
     @Test
@@ -56,20 +56,20 @@ public class ExpressionGrammarTest {
         List<Token> tokens = getTokensFromText("x<=5 || y==3");
 
         assertEquals(8, tokens.size());
-        assertEquals(GuardGrammarLexer.VARIABLE, tokens.get(0).getType());
-        assertEquals(GuardGrammar.GuardGrammarLexer.OPERATOR, tokens.get(1).getType());
-        assertEquals(GuardGrammarLexer.INT, tokens.get(2).getType());
+        assertEquals(ExpressionGrammarLexer.VARIABLE, tokens.get(0).getType());
+        assertEquals(ExpressionGrammarLexer.OPERATOR, tokens.get(1).getType());
+        assertEquals(ExpressionGrammarLexer.INT, tokens.get(2).getType());
 
-        assertEquals(GuardGrammarLexer.VARIABLE, tokens.get(4).getType());
-        assertEquals(GuardGrammar.GuardGrammarLexer.OPERATOR, tokens.get(5).getType());
-        assertEquals(GuardGrammarLexer.INT, tokens.get(6).getType());
+        assertEquals(ExpressionGrammarLexer.VARIABLE, tokens.get(4).getType());
+        assertEquals(ExpressionGrammarLexer.OPERATOR, tokens.get(5).getType());
+        assertEquals(ExpressionGrammarLexer.INT, tokens.get(6).getType());
     }
 
     @Test
     public void testParsing(){
-        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<4"));
+        ExpressionGrammarParser parser = createParserNoError(getTokensFromText("x<4"));
 
-        GuardGrammar.GuardGrammarParser.ClockExprContext ctx = parser.guard().expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext ctx = parser.expression().arithExpression().clockExpr();
         assertEquals("x", ctx.VARIABLE(0).getText());
         assertEquals("4", ctx.INT().getText());
         assertEquals("<", ctx.OPERATOR().getText());
@@ -77,15 +77,15 @@ public class ExpressionGrammarTest {
 
     @Test
     public void testParsingOuterAnd(){
-        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<=1 || (y<=2 || x<=3) && (y<=2 || x<=3) || y>6"));
+        ExpressionGrammarParser parser = createParserNoError(getTokensFromText("x<=1 || (y<=2 || x<=3) && (y<=2 || x<=3) || y>6"));
 
-        GuardGrammarParser.GuardContext guardContext = parser.guard();
-        GuardGrammar.GuardGrammarParser.ClockExprContext ctx = guardContext.or().orExpression(1).and().expression(0).guard().or().orExpression(1).expression().clockExpr();
+        ExpressionGrammarParser.ExpressionContext expressionContext = parser.expression();
+        ExpressionGrammarParser.ClockExprContext ctx = expressionContext.or().orExpression(1).and().arithExpression(0).expression().or().orExpression(1).arithExpression().clockExpr();
         assertEquals("x", ctx.VARIABLE(0).getText());
         assertEquals("3", ctx.INT().getText());
         assertEquals("<=", ctx.OPERATOR().getText());
 
-        GuardGrammar.GuardGrammarParser.ClockExprContext ctx1 = guardContext.or().orExpression(1).and().expression(1).guard().or().orExpression(0).expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext ctx1 = expressionContext.or().orExpression(1).and().arithExpression(1).expression().or().orExpression(0).arithExpression().clockExpr();
         assertEquals("y", ctx1.VARIABLE(0).getText());
         assertEquals("2", ctx1.INT().getText());
         assertEquals("<=", ctx1.OPERATOR().getText());
@@ -93,9 +93,9 @@ public class ExpressionGrammarTest {
 
     @Test
     public void testParsingWithOr(){
-        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<4||y>=5"));
+        ExpressionGrammarParser parser = createParserNoError(getTokensFromText("x<4||y>=5"));
 
-        GuardGrammar.GuardGrammarParser.ClockExprContext ctx = parser.guard().or().orExpression(1).expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext ctx = parser.expression().or().orExpression(1).arithExpression().clockExpr();
         assertEquals("y", ctx.VARIABLE(0).getText());
         assertEquals("5", ctx.INT().getText());
         assertEquals(">=", ctx.OPERATOR().getText());
@@ -103,26 +103,26 @@ public class ExpressionGrammarTest {
 
     @Test
     public void testParsingSymbolAndTextAnd(){
-        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<4 AND y>=5 and y>6 && y<7"));
+        ExpressionGrammarParser parser = createParserNoError(getTokensFromText("x<4 AND y>=5 and y>6 && y<7"));
 
-        GuardGrammarParser.AndContext andContext = parser.guard().and();
+        ExpressionGrammarParser.AndContext andContext = parser.expression().and();
 
-        GuardGrammarParser.ClockExprContext clock1 = andContext.expression(0).clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock1 = andContext.arithExpression(0).clockExpr();
         assertEquals("x", clock1.VARIABLE(0).getText());
         assertEquals("4", clock1.INT().getText());
         assertEquals("<", clock1.OPERATOR().getText());
 
-        GuardGrammarParser.ClockExprContext clock2 = andContext.expression(1).clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock2 = andContext.arithExpression(1).clockExpr();
         assertEquals("y", clock2.VARIABLE(0).getText());
         assertEquals("5", clock2.INT().getText());
         assertEquals(">=", clock2.OPERATOR().getText());
 
-        GuardGrammarParser.ClockExprContext clock3 = andContext.expression(2).clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock3 = andContext.arithExpression(2).clockExpr();
         assertEquals("y", clock3.VARIABLE(0).getText());
         assertEquals("6", clock3.INT().getText());
         assertEquals(">", clock3.OPERATOR().getText());
 
-        GuardGrammarParser.ClockExprContext clock4 = andContext.expression(3).clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock4 = andContext.arithExpression(3).clockExpr();
         assertEquals("y", clock4.VARIABLE(0).getText());
         assertEquals("7", clock4.INT().getText());
         assertEquals("<", clock4.OPERATOR().getText());
@@ -130,26 +130,26 @@ public class ExpressionGrammarTest {
 
     @Test
     public void testParsingSymbolAndTextOr(){
-        GuardGrammar.GuardGrammarParser parser = createParserNoError(getTokensFromText("x<4 OR y>=5 or y>6 || y<7"));
+        ExpressionGrammarParser parser = createParserNoError(getTokensFromText("x<4 OR y>=5 or y>6 || y<7"));
 
-        GuardGrammarParser.OrContext orContext = parser.guard().or();
+        ExpressionGrammarParser.OrContext orContext = parser.expression().or();
 
-        GuardGrammarParser.ClockExprContext clock1 = orContext.orExpression(0).expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock1 = orContext.orExpression(0).arithExpression().clockExpr();
         assertEquals("x", clock1.VARIABLE(0).getText());
         assertEquals("4", clock1.INT().getText());
         assertEquals("<", clock1.OPERATOR().getText());
 
-        GuardGrammarParser.ClockExprContext clock2 = orContext.orExpression(1).expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock2 = orContext.orExpression(1).arithExpression().clockExpr();
         assertEquals("y", clock2.VARIABLE(0).getText());
         assertEquals("5", clock2.INT().getText());
         assertEquals(">=", clock2.OPERATOR().getText());
 
-        GuardGrammarParser.ClockExprContext clock3 = orContext.orExpression(2).expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock3 = orContext.orExpression(2).arithExpression().clockExpr();
         assertEquals("y", clock3.VARIABLE(0).getText());
         assertEquals("6", clock3.INT().getText());
         assertEquals(">", clock3.OPERATOR().getText());
 
-        GuardGrammarParser.ClockExprContext clock4 = orContext.orExpression(3).expression().clockExpr();
+        ExpressionGrammarParser.ClockExprContext clock4 = orContext.orExpression(3).arithExpression().clockExpr();
         assertEquals("y", clock4.VARIABLE(0).getText());
         assertEquals("7", clock4.INT().getText());
         assertEquals("<", clock4.OPERATOR().getText());

@@ -17,7 +17,7 @@
       <source ref="id6" />
       <target ref="id6" />
       <label kind="synchronisation">o!</label>
-      <label kind="expression">(xCopy&lt;3 &amp;&amp; xCopy-yCopy&lt;3)</label>
+      <label kind="guard">(xCopy&lt;3 &amp;&amp; xCopy-yCopy&lt;3)</label>
       <label kind="assignment">xCopy = 0</label>
     </transition>
   </template>

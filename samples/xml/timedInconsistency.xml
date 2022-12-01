@@ -20,7 +20,7 @@ chan b;
 		<transition controllable="false">
 			<source ref="id2"/>
 			<target ref="id3"/>
-			<label kind="expression" x="25" y="34">x&lt;3</label>
+			<label kind="guard" x="25" y="34">x&lt;3</label>
 			<label kind="synchronisation" x="34" y="17">a!</label>
 		</transition>
 		<transition controllable="false">
@@ -31,7 +31,7 @@ chan b;
 		<transition>
 			<source ref="id2"/>
 			<target ref="id1"/>
-			<label kind="expression" x="34" y="-68">x&gt;4</label>
+			<label kind="guard" x="34" y="-68">x&gt;4</label>
 			<label kind="synchronisation" x="34" y="-51">b?</label>
 		</transition>
 	</template>
@@ -51,7 +51,7 @@ chan b;
 		<transition controllable="false">
 			<source ref="id6"/>
 			<target ref="id7"/>
-			<label kind="expression" x="25" y="34">x&gt;4</label>
+			<label kind="guard" x="25" y="34">x&gt;4</label>
 			<label kind="synchronisation" x="34" y="17">a!</label>
 		</transition>
 		<transition controllable="false">
@@ -62,7 +62,7 @@ chan b;
 		<transition>
 			<source ref="id6"/>
 			<target ref="id5"/>
-			<label kind="expression" x="34" y="-68">x&gt;4</label>
+			<label kind="guard" x="34" y="-68">x&gt;4</label>
 			<label kind="synchronisation" x="34" y="-51">b?</label>
 		</transition>
 	</template>
@@ -82,7 +82,7 @@ chan b;
 		<transition controllable="false">
 			<source ref="id10"/>
 			<target ref="id11"/>
-			<label kind="expression" x="25" y="34">x&gt;2</label>
+			<label kind="guard" x="25" y="34">x&gt;2</label>
 			<label kind="synchronisation" x="34" y="17">a!</label>
 		</transition>
 		<transition controllable="false">
@@ -93,7 +93,7 @@ chan b;
 		<transition>
 			<source ref="id10"/>
 			<target ref="id9"/>
-			<label kind="expression" x="34" y="-68">x&gt;4</label>
+			<label kind="guard" x="34" y="-68">x&gt;4</label>
 			<label kind="synchronisation" x="34" y="-51">b?</label>
 		</transition>
 	</template>
@@ -113,7 +113,7 @@ chan b;
 		<transition>
 			<source ref="id14"/>
 			<target ref="id15"/>
-			<label kind="expression" x="25" y="34">x&gt;7</label>
+			<label kind="guard" x="25" y="34">x&gt;7</label>
 			<label kind="synchronisation" x="34" y="17">b?</label>
 		</transition>
 		<transition controllable="false">
@@ -124,7 +124,7 @@ chan b;
 		<transition>
 			<source ref="id14"/>
 			<target ref="id13"/>
-			<label kind="expression" x="34" y="-68">x&lt;3</label>
+			<label kind="guard" x="34" y="-68">x&lt;3</label>
 			<label kind="synchronisation" x="34" y="-51">b?</label>
 		</transition>
 	</template>
@@ -151,7 +151,7 @@ chan b;
 		<transition controllable="false">
 			<source ref="id18"/>
 			<target ref="id19"/>
-			<label kind="expression" x="25" y="34">x&gt;4</label>
+			<label kind="guard" x="25" y="34">x&gt;4</label>
 			<label kind="synchronisation" x="34" y="17">a!</label>
 		</transition>
 		<transition>
@@ -162,7 +162,7 @@ chan b;
 		<transition>
 			<source ref="id18"/>
 			<target ref="id17"/>
-			<label kind="expression" x="34" y="-68">x&lt;3</label>
+			<label kind="guard" x="34" y="-68">x&lt;3</label>
 			<label kind="synchronisation" x="34" y="-51">b?</label>
 		</transition>
 	</template>

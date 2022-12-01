@@ -38,7 +38,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="280" y="297">new1&lt;=0</label>
+			<label kind="guard" x="280" y="297">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">a?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -46,7 +46,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="221" y="280">new1&lt;=0</label>
+			<label kind="guard" x="221" y="280">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">newInput?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -54,7 +54,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="229" y="348">new1&lt;=0</label>
+			<label kind="guard" x="229" y="348">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">i?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -90,35 +90,35 @@ clock z;</declaration>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id4"/>
-			<label kind="expression" x="205" y="50">z&gt;5</label>
+			<label kind="guard" x="205" y="50">z&gt;5</label>
 			<label kind="synchronisation" x="205" y="65">a?</label>
 			<label kind="assignment" x="238" y="93">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id4"/>
-			<label kind="expression" x="205" y="50">z&gt;5</label>
+			<label kind="guard" x="205" y="50">z&gt;5</label>
 			<label kind="synchronisation" x="205" y="65">newInput?</label>
 			<label kind="assignment" x="170" y="110">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id4"/>
-			<label kind="expression" x="205" y="50">z&gt;5</label>
+			<label kind="guard" x="205" y="50">z&gt;5</label>
 			<label kind="synchronisation" x="205" y="65">i?</label>
 			<label kind="assignment" x="212" y="102">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id4"/>
-			<label kind="expression" x="205" y="50">z&gt;5</label>
+			<label kind="guard" x="205" y="50">z&gt;5</label>
 			<label kind="synchronisation" x="205" y="65">o?</label>
 			<label kind="assignment" x="323" y="110">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id3"/>
-			<label kind="expression" x="55" y="125">z&lt;=5</label>
+			<label kind="guard" x="55" y="125">z&lt;=5</label>
 			<label kind="synchronisation" x="55" y="140">i?</label>
 			<label kind="assignment" x="55" y="155">x = 0</label>
 		</transition>
@@ -132,7 +132,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="255" y="314">new1&lt;=0</label>
+			<label kind="guard" x="255" y="314">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">a?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -140,7 +140,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="280" y="280">new1&lt;=0</label>
+			<label kind="guard" x="280" y="280">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">newInput?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -148,7 +148,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="280" y="272">new1&lt;=0</label>
+			<label kind="guard" x="280" y="272">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">i?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -184,7 +184,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id2"/>
 			<target ref="id5"/>
-			<label kind="expression" x="205" y="200">x&gt;10</label>
+			<label kind="guard" x="205" y="200">x&gt;10</label>
 			<label kind="synchronisation" x="205" y="215">newInput?</label>
 			<label kind="assignment" x="238" y="229">new1 = 0</label>
 			<nail x="272" y="272"/>
@@ -192,7 +192,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id2"/>
 			<target ref="id3"/>
-			<label kind="expression" x="55" y="200">x&lt;=10</label>
+			<label kind="guard" x="55" y="200">x&lt;=10</label>
 			<label kind="synchronisation" x="55" y="215">i?</label>
 			<label kind="assignment" x="55" y="230">z = 0</label>
 		</transition>
@@ -204,7 +204,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="382" y="289">new1&lt;=0</label>
+			<label kind="guard" x="382" y="289">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">a?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -212,7 +212,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="365" y="272">new1&lt;=0</label>
+			<label kind="guard" x="365" y="272">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">newInput?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -220,7 +220,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="365" y="246">new1&lt;=0</label>
+			<label kind="guard" x="365" y="246">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">i?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -256,42 +256,42 @@ clock z;</declaration>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id5"/>
-			<label kind="expression" x="130" y="200">x&gt;10 &amp;&amp; z&lt;=5</label>
+			<label kind="guard" x="130" y="200">x&gt;10 &amp;&amp; z&lt;=5</label>
 			<label kind="synchronisation" x="130" y="215">newInput?</label>
 			<label kind="assignment" x="127" y="238">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id4"/>
-			<label kind="expression" x="130" y="125">z&gt;5</label>
+			<label kind="guard" x="130" y="125">z&gt;5</label>
 			<label kind="synchronisation" x="130" y="140">a?</label>
 			<label kind="assignment" x="85" y="25">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id4"/>
-			<label kind="expression" x="130" y="125">z&gt;5</label>
+			<label kind="guard" x="130" y="125">z&gt;5</label>
 			<label kind="synchronisation" x="130" y="140">newInput?</label>
 			<label kind="assignment" x="85" y="85">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id4"/>
-			<label kind="expression" x="130" y="125">z&gt;5</label>
+			<label kind="guard" x="130" y="125">z&gt;5</label>
 			<label kind="synchronisation" x="130" y="140">i?</label>
 			<label kind="assignment" x="110" y="59">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id4"/>
-			<label kind="expression" x="130" y="125">z&gt;5</label>
+			<label kind="guard" x="130" y="125">z&gt;5</label>
 			<label kind="synchronisation" x="130" y="140">o?</label>
 			<label kind="assignment" x="85" y="68">new1 = 0</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id3"/>
-			<label kind="expression" x="-102" y="221">x&lt;=10 &amp;&amp; z&lt;=5</label>
+			<label kind="guard" x="-102" y="221">x&lt;=10 &amp;&amp; z&lt;=5</label>
 			<label kind="synchronisation" x="-90" y="210">i?</label>
 			<nail x="-60" y="195"/>
 			<nail x="0" y="195"/>
@@ -299,7 +299,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id5"/>
-			<label kind="expression" x="58" y="255">x&lt;5 &amp;&amp; x&gt;10</label>
+			<label kind="guard" x="58" y="255">x&lt;5 &amp;&amp; x&gt;10</label>
 			<label kind="synchronisation" x="130" y="215">a?</label>
 			<label kind="assignment" x="153" y="246">new1 = 0</label>
 			<nail x="178" y="348"/>
@@ -312,7 +312,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="399" y="331">new1&lt;=0</label>
+			<label kind="guard" x="399" y="331">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">a?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -320,7 +320,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="314" y="365">new1&lt;=0</label>
+			<label kind="guard" x="314" y="365">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">newInput?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
@@ -328,7 +328,7 @@ clock z;</declaration>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id5"/>
-			<label kind="expression" x="272" y="365">new1&lt;=0</label>
+			<label kind="guard" x="272" y="365">new1&lt;=0</label>
 			<label kind="synchronisation" x="288" y="325">i?</label>
 			<nail x="318" y="310"/>
 			<nail x="378" y="310"/>
