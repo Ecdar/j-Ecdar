@@ -119,4 +119,9 @@ public class OrGuard extends Guard {
     public int hashCode() {
         return Objects.hash(false);
     }
+
+    @Override
+    public String prettyPrint() {
+        return Guard.compositePrettyPrint(guards, "||");
+    }
 }
