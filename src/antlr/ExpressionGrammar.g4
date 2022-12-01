@@ -12,18 +12,18 @@ options { caseInsensitive = true; }
  * Parser Rules
  */
 
-constraints              : contstraint EOF ;
+expressions              : expression EOF ;
 
-contstraint         : expression
+expression          : arithExpression
                     | or ';'?
                     | and
                     ;
 
 or                  : (orExpression OR)+ orExpression;
-orExpression        : expression | and ;
+orExpression        : arithExpression | and ;
 
-and                 : (expression AND)+ expression ;
-expression          : BOOLEAN | clockExpr | boolExpr | '(' contstraint ')';
+and                 : (arithExpression AND)+ arithExpression ;
+arithExpression          : BOOLEAN | clockExpr | boolExpr | '(' expression ')';
 clockExpr           : VARIABLE ('-'VARIABLE)? OPERATOR '-'? INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 

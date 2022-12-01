@@ -45,7 +45,7 @@ public class ExpressionParser {
         parser.addErrorListener(new ErrorListener());
 
         ExpressionVisitor expressionVisitor = new ExpressionVisitor();
-        return expressionVisitor.visit(parser.contstraint());
+        return expressionVisitor.visit(parser.expression());
     }
 
     private static class ExpressionVisitor extends  ExpressionGrammarBaseVisitor<Expression>{
@@ -62,19 +62,19 @@ public class ExpressionParser {
 
         public Expression visitAnd(ExpressionGrammarParser.AndContext ctx) {
             List<Expression> expressions = new ArrayList<>();
-            for (ExpressionGrammarParser.ExpressionContext expression: ctx.expression()) {
+            for (ExpressionGrammarParser.ArithExpressionContext expression: ctx.arithExpression()) {
                 expressions.add(visit(expression));
             }
             return new AndExpression(expressions);
         }
 
         @Override
-        public Expression visitExpression(ExpressionGrammarParser.ExpressionContext ctx) {
+        public Expression visitArithExpression(ExpressionGrammarParser.ArithExpressionContext ctx) {
             if(ctx.BOOLEAN() != null) {
                 boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
                 return value ? new TrueExpression() : new FalseExpression();
-            }else if(ctx.contstraint() != null){
-                return visit(ctx.contstraint());
+            }else if(ctx.expression() != null){
+                return visit(ctx.expression());
             }
             return visitChildren(ctx);
         }

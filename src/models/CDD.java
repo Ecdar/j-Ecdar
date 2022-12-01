@@ -14,7 +14,7 @@ public class CDD {
     private long pointer;
 
     private Expression expression;
-    private boolean isGuardDirty;
+    private boolean isExpressionDirty;
 
     private CddExtractionResult extraction;
     private boolean isExtractionDirty;
@@ -74,14 +74,14 @@ public class CDD {
     }
 
     private void setDirty() {
-        isGuardDirty = true;
+        isExpressionDirty = true;
         isExtractionDirty = true;
     }
 
     public Expression getExpression(List<Clock> relevantClocks) {
-        if (isGuardDirty) {
+        if (isExpressionDirty) {
             expression = isBDD() ? toBoolExpression() : toClockGuards(relevantClocks);
-            isGuardDirty = false;
+            isExpressionDirty = false;
         }
 
         return expression;
