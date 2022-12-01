@@ -47,10 +47,10 @@ cmake --build . --config Release
 cmake --install . --config Release
 
 cd $SOURCE_DIR/build-win/ext-libs/sources;
-wget https://github.com/Ecdar/UCDD/archive/merge.tar.gz
-tar -xvf merge.tar.gz
-mkdir -p "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-merge/build"
-cd "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-merge"
+wget https://github.com/Ecdar/UCDD/archive/main.tar.gz
+tar -xvf main.tar.gz
+mkdir -p "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-main/build"
+cd "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-main"
 cd build
 cmake $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX="$SOURCE_DIR/build-win/ext-libs/UCDD" ..
 cmake --build . --config Release
