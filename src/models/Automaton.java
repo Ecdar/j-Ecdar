@@ -93,7 +93,9 @@ public class Automaton {
         this(
                 name,
                 Collections.singletonList(location),
-                edges
+                edges,
+                clocks,
+                booleans
         );
     }
 
