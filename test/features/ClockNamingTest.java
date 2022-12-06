@@ -3,6 +3,7 @@ package features;
 import logic.*;
 import models.Automaton;
 import models.Clock;
+import models.UniqueNamedContainer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import parser.JSONParser;

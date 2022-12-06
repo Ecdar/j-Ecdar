@@ -1,6 +1,4 @@
-package logic;
-
-import models.UniquelyNamed;
+package models;
 
 import java.util.*;
 import java.util.stream.Collectors;

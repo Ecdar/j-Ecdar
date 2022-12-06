@@ -47,7 +47,7 @@ public class Clock extends UniquelyNamed {
     /**
      * Returns {@code true} if this clock is meant to be used in the scope of other {@link TransitionSystem TransitionSystems} or {@link Automaton Automata}.
      *
-     * Additionally, if the {@link Clock} is global then global naming rules will be applied in the {@link logic.UniqueNamedContainer}.
+     * Additionally, if the {@link Clock} is global then global naming rules will be applied in the {@link UniqueNamedContainer}.
      * As an example, this is used for the "quo_new", because the generated clock is global amongst all quotients.
      *
      * @return {@code true} if it can be used in the scope of other {@link TransitionSystem} or {@link Automaton}.
