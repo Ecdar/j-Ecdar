@@ -23,8 +23,12 @@ public class AutomatonTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyAutomatonThrowsIllegalArgumentException() {
+        // Arrange
+        List<Location> locations = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+
         // Act
-        new Automaton("automaton");
+        new Automaton("automaton", locations, edges);
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -105,10 +105,6 @@ public class Automaton {
         );
     }
 
-    public Automaton(String name) {
-        this(name, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-    }
-
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs) {
         this(name, locations, edges, clocks, BVs, true);
     }
