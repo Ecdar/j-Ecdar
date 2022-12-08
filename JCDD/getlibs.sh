@@ -53,5 +53,5 @@ mkdir -p "$SOURCE_DIR/build/ext-libs/sources/UCDD-$CDD_VERSION/build"
 cd "$SOURCE_DIR/build/ext-libs/sources/UCDD-$CDD_VERSION"
 cd build
 cmake $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX="$SOURCE_DIR/build/ext-libs/UCDD" ..
-cmake --build .  --config Release
-cmake --install .  --config Release
+cmake --build . --config Release
+cmake --install . --config Release

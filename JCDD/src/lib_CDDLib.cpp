@@ -411,8 +411,17 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_past
  */
 JNIEXPORT jboolean JNICALL Java_lib_CDDLib_isBDD
   (JNIEnv *, jclass, jlong cdd_pointer){
+  /*
     cdd* cdd_object = (cdd*)cdd_pointer;
     return cdd_isBDD(*cdd_object);
+    */
+    cdd* cdd_object = (cdd*)cdd_pointer;
+    /*
+    if (cdd_isterminal(cdd_object->root)) {
+        return false;
+    }
+    */
+    return cdd_info(cdd_object->handle())->type == TYPE_BDD;
 }
 
 /*
@@ -448,7 +457,7 @@ JNIEXPORT jlong JNICALL Java_lib_CDDLib_applyReset
     return (jlong)cdd_result;
 }
 
-
+/* currently no usage
 JNIEXPORT jintArray JNICALL Java_lib_CDDLib_extrapolateMaxBoundsNoClose(JNIEnv *env, jclass cls, jintArray dbm, jint dim, jintArray max) {
     jsize len = env->GetArrayLength(dbm);
     jsize max_len = env->GetArrayLength(max);
@@ -459,6 +468,7 @@ JNIEXPORT jintArray JNICALL Java_lib_CDDLib_extrapolateMaxBoundsNoClose(JNIEnv *
 
     return helper_functions::cToJint(env, converted, len);
 }
+*/
 
 
 /*
@@ -630,10 +640,10 @@ JNIEXPORT jboolean JNICALL Java_lib_CDDLib_cddEquiv
  * Method:    bddToArray
  */
 JNIEXPORT jlong JNICALL Java_lib_CDDLib_bddToArray
-  (JNIEnv *env, jclass, jlong cdd_pointer, jint numBools){
+  (JNIEnv *env, jclass, jlong cdd_pointer){
     cdd* cdd_object = (cdd*)cdd_pointer;
 
-    bdd_arrays* result = new bdd_arrays(cdd_bdd_to_array(*cdd_object,numBools));
+    bdd_arrays* result = new bdd_arrays(cdd_bdd_to_array(*cdd_object));
     return (jlong)result;
 }
 
