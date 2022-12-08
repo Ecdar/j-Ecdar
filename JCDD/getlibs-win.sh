@@ -47,10 +47,11 @@ cmake --build . --config Release
 cmake --install . --config Release
 
 cd $SOURCE_DIR/build-win/ext-libs/sources;
-wget https://github.com/Ecdar/UCDD/archive/main.tar.gz
-tar -xvf main.tar.gz
-mkdir -p "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-main/build"
-cd "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-main"
+CDD_VERSION="main" # ./getlibs.sh && cmake -B build/ && cmake --build build
+wget "https://github.com/Ecdar/UCDD/archive/$CDD_VERSION.tar.gz"
+tar -xvf "$CDD_VERSION.tar.gz"
+mkdir -p "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-$CDD_VERSION/build"
+cd "$SOURCE_DIR/build-win/ext-libs/sources/UCDD-$CDD_VERSION"
 cd build
 cmake $CMAKE_ARGS -DCMAKE_INSTALL_PREFIX="$SOURCE_DIR/build-win/ext-libs/UCDD" ..
 cmake --build . --config Release
