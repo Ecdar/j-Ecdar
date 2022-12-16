@@ -208,8 +208,7 @@ public class CDD {
     public boolean isBDD()
             throws NullPointerException {
         checkForNull();
-        // CDDLib.isBDD does not recognise cddFalse and cddTrue as BDDs
-        return CDDLib.isBDD(this.pointer) || isFalse() || isTrue();
+        return CDDLib.isBDD(this.pointer);
     }
 
     public boolean isTerminal()
