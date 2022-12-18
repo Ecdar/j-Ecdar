@@ -37,7 +37,6 @@ jobs:
           submodules: recursive
 
       - name: Compile JCDD
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
