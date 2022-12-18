@@ -6,7 +6,7 @@ on:
     types: [published]
 jobs:
   run-build:
-    uses: ./.github/workflows/ci.yml@main
+    uses: ./.github/workflows/ci.yml
   native-compile:
     name: Generate native executable for - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
