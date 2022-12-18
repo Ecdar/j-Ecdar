@@ -43,15 +43,8 @@ jobs:
       - name: Build ${{ steps.executable.outputs.name }} native image
         run: ./gradlew nativeCompile
       - name: Archive binary
+        if: ${{ !github.event.act }} # Skip if this is a local test run
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.executable.outputs.name }}
           path: target/${{ steps.executable.outputs.name }}${{ matrix.executable-suffix }}
-      - name: Upload artifacts
-        if: ${{ !github.event.act }} && github.event.release.tag_name
-        uses: actions/upload-artifact@v3
-        with:
-          name: j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64
-          path: | 
-            build/native/nativeCompile/j-Ecdar-native*
-            !build/native/nativeCompile/*.txt
