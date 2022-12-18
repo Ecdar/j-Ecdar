@@ -6,11 +6,11 @@ on:
     branch:
       - "main"
 jobs:
-  build:
-    uses: ./.github/workflows/ci.yml
+#  build:
+#    uses: ./.github/workflows/ci.yml
   native-compile:
     name: Generate native executable for - ${{ matrix.os }}
-    needs: build
+#    needs: build
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
@@ -30,8 +30,41 @@ jobs:
             executable-suffix: '.exe'
             native-build-args: --verbose -J-Xmx10g
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v3
+      # Recursively checkout all dependencies
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Compile JCDD
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
+          cd JCDD && mkdir build
+          ./getlibs.sh
+          cmake -B build/
+          cmake --build build/
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          cd JCDD && mkdir build-win
+          ./getlibs-win.sh
+          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
+          cmake --build build-win/
+
+#      - name: Upload JCDD Linux
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: jcdd-linux
+#          path: JCDD/build/jcdd/lib/*
+#      - name: Upload JCDD Windows
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: jcdd-windows
+#          path: JCDD/build-win/jcdd/lib/*
+
+      - name: Copy jcdd.jar to lib folder
+        run: cp -a ./JCDD/build/jcdd/lib/ ./lib
 
       - uses: actions/checkout@v3
       - id: executable
@@ -45,7 +78,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build ${{ steps.executable.outputs.name }} native image
+      - name: Build ${{ steps.executable.outputs.name }}
         run: ./gradlew nativeCompile
       - name: Archive binary
         if: ${{ !github.event.act }} # Skip if this is a local test run
