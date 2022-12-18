@@ -1,0 +1,57 @@
+name: Generate Native Executables
+needs: build
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+jobs:
+  run-build:
+    uses: ./.github/workflows/ci.yml@main
+  native-compile:
+    name: Generate native executable for - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-2019]
+        graalvm-version: ['22.3.0']
+        java-version: ['11']
+        include:
+          - os: ubuntu-latest
+            executable-suffix: ''
+            native-build-args: --verbose -J-Xmx10g
+          - os: macos-latest
+            executable-suffix: ''
+            native-build-args: --verbose -J-Xmx13g
+          - os: windows-2019
+            executable-suffix: '.exe'
+            native-build-args: --verbose -J-Xmx10g
+    steps:
+      - uses: actions/checkout@v3
+      - id: executable
+        run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
+      - name: Set up GraalVM (Java ${{ matrix.java-version }})
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: '${{ matrix.graalvm-version }}'
+          java-version: '${{ matrix.java-version }}'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build ${{ steps.executable.outputs.name }} native image
+        run: ./gradlew nativeCompile
+      - name: Archive binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.executable.outputs.name }}
+          path: target/${{ steps.executable.outputs.name }}${{ matrix.executable-suffix }}
+      - name: Upload artifacts
+        if: ${{ !github.event.act }} && github.event.release.tag_name
+        uses: actions/upload-artifact@v3
+        with:
+          name: j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64
+          path: | 
+            build/native/nativeCompile/j-Ecdar-native*
+            !build/native/nativeCompile/*.txt
