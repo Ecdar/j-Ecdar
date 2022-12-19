@@ -52,7 +52,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
         T newItem = (T) item.getCopy();
 
         if (item.isGlobal()) {
-            // If the item we are adding is global then we only want to add it if it's unique name is not present.
+            // We only want to add global items it if its unique name is not present.
             Optional<T> existing = findFirstWithUniqueName(newItem.getUniqueName());
             if (existing.isEmpty()) {
                 items.add(newItem);
