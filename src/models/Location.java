@@ -142,6 +142,11 @@ public final class Location {
         return create(name, invariant, true, isUrgent, isUniversal, isInconsistent);
     }
 
+    public static Location createFromState(State state, List<Clock> clocks) {
+        Location location = state.getLocation();
+        return location.copy();
+    }
+
     public static Location createComposition(List<Location> children) {
         if (children.size() == 0) {
             throw new IllegalArgumentException("Requires at least one location to create a product");

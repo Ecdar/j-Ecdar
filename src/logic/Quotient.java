@@ -97,7 +97,7 @@ public class Quotient extends AggregatedTransitionSystem {
             // Rule 1 (cartesian product)
             if (in(a, intersect(s.getActions(), t.getActions()))) {
                 Log.debug("Rule 1");
-                List<Move> moveProduct = moveProduct(t_moves, s_moves, true,true);
+                List<Move> moveProduct = moveProduct(t_moves, s_moves, true, true);
                 for (Move move : moveProduct) {
                     move.conjunctCDD(move.getEnabledPart());
                 }
@@ -108,7 +108,7 @@ public class Quotient extends AggregatedTransitionSystem {
             if (in(a, difference(s.getActions(), t.getActions()))) {
                 Log.debug("Rule 2");
                 List<Move> movesLeft = new ArrayList<>();
-                movesLeft.add(new Move(lt,lt, new ArrayList<>()));
+                movesLeft.add(new Move(lt, lt, new ArrayList<>()));
 
                 List<Move> moveProduct = moveProduct(movesLeft, s_moves, true, true);
                 for (Move move : moveProduct) {
@@ -179,8 +179,8 @@ public class Quotient extends AggregatedTransitionSystem {
             if (in(a, difference(t.getActions(), s.getActions()))) {
                 Log.debug("Rule 8");
                 List<Move> movesRight = new ArrayList<>();
-                movesRight.add(new Move(ls,ls,new ArrayList<>()));
-                List<Move> moveProduct = moveProduct(t_moves, movesRight, true,true);
+                movesRight.add(new Move(ls, ls, new ArrayList<>()));
+                List<Move> moveProduct = moveProduct(t_moves, movesRight, true, true);
                 for (Move move : moveProduct) {
                     move.conjunctCDD(move.getEnabledPart());
                 }

@@ -1,5 +1,7 @@
 package logic;
 
+import log.Log;
+import log.Urgency;
 import models.*;
 import org.junit.Test;
 
@@ -34,7 +36,7 @@ public class QuotientTest {
         assertEquals(quotient.getClocks().size(), 1);
         assertTrue(contains_clock_quo_new);
     }
-
+    
     @Test
     public void quotientConstructorShouldAddANewChannel() {
         // Arrange
@@ -59,7 +61,7 @@ public class QuotientTest {
         assertEquals(quotient.getInputs().size(), 1);
         assertTrue(contains_channel_i_new);
     }
-
+    
     @Test
     public void quotientShouldHaveInputsAsUnionOfLhsAndRhs() {
         // Arrange

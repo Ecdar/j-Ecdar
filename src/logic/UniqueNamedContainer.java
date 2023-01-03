@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * for this reason this container does not ensure that the unique names are
  * in fact unique to the collection. This is handled by the implementation of {@link UniquelyNamed}
  * which must utilise that the unique index provided to the renaming function.
- *
+ * <p>
  * Global items on the other hand are never renamed and only a singe instance
  * with the same unique name can be in the container. This is used for clocks
  * like the "quo_new" which are reused between quotients.
@@ -43,10 +43,10 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
 
     /**
      * Adds the specified element to the end of this container.
-     *
+     * <p>
      * For non singleton items renaming of its unique name will happen when:
-     *   There is another item with the same owner and the same original name.
-     *   There is another item with a different owner and the same original name.
+     * There is another item with the same owner and the same original name.
+     * There is another item with a different owner and the same original name.
      *
      * @param item item to be added to the end of this container.
      */
@@ -54,30 +54,19 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
         T newItem = (T) item.getCopy();
 
         if (!item.isGlobal()) {
-            // Unique name naming rules:
-            //   Same owner and different name: Keep it as is
-            //   Same owner and original name: Add owner to name "owner.n.name" where n is a counter value
-            // Motivation: Machine <= Machine || Machine. Here the owner is Machine but their clocks are different.
-            //   Different owner and name: Keep it as is
-            //   Different owner and same original name: Add owner to name "owner.n.name" where n is a counter value
-            List<T> similarOriginalName = items.stream()
-                    .filter(current -> Objects.equals(current.getOriginalName(), newItem.getOriginalName()))
+            List<T> sameName = items.stream()
+                    .filter(it -> sameName(it, item))
                     .collect(Collectors.toList());
-
-            if (similarOriginalName.size() != 0) {
-
-                List<T> similarOwner = similarOriginalName.stream()
-                        .filter(current -> Objects.equals(current.getOwnerName(), newItem.getOwnerName()))
-                        .collect(Collectors.toList());
-
-                if (similarOwner.size() > 0) {
-                    for (int i = 0; i < similarOwner.size(); i++) {
-                        similarOwner.get(i).setUniqueName(i + 1);
+            if (sameName.size() != 0) {
+                List<T> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(item.getOwnerName())).collect(Collectors.toList());
+                if (sameOwner.size() != 0) { // Same name, same owner
+                    for (int i = 0; i < sameOwner.size(); i++) {
+                        sameOwner.get(i).setUniqueName(i + 1);
                     }
-                    newItem.setUniqueName(similarOwner.size() + 1);
-                } else {
-                    for (T current : similarOriginalName) {
-                        current.setUniqueName();
+                    newItem.setUniqueName(sameOwner.size() + 1);
+                } else { //  Same name, different owner
+                    for (int i = 0; i < sameName.size(); i++) {
+                        sameName.get(i).setUniqueName();
                     }
                     newItem.setUniqueName();
                 }
@@ -89,6 +78,10 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
         if (existing.isEmpty()) {
             items.add(newItem);
         }
+    }
+
+    private boolean sameName(UniquelyNamed item1, UniquelyNamed item2) {
+        return item1.getOriginalName().equals(item2.getOriginalName());
     }
 
     /**
@@ -120,7 +113,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
 
     /**
      * Appends all the elements in the specified iterable to the end of this container,
-     *   in the order that they are returned by the specified collection's iterator.
+     * in the order that they are returned by the specified collection's iterator.
      *
      * @param items The iterable with items which should be added to this container.
      */
