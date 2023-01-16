@@ -10,7 +10,7 @@ public class Edge {
     private Location source, target;
     private Channel chan;
     private boolean isInput;
-    private Guard guard;
+    private BooleanExpression booleanExpression;
     private List<Update> updates;
 
     public void setSource(Location source) {
@@ -33,16 +33,16 @@ public class Edge {
         isInput = input;
     }
 
-    public void setGuard(Guard guard) {
-        this.guard = guard;
+    public void setGuard(BooleanExpression booleanExpression) {
+        this.booleanExpression = booleanExpression;
     }
 
-    public Edge(Location source, Location target, Channel chan, boolean isInput, Guard guards, List<Update> updates) {
+    public Edge(Location source, Location target, Channel chan, boolean isInput, BooleanExpression guards, List<Update> updates) {
         this.source = source;
         this.target = target;
         this.chan = chan;
         this.isInput = isInput;
-        this.guard = guards;
+        this.booleanExpression = guards;
         this.updates = updates;
     }
 
@@ -52,7 +52,7 @@ public class Edge {
             targetR,
             copy.chan,
             copy.isInput,
-            copy.guard.copy(newClocks, oldClocks, newBVs, oldBVs),
+            copy.booleanExpression.copy(newClocks, oldClocks, newBVs, oldBVs),
             copy.updates
                 .stream()
                 .map(update -> update.copy(
@@ -67,11 +67,11 @@ public class Edge {
     }
 
     public CDD getGuardCDD() {
-        return new CDD(guard);
+        return new CDD(booleanExpression);
     }
 
     public int getMaxConstant(Clock clock) {
-        return guard.getMaxConstant(clock);
+        return booleanExpression.getMaxConstant(clock);
     }
 
     // Used in determinism check to verify if two edges have exactly the same updates
@@ -97,8 +97,8 @@ public class Edge {
         return isInput;
     }
 
-    public Guard getGuard() {
-        return guard;
+    public BooleanExpression getGuard() {
+        return booleanExpression;
     }
 
     public List<Update> getUpdates() {
@@ -120,14 +120,14 @@ public class Edge {
         if (chan == null && edge.chan != null) {
             return false;
         }
-        if (guard == null && edge.guard != null) {
+        if (booleanExpression == null && edge.booleanExpression != null) {
             return false;
         }
         return isInput == edge.isInput &&
                 source != null && source.equals(edge.source) &&
                 target != null && target.equals(edge.target) &&
                 chan != null && chan.equals(edge.chan) &&
-                guard != null && guard.equals(edge.guard) &&
+                booleanExpression != null && booleanExpression.equals(edge.booleanExpression) &&
                 hasEqualUpdates(edge);
     }
 
@@ -137,13 +137,13 @@ public class Edge {
                 source + " - " +
                 chan.getName() +
                 (isInput ? "?" : "!") + " - " +
-                guard + " - " +
+                booleanExpression + " - " +
                 Arrays.toString(this.updates.toArray()) + " - " +
                 target + ")\n";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source, target, chan, isInput, guard, updates);
+        return Objects.hash(source, target, chan, isInput, booleanExpression, updates);
     }
 }

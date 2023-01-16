@@ -48,12 +48,12 @@ public class Federation {
         return new Federation(zones);
     }
 
-    public Guard toGuards(List<Clock> clocks) {
-        List<Guard> turnedBackIntoGuards = new ArrayList<>();
+    public BooleanExpression toGuard(List<Clock> clocks) {
+        List<BooleanExpression> turnedBackIntoBooleanExpressions = new ArrayList<>();
         for (Zone zone : getZones()) {
-            turnedBackIntoGuards.add(zone.buildGuardsFromZone(clocks, clocks));
+            turnedBackIntoBooleanExpressions.add(zone.createExpression(clocks, clocks));
         }
-        return new OrGuard(turnedBackIntoGuards);
+        return new OrExpression(turnedBackIntoBooleanExpressions);
     }
 
     public boolean isUnrestrained(List<Clock> clocks) {

@@ -1,12 +1,9 @@
 package parser;
 
-import logic.JsonAutomatonEncoder;
-import logic.Pruning;
 import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import models.*;
 import org.json.simple.parser.ParseException;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,34 +30,34 @@ public class JSONParserTest {
                 "Components/Imp.json"};
         machines = JSONParser.parse(base, components, false);
 
-        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
-        Location l2 = Location.create("L2", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l3 = Location.create("L3", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l5 = Location.create("L5", new TrueGuard(), true, false, false, false, 0, 0);
-        Location u0 = Location.create("U0", new TrueGuard(), false, false, true, false, 0, 0);
+        Location l0 = Location.create("L0", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueExpression(), false, false, false, false, 0, 0);
+        Location l2 = Location.create("L2", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l3 = Location.create("L3", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l5 = Location.create("L5", new TrueExpression(), true, false, false, false, 0, 0);
+        Location u0 = Location.create("U0", new TrueExpression(), false, false, true, false, 0, 0);
 
         Channel button1 = new Channel("button1");
         Channel button2 = new Channel("button2");
         Channel good = new Channel("good");
         Channel bad = new Channel("bad");
 
-        Edge t1 = new Edge(l2, l2, bad, true, new TrueGuard(), emptyUpdates);
-        Edge t2 = new Edge(l2, l2, good, true, new TrueGuard(), emptyUpdates);
-        Edge t3 = new Edge(l2, l2, button1, false, new TrueGuard(), emptyUpdates);
-        Edge t4 = new Edge(l3, l3, button1, true, new TrueGuard(), emptyUpdates);
-        Edge t5 = new Edge(l3, l3, button2, true, new TrueGuard(), emptyUpdates);
-        Edge t6 = new Edge(l3, l3, good, false, new TrueGuard(), emptyUpdates);
-        Edge t7 = new Edge(l5, u0, button2, true, new TrueGuard(), emptyUpdates);
-        Edge t8 = new Edge(l5, l5, good, false, new TrueGuard(), emptyUpdates);
-        Edge t9 = new Edge(l5, l5, button1, true, new TrueGuard(), emptyUpdates);
-        Edge t10 = new Edge(l0, l0, button1, true, new TrueGuard(), emptyUpdates);
-        Edge t11 = new Edge(l0, l0, good, false, new TrueGuard(), emptyUpdates);
-        Edge t12 = new Edge(l1, l1, button1, true, new TrueGuard(), emptyUpdates);
-        Edge t13 = new Edge(l1, l1, button2, true, new TrueGuard(), emptyUpdates);
-        Edge t14 = new Edge(l1, l1, good, false, new TrueGuard(), emptyUpdates);
-        Edge t15 = new Edge(l1, l1, bad, false, new TrueGuard(), emptyUpdates);
-        Edge t16 = new Edge(l0, l1, button2, true, new TrueGuard(), emptyUpdates);
+        Edge t1 = new Edge(l2, l2, bad, true, new TrueExpression(), emptyUpdates);
+        Edge t2 = new Edge(l2, l2, good, true, new TrueExpression(), emptyUpdates);
+        Edge t3 = new Edge(l2, l2, button1, false, new TrueExpression(), emptyUpdates);
+        Edge t4 = new Edge(l3, l3, button1, true, new TrueExpression(), emptyUpdates);
+        Edge t5 = new Edge(l3, l3, button2, true, new TrueExpression(), emptyUpdates);
+        Edge t6 = new Edge(l3, l3, good, false, new TrueExpression(), emptyUpdates);
+        Edge t7 = new Edge(l5, u0, button2, true, new TrueExpression(), emptyUpdates);
+        Edge t8 = new Edge(l5, l5, good, false, new TrueExpression(), emptyUpdates);
+        Edge t9 = new Edge(l5, l5, button1, true, new TrueExpression(), emptyUpdates);
+        Edge t10 = new Edge(l0, l0, button1, true, new TrueExpression(), emptyUpdates);
+        Edge t11 = new Edge(l0, l0, good, false, new TrueExpression(), emptyUpdates);
+        Edge t12 = new Edge(l1, l1, button1, true, new TrueExpression(), emptyUpdates);
+        Edge t13 = new Edge(l1, l1, button2, true, new TrueExpression(), emptyUpdates);
+        Edge t14 = new Edge(l1, l1, good, false, new TrueExpression(), emptyUpdates);
+        Edge t15 = new Edge(l1, l1, bad, false, new TrueExpression(), emptyUpdates);
+        Edge t16 = new Edge(l0, l1, button2, true, new TrueExpression(), emptyUpdates);
 
         Clock a = new Clock("a", "Aut");
         Clock b = new Clock("b", "Aut");
@@ -83,24 +80,24 @@ public class JSONParserTest {
         Clock x = new Clock("x", "Aut");
         Clock y = new Clock("y", "Aut");
 
-        models.ClockGuard g_l12_l17 = new ClockGuard(x, 15,  Relation.LESS_EQUAL);
-        models.ClockGuard g_l12_l14 = new ClockGuard(x, 20,  Relation.LESS_THAN);
-        models.ClockGuard g_l12_l13 = new ClockGuard(x, 5,  Relation.LESS_THAN);
-        models.ClockGuard g_l12_l15 = new ClockGuard(x, 8,  Relation.LESS_EQUAL);
-        models.ClockGuard g_l12_l16 = new ClockGuard(x, 55,  Relation.LESS_THAN);
-        models.ClockGuard g_l15_l18 = new ClockGuard(x, 15,  Relation.GREATER_THAN);
-        models.ClockGuard inv_l15 = new ClockGuard(x, 20,  Relation.LESS_EQUAL);
+        ClockExpression g_l12_l17 = new ClockExpression(x, 15,  Relation.LESS_EQUAL);
+        ClockExpression g_l12_l14 = new ClockExpression(x, 20,  Relation.LESS_THAN);
+        ClockExpression g_l12_l13 = new ClockExpression(x, 5,  Relation.LESS_THAN);
+        ClockExpression g_l12_l15 = new ClockExpression(x, 8,  Relation.LESS_EQUAL);
+        ClockExpression g_l12_l16 = new ClockExpression(x, 55,  Relation.LESS_THAN);
+        ClockExpression g_l15_l18 = new ClockExpression(x, 15,  Relation.GREATER_THAN);
+        ClockExpression inv_l15 = new ClockExpression(x, 20,  Relation.LESS_EQUAL);
 
 
         ClockUpdate u1 = new ClockUpdate(x, 0);
 
-        Location l12 = Location.create("L12", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l13 = Location.create("L13", new TrueGuard(), false, false, false, false, 0, 0);
-        Location l14 = Location.create("L14", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l12 = Location.create("L12", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l13 = Location.create("L13", new TrueExpression(), false, false, false, false, 0, 0);
+        Location l14 = Location.create("L14", new TrueExpression(), false, false, false, false, 0, 0);
         Location l15 = Location.create("L15", inv_l15, false, false, false, false, 0, 0);
-        Location l16 = Location.create("L16", new TrueGuard(), false, false, false, false, 0, 0);
-        Location l17 = Location.create("L17", new TrueGuard(), false, false, false, false, 0, 0);
-        Location l18 = Location.create("L18", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l16 = Location.create("L16", new TrueExpression(), false, false, false, false, 0, 0);
+        Location l17 = Location.create("L17", new TrueExpression(), false, false, false, false, 0, 0);
+        Location l18 = Location.create("L18", new TrueExpression(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
         Channel i2 = new Channel("i2");
@@ -124,14 +121,14 @@ public class JSONParserTest {
         t2 = new Edge(l12, l17, i3, true, g_l12_l17, emptyUpdates);
         t3 = new Edge(l12, l15, i4, true, g_l12_l15, new ArrayList<>(){{add(u1);}});
         t4 = new Edge(l12, l16, i5, true, g_l12_l16, emptyUpdates);
-        t5 = new Edge(l17, l18, o8, false, new TrueGuard(), new ArrayList<>(){{add(u1);}});
-        t6 = new Edge(l16, l18, o8, false, new TrueGuard(), emptyUpdates);
+        t5 = new Edge(l17, l18, o8, false, new TrueExpression(), new ArrayList<>(){{add(u1);}});
+        t6 = new Edge(l16, l18, o8, false, new TrueExpression(), emptyUpdates);
         t7 = new Edge(l15, l18, o8, false, g_l15_l18, emptyUpdates);
-        t8 = new Edge(l14, l18, o8, false, new TrueGuard(), emptyUpdates);
-        t9 = new Edge(l13, l18, o8, false, new TrueGuard(), emptyUpdates);
-        t10 = new Edge(l17, l17, o3, false, new TrueGuard(), emptyUpdates);
-        t11 = new Edge(l17, l17, o5, false, new TrueGuard(), emptyUpdates);
-        t12 = new Edge(l17, l14, i6, true, new TrueGuard(), emptyUpdates);
+        t8 = new Edge(l14, l18, o8, false, new TrueExpression(), emptyUpdates);
+        t9 = new Edge(l13, l18, o8, false, new TrueExpression(), emptyUpdates);
+        t10 = new Edge(l17, l17, o3, false, new TrueExpression(), emptyUpdates);
+        t11 = new Edge(l17, l17, o5, false, new TrueExpression(), emptyUpdates);
+        t12 = new Edge(l17, l14, i6, true, new TrueExpression(), emptyUpdates);
         t13 = new Edge(l12, l13, i1, true, g_l12_l13, emptyUpdates);
 
         Ref1 = new Automaton("Ref1", new ArrayList<>(Arrays.asList(l12, l13, l14, l15, l16, l17, l18)),

@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 public class CDD {
     private long pointer;
 
-    private Guard guard;
-    private boolean isGuardDirty;
+    private BooleanExpression booleanExpression;
+    private boolean isExpressionDirty;
 
     private CddExtractionResult extraction;
     private boolean isExtractionDirty;
@@ -42,71 +42,71 @@ public class CDD {
         setDirty();
     }
 
-    public CDD(Guard guard)
+    public CDD(BooleanExpression booleanExpression)
             throws IllegalArgumentException {
         CDD cdd;
-        if (guard instanceof FalseGuard) {
+        if (booleanExpression instanceof FalseExpression) {
             cdd = cddFalse();
-        } else if (guard instanceof TrueGuard) {
+        } else if (booleanExpression instanceof TrueExpression) {
             cdd = cddTrue();
-        } else if (guard instanceof ClockGuard) {
+        } else if (booleanExpression instanceof ClockExpression) {
             Zone zone = new Zone(numClocks, true);
             zone.init();
-            zone.buildConstraintsForGuard((ClockGuard) guard, clocks);
+            zone.applyConstraints((ClockExpression) booleanExpression, clocks);
             cdd = CDD.createFromDbm(zone.getDbm(), numClocks);
-        } else if (guard instanceof BoolGuard) {
-            cdd = create((BoolGuard) guard);
-        } else if (guard instanceof AndGuard) {
+        } else if (booleanExpression instanceof BoolExpression) {
+            cdd = create((BoolExpression) booleanExpression);
+        } else if (booleanExpression instanceof AndExpression) {
             cdd = cddTrue();
-            for (Guard g : ((AndGuard) guard).getGuards()) {
+            for (BooleanExpression g : ((AndExpression) booleanExpression).getExpressions()) {
                 cdd = cdd.conjunction(new CDD(g));
             }
-        } else if (guard instanceof OrGuard) {
+        } else if (booleanExpression instanceof OrExpression) {
             cdd = cddFalse();
-            for (Guard g : ((OrGuard) guard).getGuards()) {
+            for (BooleanExpression g : ((OrExpression) booleanExpression).getExpressions()) {
                 cdd = cdd.disjunction(new CDD(g));
             }
         } else {
             throw new IllegalArgumentException("Guard instance is not supported");
         }
         this.pointer = cdd.pointer;
-        this.guard = guard;
+        this.booleanExpression = booleanExpression;
     }
 
     private void setDirty() {
-        isGuardDirty = true;
+        isExpressionDirty = true;
         isExtractionDirty = true;
     }
 
-    public Guard getGuard(List<Clock> relevantClocks) {
-        if (isGuardDirty) {
-            guard = isBDD() ? toBoolGuards() : toClockGuards(relevantClocks);
-            isGuardDirty = false;
+    public BooleanExpression getExpression(List<Clock> relevantClocks) {
+        if (isExpressionDirty) {
+            booleanExpression = isBDD() ? toBoolExpression() : toClockGuards(relevantClocks);
+            isExpressionDirty = false;
         }
 
-        return guard;
+        return booleanExpression;
     }
 
-    public Guard getGuard() {
-        return getGuard(clocks);
+    public BooleanExpression getExpression() {
+        return getExpression(clocks);
     }
 
-    private Guard toClockGuards(List<Clock> relevantClocks)
+    private BooleanExpression toClockGuards(List<Clock> relevantClocks)
             throws IllegalArgumentException {
         if (isBDD()) {
             throw new IllegalArgumentException("CDD is a BDD");
         }
 
         if (isFalse()) {
-            return new FalseGuard();
+            return new FalseExpression();
         }
         if (isTrue()) {
-            return new TrueGuard();
+            return new TrueExpression();
         }
 
         CDD copy = hardCopy();
 
-        List<Guard> orParts = new ArrayList<>();
+        List<BooleanExpression> orParts = new ArrayList<>();
         while (!copy.isTerminal()) {
             copy.reduce().removeNegative();
             CddExtractionResult extraction = copy.extract();
@@ -115,63 +115,63 @@ public class CDD {
             Zone zone = new Zone(extraction.getDbm());
             CDD bdd = extraction.getBddPart();
 
-            List<Guard> andParts = new ArrayList<>();
+            List<BooleanExpression> andParts = new ArrayList<>();
             // Adds normal guards and diagonal constraints
             andParts.add(
-                    zone.buildGuardsFromZone(clocks, relevantClocks)
+                    zone.createExpression(clocks, relevantClocks)
             );
             // Adds boolean constraints (var == val)
             andParts.add(
-                    bdd.toBoolGuards()
+                    bdd.toBoolExpression()
             );
             // Removes all TrueGuards
             andParts = andParts.stream()
-                    .filter(guard -> !(guard instanceof TrueGuard))
+                    .filter(guard -> !(guard instanceof TrueExpression))
                     .collect(Collectors.toList());
 
             orParts.add(
-                    new AndGuard(andParts)
+                    new AndExpression(andParts)
             );
         }
 
-        return new OrGuard(orParts);
+        return new OrExpression(orParts);
     }
 
-    private Guard toBoolGuards()
+    private BooleanExpression toBoolExpression()
             throws IllegalArgumentException {
         if (!isBDD()) {
             throw new IllegalArgumentException("CDD is not a BDD");
         }
 
         if (isFalse()) {
-            return new FalseGuard();
+            return new FalseExpression();
         }
         if (isTrue()) {
-            return new TrueGuard();
+            return new TrueExpression();
         }
 
         long ptr = getPointer();
         BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr, numBools));
 
-        List<Guard> orParts = new ArrayList<>();
+        List<BooleanExpression> orParts = new ArrayList<>();
         for (int i = 0; i < arrays.traceCount; i++) {
 
-            List<Guard> andParts = new ArrayList<>();
+            List<BooleanExpression> andParts = new ArrayList<>();
             for (int j = 0; j < arrays.booleanCount; j++) {
 
                 int index = arrays.getVariables().get(i).get(j);
                 if (index >= 0) {
                     BoolVar var = BVs.get(index - bddStartLevel);
                     boolean val = arrays.getValues().get(i).get(j) == 1;
-                    BoolGuard bg = new BoolGuard(var, Relation.EQUAL, val);
+                    BoolExpression bg = new BoolExpression(var, Relation.EQUAL, val);
 
                     andParts.add(bg);
                 }
             }
 
-            orParts.add(new AndGuard(andParts));
+            orParts.add(new AndExpression(andParts));
         }
-        return new OrGuard(orParts);
+        return new OrExpression(orParts);
     }
 
     public long getPointer() {
@@ -633,7 +633,7 @@ public class CDD {
 
     @Override
     public String toString() {
-        return getGuard().toString();
+        return getExpression().toString();
     }
 
     @Override
@@ -663,14 +663,14 @@ public class CDD {
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                BoolGuard bg = new BoolGuard(u.getBV(), Relation.EQUAL, u.getValue());
+                BoolExpression bg = new BoolExpression(u.getBV(), Relation.EQUAL, u.getValue());
                 res = res.conjunction(CDD.create(bg));
             }
         }
         return res.removeNegative().reduce();
     }
 
-    public static CDD create(BoolGuard guard) {
+    public static CDD create(BoolExpression guard) {
         if (guard.getValue()) {
             return createBddNode(bddStartLevel + indexOf(guard.getVar()));
         }

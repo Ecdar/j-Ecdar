@@ -12,10 +12,10 @@ public class AutomatonTest {
     public void testActionIsBothAnInputAndOutputThrowsException() {
         // Arrange
         Channel channel = new Channel("channel");
-        Location location = Location.create("Location", new TrueGuard(), true, false, false, false);
+        Location location = Location.create("Location", new TrueExpression(), true, false, false, false);
         List<Edge> edges = new ArrayList<>();
-        edges.add(new Edge(location, location, channel, true, new TrueGuard(), new ArrayList<>()));
-        edges.add(new Edge(location, location, channel, false, new TrueGuard(), new ArrayList<>()));
+        edges.add(new Edge(location, location, channel, true, new TrueExpression(), new ArrayList<>()));
+        edges.add(new Edge(location, location, channel, false, new TrueExpression(), new ArrayList<>()));
 
         // Act
         new Automaton("automaton", location, edges);
@@ -34,7 +34,7 @@ public class AutomatonTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNoInitialLocationThrowsIllegalArgumentException() {
         // Arrange
-        Location location = Location.create("Location", new TrueGuard(), false, false, false, false);
+        Location location = Location.create("Location", new TrueExpression(), false, false, false, false);
 
         // Act
         new Automaton("automaton", location, new ArrayList<>());
@@ -44,8 +44,8 @@ public class AutomatonTest {
     public void testMultipleInitialLocationsThrowsException() {
         // Arrange
         List<Location> locations = new ArrayList<>();
-        locations.add(Location.create("Location", new TrueGuard(), true, false, false, false));
-        locations.add(Location.create("Location", new TrueGuard(), true, false, false, false));
+        locations.add(Location.create("Location", new TrueExpression(), true, false, false, false));
+        locations.add(Location.create("Location", new TrueExpression(), true, false, false, false));
         List<Edge> edges = new ArrayList<>();
 
         // Act
@@ -56,7 +56,7 @@ public class AutomatonTest {
     public void testCopyConstructorUsesNewReferences() {
         // Arrange
         List<Location> locations = new ArrayList<>();
-        locations.add(Location.create("Location", new TrueGuard(), true, false, false, false));
+        locations.add(Location.create("Location", new TrueExpression(), true, false, false, false));
         List<Edge> edges = new ArrayList<>();
         List<Clock> clocks = new ArrayList<>();
         List<BoolVar> booleans = new ArrayList<>();

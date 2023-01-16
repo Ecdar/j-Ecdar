@@ -2,27 +2,27 @@ package models;
 
 import java.util.*;
 
-public class BoolGuard extends Guard {
+public class BoolExpression extends BooleanExpression {
     private final BoolVar var;
     private final Relation relation;
     private final boolean value;
 
-    public BoolGuard(BoolVar var, Relation relation, boolean value) {
+    public BoolExpression(BoolVar var, Relation relation, boolean value) {
         // These are the only relation types allowed
         if (relation != Relation.EQUAL && relation != Relation.NOT_EQUAL) {
-            throw new IllegalArgumentException("The relation of the clock guard is invalid");
+            throw new IllegalArgumentException("The relation of the clock expression is invalid");
         }
         this.var = var;
         this.relation = relation;
         this.value = value;
     }
 
-    public BoolGuard(BoolVar var, String comparator, boolean value)
+    public BoolExpression(BoolVar var, String comparator, boolean value)
             throws NoSuchElementException {
         this(var, Relation.fromString(comparator), value);
     }
 
-    public BoolGuard(BoolGuard copy, List<BoolVar> newBVs, List<BoolVar> oldBVs)
+    public BoolExpression(BoolExpression copy, List<BoolVar> newBVs, List<BoolVar> oldBVs)
             throws IndexOutOfBoundsException, NoSuchElementException {
         this(newBVs.get(oldBVs.indexOf(copy.getVar())), copy.relation, copy.value);
     }
@@ -35,14 +35,14 @@ public class BoolGuard extends Guard {
         return value;
     }
 
-    public BoolGuard negate() {
+    public BoolExpression negate() {
         switch (relation) {
             case EQUAL:
-                return new BoolGuard(var, Relation.NOT_EQUAL, value);
+                return new BoolExpression(var, Relation.NOT_EQUAL, value);
             case NOT_EQUAL:
-                return new BoolGuard(var, Relation.EQUAL, value);
+                return new BoolExpression(var, Relation.EQUAL, value);
         }
-        throw new IllegalStateException("The relation of the boolean guard is invalid");
+        throw new IllegalStateException("The relation of the boolean expression is invalid");
     }
 
     @Override
@@ -51,8 +51,8 @@ public class BoolGuard extends Guard {
     }
 
     @Override
-    Guard copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
-        return new BoolGuard(
+    BooleanExpression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+        return new BoolExpression(
             this, newBVs, oldBVs
         );
     }
@@ -62,11 +62,11 @@ public class BoolGuard extends Guard {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof BoolGuard)) {
+        if (!(obj instanceof BoolExpression)) {
             return false;
         }
 
-        BoolGuard other = (BoolGuard) obj;
+        BoolExpression other = (BoolExpression) obj;
 
         return var.equals(other.var) &&
                 relation == other.relation &&

@@ -74,20 +74,20 @@ public class BoolTest {
         BoolVar c = new BoolVar("c", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b); BVs.add(c);
-        BoolGuard bg_a_false = new BoolGuard(a, "==",false);
-        BoolGuard bg_b_false = new BoolGuard(b, "==",false);
-        BoolGuard bg_a_true = new BoolGuard(a, "==",true);
-        BoolGuard bg_b_true = new BoolGuard(b, "==",true);
-        BoolGuard bg_c_true = new BoolGuard(c, "==",true);
-        BoolGuard bg_c_false = new BoolGuard(c, "==",false);
-        List<Guard> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
+        BoolExpression bg_a_false = new BoolExpression(a, "==",false);
+        BoolExpression bg_b_false = new BoolExpression(b, "==",false);
+        BoolExpression bg_a_true = new BoolExpression(a, "==",true);
+        BoolExpression bg_b_true = new BoolExpression(b, "==",true);
+        BoolExpression bg_c_true = new BoolExpression(c, "==",true);
+        BoolExpression bg_c_false = new BoolExpression(c, "==",false);
+        List<BooleanExpression> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
         //  List<Guard> l2 = new ArrayList<>(List.of(bg_a_true,bg_b_true,bg_c_false));
         //  List<Guard> l3 = new ArrayList<>(List.of(bg_a_false,bg_b_true,bg_c_false));
-        List<List<Guard>> list = new ArrayList();
+        List<List<BooleanExpression>> list = new ArrayList();
         list.add(l1); //list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
-        CDD cdd =new CDD(new AndGuard(l1));
+        CDD cdd =new CDD(new AndExpression(l1));
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
         Log.debug(bddArr.getValues());
         Log.debug(bddArr.getVariables());
@@ -107,19 +107,19 @@ public class BoolTest {
         BoolVar c = new BoolVar("c", "aut", true);
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(a); BVs.add(b); BVs.add(c);
-        BoolGuard bg_a_false = new BoolGuard(a, "==",false);
-        BoolGuard bg_b_false = new BoolGuard(b, "==",false);
-        BoolGuard bg_a_true = new BoolGuard(a, "==",true);
-        BoolGuard bg_b_true = new BoolGuard(b, "==",true);
-        BoolGuard bg_c_true = new BoolGuard(c, "==",true);
-        BoolGuard bg_c_false = new BoolGuard(c, "==",false);
-        Guard l1 = new AndGuard(bg_a_true,bg_b_false,bg_c_false);
-        Guard l2 = new AndGuard(bg_a_true,bg_b_true,bg_c_false);
-        Guard l3 = new AndGuard(bg_a_false,bg_b_true,bg_c_false);
+        BoolExpression bg_a_false = new BoolExpression(a, "==",false);
+        BoolExpression bg_b_false = new BoolExpression(b, "==",false);
+        BoolExpression bg_a_true = new BoolExpression(a, "==",true);
+        BoolExpression bg_b_true = new BoolExpression(b, "==",true);
+        BoolExpression bg_c_true = new BoolExpression(c, "==",true);
+        BoolExpression bg_c_false = new BoolExpression(c, "==",false);
+        BooleanExpression l1 = new AndExpression(bg_a_true,bg_b_false,bg_c_false);
+        BooleanExpression l2 = new AndExpression(bg_a_true,bg_b_true,bg_c_false);
+        BooleanExpression l3 = new AndExpression(bg_a_false,bg_b_true,bg_c_false);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
-        Log.debug("or guard " + new OrGuard(l1,l2,l3));
-        CDD cdd =new CDD(new OrGuard(l1,l2,l3));
+        Log.debug("or guard " + new OrExpression(l1,l2,l3));
+        CDD cdd =new CDD(new OrExpression(l1,l2,l3));
         cdd.printDot();
         Log.debug( l1 + "  " +  l2 + "  " +  l3 + "  " + cdd);
         //assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
@@ -136,30 +136,30 @@ public class BoolTest {
         BVs.add(a); BVs.add(b);
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Guard>> noguard = new ArrayList<>();
-        List<Guard> emptyBoolGuards = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
+        List<BooleanExpression> emptyBoolBooleanExpressions = new ArrayList<>();
         BoolUpdate[] emptyBoolUpdates = new BoolUpdate[]{};
 
-        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
-        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
-        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+        ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
+        ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
+        ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
+        ClockExpression g4 = new ClockExpression(y, 2, Relation.GREATER_EQUAL);
 
-        ClockGuard g5= new ClockGuard(x, 6, Relation.LESS_EQUAL);
-        ClockGuard g6 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
-        ClockGuard g7 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
-        ClockGuard g8 = new ClockGuard(y, 6, Relation.GREATER_EQUAL);
+        ClockExpression g5= new ClockExpression(x, 6, Relation.LESS_EQUAL);
+        ClockExpression g6 = new ClockExpression(x, 1, Relation.GREATER_EQUAL);
+        ClockExpression g7 = new ClockExpression(y, 7, Relation.LESS_EQUAL);
+        ClockExpression g8 = new ClockExpression(y, 6, Relation.GREATER_EQUAL);
 
 
-        BoolGuard bg1 = new BoolGuard(a, "==",false);
-        BoolGuard bg2 = new BoolGuard(b, "==",false);
-        List<Guard> boolGuards1 = new ArrayList<>();
-        List<Guard> boolGuards2 = new ArrayList<>();
+        BoolExpression bg1 = new BoolExpression(a, "==",false);
+        BoolExpression bg2 = new BoolExpression(b, "==",false);
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
         boolGuards1.add(bg1);
         boolGuards2.add(bg2);
 
-        List<List<Guard>> guards1 = new ArrayList<>();
-        List<Guard> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -167,8 +167,8 @@ public class BoolTest {
         inner.addAll(boolGuards1);
         guards1.add(inner);
 
-        List<List<Guard>> guards2 = new ArrayList<>();
-        List<Guard> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -176,13 +176,13 @@ public class BoolTest {
         inner1.addAll(boolGuards2);
         guards2.add(inner1);
 
-        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l0 = Location.create("L0", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueExpression(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndExpression(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndExpression(inner1), noUpdate);
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);
@@ -203,8 +203,8 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
         CDD.addBooleans(BVs);
-        CDD origin1 = new CDD(new AndGuard(inner));
-        CDD origin2 = new CDD(new AndGuard(inner1));
+        CDD origin1 = new CDD(new AndExpression(inner));
+        CDD origin2 = new CDD(new AndExpression(inner1));
         CDD bothOrigins = origin1.disjunction(origin2);
 
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
@@ -234,27 +234,27 @@ public class BoolTest {
         bools.add(b);
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Guard>> noguard = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
 
-        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
-        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
-        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+        ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
+        ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
+        ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
+        ClockExpression g4 = new ClockExpression(y, 2, Relation.GREATER_EQUAL);
 
-        ClockGuard g5= new ClockGuard(x, 6, Relation.LESS_EQUAL);
-        ClockGuard g6 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
-        ClockGuard g7 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
-        ClockGuard g8 = new ClockGuard(y, 6, Relation.GREATER_EQUAL);
+        ClockExpression g5= new ClockExpression(x, 6, Relation.LESS_EQUAL);
+        ClockExpression g6 = new ClockExpression(x, 1, Relation.GREATER_EQUAL);
+        ClockExpression g7 = new ClockExpression(y, 7, Relation.LESS_EQUAL);
+        ClockExpression g8 = new ClockExpression(y, 6, Relation.GREATER_EQUAL);
 
 
-        BoolGuard bg_a_false = new BoolGuard(a, "==",false);
-        BoolGuard bg_b_false = new BoolGuard(b, "==",false);
-        BoolGuard bg_a_true = new BoolGuard(a, "==",true);
-        BoolGuard bg_b_true = new BoolGuard(b, "==",true);
+        BoolExpression bg_a_false = new BoolExpression(a, "==",false);
+        BoolExpression bg_b_false = new BoolExpression(b, "==",false);
+        BoolExpression bg_a_true = new BoolExpression(a, "==",true);
+        BoolExpression bg_b_true = new BoolExpression(b, "==",true);
 
-        List<Guard> boolGuards1 = new ArrayList<>();
-        List<Guard> boolGuards2 = new ArrayList<>();
-        List<Guard> boolGuards3 = new ArrayList<>();
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
+        List<BooleanExpression> boolGuards3 = new ArrayList<>();
         boolGuards1.add(bg_a_false);
         boolGuards1.add(bg_b_false);
 
@@ -265,8 +265,8 @@ public class BoolTest {
         boolGuards3.add(bg_a_true);
 
 
-        List<List<Guard>> guards1 = new ArrayList<>();
-        List<Guard> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -274,8 +274,8 @@ public class BoolTest {
         inner.addAll(boolGuards1);
         guards1.add(inner);
 
-        List<List<Guard>> guards2 = new ArrayList<>();
-        List<Guard> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -286,17 +286,17 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
         CDD.addBooleans(BVs);
-        CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
+        CDD compl = (new CDD(new AndExpression(inner)).disjunction(new CDD(new AndExpression(inner1)))).negation();
 
 
-        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l0 = Location.create("L0", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueExpression(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
-        Edge e2 = new Edge(l0, l1, i1, true, compl.getGuard(clocks), noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndExpression(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndExpression(inner1), noUpdate);
+        Edge e2 = new Edge(l0, l1, i1, true, compl.getExpression(clocks), noUpdate);
         CDD.done();
 
         List<Location> locations = new ArrayList<>();
@@ -338,27 +338,27 @@ public class BoolTest {
         bools.add(b);
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Guard>> noguard = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
 
-        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
-        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 3, Relation.LESS_EQUAL);
-        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+        ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
+        ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
+        ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
+        ClockExpression g4 = new ClockExpression(y, 2, Relation.GREATER_EQUAL);
 
-        ClockGuard g5= new ClockGuard(x, 6, Relation.LESS_EQUAL);
-        ClockGuard g6 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
-        ClockGuard g7 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
-        ClockGuard g8 = new ClockGuard(y, 6, Relation.GREATER_EQUAL);
+        ClockExpression g5= new ClockExpression(x, 6, Relation.LESS_EQUAL);
+        ClockExpression g6 = new ClockExpression(x, 1, Relation.GREATER_EQUAL);
+        ClockExpression g7 = new ClockExpression(y, 7, Relation.LESS_EQUAL);
+        ClockExpression g8 = new ClockExpression(y, 6, Relation.GREATER_EQUAL);
 
 
-        BoolGuard bg_a_false = new BoolGuard(a, "==",false);
-        BoolGuard bg_b_false = new BoolGuard(b, "==",false);
-        BoolGuard bg_a_true = new BoolGuard(a, "==",true);
-        BoolGuard bg_b_true = new BoolGuard(b, "==",true);
+        BoolExpression bg_a_false = new BoolExpression(a, "==",false);
+        BoolExpression bg_b_false = new BoolExpression(b, "==",false);
+        BoolExpression bg_a_true = new BoolExpression(a, "==",true);
+        BoolExpression bg_b_true = new BoolExpression(b, "==",true);
 
-        List<Guard> boolGuards1 = new ArrayList<>();
-        List<Guard> boolGuards2 = new ArrayList<>();
-        List<Guard> boolGuards3 = new ArrayList<>();
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
+        List<BooleanExpression> boolGuards3 = new ArrayList<>();
         boolGuards1.add(bg_a_false);
         boolGuards1.add(bg_b_false);
 
@@ -369,8 +369,8 @@ public class BoolTest {
         boolGuards3.add(bg_a_true);
 
 
-        List<List<Guard>> guards1 = new ArrayList<>();
-        List<Guard> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -378,8 +378,8 @@ public class BoolTest {
         inner.addAll(boolGuards1);
         guards1.add(inner);
 
-        List<List<Guard>> guards2 = new ArrayList<>();
-        List<Guard> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -390,17 +390,17 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
         CDD.addBooleans(BVs);
-        CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
+        CDD compl = (new CDD(new AndExpression(inner)).disjunction(new CDD(new AndExpression(inner1)))).negation();
 
 
-        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l0 = Location.create("L0", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueExpression(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
-        Edge e2 = new Edge(l0, l1, i1, true, compl.getGuard(clocks), noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndExpression(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndExpression(inner1), noUpdate);
+        Edge e2 = new Edge(l0, l1, i1, true, compl.getExpression(clocks), noUpdate);
         CDD.done();
 
         List<Location> locations = new ArrayList<>();
@@ -603,7 +603,7 @@ public class BoolTest {
         Update update = new BoolUpdate(a,true);
         List<Update> updates = new ArrayList<>();
         updates.add(update);
-        Edge e = new Edge(null,null,null,true,new TrueGuard(),updates);
+        Edge e = new Edge(null,null,null,true,new TrueExpression(),updates);
         CDD result = state.transitionBack(e);
         Log.debug(result);
         CDD.done();
@@ -621,25 +621,25 @@ public class BoolTest {
 
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Guard>> noguard = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
 
-        ClockGuard g1 = new ClockGuard(x, 10, Relation.LESS_EQUAL);
-        ClockGuard g2 = new ClockGuard(x, 5, Relation.GREATER_EQUAL);
-        ClockGuard g3 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
-        ClockGuard g4 = new ClockGuard(y, 2, Relation.GREATER_EQUAL);
+        ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
+        ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
+        ClockExpression g3 = new ClockExpression(y, 7, Relation.LESS_EQUAL);
+        ClockExpression g4 = new ClockExpression(y, 2, Relation.GREATER_EQUAL);
 
-        ClockGuard g5= new ClockGuard(x, 6, Relation.LESS_EQUAL);
-        ClockGuard g6 = new ClockGuard(x, 1, Relation.GREATER_EQUAL);
-        ClockGuard g7 = new ClockGuard(y, 7, Relation.LESS_EQUAL);
-        ClockGuard g8 = new ClockGuard(y, 6, Relation.GREATER_EQUAL);
+        ClockExpression g5= new ClockExpression(x, 6, Relation.LESS_EQUAL);
+        ClockExpression g6 = new ClockExpression(x, 1, Relation.GREATER_EQUAL);
+        ClockExpression g7 = new ClockExpression(y, 7, Relation.LESS_EQUAL);
+        ClockExpression g8 = new ClockExpression(y, 6, Relation.GREATER_EQUAL);
 
 
-        BoolGuard bg1 = new BoolGuard(a, "==",false);
-        BoolGuard bg2 = new BoolGuard(b, "==",false);
-        BoolGuard bg3 = new BoolGuard(a, "==",true);
-        BoolGuard bg4 = new BoolGuard(b, "==",true);
-        List<Guard> boolGuards1 = new ArrayList<>();
-        List<Guard> boolGuards2 = new ArrayList<>();
+        BoolExpression bg1 = new BoolExpression(a, "==",false);
+        BoolExpression bg2 = new BoolExpression(b, "==",false);
+        BoolExpression bg3 = new BoolExpression(a, "==",true);
+        BoolExpression bg4 = new BoolExpression(b, "==",true);
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
         boolGuards1.add(bg1);
         boolGuards1.add(bg4);
 
@@ -647,8 +647,8 @@ public class BoolTest {
         boolGuards2.add(bg3);
 
 
-        List<List<Guard>> guards1 = new ArrayList<>();
-        List<Guard> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -656,8 +656,8 @@ public class BoolTest {
         inner.addAll((boolGuards1));
         guards1.add(inner);
 
-        List<List<Guard>> guards2 = new ArrayList<>();
-        List<Guard> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -665,13 +665,13 @@ public class BoolTest {
         inner1.addAll(boolGuards2);
         guards2.add(inner1);
 
-        Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
-        Location l1 = Location.create("L1", new TrueGuard(), false, false, false, false, 0, 0);
+        Location l0 = Location.create("L0", new TrueExpression(), true, false, false, false, 0, 0);
+        Location l1 = Location.create("L1", new TrueExpression(), false, false, false, false, 0, 0);
 
         Channel i1 = new Channel("i1");
 
-        Edge e0 = new Edge(l0, l1, i1, true, new AndGuard(inner), noUpdate);
-        Edge e1 = new Edge(l0, l1, i1, true, new AndGuard(inner1), noUpdate);
+        Edge e0 = new Edge(l0, l1, i1, true, new AndExpression(inner), noUpdate);
+        Edge e1 = new Edge(l0, l1, i1, true, new AndExpression(inner1), noUpdate);
 
         List<Location> locations = new ArrayList<>();
         locations.add(l0);

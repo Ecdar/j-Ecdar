@@ -35,13 +35,13 @@ public class StatePair {
      * This function prints the <code>StatePair</code> in a more readable manner compared to <code>toString</code>.
      * <p>
      *     The format of the function is <p>
-     *         <code>(LEFT_LOCATION, RIGHT_LOCATION) [ GUARD ]</code>
+     *         <code>(LEFT_LOCATION, RIGHT_LOCATION) [ EXPRESSION ]</code>
      *     </p>whereas the format of <code>toString</code> is <p>
      *         <code>L=(LEFT_LOCATION, RIGHT_LOCATION)  CDD= LEFT_INVARIANT RIGHT_INVARIANT</code>
      *     </p>
      * </p>
      * <p>
-     *     This function prints the zone as a guard, not a <code>CDD</code> or <code>DBM</code>.
+     *     This function prints the zone as an expression, not a <code>CDD</code> or <code>DBM</code>.
      * </p>
      * <p>
      *     Since <code>left.getInvariant()</code> is equal to <code>right.getInvariant()</code>,
@@ -52,7 +52,7 @@ public class StatePair {
     public String prettyPrint() {
         return String.format("(%s %s) [ %s ]",
                 left.getLocation(), right.getLocation(),
-                left.getInvariant().getGuard().prettyPrint());
+                left.getInvariant().getExpression().prettyPrint());
     }
 
     @Override

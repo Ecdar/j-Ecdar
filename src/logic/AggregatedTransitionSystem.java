@@ -250,7 +250,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     private Edge createEdgeFromTransition(Transition transition, Location source, Location target, Channel channel) {
-        Guard guard = transition.getGuards(getClocks());
+        BooleanExpression guard = transition.getGuard(getClocks());
         List<Update> updates = transition.getUpdates();
         boolean isInput = getInputs().contains(channel);
         return new Edge(source, target, channel, isInput, guard, updates);

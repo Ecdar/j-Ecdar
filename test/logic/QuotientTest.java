@@ -1,7 +1,5 @@
 package logic;
 
-import log.Log;
-import log.Urgency;
 import models.*;
 import org.junit.Test;
 
@@ -15,12 +13,12 @@ public class QuotientTest {
     @Test
     public void quotientConstructorShouldAddANewClockWithNameQuo_new() {
         // Arrange
-        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
         Automaton t = new Automaton("t", t_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
 
-        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> s_locations = new ArrayList<>();
         s_locations.add(s_initial_location);
         Automaton s = new Automaton("s", s_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
@@ -40,12 +38,12 @@ public class QuotientTest {
     @Test
     public void quotientConstructorShouldAddANewChannel() {
         // Arrange
-        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
         Automaton t = new Automaton("t", t_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
 
-        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> s_locations = new ArrayList<>();
         s_locations.add(s_initial_location);
         Automaton s = new Automaton("s", s_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
@@ -68,17 +66,17 @@ public class QuotientTest {
         Channel a = new Channel("a");
         Channel b = new Channel("a");
 
-        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
 
-        Edge t_initial_location_looping_edge = new Edge(t_initial_location, t_initial_location, a, true, new TrueGuard(), new ArrayList<>());
+        Edge t_initial_location_looping_edge = new Edge(t_initial_location, t_initial_location, a, true, new TrueExpression(), new ArrayList<>());
         List<Edge> t_edges = new ArrayList<>();
         t_edges.add(t_initial_location_looping_edge);
 
         Automaton t = new Automaton("t", t_initial_location, t_edges);
 
-        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
 
-        Edge s_initial_location_looping_edge = new Edge(s_initial_location, s_initial_location, b, true, new TrueGuard(), new ArrayList<>());
+        Edge s_initial_location_looping_edge = new Edge(s_initial_location, s_initial_location, b, true, new TrueExpression(), new ArrayList<>());
         List<Edge> s_edges = new ArrayList<>();
         s_edges.add(s_initial_location_looping_edge);
 
@@ -102,13 +100,13 @@ public class QuotientTest {
         Channel d = new Channel("d");
         Channel e = new Channel("e");
 
-        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
 
-        Edge t_edge_out_a = new Edge(t_initial_location, t_initial_location, a, false, new TrueGuard(), new ArrayList<>());
-        Edge t_edge_out_b = new Edge(t_initial_location, t_initial_location, b, false, new TrueGuard(), new ArrayList<>());
-        Edge t_edge_in_d = new Edge(t_initial_location, t_initial_location, d, true, new TrueGuard(), new ArrayList<>());
+        Edge t_edge_out_a = new Edge(t_initial_location, t_initial_location, a, false, new TrueExpression(), new ArrayList<>());
+        Edge t_edge_out_b = new Edge(t_initial_location, t_initial_location, b, false, new TrueExpression(), new ArrayList<>());
+        Edge t_edge_in_d = new Edge(t_initial_location, t_initial_location, d, true, new TrueExpression(), new ArrayList<>());
         List<Edge> t_edges = new ArrayList<>();
         t_edges.add(t_edge_out_a);
         t_edges.add(t_edge_out_b);
@@ -116,14 +114,14 @@ public class QuotientTest {
 
         Automaton t = new Automaton("t", t_locations, t_edges);
 
-        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location s_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> s_locations = new ArrayList<>();
         s_locations.add(s_initial_location);
 
-        Edge s_edge_out_b = new Edge(s_initial_location, s_initial_location, b, false, new TrueGuard(), new ArrayList<>());
-        Edge s_edge_out_c = new Edge(s_initial_location, s_initial_location, c, false, new TrueGuard(), new ArrayList<>());
-        Edge s_edge_in_d = new Edge(s_initial_location, s_initial_location, d, true, new TrueGuard(), new ArrayList<>());
-        Edge s_edge_in_e = new Edge(s_initial_location, s_initial_location, e, true, new TrueGuard(), new ArrayList<>());
+        Edge s_edge_out_b = new Edge(s_initial_location, s_initial_location, b, false, new TrueExpression(), new ArrayList<>());
+        Edge s_edge_out_c = new Edge(s_initial_location, s_initial_location, c, false, new TrueExpression(), new ArrayList<>());
+        Edge s_edge_in_d = new Edge(s_initial_location, s_initial_location, d, true, new TrueExpression(), new ArrayList<>());
+        Edge s_edge_in_e = new Edge(s_initial_location, s_initial_location, e, true, new TrueExpression(), new ArrayList<>());
         List<Edge> s_edges = new ArrayList<>();
         s_edges.add(s_edge_out_b);
         s_edges.add(s_edge_out_c);
@@ -157,7 +155,7 @@ public class QuotientTest {
     @Test
     public void doubleQuotientShouldReuseQuotientClock() {
         // Arrange
-        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
         Automaton automaton = new Automaton("t", t_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
@@ -173,7 +171,7 @@ public class QuotientTest {
     @Test
     public void doubleQuotientShouldReuseQuotientInputAction() {
         // Arrange
-        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueGuard(), false, false, false);
+        Location t_initial_location = Location.createInitialLocation("t_initial", new TrueExpression(), false, false, false);
         List<Location> t_locations = new ArrayList<>();
         t_locations.add(t_initial_location);
         Automaton automaton = new Automaton("t", t_locations, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);

@@ -10,7 +10,7 @@ import java.util.*;
  * {@link Location} is a class used by both {@link Automaton} and {@link TransitionSystem} to decribe a location.
  *  It is named and has coordinates describing the position where it should be drawn in the GUI.
  *  A {@link Location} can be marked as initial, urgent, universal, and inconsistent.
- *  In order to reduce the conversions between {@link Guard} and {@link CDD}
+ *  In order to reduce the conversions between {@link BooleanExpression} and {@link CDD}
  *  the invariant is stored as both and only updated when required.
  *  For {@link Pruning} it also stores the inconsistent part of its invariant.
  * <p>
@@ -21,15 +21,15 @@ import java.util.*;
  *  The invariant of a composed location is lazily created as the conjunction of its children's invariants.
  *  In this context lazily created means that the locally stored invariant value in this location is only
  *  updated when a change in this composed location warrants an update to it.
- *  This can be warranted when {@link #setInvariantGuard(Guard)} is invoked.
+ *  This can be warranted when {@link #setInvariant(BooleanExpression)} is invoked.
  * </p>
  * <p>
  * A {@link Location} can also be a <b>simple</b> location, which is a location with exactly one child.
  *  A simple location is used when the {@link CDD CDD invariant} of this location
- *  is not directly created from the {@link Guard Guard invariant}.
+ *  is not directly created from the {@link BooleanExpression Invariant}.
  *  Instead the {@link CDD CDD invariant} of this location will always be the {@link CDD CDD invariant} of its child,
- *  whilst the {@link Guard Guard invariant} of this location can be different from the {@link CDD CDD invariant}.
- *  For this reason a simple location can have a {@link Guard Guard invariant} and {@link CDD CDD invariant}
+ *  whilst the {@link BooleanExpression Invariant} of this location can be different from the {@link CDD CDD invariant}.
+ *  For this reason a simple location can have a {@link BooleanExpression Invariant} and {@link CDD CDD invariant}
  *  which is out of sync.
  *  <b>Deprecation warning:</b> <i>simple</i> locations are planned to be deprecated and one should instead create
  *      composed locations which have a more predictable specification
@@ -38,7 +38,7 @@ import java.util.*;
  * State overview:
  *     <li>name
  *     <li>x and y coordinates
- *     <li>invariant both as {@link Guard} and {@link CDD}
+ *     <li>invariant both as {@link BooleanExpression} and {@link CDD}
  *     <li>inconsistent part for {@link Pruning}
  *     <li>whether it is initial, urgent, universal, inconsistent
  * </ul>
@@ -49,7 +49,7 @@ public final class Location {
     private String name;
     private int x, y;
 
-    private Guard invariantGuard;
+    private BooleanExpression invariantBooleanExpression;
     private CDD invariantCdd;
 
     private CDD inconsistentPart;
@@ -63,7 +63,7 @@ public final class Location {
 
     private Location(
             String name,
-            Guard invariantGuard,
+            BooleanExpression invariantBooleanExpression,
             CDD invariantCdd,
             CDD inconsistentPart,
             boolean isInitial,
@@ -79,7 +79,7 @@ public final class Location {
         }
 
         this.name = name;
-        this.invariantGuard = invariantGuard;
+        this.invariantBooleanExpression = invariantBooleanExpression;
         this.invariantCdd = invariantCdd;
         this.inconsistentPart = inconsistentPart;
         this.isInitial = isInitial;
@@ -93,7 +93,7 @@ public final class Location {
 
     public static Location create(
             String name,
-            Guard invariant,
+            BooleanExpression invariant,
             boolean isInitial,
             boolean isUrgent,
             boolean isUniversal,
@@ -118,7 +118,7 @@ public final class Location {
 
     public static Location create(
             String name,
-            Guard invariant,
+            BooleanExpression invariant,
             boolean isInitial,
             boolean isUrgent,
             boolean isUniversal,
@@ -134,7 +134,7 @@ public final class Location {
 
     public static Location createInitialLocation(
             String name,
-            Guard invariant,
+            BooleanExpression invariant,
             boolean isUrgent,
             boolean isUniversal,
             boolean isInconsistent
@@ -155,7 +155,7 @@ public final class Location {
         int x = 0;
         int y = 0;
 
-        List<Guard> guards = new ArrayList<>();
+        List<BooleanExpression> booleanExpressions = new ArrayList<>();
         for (Location location : children) {
             nameBuilder.append(location.getName());
             isInitial = isInitial && location.isInitial();
@@ -164,7 +164,7 @@ public final class Location {
             isInconsistent = isInconsistent || location.isInconsistent();
             x += location.getX();
             y += location.getY();
-            guards.add(location.getInvariantGuard());
+            booleanExpressions.add(location.getInvariant());
         }
 
         int amount = children.size();
@@ -172,7 +172,7 @@ public final class Location {
         y /= amount;
         String name = nameBuilder.toString();
 
-        Guard invariant = new AndGuard(guards);
+        BooleanExpression invariant = new AndExpression(booleanExpressions);
         return new Location(
             name,
             invariant,
@@ -197,7 +197,7 @@ public final class Location {
     ) {
         return new Location(
             name,
-            new TrueGuard(),
+            new TrueExpression(),
             null,
             null,
             isInitial,
@@ -223,7 +223,7 @@ public final class Location {
     ) {
         return new Location(
             name,
-            new FalseGuard(),
+            new FalseExpression(),
             null,
             null,
             isInitial,
@@ -246,7 +246,7 @@ public final class Location {
 
         return new Location(
             child.getName(),
-            child.getInvariantGuard(),
+            child.getInvariant(),
             null,
             child.getInconsistentPart(),
             child.isInitial(),
@@ -262,7 +262,7 @@ public final class Location {
     public Location copy() {
         return new Location(
             getName(),
-            getInvariantGuard(),
+            getInvariant(),
             null,
             getInconsistentPart(),
             isInitial(),
@@ -283,7 +283,7 @@ public final class Location {
     ) {
         return new Location(
             getName(),
-            getInvariantGuard().copy(
+            getInvariant().copy(
                     newClocks, oldClocks, newBVs, oldBVs
             ),
             null,
@@ -311,7 +311,7 @@ public final class Location {
     }
 
     public void removeInvariants() {
-        invariantGuard = new TrueGuard();
+        invariantBooleanExpression = new TrueExpression();
         invariantCdd = CDD.cddTrue();
     }
 
@@ -351,17 +351,17 @@ public final class Location {
         this.y = y;
     }
 
-    public Guard getInvariantGuard() {
-        if (invariantGuard == null) {
-            invariantGuard = getInvariantCdd().getGuard();
+    public BooleanExpression getInvariant() {
+        if (invariantBooleanExpression == null) {
+            invariantBooleanExpression = getInvariantCdd().getExpression();
         }
 
-        return invariantGuard;
+        return invariantBooleanExpression;
     }
 
     public CDD getInvariantCdd() {
         if (isSimple()) {
-            return new CDD(children.get(0).getInvariantGuard());
+            return new CDD(children.get(0).getInvariant());
         }
 
         if (invariantCdd == null) {
@@ -375,15 +375,15 @@ public final class Location {
                     this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCdd());
                 }
             } else {
-                invariantCdd = new CDD(getInvariantGuard());
+                invariantCdd = new CDD(getInvariant());
             }
         }
 
         return invariantCdd;
     }
 
-    public void setInvariantGuard(Guard invariantAsGuard) {
-        this.invariantGuard = invariantAsGuard;
+    public void setInvariant(BooleanExpression invariantAsBooleanExpression) {
+        this.invariantBooleanExpression = invariantAsBooleanExpression;
         this.invariantCdd = null;
     }
 
@@ -400,7 +400,7 @@ public final class Location {
     }
 
     public int getMaxConstant(Clock clock) {
-        return getInvariantGuard().getMaxConstant(clock);
+        return getInvariant().getMaxConstant(clock);
     }
 
     @Override
@@ -441,6 +441,6 @@ public final class Location {
             return Objects.hash(children);
         }
 
-        return Objects.hash(name, getInvariantGuard(), isInitial, isUrgent, isUniversal, isInconsistent);
+        return Objects.hash(name, getInvariant(), isInitial, isUrgent, isUniversal, isInconsistent);
     }
 }
