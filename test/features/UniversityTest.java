@@ -314,6 +314,7 @@ public class UniversityTest {
 
         assertFalse(refines);
     }
+
     @Test
     public void doubleQuotientTest3() {
         // refinement: res <= spec \ adm2 \ machine
@@ -357,8 +358,6 @@ public class UniversityTest {
         Quotient rhs = new Quotient(getSpec(), getAdm());
         Refinement refinement = new Refinement(lhs, rhs);
 
-        XMLFileWriter.toXML("./testOutput/specDIVadm.xml", lhs.getAutomaton());
-        XMLFileWriter.toXML("./testOutput/comp.xml", rhs.getAutomaton());
         boolean refines = refinement.check();
 
         assertTrue(refines);
@@ -417,8 +416,6 @@ public class UniversityTest {
         TransitionSystem lhs = getSimpleResearcher();
 
         TransitionSystem rhs = new SimpleTransitionSystem(new Quotient(getSimpleSpec(), getSimpleAdm()).getAutomaton());
-        // TransitionSystem rhs = new Quotient(getSimpleSpec(), getSimpleAdm());
-        XMLFileWriter.toXML("testOutput/simpleversityQuotient.xml",rhs.getAutomaton());
         Refinement refinement = new Refinement(lhs, rhs);
         assertTrue(new Refinement(new Composition(getSimpleAdm(),getSimpleResearcher()),getSimpleSpec()).check());
         boolean refines = refinement.check();
@@ -755,9 +752,6 @@ public class UniversityTest {
 
         Refinement refinement1 = new Refinement(composition1, composition2);
         Refinement refinement2 = new Refinement(composition2, composition1);
-
-        new SimpleTransitionSystem(composition1.getAutomaton()).toXML("testOutput/comp1.xml");
-        new SimpleTransitionSystem(composition2.getAutomaton()).toXML("testOutput/comp2.xml");
 
         boolean refines1 = refinement1.check();
         boolean refines2 = refinement2.check();

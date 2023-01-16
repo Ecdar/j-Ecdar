@@ -79,6 +79,34 @@ public class Automaton {
         }
     }
 
+    public Automaton(String name, List<Location> locations, List<Edge> edges) {
+        this(
+                name,
+                locations,
+                edges,
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
+    }
+
+    public Automaton(String name, Location location, List<Edge> edges, List<Clock> clocks, List<BoolVar> booleans) {
+        this(
+                name,
+                Collections.singletonList(location),
+                edges,
+                clocks,
+                booleans
+        );
+    }
+
+    public Automaton(String name, Location location, List<Edge> edges) {
+        this(
+                name,
+                Collections.singletonList(location),
+                edges
+        );
+    }
+
     public Automaton(String name, List<Location> locations, List<Edge> edges, List<Clock> clocks, List<BoolVar> BVs) {
         this(name, locations, edges, clocks, BVs, true);
     }
@@ -86,7 +114,7 @@ public class Automaton {
     public Automaton(Automaton automaton) {
         name = automaton.name + "Copy";
         clocks = automaton.clocks.stream()
-                .map(clock -> new Clock(clock.getOriginalName() + "Copy", name))
+                .map(clock -> new Clock(clock.getOriginalName() + "Copy", name, clock.isGlobal()))
                 .collect(Collectors.toList());
         BVs = automaton.BVs.stream()
                 .map(boolVar -> new BoolVar(boolVar.getOriginalName() + "Copy", name, boolVar.getInitialValue()))

@@ -13,113 +13,54 @@ public class AutomatonTest {
         // Arrange
         Channel channel = new Channel("channel");
         Location location = Location.create("Location", new TrueExpression(), true, false, false, false);
-        List<Location> locations = new ArrayList<>();
-        locations.add(location);
         List<Edge> edges = new ArrayList<>();
-        edges.add(
-                new Edge(location, location, channel, true, new TrueExpression(), new ArrayList<>())
-        );
-        edges.add(
-                new Edge(location, location, channel, false, new TrueExpression(), new ArrayList<>())
-        );
-        List<Clock> clocks = new ArrayList<>();
-        List<BoolVar> booleans = new ArrayList<>();
+        edges.add(new Edge(location, location, channel, true, new TrueExpression(), new ArrayList<>()));
+        edges.add(new Edge(location, location, channel, false, new TrueExpression(), new ArrayList<>()));
 
         // Act
-        Automaton automaton = new Automaton(
-                "automaton",
-                locations,
-                edges,
-                clocks,
-                booleans,
-                false
-        );
+        new Automaton("automaton", location, edges);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNoLocationsThrowsException() {
+    public void testEmptyAutomatonThrowsIllegalArgumentException() {
         // Arrange
         List<Location> locations = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
-        List<Clock> clocks = new ArrayList<>();
-        List<BoolVar> booleans = new ArrayList<>();
 
         // Act
-        Automaton automaton = new Automaton(
-                "automaton",
-                locations,
-                edges,
-                clocks,
-                booleans,
-                false
-        );
+        new Automaton("automaton", locations, edges);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNoInitialLocationThrowsException() {
+    public void testNoInitialLocationThrowsIllegalArgumentException() {
         // Arrange
-        List<Location> locations = new ArrayList<>();
-        locations.add(
-                Location.create("Location", new TrueExpression(), false, false, false, false)
-        );
-        List<Edge> edges = new ArrayList<>();
-        List<Clock> clocks = new ArrayList<>();
-        List<BoolVar> booleans = new ArrayList<>();
+        Location location = Location.create("Location", new TrueExpression(), false, false, false, false);
 
         // Act
-        Automaton automaton = new Automaton(
-                "automaton",
-                locations,
-                edges,
-                clocks,
-                booleans,
-                false
-        );
+        new Automaton("automaton", location, new ArrayList<>());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testMultipleInitialLocationsThrowsException() {
         // Arrange
         List<Location> locations = new ArrayList<>();
-        locations.add(
-                Location.create("Location", new TrueExpression(), true, false, false, false)
-        );
-        locations.add(
-                Location.create("Location", new TrueExpression(), true, false, false, false)
-        );
+        locations.add(Location.create("Location", new TrueExpression(), true, false, false, false));
+        locations.add(Location.create("Location", new TrueExpression(), true, false, false, false));
         List<Edge> edges = new ArrayList<>();
-        List<Clock> clocks = new ArrayList<>();
-        List<BoolVar> booleans = new ArrayList<>();
 
         // Act
-        Automaton automaton = new Automaton(
-                "automaton",
-                locations,
-                edges,
-                clocks,
-                booleans,
-                false
-        );
+        new Automaton("automaton", locations, edges);
     }
 
     @Test
     public void testCopyConstructorUsesNewReferences() {
         // Arrange
         List<Location> locations = new ArrayList<>();
-        locations.add(
-                Location.create("Location", new TrueExpression(), true, false, false, false)
-        );
+        locations.add(Location.create("Location", new TrueExpression(), true, false, false, false));
         List<Edge> edges = new ArrayList<>();
         List<Clock> clocks = new ArrayList<>();
         List<BoolVar> booleans = new ArrayList<>();
-        Automaton automaton = new Automaton(
-                "automaton",
-                locations,
-                edges,
-                clocks,
-                booleans,
-                false
-        );
+        Automaton automaton = new Automaton("automaton", locations, edges, clocks, booleans, false);
 
         // Act
         Automaton copy = new Automaton(automaton);

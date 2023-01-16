@@ -132,6 +132,16 @@ public final class Location {
         return location.copy();
     }
 
+    public static Location createInitialLocation(
+            String name,
+            Expression invariant,
+            boolean isUrgent,
+            boolean isUniversal,
+            boolean isInconsistent
+    ) {
+        return create(name, invariant, true, isUrgent, isUniversal, isInconsistent);
+    }
+
     public static Location createComposition(List<Location> children) {
         if (children.size() == 0) {
             throw new IllegalArgumentException("Requires at least one location to create a product");
