@@ -81,7 +81,7 @@ public class VariousTest {
         ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
         ClockExpression g4 = new ClockExpression(y, 2, Relation.GREATER_EQUAL);
 
-        List<Expression> inner = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -97,7 +97,7 @@ public class VariousTest {
 
 
         origin1 = origin1.delay();
-        Expression origin1Guards = origin1.getExpression(clocks);
+        BooleanExpression origin1Guards = origin1.getExpression(clocks);
         Log.debug(origin1Guards);
         assert(true);
     }
@@ -110,8 +110,8 @@ public class VariousTest {
         ClockExpression g1 = new ClockExpression(x, 10, Relation.GREATER_EQUAL);
         ClockExpression g3 = new ClockExpression(y, 3, Relation.LESS_EQUAL);
 
-        List<List<Expression>> guards1 = new ArrayList<>();
-        List<Expression> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g3);
         guards1.add(inner);
@@ -124,7 +124,7 @@ public class VariousTest {
 
         CDD origin1 = new CDD(new AndExpression(inner));
 
-        Expression origin1Guards = origin1.getExpression(clocks);
+        BooleanExpression origin1Guards = origin1.getExpression(clocks);
         Log.debug(origin1Guards);
 
 
@@ -134,7 +134,7 @@ public class VariousTest {
         list1.add(clockUpdate);
         origin1 = origin1.applyReset(list1);
 
-        Expression origin2Guards = origin1.getExpression(clocks);
+        BooleanExpression origin2Guards = origin1.getExpression(clocks);
         Log.debug(origin2Guards);
 
         assert(origin2Guards.toString().equals("(x==0 && y<=3 && y-x<=3 && x-y<=0)"));

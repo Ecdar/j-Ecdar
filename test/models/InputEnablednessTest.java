@@ -54,45 +54,45 @@ public class InputEnablednessTest {
         ClockExpression e9_g1 = new ClockExpression(x, 10,  Relation.LESS_EQUAL);
 
 
-        Expression e5_g1_1 = new ClockExpression(x, null,2, Relation.LESS_EQUAL); // x>10
-        Expression e5_g1_2 = new ClockExpression(y, null, 3, Relation.GREATER_THAN);
-        Expression e5_g2_1 = new ClockExpression(x, null,2, Relation.GREATER_THAN);
-        Expression e5_g2_2 = new ClockExpression(x, null,3, Relation.LESS_THAN);
-        Expression e5_g3_1 = new ClockExpression(x, null,3, Relation.GREATER_EQUAL);  // x>2
-        Expression e5_g3_2 = new ClockExpression(x, null,5, Relation.LESS_EQUAL);
-        Expression e5_g3_3 = new ClockExpression(y, null,4, Relation.LESS_THAN);
-        Expression e5_g4 = new ClockExpression(x, null,5, Relation.GREATER_THAN);
+        BooleanExpression e5_g1_1 = new ClockExpression(x, null,2, Relation.LESS_EQUAL); // x>10
+        BooleanExpression e5_g1_2 = new ClockExpression(y, null, 3, Relation.GREATER_THAN);
+        BooleanExpression e5_g2_1 = new ClockExpression(x, null,2, Relation.GREATER_THAN);
+        BooleanExpression e5_g2_2 = new ClockExpression(x, null,3, Relation.LESS_THAN);
+        BooleanExpression e5_g3_1 = new ClockExpression(x, null,3, Relation.GREATER_EQUAL);  // x>2
+        BooleanExpression e5_g3_2 = new ClockExpression(x, null,5, Relation.LESS_EQUAL);
+        BooleanExpression e5_g3_3 = new ClockExpression(y, null,4, Relation.LESS_THAN);
+        BooleanExpression e5_g4 = new ClockExpression(x, null,5, Relation.GREATER_THAN);
 
-        Expression e6_g1 = new ClockExpression(x, null,10, Relation.GREATER_THAN);
+        BooleanExpression e6_g1 = new ClockExpression(x, null,10, Relation.GREATER_THAN);
 
 
 
-        List<Expression> e5_1 = new ArrayList<>();
+        List<BooleanExpression> e5_1 = new ArrayList<>();
         e5_1.add(e5_g1_1);
         e5_1.add(e5_g1_2);
-        Expression guards_e5_1= new AndExpression(e5_1);
+        BooleanExpression guards_e5_1= new AndExpression(e5_1);
 
-        List<Expression> e5_2 = new ArrayList<>();
+        List<BooleanExpression> e5_2 = new ArrayList<>();
         e5_2.add(e5_g2_1);
         e5_2.add(e5_g2_2);
-        Expression guards_e5_2= new AndExpression(e5_2);
+        BooleanExpression guards_e5_2= new AndExpression(e5_2);
 
-        List<Expression> e5_3 = new ArrayList<>();
+        List<BooleanExpression> e5_3 = new ArrayList<>();
         e5_3.add(e5_g3_1);
         e5_3.add(e5_g3_2);
         e5_3.add(e5_g3_3);
-        Expression guards_e5_3= new AndExpression(e5_3);
+        BooleanExpression guards_e5_3= new AndExpression(e5_3);
 
-        List<Expression> e5_4 = new ArrayList<>();
+        List<BooleanExpression> e5_4 = new ArrayList<>();
         e5_4.add(e5_g4);
-        Expression guards_e5_4= new AndExpression(e5_4);
+        BooleanExpression guards_e5_4= new AndExpression(e5_4);
 
-        List<Expression> guards_e5_or = new ArrayList<>();
+        List<BooleanExpression> guards_e5_or = new ArrayList<>();
         guards_e5_or.add(guards_e5_1);
         guards_e5_or.add(guards_e5_2);
         guards_e5_or.add(guards_e5_3);
         guards_e5_or.add(guards_e5_4);
-        Expression guards_e5 = new OrExpression(guards_e5_or);
+        BooleanExpression guards_e5 = new OrExpression(guards_e5_or);
 
         //Guard e9_g2 = new Guard(y, 10, false, false);
 

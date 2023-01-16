@@ -3,7 +3,7 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public class ClockExpression extends Expression {
+public class ClockExpression extends BooleanExpression {
     private final Clock clock, diagonalClock;
     private final int bound;
     private final Relation relation;
@@ -100,7 +100,7 @@ public class ClockExpression extends Expression {
     }
 
     @Override
-    Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+    BooleanExpression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         return new ClockExpression(this, newClocks, oldClocks);
     }
 

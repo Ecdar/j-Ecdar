@@ -6,16 +6,16 @@ import com.google.common.collect.Lists;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OrExpression extends Expression {
+public class OrExpression extends BooleanExpression {
 
-    private List<Expression> expressions;
+    private List<BooleanExpression> booleanExpressions;
 
-    public OrExpression(List<Expression> expressions) {
-        this.expressions = expressions;
+    public OrExpression(List<BooleanExpression> booleanExpressions) {
+        this.booleanExpressions = booleanExpressions;
 
         /* If any of the expressions are OrExpressions themselves,
          *   then we can decompose their expressions to be contained in this */
-        List<OrExpression> worklist = this.expressions
+        List<OrExpression> worklist = this.booleanExpressions
                 .stream()
                 .filter(expression -> expression instanceof OrExpression)
                 .map(expression -> (OrExpression) expression)
@@ -24,66 +24,66 @@ public class OrExpression extends Expression {
             OrExpression current = worklist.get(0);
             worklist.remove(0);
 
-            for (Expression expression : current.expressions) {
-                if (expression instanceof OrExpression) {
-                    worklist.add((OrExpression) expression);
+            for (BooleanExpression booleanExpression : current.booleanExpressions) {
+                if (booleanExpression instanceof OrExpression) {
+                    worklist.add((OrExpression) booleanExpression);
                 }
-                this.expressions.add(expression);
+                this.booleanExpressions.add(booleanExpression);
             }
 
-            this.expressions.remove(current);
+            this.booleanExpressions.remove(current);
         }
 
         // Remove all expressions if there is a true expression
-        boolean hasTrueExpression = this.expressions.stream().anyMatch(expression -> expression instanceof TrueExpression);
+        boolean hasTrueExpression = this.booleanExpressions.stream().anyMatch(expression -> expression instanceof TrueExpression);
         if (hasTrueExpression) {
             /* If there are one or more TrueExpressions then we just need a single TrueExpression.
              *   It would be possible to just clear it and let the last predicate,
              *   ensure that the empty OrExpression is a tautology.
              *   However, this is more robust towards changes */
-            this.expressions.clear();
-            this.expressions.add(new TrueExpression());
+            this.booleanExpressions.clear();
+            this.booleanExpressions.add(new TrueExpression());
         }
 
         // Remove all false expressions
-        this.expressions = this.expressions.stream().filter(expression -> !(expression instanceof FalseExpression)).collect(Collectors.toList());
+        this.booleanExpressions = this.booleanExpressions.stream().filter(expression -> !(expression instanceof FalseExpression)).collect(Collectors.toList());
 
         // If there are no expressions then it is a tautology
-        if (this.expressions.size() == 0) {
-            this.expressions.add(new TrueExpression());
+        if (this.booleanExpressions.size() == 0) {
+            this.booleanExpressions.add(new TrueExpression());
         }
     }
 
-    public OrExpression(List<Expression>... expressions) {
+    public OrExpression(List<BooleanExpression>... expressions) {
         this(Lists.newArrayList(Iterables.concat(expressions)));
     }
 
-    public OrExpression(Expression... expressions) {
-        this(Arrays.asList(expressions));
+    public OrExpression(BooleanExpression... booleanExpressions) {
+        this(Arrays.asList(booleanExpressions));
     }
 
     public OrExpression(OrExpression copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         // As this is the copy-constructor we need to create new instances of the expressions
-        this(copy.expressions.stream().map(expression ->
+        this(copy.booleanExpressions.stream().map(expression ->
             expression.copy(newClocks, oldClocks, newBVs, oldBVs)
         ).collect(Collectors.toList()));
     }
 
-    public List<Expression> getExpressions() {
-        return expressions;
+    public List<BooleanExpression> getExpressions() {
+        return booleanExpressions;
     }
 
     @Override
     int getMaxConstant(Clock clock) {
         int max = 0;
-        for (Expression expression : expressions) {
-            max = Math.max(max, expression.getMaxConstant(clock));
+        for (BooleanExpression booleanExpression : booleanExpressions) {
+            max = Math.max(max, booleanExpression.getMaxConstant(clock));
         }
         return max;
     }
 
     @Override
-    Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+    BooleanExpression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         return new OrExpression(
             this, newClocks, oldClocks, newBVs, oldBVs
         );
@@ -99,18 +99,18 @@ public class OrExpression extends Expression {
         }
 
         OrExpression other = (OrExpression) obj;
-        return Arrays.equals(expressions.toArray(), other.expressions.toArray());
+        return Arrays.equals(booleanExpressions.toArray(), other.booleanExpressions.toArray());
     }
 
     @Override
     public String toString() {
-        if (expressions.size() == 1) {
-            return expressions.get(0).toString();
+        if (booleanExpressions.size() == 1) {
+            return booleanExpressions.get(0).toString();
         }
 
         return "(" +
-                expressions.stream()
-                    .map(Expression::toString)
+                booleanExpressions.stream()
+                    .map(BooleanExpression::toString)
                     .collect(Collectors.joining(" or "))
                 + ")";
     }
@@ -122,6 +122,6 @@ public class OrExpression extends Expression {
 
     @Override
     public String prettyPrint() {
-        return Expression.compositePrettyPrint(expressions, "||");
+        return BooleanExpression.compositePrettyPrint(booleanExpressions, "||");
     }
 }

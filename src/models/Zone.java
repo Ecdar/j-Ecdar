@@ -182,11 +182,11 @@ public class Zone {
         return clocks.contains(clock);
     }
 
-    public Expression createExpression(List<Clock> clocks, List<Clock> relevantClocks) {
-        List<Expression> expressions = new ArrayList<>();
-        expressions.addAll(createNormalGuards(clocks, relevantClocks));
-        expressions.addAll(createDiagonalConstraints(clocks, relevantClocks));
-        return new AndExpression(expressions);
+    public BooleanExpression createExpression(List<Clock> clocks, List<Clock> relevantClocks) {
+        List<BooleanExpression> booleanExpressions = new ArrayList<>();
+        booleanExpressions.addAll(createNormalGuards(clocks, relevantClocks));
+        booleanExpressions.addAll(createDiagonalConstraints(clocks, relevantClocks));
+        return new AndExpression(booleanExpressions);
     }
 
     public List<ClockExpression> createNormalGuards(List<Clock> clocks, List<Clock> relevantClocks) {

@@ -167,7 +167,7 @@ public class XMLParser {
             String locName = loc.getAttributeValue("id");
             boolean isInitial = locName.equals(initId);
             List<Element> labels = loc.getChildren("label");
-            Expression invariants = new TrueExpression();
+            BooleanExpression invariants = new TrueExpression();
             int x=0,y=0;
             boolean xyDefined = false;
 
@@ -238,7 +238,7 @@ public class XMLParser {
             Location target = findLocations(locations, edge.getChild("target").getAttributeValue("ref"));
 
             List<Element> labels = edge.getChildren("label");
-            Expression guards = new TrueExpression();
+            BooleanExpression guards = new TrueExpression();
             List<Update> updates = new ArrayList<>();
             Channel chan = null;
 

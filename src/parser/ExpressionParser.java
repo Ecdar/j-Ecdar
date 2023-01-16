@@ -34,7 +34,7 @@ public class ExpressionParser {
         throw new BooleanVariableNotFoundException("Boolean variable: " + name + " was not found");
     }
 
-    public static Expression parse(String expressionString, List<Clock> clockList, List<BoolVar> BVList) {
+    public static BooleanExpression parse(String expressionString, List<Clock> clockList, List<BoolVar> BVList) {
         clocks = clockList;
         BVs = BVList;
         CharStream charStream = CharStreams.fromString(expressionString);
@@ -48,28 +48,28 @@ public class ExpressionParser {
         return expressionVisitor.visit(parser.expression());
     }
 
-    private static class ExpressionVisitor extends  ExpressionGrammarBaseVisitor<Expression>{
+    private static class ExpressionVisitor extends  ExpressionGrammarBaseVisitor<BooleanExpression>{
 
         @Override
-        public Expression visitOr(ExpressionGrammarParser.OrContext ctx) {
-            List<Expression> orExpressions = new ArrayList<>();
+        public BooleanExpression visitOr(ExpressionGrammarParser.OrContext ctx) {
+            List<BooleanExpression> orBooleanExpressions = new ArrayList<>();
             for(ExpressionGrammarParser.OrExpressionContext orExpression: ctx.orExpression()){
-                orExpressions.add(visit(orExpression));
+                orBooleanExpressions.add(visit(orExpression));
             }
 
-            return new OrExpression(orExpressions);
+            return new OrExpression(orBooleanExpressions);
         }
 
-        public Expression visitAnd(ExpressionGrammarParser.AndContext ctx) {
-            List<Expression> expressions = new ArrayList<>();
+        public BooleanExpression visitAnd(ExpressionGrammarParser.AndContext ctx) {
+            List<BooleanExpression> booleanExpressions = new ArrayList<>();
             for (ExpressionGrammarParser.ArithExpressionContext expression: ctx.arithExpression()) {
-                expressions.add(visit(expression));
+                booleanExpressions.add(visit(expression));
             }
-            return new AndExpression(expressions);
+            return new AndExpression(booleanExpressions);
         }
 
         @Override
-        public Expression visitArithExpression(ExpressionGrammarParser.ArithExpressionContext ctx) {
+        public BooleanExpression visitArithExpression(ExpressionGrammarParser.ArithExpressionContext ctx) {
             if(ctx.BOOLEAN() != null) {
                 boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
                 return value ? new TrueExpression() : new FalseExpression();
@@ -80,7 +80,7 @@ public class ExpressionParser {
         }
 
         @Override
-        public Expression visitClockExpr(ExpressionGrammarParser.ClockExprContext ctx) {
+        public BooleanExpression visitClockExpr(ExpressionGrammarParser.ClockExprContext ctx) {
             int value = Integer.parseInt(ctx.INT().getText());
             String operator = ctx.OPERATOR().getText();
             Clock clock_i = findClock(ctx.VARIABLE(0).getText());
@@ -95,7 +95,7 @@ public class ExpressionParser {
         }
 
         @Override
-        public Expression visitBoolExpr(ExpressionGrammarParser.BoolExprContext ctx) {
+        public BooleanExpression visitBoolExpr(ExpressionGrammarParser.BoolExprContext ctx) {
             boolean value = Boolean.parseBoolean(ctx.BOOLEAN().getText());
             String operator = ctx.OPERATOR().getText();
             BoolVar bv = findBV(ctx.VARIABLE().getText());

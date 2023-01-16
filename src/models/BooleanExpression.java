@@ -3,11 +3,11 @@ package models;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class Expression {
+public abstract class BooleanExpression {
 
     abstract int getMaxConstant(Clock clock);
 
-    abstract Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs);
+    abstract BooleanExpression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs);
 
     @Override
     public abstract boolean equals(Object o);
@@ -22,9 +22,9 @@ public abstract class Expression {
         return toString();
     }
 
-    static String compositePrettyPrint(List<Expression> expressions, String connector) {
-        return expressions.stream()
-                .limit(expressions.size()-1)
+    static String compositePrettyPrint(List<BooleanExpression> booleanExpressions, String connector) {
+        return booleanExpressions.stream()
+                .limit(booleanExpressions.size()-1)
                 .map(g -> {
                     if (g instanceof OrExpression || g instanceof AndExpression)
                         return String.format("(%s) %s ", g.prettyPrint(), connector);
@@ -32,6 +32,6 @@ public abstract class Expression {
                         return String.format("%s %s ", g.prettyPrint(), connector);
                 })
                 .collect(Collectors.joining())
-                + expressions.get(expressions.size()-1).prettyPrint();
+                + booleanExpressions.get(booleanExpressions.size()-1).prettyPrint();
     }
 }

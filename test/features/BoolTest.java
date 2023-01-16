@@ -80,10 +80,10 @@ public class BoolTest {
         BoolExpression bg_b_true = new BoolExpression(b, "==",true);
         BoolExpression bg_c_true = new BoolExpression(c, "==",true);
         BoolExpression bg_c_false = new BoolExpression(c, "==",false);
-        List<Expression> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
+        List<BooleanExpression> l1 = new ArrayList<>(List.of(bg_a_true,bg_b_false,bg_c_false));
         //  List<Guard> l2 = new ArrayList<>(List.of(bg_a_true,bg_b_true,bg_c_false));
         //  List<Guard> l3 = new ArrayList<>(List.of(bg_a_false,bg_b_true,bg_c_false));
-        List<List<Expression>> list = new ArrayList();
+        List<List<BooleanExpression>> list = new ArrayList();
         list.add(l1); //list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
@@ -113,9 +113,9 @@ public class BoolTest {
         BoolExpression bg_b_true = new BoolExpression(b, "==",true);
         BoolExpression bg_c_true = new BoolExpression(c, "==",true);
         BoolExpression bg_c_false = new BoolExpression(c, "==",false);
-        Expression l1 = new AndExpression(bg_a_true,bg_b_false,bg_c_false);
-        Expression l2 = new AndExpression(bg_a_true,bg_b_true,bg_c_false);
-        Expression l3 = new AndExpression(bg_a_false,bg_b_true,bg_c_false);
+        BooleanExpression l1 = new AndExpression(bg_a_true,bg_b_false,bg_c_false);
+        BooleanExpression l2 = new AndExpression(bg_a_true,bg_b_true,bg_c_false);
+        BooleanExpression l3 = new AndExpression(bg_a_false,bg_b_true,bg_c_false);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
         Log.debug("or guard " + new OrExpression(l1,l2,l3));
@@ -136,8 +136,8 @@ public class BoolTest {
         BVs.add(a); BVs.add(b);
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Expression>> noguard = new ArrayList<>();
-        List<Expression> emptyBoolExpressions = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
+        List<BooleanExpression> emptyBoolBooleanExpressions = new ArrayList<>();
         BoolUpdate[] emptyBoolUpdates = new BoolUpdate[]{};
 
         ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
@@ -153,13 +153,13 @@ public class BoolTest {
 
         BoolExpression bg1 = new BoolExpression(a, "==",false);
         BoolExpression bg2 = new BoolExpression(b, "==",false);
-        List<Expression> boolGuards1 = new ArrayList<>();
-        List<Expression> boolGuards2 = new ArrayList<>();
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
         boolGuards1.add(bg1);
         boolGuards2.add(bg2);
 
-        List<List<Expression>> guards1 = new ArrayList<>();
-        List<Expression> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -167,8 +167,8 @@ public class BoolTest {
         inner.addAll(boolGuards1);
         guards1.add(inner);
 
-        List<List<Expression>> guards2 = new ArrayList<>();
-        List<Expression> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -234,7 +234,7 @@ public class BoolTest {
         bools.add(b);
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Expression>> noguard = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
 
         ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
         ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
@@ -252,9 +252,9 @@ public class BoolTest {
         BoolExpression bg_a_true = new BoolExpression(a, "==",true);
         BoolExpression bg_b_true = new BoolExpression(b, "==",true);
 
-        List<Expression> boolGuards1 = new ArrayList<>();
-        List<Expression> boolGuards2 = new ArrayList<>();
-        List<Expression> boolGuards3 = new ArrayList<>();
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
+        List<BooleanExpression> boolGuards3 = new ArrayList<>();
         boolGuards1.add(bg_a_false);
         boolGuards1.add(bg_b_false);
 
@@ -265,8 +265,8 @@ public class BoolTest {
         boolGuards3.add(bg_a_true);
 
 
-        List<List<Expression>> guards1 = new ArrayList<>();
-        List<Expression> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -274,8 +274,8 @@ public class BoolTest {
         inner.addAll(boolGuards1);
         guards1.add(inner);
 
-        List<List<Expression>> guards2 = new ArrayList<>();
-        List<Expression> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -338,7 +338,7 @@ public class BoolTest {
         bools.add(b);
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Expression>> noguard = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
 
         ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
         ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
@@ -356,9 +356,9 @@ public class BoolTest {
         BoolExpression bg_a_true = new BoolExpression(a, "==",true);
         BoolExpression bg_b_true = new BoolExpression(b, "==",true);
 
-        List<Expression> boolGuards1 = new ArrayList<>();
-        List<Expression> boolGuards2 = new ArrayList<>();
-        List<Expression> boolGuards3 = new ArrayList<>();
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
+        List<BooleanExpression> boolGuards3 = new ArrayList<>();
         boolGuards1.add(bg_a_false);
         boolGuards1.add(bg_b_false);
 
@@ -369,8 +369,8 @@ public class BoolTest {
         boolGuards3.add(bg_a_true);
 
 
-        List<List<Expression>> guards1 = new ArrayList<>();
-        List<Expression> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -378,8 +378,8 @@ public class BoolTest {
         inner.addAll(boolGuards1);
         guards1.add(inner);
 
-        List<List<Expression>> guards2 = new ArrayList<>();
-        List<Expression> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);
@@ -621,7 +621,7 @@ public class BoolTest {
 
 
         List<Update> noUpdate = new ArrayList<>();
-        List<List<Expression>> noguard = new ArrayList<>();
+        List<List<BooleanExpression>> noguard = new ArrayList<>();
 
         ClockExpression g1 = new ClockExpression(x, 10, Relation.LESS_EQUAL);
         ClockExpression g2 = new ClockExpression(x, 5, Relation.GREATER_EQUAL);
@@ -638,8 +638,8 @@ public class BoolTest {
         BoolExpression bg2 = new BoolExpression(b, "==",false);
         BoolExpression bg3 = new BoolExpression(a, "==",true);
         BoolExpression bg4 = new BoolExpression(b, "==",true);
-        List<Expression> boolGuards1 = new ArrayList<>();
-        List<Expression> boolGuards2 = new ArrayList<>();
+        List<BooleanExpression> boolGuards1 = new ArrayList<>();
+        List<BooleanExpression> boolGuards2 = new ArrayList<>();
         boolGuards1.add(bg1);
         boolGuards1.add(bg4);
 
@@ -647,8 +647,8 @@ public class BoolTest {
         boolGuards2.add(bg3);
 
 
-        List<List<Expression>> guards1 = new ArrayList<>();
-        List<Expression> inner = new ArrayList<>();
+        List<List<BooleanExpression>> guards1 = new ArrayList<>();
+        List<BooleanExpression> inner = new ArrayList<>();
         inner.add(g1);
         inner.add(g2);
         inner.add(g3);
@@ -656,8 +656,8 @@ public class BoolTest {
         inner.addAll((boolGuards1));
         guards1.add(inner);
 
-        List<List<Expression>> guards2 = new ArrayList<>();
-        List<Expression> inner1 = new ArrayList<>();
+        List<List<BooleanExpression>> guards2 = new ArrayList<>();
+        List<BooleanExpression> inner1 = new ArrayList<>();
         inner1.add(g5);
         inner1.add(g6);
         inner1.add(g7);

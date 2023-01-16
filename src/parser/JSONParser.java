@@ -220,7 +220,7 @@ public class JSONParser {
 
             boolean isNotUrgent = "NORMAL".equals(jsonObject.get("urgency").toString());
 
-            Expression invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueExpression() :
+            BooleanExpression invariant = ("".equals(jsonObject.get("invariant").toString()) ? new TrueExpression() :
                     ExpressionParser.parse(jsonObject.get("invariant").toString(), componentClocks, BVs));
             Location loc = Location.create(jsonObject.get("id").toString(), invariant, isInitial, !isNotUrgent,
                     isUniversal, isInconsistent);
@@ -251,7 +251,7 @@ public class JSONParser {
         for (Object obj : edgeList) {
             JSONObject jsonObject = (JSONObject) obj;
 
-            Expression guards;
+            BooleanExpression guards;
             List<ClockUpdate> clockUpdates = new ArrayList<>();
             List<BoolUpdate> boolUpdates = new ArrayList<>();
 

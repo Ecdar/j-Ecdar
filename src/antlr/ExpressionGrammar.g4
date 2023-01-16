@@ -12,7 +12,7 @@ options { caseInsensitive = true; }
  * Parser Rules
  */
 
-expressions              : expression EOF ;
+expressions         : expression EOF ;
 
 expression          : arithExpression
                     | or ';'?
@@ -23,7 +23,7 @@ or                  : (orExpression OR)+ orExpression;
 orExpression        : arithExpression | and ;
 
 and                 : (arithExpression AND)+ arithExpression ;
-arithExpression          : BOOLEAN | clockExpr | boolExpr | '(' expression ')';
+arithExpression     : BOOLEAN | clockExpr | boolExpr | '(' expression ')';
 clockExpr           : VARIABLE ('-'VARIABLE)? OPERATOR '-'? INT ;
 boolExpr            : VARIABLE OPERATOR BOOLEAN ;
 

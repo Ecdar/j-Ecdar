@@ -3,7 +3,7 @@ package models;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ExpressionTest {
+public class BooleanExpressionTest {
     private static Clock x;
 
     @BeforeClass

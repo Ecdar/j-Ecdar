@@ -2,7 +2,7 @@ package models;
 
 import java.util.*;
 
-public class BoolExpression extends Expression {
+public class BoolExpression extends BooleanExpression {
     private final BoolVar var;
     private final Relation relation;
     private final boolean value;
@@ -51,7 +51,7 @@ public class BoolExpression extends Expression {
     }
 
     @Override
-    Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+    BooleanExpression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         return new BoolExpression(
             this, newBVs, oldBVs
         );

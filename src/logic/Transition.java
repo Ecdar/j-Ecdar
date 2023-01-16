@@ -58,7 +58,7 @@ public  class Transition {
         return move.getEdges();
     }
 
-    public Expression getGuard(List <Clock> relevantClocks ) {
+    public BooleanExpression getGuard(List <Clock> relevantClocks ) {
         return move.getGuard( relevantClocks);
     }
 

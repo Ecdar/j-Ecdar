@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class DBMTest {
     private static final int DBM_INF = 2147483646;
     private static State state1, state2, state3, state4, state5;
-    private static Expression g1, g2, g3, g4, g5, g6, g7, g8;
+    private static BooleanExpression g1, g2, g3, g4, g5, g6, g7, g8;
     private static List<Clock> clockList = new ArrayList<>();
     private static Clock x,y,z;
 
@@ -115,9 +115,9 @@ public class DBMTest {
         map.put(x,12);
         map.put(y,10);
 
-        Expression g2 = new ClockExpression(x,null, 20,Relation.LESS_EQUAL);
-        Expression g3 = new ClockExpression(y,null, 2,Relation.LESS_EQUAL);
-        Expression initialZone = new AndExpression(g2,g3);
+        BooleanExpression g2 = new ClockExpression(x,null, 20,Relation.LESS_EQUAL);
+        BooleanExpression g3 = new ClockExpression(y,null, 2,Relation.LESS_EQUAL);
+        BooleanExpression initialZone = new AndExpression(g2,g3);
 
         Location l1 = Location.create("L1",new TrueExpression(),true,false,false,false, 0, 0);
         State state1 = new State(l1.copy(), new CDD(initialZone));

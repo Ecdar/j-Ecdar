@@ -43,19 +43,19 @@ public class CDDTest {
         CDD cdd3 = cdd1.conjunction(cdd2);
         Log.debug(cdd2.getExpression(clocks));
 
-        Expression g1 = new ClockExpression(b,a,3,Relation.LESS_EQUAL );
-        Expression g2 = new ClockExpression(a,b,5,Relation.LESS_EQUAL );
+        BooleanExpression g1 = new ClockExpression(b,a,3,Relation.LESS_EQUAL );
+        BooleanExpression g2 = new ClockExpression(a,b,5,Relation.LESS_EQUAL );
 
-        Expression g3 = new ClockExpression(b,a,4,Relation.LESS_EQUAL );
-        Expression g4 = new ClockExpression(a,b,6,Relation.LESS_EQUAL );
+        BooleanExpression g3 = new ClockExpression(b,a,4,Relation.LESS_EQUAL );
+        BooleanExpression g4 = new ClockExpression(a,b,6,Relation.LESS_EQUAL );
 
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.add(g1);
-        expressionList.add(g2);
-        expressionList.add(g3);
-        expressionList.add(g4);
+        List<BooleanExpression> booleanExpressionList = new ArrayList<>();
+        booleanExpressionList.add(g1);
+        booleanExpressionList.add(g2);
+        booleanExpressionList.add(g3);
+        booleanExpressionList.add(g4);
 
-        Log.debug(new CDD(new AndExpression(expressionList)).getExpression(clocks));
+        Log.debug(new CDD(new AndExpression(booleanExpressionList)).getExpression(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         cdd1.free();
@@ -281,11 +281,11 @@ public class CDDTest {
         CDD.addClocks(clocks);
 
 
-        Expression e2_g1 = new ClockExpression(x, null, 3,  Relation.GREATER_EQUAL);
+        BooleanExpression e2_g1 = new ClockExpression(x, null, 3,  Relation.GREATER_EQUAL);
         //Guard e2_g3 = new ClockGuard(x, null, 999,  Relation.LESS_THAN);
-        Expression e2_g2 = new ClockExpression(y, null, 5,  Relation.LESS_EQUAL);
+        BooleanExpression e2_g2 = new ClockExpression(y, null, 5,  Relation.LESS_EQUAL);
 
-        List<Expression> g1 = new ArrayList<>();
+        List<BooleanExpression> g1 = new ArrayList<>();
         //  g1.add(new AndGuard(e2_g1, e2_g3));
         g1.add(e2_g1);
         g1.add(e2_g2);

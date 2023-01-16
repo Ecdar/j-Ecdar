@@ -3,7 +3,7 @@ package models;
 import java.util.List;
 import java.util.Objects;
 
-public class FalseExpression extends Expression {
+public class FalseExpression extends BooleanExpression {
 
     @Override
     int getMaxConstant(Clock clock) {
@@ -11,7 +11,7 @@ public class FalseExpression extends Expression {
     }
 
     @Override
-    Expression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
+    BooleanExpression copy(List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
         return new FalseExpression();
     }
 
