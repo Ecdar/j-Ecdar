@@ -35,7 +35,7 @@ public class State {
         return location.getInvariantCdd();
     }
 
-    public Expression getInvariants(List<Clock> relevantClocks) {
+    public Expression getInvariant(List<Clock> relevantClocks) {
         return location.getInvariantCdd().getExpression(relevantClocks);
     }
 

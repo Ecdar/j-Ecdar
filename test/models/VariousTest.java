@@ -50,12 +50,12 @@ public class VariousTest {
         z2.init();
 
         ClockExpression g1 = new ClockExpression(y, 5,  Relation.GREATER_EQUAL);
-        z1.buildConstraintsForGuard(g1,clocks);
+        z1.applyConstraints(g1,clocks);
 
         z1.printDbm(true,true);
         ClockExpression g2 = new ClockExpression(y, 6,  Relation.GREATER_EQUAL);
         Log.debug(g2);
-        z2.buildConstraintsForGuard(g2,clocks);
+        z2.applyConstraints(g2,clocks);
         z2.printDbm(true,true);
 
         List<Zone> zoneList1 = new ArrayList<>();

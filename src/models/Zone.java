@@ -50,7 +50,7 @@ public class Zone {
         return dimension;
     }
 
-    public void buildConstraintsForGuard(ClockExpression guard, List<Clock> clocks) {
+    public void applyConstraints(ClockExpression guard, List<Clock> clocks) {
         if (guard.isDiagonal()) {
             buildConstraintsForDiagonalConstraint(guard, clocks);
         } else {
@@ -182,14 +182,14 @@ public class Zone {
         return clocks.contains(clock);
     }
 
-    public Expression buildExpressionFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+    public Expression createExpression(List<Clock> clocks, List<Clock> relevantClocks) {
         List<Expression> expressions = new ArrayList<>();
-        expressions.addAll(buildNormalGuardsFromZone(clocks, relevantClocks));
-        expressions.addAll(buildDiagonalConstraintsFromZone(clocks, relevantClocks));
+        expressions.addAll(createNormalGuards(clocks, relevantClocks));
+        expressions.addAll(createDiagonalConstraints(clocks, relevantClocks));
         return new AndExpression(expressions);
     }
 
-    public List<ClockExpression> buildNormalGuardsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+    public List<ClockExpression> createNormalGuards(List<Clock> clocks, List<Clock> relevantClocks) {
         List<ClockExpression> guards = new ArrayList<>();
 
         for (int i = 1; i < dimension; i++) {
@@ -241,7 +241,7 @@ public class Zone {
         return guards;
     }
 
-    public List<ClockExpression> buildDiagonalConstraintsFromZone(List<Clock> clocks, List<Clock> relevantClocks) {
+    public List<ClockExpression> createDiagonalConstraints(List<Clock> clocks, List<Clock> relevantClocks) {
         List<ClockExpression> guards = new ArrayList<>();
 
         for (int i = 1; i < dimension; i++) {

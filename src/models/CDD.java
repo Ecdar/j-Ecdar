@@ -52,7 +52,7 @@ public class CDD {
         } else if (expression instanceof ClockExpression) {
             Zone zone = new Zone(numClocks, true);
             zone.init();
-            zone.buildConstraintsForGuard((ClockExpression) expression, clocks);
+            zone.applyConstraints((ClockExpression) expression, clocks);
             cdd = CDD.createFromDbm(zone.getDbm(), numClocks);
         } else if (expression instanceof BoolExpression) {
             cdd = create((BoolExpression) expression);
@@ -118,7 +118,7 @@ public class CDD {
             List<Expression> andParts = new ArrayList<>();
             // Adds normal guards and diagonal constraints
             andParts.add(
-                    zone.buildExpressionFromZone(clocks, relevantClocks)
+                    zone.createExpression(clocks, relevantClocks)
             );
             // Adds boolean constraints (var == val)
             andParts.add(

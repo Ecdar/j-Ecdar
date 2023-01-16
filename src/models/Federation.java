@@ -48,10 +48,10 @@ public class Federation {
         return new Federation(zones);
     }
 
-    public Expression toGuards(List<Clock> clocks) {
+    public Expression toGuard(List<Clock> clocks) {
         List<Expression> turnedBackIntoExpressions = new ArrayList<>();
         for (Zone zone : getZones()) {
-            turnedBackIntoExpressions.add(zone.buildExpressionFromZone(clocks, clocks));
+            turnedBackIntoExpressions.add(zone.createExpression(clocks, clocks));
         }
         return new OrExpression(turnedBackIntoExpressions);
     }
