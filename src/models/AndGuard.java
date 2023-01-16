@@ -118,4 +118,9 @@ public class AndGuard extends Guard {
     public int hashCode() {
         return Objects.hash(guards);
     }
+
+    @Override
+    public String prettyPrint() {
+        return Guard.compositePrettyPrint(guards, "&&");
+    }
 }

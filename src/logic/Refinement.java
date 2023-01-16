@@ -1,5 +1,6 @@
 package logic;
 
+import lib.CDDLib;
 import log.Log;
 import models.*;
 
@@ -178,7 +179,7 @@ public class Refinement {
                 passed.put(locPair,pair);
 
             // assert(passedContainsStatePair(curr));
-            Log.debug("Picked state pair " + locPair.leftLocation.getName()+"-"+locPair.rightLocation.getName());
+            Log.debug("Picked state pair " + pair.prettyPrint());
             // check that for every delay in TS 1 there is a corresponding delay in TS
             boolean holds0 = checkDelay(left, right);
             if (!holds0) {

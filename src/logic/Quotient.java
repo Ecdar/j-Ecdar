@@ -18,7 +18,7 @@ public class Quotient extends AggregatedTransitionSystem {
         this.s = s;
 
         // Clocks should contain the clocks of t, s, and the new clock.
-        Optional<Clock> existingClock = clocks.findAnyWithOriginalName("quo_new");
+        Optional<Clock> existingClock = clocks.findFirstWithOriginalName("quo_new");
         if (existingClock.isPresent()) {
             newClock = existingClock.get();
         } else {
@@ -39,10 +39,7 @@ public class Quotient extends AggregatedTransitionSystem {
     }
 
     public Quotient(Automaton t, Automaton s) {
-        this(
-                new SimpleTransitionSystem(t),
-                new SimpleTransitionSystem(s)
-        );
+        this(new SimpleTransitionSystem(t), new SimpleTransitionSystem(s));
     }
 
     public Set<Channel> getInputs() {
