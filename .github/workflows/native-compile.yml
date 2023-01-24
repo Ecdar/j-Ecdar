@@ -85,9 +85,10 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./lib
+          path: ./JCDD/build-win/jcdd/lib/
           key: jcdd-win
           enableCrossOsArchive: true
+        run: cp -a ./JCDD/build-win/jcdd/lib/ ./lib
           
       - if: runner.os != 'Windows'
         name: Load JCDD from cache
@@ -95,9 +96,10 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./lib
+          path: ./JCDD/build/jcdd/lib/
           key: jcdd-unix
           enableCrossOsArchive: true
+        run: cp -a ./JCDD/build/jcdd/lib/ ./lib
 
       - uses: actions/checkout@v3
       - id: executable
