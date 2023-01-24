@@ -29,7 +29,7 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/
+          path: ./JCDD/build/jcdd/lib/
           key: jcdd-unix
           enableCrossOsArchive: true
           
@@ -48,7 +48,7 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/
+          path: ./JCDD//build-win/jcdd/lib/
           key: jcdd-win
           enableCrossOsArchive: true
 
@@ -79,20 +79,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - if: runner.os == 'Windows'
-        name: Load JCDD from cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-jcdd
-        with:
-          path: ./JCDD/
-          key: jcdd-win
-          enableCrossOsArchive: true
-
-      - if: runner.os == 'Windows'
-        name: Copy JCDD for Windows
-        run: cp -a ./JCDD/build-win/jcdd/lib/ ./lib
           
       - if: runner.os != 'Windows'
         name: Load JCDD from cache
@@ -100,13 +86,27 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/
+          path: ./JCDD/build/jcdd/lib/
           key: jcdd-unix
           enableCrossOsArchive: true
 
       - if: runner.os != 'Windows'
         name: Copy JCDD for Unix
         run: cp -a ./JCDD/build/jcdd/lib/ ./lib
+
+      - if: runner.os == 'Windows'
+        name: Load JCDD from cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-jcdd
+        with:
+          path: ./JCDD/build-win/jcdd/lib/
+          key: jcdd-win
+          enableCrossOsArchive: true
+
+      - if: runner.os == 'Windows'
+        name: Copy JCDD for Windows
+        run: cp -a ./JCDD/build-win/jcdd/lib/ ./lib
 
       - uses: actions/checkout@v3
       - id: executable
