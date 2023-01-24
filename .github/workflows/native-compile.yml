@@ -94,7 +94,7 @@ jobs:
         name: Copy JCDD for Unix
         run: |
           cp -a ./JCDD/build/jcdd/lib/ ./lib
-          readlink -e ./lib
+          readlink -e ./lib/*
 
       - if: runner.os == 'Windows'
         name: Load JCDD from cache
