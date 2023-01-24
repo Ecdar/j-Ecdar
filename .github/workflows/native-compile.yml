@@ -52,6 +52,7 @@ jobs:
           enableCrossOsArchive: true
 
   native-compile:
+    needs: jcdd-compile
     name: Generate native executable for - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
