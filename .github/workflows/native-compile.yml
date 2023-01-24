@@ -92,7 +92,10 @@ jobs:
 
       - if: runner.os != 'Windows'
         name: Copy JCDD for Unix
-        run: cp -a ./JCDD/build/jcdd/lib/ ./lib
+        run: |
+          cp -a ./JCDD/build/jcdd/lib/ ./lib
+          echo "--------------- HERE!!! ---------------"
+          ls ./lib
 
       - if: runner.os == 'Windows'
         name: Load JCDD from cache
