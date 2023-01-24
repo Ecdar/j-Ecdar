@@ -94,8 +94,7 @@ jobs:
         name: Copy JCDD for Unix
         run: |
           cp -a ./JCDD/build/jcdd/lib/ ./lib
-          echo "--------------- HERE!!! ---------------"
-          ls ./lib
+          ls -la ./lib
 
       - if: runner.os == 'Windows'
         name: Load JCDD from cache
@@ -109,7 +108,7 @@ jobs:
 
       - if: runner.os == 'Windows'
         name: Copy JCDD for Windows
-        run: cp -a ./JCDD/build-win/jcdd/lib/ ./lib
+        run: Copy-item -Recurse ./JCDD/build-win/jcdd/lib/ -Destination ./lib
 
       - uses: actions/checkout@v3
       - id: executable
