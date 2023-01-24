@@ -2,6 +2,7 @@ name: Generate Native Executables
 
 on:
   workflow_dispatch:
+  workflow_call:
   
 jobs:
   jcdd-compile:
