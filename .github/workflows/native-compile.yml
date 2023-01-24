@@ -89,6 +89,9 @@ jobs:
           path: ./JCDD/build-win/jcdd/lib/
           key: jcdd-win
           enableCrossOsArchive: true
+
+      - if: runner.os == 'Windows'
+        name: Copy JCDD for Windows
         run: cp -a ./JCDD/build-win/jcdd/lib/ ./lib
           
       - if: runner.os != 'Windows'
@@ -100,6 +103,9 @@ jobs:
           path: ./JCDD/build/jcdd/lib/
           key: jcdd-unix
           enableCrossOsArchive: true
+
+      - if: runner.os != 'Windows'
+        name: Copy JCDD for Unix
         run: cp -a ./JCDD/build/jcdd/lib/ ./lib
 
       - uses: actions/checkout@v3
