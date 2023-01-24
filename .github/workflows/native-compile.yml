@@ -2,15 +2,62 @@ name: Generate Native Executables
 
 on:
   workflow_dispatch:
-  pull_request:
-    branch:
-      - "main"
+  
 jobs:
-#  build:
-#    uses: ./.github/workflows/ci.yml
+  jcdd-compile:
+    name: Compile JCDD
+    runs-on: ubuntu-latest
+    
+    outputs:
+      jcdd-unix: ${{ steps.jcdd-unix.outputs.jcdd-jar
+      jcdd-win: ${{ steps.jcdd-win.outputs.jcdd-jar
+    
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          
+      - name: Compile JCDD for Unix
+        id: jcdd-unix
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
+          cd JCDD && mkdir build
+          ./getlibs.sh
+          cmake -B build/
+          cmake --build build/
+          
+      - name: Cache JCDD for Unix
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-jcdd
+        with:
+          path: ./JCDD/build/jcdd/lib/
+          key: jcdd-unix
+          enableCrossOsArchive: true
+          
+      - name: Compile JCDD for Windows
+        id: jcdd-win
+        run: |
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          cd JCDD && mkdir build-win
+          ./getlibs-win.sh
+          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
+          cmake --build build-win/
+          
+      - name: Cache JCDD for Windows
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-jcdd
+        with:
+          path: ./JCDD/build-win/jcdd/lib/
+          key: jcdd-win
+          enableCrossOsArchive: true
+
   native-compile:
     name: Generate native executable for - ${{ matrix.os }}
-#    needs: build
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
@@ -36,38 +83,34 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Compile JCDD
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
-          cd JCDD && mkdir build
-          ./getlibs.sh
-          cmake -B build/
-          cmake --build build/
-          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-          cd JCDD && mkdir build-win
-          ./getlibs-win.sh
-          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
-          cmake --build build-win/
-
-#      - name: Upload JCDD Linux
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: jcdd-linux
-#          path: JCDD/build/jcdd/lib/*
-#      - name: Upload JCDD Windows
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: jcdd-windows
-#          path: JCDD/build-win/jcdd/lib/*
-
-      - name: Copy jcdd.jar to lib folder
-        run: cp -a ./JCDD/build/jcdd/lib/ ./lib
+      - if: runner.os == 'Windows'
+        name: Load JCDD from cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-jcdd
+        with:
+          path: |
+            ./JCDD/build-win/jcdd/lib/
+            ./lib
+          key: jcdd-win
+          enableCrossOsArchive: true
+          
+      - if: runner.os != 'Windows'
+        name: Load JCDD from cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-jcdd
+        with:
+          path: |
+            ./JCDD/build/jcdd/lib/
+            ./lib
+          key: jcdd-unix
+          enableCrossOsArchive: true
 
       - uses: actions/checkout@v3
       - id: executable
         run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
+      
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
         with:
@@ -75,10 +118,14 @@ jobs:
           java-version: '${{ matrix.java-version }}'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+          
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+        
       - name: Build ${{ steps.executable.outputs.name }}
         run: ./gradlew nativeCompile
+        
       - name: Archive binary
         if: ${{ !github.event.act }} # Skip if this is a local test run
         uses: actions/upload-artifact@v3
