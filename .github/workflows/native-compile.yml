@@ -29,7 +29,7 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/build/jcdd/lib/
+          path: ./JCDD/
           key: jcdd-unix
           enableCrossOsArchive: true
           
@@ -48,7 +48,7 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/build-win/jcdd/lib/
+          path: ./JCDD/
           key: jcdd-win
           enableCrossOsArchive: true
 
@@ -86,7 +86,7 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/build-win/jcdd/lib/
+          path: ./JCDD/
           key: jcdd-win
           enableCrossOsArchive: true
 
@@ -100,7 +100,7 @@ jobs:
         env:
           cache-name: cache-jcdd
         with:
-          path: ./JCDD/build/jcdd/lib/
+          path: ./JCDD/
           key: jcdd-unix
           enableCrossOsArchive: true
 
