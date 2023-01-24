@@ -7,17 +7,12 @@ jobs:
   jcdd-compile:
     name: Compile JCDD
     runs-on: ubuntu-latest
-    
-    outputs:
-      jcdd-unix: ${{ steps.jcdd-unix.outputs.jcdd-jar
-      jcdd-win: ${{ steps.jcdd-win.outputs.jcdd-jar
-    
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
         with:
           submodules: recursive
-          
+
       - name: Compile JCDD for Unix
         id: jcdd-unix
         run: |
