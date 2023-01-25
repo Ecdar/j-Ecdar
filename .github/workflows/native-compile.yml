@@ -5,55 +5,55 @@ on:
   workflow_call:
   
 jobs:
-  jcdd-compile:
-    name: Compile JCDD
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout project sources
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - if: steps.cache-jcdd-unix.outputs.cache-hit != 'true'
-        name: Compile JCDD for Unix
-        id: jcdd-unix
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
-          cd JCDD && mkdir build
-          ./getlibs.sh
-          cmake -B build/
-          cmake --build build/
-
-      - if: steps.cache-jcdd-unix.outputs.cache-hit != 'true'
-        name: Cache JCDD for Unix
-        id: cache-jcdd-unix
-        uses: actions/cache@v2
-        with:
-          path: ./JCDD/build/jcdd/lib
-          key: jcdd-unix
-
-      - if: steps.cache-jcdd-win.outputs.cache-hit != 'true'
-        name: Compile JCDD for Windows
-        id: jcdd-win
-        run: |
-          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-          cd JCDD && mkdir build-win
-          ./getlibs-win.sh
-          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
-          cmake --build build-win/
-
-      - if: steps.cache-jcdd-win.outputs.cache-hit != 'true'
-        name: Cache JCDD for Windows
-        id: cache-jcdd-win
-        uses: actions/cache@v2
-        with:
-          path: ./JCDD//build-win/jcdd/lib
-          key: jcdd-win
+#  jcdd-compile:
+#    name: Compile JCDD
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout project sources
+#        uses: actions/checkout@v3
+#        with:
+#          submodules: recursive
+#
+#      - if: steps.cache-jcdd-unix.outputs.cache-hit != 'true'
+#        name: Compile JCDD for Unix
+#        id: jcdd-unix
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
+#          cd JCDD && mkdir build
+#          ./getlibs.sh
+#          cmake -B build/
+#          cmake --build build/
+#
+#      - if: steps.cache-jcdd-unix.outputs.cache-hit != 'true'
+#        name: Cache JCDD for Unix
+#        id: cache-jcdd-unix
+#        uses: actions/cache@v2
+#        with:
+#          path: ./JCDD/build/jcdd/lib
+#          key: jcdd-unix
+#
+#      - if: steps.cache-jcdd-win.outputs.cache-hit != 'true'
+#        name: Compile JCDD for Windows
+#        id: jcdd-win
+#        run: |
+#          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+#          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+#          cd JCDD && mkdir build-win
+#          ./getlibs-win.sh
+#          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
+#          cmake --build build-win/
+#
+#      - if: steps.cache-jcdd-win.outputs.cache-hit != 'true'
+#        name: Cache JCDD for Windows
+#        id: cache-jcdd-win
+#        uses: actions/cache@v2
+#        with:
+#          path: ./JCDD//build-win/jcdd/lib
+#          key: jcdd-win
 
   native-compile:
-    needs: jcdd-compile
+#    needs: jcdd-compile
     name: Generate native executable for - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
@@ -77,23 +77,35 @@ jobs:
         with:
           submodules: recursive
           
-      - if: runner.os != 'Windows'
-        name: Load JCDD from cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-jcdd
-        with:
-          path: ./lib
-          key: jcdd-unix
+#      - if: runner.os != 'Windows'
+#        name: Load JCDD from cache
+#        uses: actions/cache@v3
+#        env:
+#          cache-name: cache-jcdd
+#        with:
+#          path: ./lib
+#          key: jcdd-unix
+#
+#      - if: runner.os == 'Windows'
+#        name: Load JCDD from cache
+#        uses: actions/cache@v3
+#        env:
+#          cache-name: cache-jcdd
+#        with:
+#          path: ./lib
+#          key: jcdd-win
 
       - if: runner.os == 'Windows'
-        name: Load JCDD from cache
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-jcdd
+        uses: actions/download-artifact@v3
         with:
+          name: jcdd-windows
           path: ./lib
-          key: jcdd-win
+
+      - if: runner.os != 'Windows'
+        uses: actions/download-artifact@v3
+        with:
+          name: jcdd-linux
+          path: ./lib
 
       - uses: actions/checkout@v3
       - id: executable
