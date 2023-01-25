@@ -96,14 +96,20 @@ jobs:
 #          key: jcdd-win
 
       - if: runner.os == 'Windows'
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: ci.yml
+          workflow_conclusion: success
+          branch: master
           name: jcdd-windows
           path: ./lib
 
       - if: runner.os != 'Windows'
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         with:
+          workflow: ci.yml
+          workflow_conclusion: success
+          branch: master
           name: jcdd-linux
           path: ./lib
 
