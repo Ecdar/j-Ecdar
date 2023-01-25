@@ -102,7 +102,7 @@ jobs:
           workflow_conclusion: success
           branch: main
           name: jcdd-windows
-          path: ./lib
+          path: /home/runner/work/j-Ecdar/j-Ecdar/lib/
 
       - if: runner.os != 'Windows'
         uses: dawidd6/action-download-artifact@v2
@@ -111,7 +111,7 @@ jobs:
           workflow_conclusion: success
           branch: main
           name: jcdd-linux
-          path: ./lib
+          path: /home/runner/work/j-Ecdar/j-Ecdar/lib/
 
       - uses: actions/checkout@v3
       - id: executable
