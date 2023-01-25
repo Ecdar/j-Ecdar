@@ -100,7 +100,7 @@ jobs:
         with:
           workflow: ci.yml
           workflow_conclusion: success
-          branch: master
+          branch: main
           name: jcdd-windows
           path: ./lib
 
@@ -109,7 +109,7 @@ jobs:
         with:
           workflow: ci.yml
           workflow_conclusion: success
-          branch: master
+          branch: main
           name: jcdd-linux
           path: ./lib
 
