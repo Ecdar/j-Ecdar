@@ -107,7 +107,9 @@ jobs:
           native-image-job-reports: 'true'
           
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        run: |
+          chmod +x gradlew
+          chmod -R 777 .
         
       - name: Build ${{ steps.executable.outputs.name }}
         run: ./gradlew nativeCompile
