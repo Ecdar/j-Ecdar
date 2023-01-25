@@ -6,7 +6,6 @@ on:
   
 jobs:
   jcdd-compile:
-    if: steps.cache-jcdd-unix.outputs.cache-hit != 'true' || steps.cache-jcdd-win.outputs.cache-hit != 'true'
     name: Compile JCDD
     runs-on: ubuntu-latest
     steps:
@@ -15,7 +14,8 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Compile JCDD for Unix
+      - if: steps.cache-jcdd-unix.outputs.cache-hit != 'true'
+        name: Compile JCDD for Unix
         id: jcdd-unix
         run: |
           sudo apt-get update
@@ -25,14 +25,16 @@ jobs:
           cmake -B build/
           cmake --build build/
 
-      - name: Cache JCDD for Unix
+      - if: steps.cache-jcdd-unix.outputs.cache-hit != 'true'
+        name: Cache JCDD for Unix
         id: cache-jcdd-unix
         uses: actions/cache@v2
         with:
           path: ./JCDD/build/jcdd/lib
           key: jcdd-unix
 
-      - name: Compile JCDD for Windows
+      - if: steps.cache-jcdd-win.outputs.cache-hit != 'true'
+        name: Compile JCDD for Windows
         id: jcdd-win
         run: |
           sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
@@ -42,7 +44,8 @@ jobs:
           cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
           cmake --build build-win/
 
-      - name: Cache JCDD for Windows
+      - if: steps.cache-jcdd-win.outputs.cache-hit != 'true'
+        name: Cache JCDD for Windows
         id: cache-jcdd-win
         uses: actions/cache@v2
         with:
