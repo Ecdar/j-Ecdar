@@ -6,6 +6,7 @@ on:
   
 jobs:
   jcdd-compile:
+    if: steps.cache-jcdd-unix.outputs.cache-hit != 'true' || steps.cache-jcdd-win.outputs.cache-hit != 'true'
     name: Compile JCDD
     runs-on: ubuntu-latest
     steps:
@@ -25,9 +26,8 @@ jobs:
           cmake --build build/
 
       - name: Cache JCDD for Unix
+        id: cache-jcdd-unix
         uses: actions/cache@v2
-        env:
-          cache-name: cache-jcdd
         with:
           path: ./JCDD/build/jcdd/lib
           key: jcdd-unix
@@ -43,9 +43,8 @@ jobs:
           cmake --build build-win/
 
       - name: Cache JCDD for Windows
+        id: cache-jcdd-win
         uses: actions/cache@v2
-        env:
-          cache-name: cache-jcdd
         with:
           path: ./JCDD//build-win/jcdd/lib
           key: jcdd-win
