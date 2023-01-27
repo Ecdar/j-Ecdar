@@ -5,53 +5,7 @@ on:
   workflow_call:
   
 jobs:
-#  jcdd-compile:
-#    name: Compile JCDD
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout project sources
-#        uses: actions/checkout@v3
-#        with:
-#          submodules: recursive
-#
-#      - name: Compile JCDD for Unix
-#        id: jcdd-unix
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y cmake openjdk-11-jdk g++ mingw-w64-x86-64-dev mingw-w64-tools g++-mingw-w64-x86-64
-#          cd JCDD && mkdir build
-#          ./getlibs.sh
-#          cmake -B build/
-#          cmake --build build/
-#
-#      - name: Cache JCDD for Unix
-#        uses: actions/cache@v2
-#        env:
-#          cache-name: cache-jcdd
-#        with:
-#          path: ./JCDD/build/jcdd/lib/*
-#          key: jcdd-unix
-#
-#      - name: Compile JCDD for Windows
-#        id: jcdd-win
-#        run: |
-#          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-#          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-#          cd JCDD && mkdir build-win
-#          ./getlibs-win.sh
-#          cmake -B build-win/ -DCMAKE_TOOLCHAIN_FILE=./toolchain-x86_64-w64-mingw32.cmake
-#          cmake --build build-win/
-#
-#      - name: Cache JCDD for Windows
-#        uses: actions/cache@v2
-#        env:
-#          cache-name: cache-jcdd
-#        with:
-#          path: ./JCDD//build-win/jcdd/lib/*
-#          key: jcdd-win
-
   native-compile:
-#    needs: jcdd-compile
     name: Generate native executable for - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
@@ -94,8 +48,10 @@ jobs:
           path: $GITHUB_WORKSPACE/lib
 
       - uses: actions/checkout@v3
-      - id: executable
-        run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
+        id: executable
+        run: |
+          echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
+          ls -al $GITHUB_WORKSPACE/lib
       
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
