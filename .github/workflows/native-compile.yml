@@ -47,7 +47,7 @@ jobs:
           path: ${{ github.workspace }}/lib
 
       - id: executable
-        run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
+        run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name + '_' || '' }}${{ runner.os }}-x86_64"
       
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
@@ -68,4 +68,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.executable.outputs.name }}
-          path: target/${{ steps.executable.outputs.name }}${{ matrix.executable-suffix }}
+          path: ${{ github.workspace }}/build/native/nativeCompile/${{ steps.executable.outputs.name }}${{ matrix.executable-suffix }}
