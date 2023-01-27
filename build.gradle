@@ -37,7 +37,7 @@ dependencies {
 graalvmNative {
     binaries {
         main {
-            imageName = 'j-Ecdar-native'
+            imageName = 'j-Ecdar'
             mainClass = 'connection.Main'
             useFatJar = true
             sharedLibrary = false
