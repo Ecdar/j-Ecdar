@@ -23,16 +23,10 @@ jobs:
             executable-suffix: '.exe'
             native-build-args: --verbose -J-Xmx10g
     steps:
-      # Recursively checkout all dependencies
       - name: Checkout project sources
         uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - name: Prepare for JCDD download
-        run: |
-          mkdir -p ${{ github.workspace }}/lib
-          ls .
 
       - if: runner.os == 'Windows'
         uses: dawidd6/action-download-artifact@v2
@@ -54,9 +48,6 @@ jobs:
 
       - id: executable
         run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
-
-      - name: Permission check
-        run: ls -al ${{ github.workspace }}
       
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
@@ -74,7 +65,6 @@ jobs:
         run: ./gradlew nativeCompile
         
       - name: Archive binary
-        if: ${{ !github.event.act }} # Skip if this is a local test run
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.executable.outputs.name }}
