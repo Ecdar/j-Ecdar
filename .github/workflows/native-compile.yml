@@ -29,6 +29,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Prepare for JCDD download
+        run: mkdir -p ${{ github.workspace }}/lib
+
       - if: runner.os == 'Windows'
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -36,7 +39,7 @@ jobs:
           workflow_conclusion: success
           branch: main
           name: jcdd-windows
-          path: $GITHUB_WORKSPACE/lib
+          path: ${{ github.workspace }}/lib
 
       - if: runner.os != 'Windows'
         uses: dawidd6/action-download-artifact@v2
@@ -52,7 +55,7 @@ jobs:
         run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
 
       - name: Permission check
-        run: ls -al ${{ github.workspace }}/lib
+        run: ls -Ral ${{ github.workspace }}/lib
       
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
