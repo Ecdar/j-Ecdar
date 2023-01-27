@@ -52,12 +52,11 @@ jobs:
           name: jcdd-linux
           path: ${{ github.workspace }}/lib
 
-      - uses: actions/checkout@v3
       - id: executable
         run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
 
       - name: Permission check
-        run: ls -Ral ${{ github.workspace }}
+        run: ls -al ${{ github.workspace }}
       
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
