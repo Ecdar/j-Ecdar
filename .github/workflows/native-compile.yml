@@ -82,9 +82,7 @@ jobs:
           workflow_conclusion: success
           branch: main
           name: jcdd-windows
-          path: $LIB_PATH
-        env:
-          LIB_PATH: "${{ GITHUB_WORKSPACE }}/lib"
+          path: $GITHUB_WORKSPACE/lib
 
       - if: runner.os != 'Windows'
         uses: dawidd6/action-download-artifact@v2
@@ -93,9 +91,7 @@ jobs:
           workflow_conclusion: success
           branch: main
           name: jcdd-linux
-          path: $LIB_PATH
-        env:
-          LIB_PATH: "${{ GITHUB_WORKSPACE }}/lib"
+          path: $GITHUB_WORKSPACE/lib
 
       - uses: actions/checkout@v3
       - id: executable
