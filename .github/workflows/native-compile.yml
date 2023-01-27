@@ -45,14 +45,14 @@ jobs:
           workflow_conclusion: success
           branch: main
           name: jcdd-linux
-          path: $GITHUB_WORKSPACE/lib
+          path: ${{ github.workspace }}/lib
 
       - uses: actions/checkout@v3
       - id: executable
         run: echo "::set-output name=name::j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64"
 
       - name: Permission check
-        run: ls -al $GITHUB_WORKSPACE/lib
+        run: ls -al ${{ github.workspace }}/lib
       
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
