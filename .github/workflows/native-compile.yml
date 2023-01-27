@@ -30,7 +30,7 @@ jobs:
           submodules: recursive
 
       - name: Prepare for JCDD download
-        run: mkdir -p ${{ github.workspace }}/lib
+        run: sudo mkdir lib
 
       - if: runner.os == 'Windows'
         uses: dawidd6/action-download-artifact@v2
