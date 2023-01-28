@@ -42,12 +42,9 @@ jobs:
           workflow: ci.yml
           workflow_conclusion: success
           branch: main
-          name: '${{ matrix.jcdd-artifact }}'
+          name: ${{ matrix.jcdd-artifact }}
           path: ${{ github.workspace }}/lib
 
-      - id: executable
-        run: echo "name=j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64" >> $GITHUB_OUTPUT
-      
       - name: Set up GraalVM (Java ${{ matrix.java-version }})
         uses: graalvm/setup-graalvm@v1
         with:
@@ -60,11 +57,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         
-      - name: Build ${{ steps.executable.outputs.name }}
+      - name: Build j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64
         run: ./gradlew nativeCompile
         
       - name: Archive binary
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.executable.outputs.name }}
+          name: j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64
           path: ${{ github.workspace }}/build/native/nativeCompile/j-Ecdar${{ matrix.executable-suffix }}
