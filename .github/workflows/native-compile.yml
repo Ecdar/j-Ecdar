@@ -2,7 +2,6 @@ name: Generate Native Executables
 
 on:
   workflow_dispatch:
-  workflow_call:
   
 jobs:
   native-compile:
@@ -19,34 +18,31 @@ jobs:
           - os: ubuntu-latest
             executable-suffix: ''
             native-build-args: --verbose -J-Xmx10g
+            jcdd-artifact: jcdd-linux
+
           - os: macos-latest
             executable-suffix: ''
             native-build-args: --verbose -J-Xmx13g
+            jcdd-artifact: jcdd-linux
+
           - os: windows-2019
             executable-suffix: '.exe'
             native-build-args: --verbose -J-Xmx10g
+            jcdd-artifact: jcdd-windows
+
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - if: runner.os == 'Windows'
+      - name: Fetch JCDD
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ci.yml
           workflow_conclusion: success
           branch: main
-          name: jcdd-windows
-          path: ${{ github.workspace }}/lib
-
-      - if: runner.os != 'Windows'
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: ci.yml
-          workflow_conclusion: success
-          branch: main
-          name: jcdd-linux
+          name: ${{ matrix.jcdd-artifact }}
           path: ${{ github.workspace }}/lib
 
       - id: executable
