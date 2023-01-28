@@ -18,17 +18,17 @@ jobs:
           - os: ubuntu-latest
             executable-suffix: ''
             native-build-args: --verbose -J-Xmx10g
-            jcdd-artifact: jcdd-linux
+            jcdd-artifact: 'jcdd-linux'
 
           - os: macos-latest
             executable-suffix: ''
             native-build-args: --verbose -J-Xmx13g
-            jcdd-artifact: jcdd-linux
+            jcdd-artifact: 'jcdd-linux'
 
           - os: windows-2019
             executable-suffix: '.exe'
             native-build-args: --verbose -J-Xmx10g
-            jcdd-artifact: jcdd-windows
+            jcdd-artifact: 'jcdd-windows'
 
     steps:
       - name: Checkout project sources
