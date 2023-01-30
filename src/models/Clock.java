@@ -1,18 +1,60 @@
 package models;
 
+import logic.TransitionSystem;
+
 import java.util.Objects;
 
 public class Clock extends UniquelyNamed {
-    public Clock(String name, String ownerName) {
+    /**
+     * If {@code true} then this clock is used in the scope of multiple {@link TransitionSystem} or {@link Automaton}.
+     * As an example, the quotient creates or reuses the new "quo_new" clock that is shared across the {@link TransitionSystem TransitionSystems}.
+     */
+    private final boolean isGlobal;
+
+    /**
+     * Constructs a new clock.
+     *
+     * @param name The original name and initial unique name of the clock.
+     * @param ownerName The owner of the clock. E.g. the name of the {@link Automaton}.
+     * @param isGlobal If {@code true} the clock can be used across all {@link Automaton Automata}.
+     */
+    public Clock(String name, String ownerName, boolean isGlobal) {
         this.uniqueName = name;
         this.originalName = name;
         this.ownerName = ownerName;
+        this.isGlobal = isGlobal;
     }
 
+    /**
+     * Constructs a local clock.
+     *
+     * @param name The original name and initial unique name of the clock.
+     * @param ownerName The owner of the clock. E.g. the name of the {@link Automaton}.
+     */
+    public Clock(String name, String ownerName) {
+        this(name, ownerName, false);
+    }
+
+    /**
+     * Copy constructor for a clock.
+     *
+     * @param copy The clock instance to copy.
+     */
     public Clock(Clock copy) {
-        this.uniqueName = copy.originalName;
-        this.originalName = copy.originalName;
-        this.ownerName = copy.ownerName;
+        this(copy.getOriginalName(), copy.getOwnerName(), copy.isGlobal);
+    }
+
+    /**
+     * Returns {@code true} if this clock is meant to be used in the scope of other {@link TransitionSystem TransitionSystems} or {@link Automaton Automata}.
+     *
+     * Additionally, if the {@link Clock} is global then global naming rules will be applied in the {@link UniqueNamedContainer}.
+     * As an example, this is used for the "quo_new", because the generated clock is global amongst all quotients.
+     *
+     * @return {@code true} if it can be used in the scope of other {@link TransitionSystem} or {@link Automaton}.
+     */
+    @Override
+    public boolean isGlobal() {
+        return isGlobal;
     }
 
     @Override
@@ -39,7 +81,7 @@ public class Clock extends UniquelyNamed {
 
     @Override
     public int hashCode() {
-        return Objects.hash(originalName, ownerName);
+        return Objects.hash(originalName, ownerName, isGlobal);
     }
 
     @Override
