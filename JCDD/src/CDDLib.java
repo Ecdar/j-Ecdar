@@ -19,58 +19,10 @@ public class CDDLib {
                 break;
             }
         }
-
-        /*
         if (lib != null) {
             System.load(lib.getAbsolutePath());
         } else {
             System.load(searchPath.get(searchPath.size() - 1).getAbsolutePath()); // Default path
-        }
-
-        try {
-            java.io.FileWriter myWriter = new java.io.FileWriter("LOGG", true);
-            myWriter.write(System.lineSeparator());
-            myWriter.write("lib: ");
-            myWriter.write(lib.getAbsolutePath());
-            myWriter.close();
-        }
-        catch (Exception e) {
-            System.out.println("---------------------------");
-            System.out.println(e);
-            System.out.println("---------------------------");
-        }
-        String currentLibraryPath = System.getProperty("java.library.path");
-        if (lib != null) {
-            String newLibraryPath = lib.getAbsolutePath();
-            System.setProperty("java.library.path", currentLibraryPath + File.pathSeparator + newLibraryPath);
-            //System.load(lib.getAbsolutePath());
-        } else {
-            String newLibraryPath = searchPath.get(searchPath.size() - 1).getAbsolutePath();
-            System.setProperty("java.library.path", currentLibraryPath + File.pathSeparator + newLibraryPath);
-            //System.load(searchPath.get(searchPath.size() - 1).getAbsolutePath()); // Default path
-        }
-        try {
-            java.io.FileWriter myWriter = new java.io.FileWriter("LOGG", true);
-            myWriter.write(System.lineSeparator());
-            myWriter.write("\njava.library.path: ");
-            myWriter.write(System.getProperty("java.library.path"));
-            myWriter.close();
-        }
-        catch (Exception e) {
-            System.out.println("---------------------------");
-            System.out.println(e);
-            System.out.println("---------------------------");
-        }
-         */
-        String currentLibraryPath = System.getProperty("java.library.path");
-        if (lib != null) {
-            String newLibraryPath = lib.getAbsolutePath();
-            System.setProperty("java.library.path", currentLibraryPath + File.pathSeparator + newLibraryPath);
-            //System.load(lib.getAbsolutePath());
-        } else {
-            String newLibraryPath = searchPath.get(searchPath.size() - 1).getAbsolutePath();
-            System.setProperty("java.library.path", currentLibraryPath + File.pathSeparator + newLibraryPath);
-            //System.load(searchPath.get(searchPath.size() - 1).getAbsolutePath()); // Default path
         }
     }
 
@@ -124,7 +76,7 @@ public class CDDLib {
     public static native long getCddPartFromExtractionResult(long extractionResultPointer);
     public static native long getBddPartFromExtractionResult(long extractionResultPointer);
 
-    public static native long bddToArray(long cddPointer, int numBools);
+    public static native long bddToArray(long cddPointer);
     public static native int[] getVarsFromBDDArray(long bddArrayPointer);
     public static native int[] getValuesFromBDDArray(long bddArrayPointer);
     public static native int getNumTracesFromBDDArray(long bddArrayPointer);

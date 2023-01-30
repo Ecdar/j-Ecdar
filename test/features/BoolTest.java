@@ -36,7 +36,7 @@ public class BoolTest {
         CDD bc = CDD.createBddNode(2);
         CDD cdd =ba.disjunction(bb.conjunction(bc));
         Log.debug("size " + BVs.size());
-        BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
+        BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer()));
 
         Log.debug(bddArr.toString());
 
@@ -88,7 +88,7 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
         CDD cdd =new CDD(new AndGuard(l1));
-        BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer(),BVs.size()));
+        BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer()));
         Log.debug(bddArr.getValues());
         Log.debug(bddArr.getVariables());
 
@@ -435,7 +435,7 @@ public class BoolTest {
 
         CDD test = new CDD(CDDLib.cddNBddvar(bddStartLevel));
         test.printDot();
-        BDDArrays arr = new BDDArrays(CDDLib.bddToArray(test.getPointer(),CDD.numBools));
+        BDDArrays arr = new BDDArrays(CDDLib.bddToArray(test.getPointer()));
         Log.debug(arr);
 
 
@@ -443,7 +443,7 @@ public class BoolTest {
 
         CDD test1 = new CDD(CDDLib.cddBddvar(bddStartLevel));
         test1.printDot();
-        BDDArrays arr1 = new BDDArrays(CDDLib.bddToArray(test1.getPointer(),CDD.numBools));
+        BDDArrays arr1 = new BDDArrays(CDDLib.bddToArray(test1.getPointer()));
         Log.debug(arr1);
         CDD.done();
 
@@ -461,7 +461,7 @@ public class BoolTest {
         CDD.addBooleans(new ArrayList<>(){{add(bv1);}});
 
         CDD test2 = new CDD(CDDLib.cddNBddvar(bddStartLevel));
-        BDDArrays arr2 = new BDDArrays(CDDLib.bddToArray(test2.getPointer(),CDD.numBools));
+        BDDArrays arr2 = new BDDArrays(CDDLib.bddToArray(test2.getPointer()));
         Log.debug(arr2);
         CDD.done();
 

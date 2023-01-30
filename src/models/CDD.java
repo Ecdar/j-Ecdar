@@ -151,7 +151,7 @@ public class CDD {
         }
 
         long ptr = getPointer();
-        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr, numBools));
+        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr));
 
         List<Guard> orParts = new ArrayList<>();
         for (int i = 0; i < arrays.traceCount; i++) {

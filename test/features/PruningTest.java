@@ -183,20 +183,6 @@ public class PruningTest {
 
     @Test
     public void pruningWithOrTest2() {
-
-/*
-        try {
-            java.io.FileWriter myWriter = new java.io.FileWriter("LOGG", true);
-            myWriter.write(System.lineSeparator());
-            myWriter.write(System.getProperty("java.library.path"));
-            myWriter.close();
-        }
-        catch (Exception e) {
-            System.out.println("---------------------------");
-            System.out.println(e);
-            System.out.println("---------------------------");
-        }
-*/
         SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[4]);
         SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
         SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[5]);
