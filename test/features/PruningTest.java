@@ -183,6 +183,7 @@ public class PruningTest {
 
     @Test
     public void pruningWithOrTest2() {
+
         SimpleTransitionSystem orig1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[4]);
         SimpleTransitionSystem pruned1 = Pruning.adversarialPruning(orig1);
         SimpleTransitionSystem exp1 = new SimpleTransitionSystem(XMLParser.parse("samples/xml/quotient/pruningWithOr.xml", false)[5]);

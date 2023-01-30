@@ -46,7 +46,7 @@ cmake --build . --config Release
 cmake --install . --config Release
 
 cd $SOURCE_DIR/build/ext-libs/sources;
-CDD_VERSION="main" # ./getlibs.sh && cmake -B build/ && cmake --build build
+CDD_VERSION="main"
 wget "https://github.com/Ecdar/UCDD/archive/$CDD_VERSION.tar.gz"
 tar -xvf "$CDD_VERSION.tar.gz"
 mkdir -p "$SOURCE_DIR/build/ext-libs/sources/UCDD-$CDD_VERSION/build"
