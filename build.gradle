@@ -17,8 +17,6 @@ java{
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-mainClassName = "JECDAR"
-
 dependencies {
     testImplementation "junit:junit:4.12"
     implementation 'io.grpc:grpc-netty-shaded:1.42.0'
@@ -38,7 +36,7 @@ graalvmNative {
     binaries {
         main {
             imageName = 'j-Ecdar'
-            mainClass = 'connection.Main'
+            mainClass = 'JECDAR'
             useFatJar = true
             sharedLibrary = false
         }

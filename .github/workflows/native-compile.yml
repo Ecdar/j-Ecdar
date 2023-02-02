@@ -11,11 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2019]
+        os: [ubuntu-20.04, macos-latest, windows-2019]
         graalvm-version: ['22.3.0']
         java-version: ['11']
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             executable-suffix: ''
             native-build-args: --verbose -J-Xmx10g
             jcdd-artifact: jcdd-linux
@@ -57,11 +57,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         
-      - name: Build j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64
+      - name: Build j-Ecdar_${{ github.event.release.tag_name || github.sha }}_${{ runner.os }}-x86_64
         run: ./gradlew nativeCompile
         
       - name: Archive binary
         uses: actions/upload-artifact@v3
         with:
-          name: j-Ecdar_${{ github.event.release.tag_name || 'snapshot' }}_${{ runner.os }}-x86_64
+          name: j-Ecdar_${{ github.event.release.tag_name || github.sha }}_${{ runner.os }}-x86_64
           path: ${{ github.workspace }}/build/native/nativeCompile/j-Ecdar${{ matrix.executable-suffix }}
