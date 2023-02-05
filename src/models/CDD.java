@@ -11,25 +11,78 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CDD {
+    /**
+     * The pointer used in the {@link CDDLib} to represent this {@link CDD}.
+     */
     private long pointer;
 
+    /**
+     * This {@link CDD} converted to a {@link Guard}.
+     */
     private Guard guard;
+
+    /**
+     * If this boolean is <code>true</code> then this {@link CDD} has changed, and we should recompute the {@link Guard}.
+     * Otherwise, if this boolean is false, then the already computed {@link CDD#guard} will be returned from {@link CDD#getGuard()}.
+     * Since re-computation of the {@link CDD#guard} is only performed when this {@link CDD has changed, then the guard returned is
+     * a reference mutable from other places, and thereby it should be viewed as readonly or copied.
+     */
     private boolean isGuardDirty;
 
+    /**
+     * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#delay()} will call {@link CDDLib#delay(long)} with this {@link CDD#pointer}.
+     * Otherwise, {@link CDD#delayInvar(CDD)} will just return <code>this</code>.
+     */
     private boolean isDelayedDirty;
+
+    /**
+     * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#delayInvar(CDD)}} will call {@link CDDLib#delayInvar(long, long)} with this {@link CDD#pointer} and the argument.
+     * Otherwise, {@link CDD#delayInvar(CDD)} will just return <code>this</code>.
+     */
     private boolean isDelayedInvariantDirty;
+
+    /**
+     * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#past()}} will call {@link CDDLib#past(long)} with this {@link CDD#pointer}.
+     * Otherwise, {@link CDD#past()} will just return <code>this</code>.
+     */
     private boolean isPastDirty;
 
+    /**
+     * The bottom part of a {@link CDD} are BDD nodes. If this boolean is true then we are within that part of the {@link CDD}.
+     */
     private boolean isBdd;
+
+    /**
+     * The bottom most nodes labeled either <code>true</code> or <code>false</code> are called terminal nodes.
+     * These nodes have only ingoing edges and no outgoing.
+     * If this boolean is true, then the {@link CDD#pointer} points at one of these terminal nodes.
+     * If this is the case, then this {@link CDD} is a BDD ({@link CDD#isBdd} is <code>true</code>).
+     */
     private boolean isTerminal;
+
+    /**
+     * If {@link CDD#isGuardDirty} is true then this {@link CDD} has changed, and {@link CDD#isUrgent()} will be recompute.
+     * Otherwise, {@link CDD#isUrgent()} will just return {@link CDD#isUrgent}.
+     */
     private boolean isUrgent;
+
+    /**
+     *
+     */
     private boolean isUnrestrained;
+
     private boolean isTrue;
     private boolean isFalse;
+
     private boolean canDelayIndefinitely;
     private boolean hasRemovedNegatives;
 
     private CddExtractionResult extraction;
+
+    /**
+     * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#extract()} will call {@link CDDLib#extractBddAndDbm(long)} with this {@link CDD#pointer}.
+     * Otherwise, {@link CDD#extract()} will just return the stored {@link CDD#extraction}.
+     */
     private boolean isExtractionDirty;
 
     private static boolean cddIsRunning;
@@ -352,9 +405,7 @@ public class CDD {
             }
         }
 
-        canDelayIndefinitely = result;
-
-        return result;
+        return canDelayIndefinitely = result;
     }
 
     public boolean isUrgent() {
@@ -381,9 +432,7 @@ public class CDD {
             }
         }
 
-        isUrgent = result;
-
-        return result;
+        return isUrgent = result;
     }
 
     /**
@@ -391,7 +440,7 @@ public class CDD {
      * In contrast to {@link #copy()} this does not create a completely
      * new CDD instance by invoking the {@link CDDLib#copy(long)}. The usefulness
      * of {@link #hardCopy()} is its lightweight nature and as the pointer
-     * is a pass-by-value then immediate not oeprator invocations won't alter the pointer
+     * is a pass-by-value the immediate not operator invocations won't alter the pointer
      * value of the original (this.pointer) retrieved through {@link #getPointer()}.
      *
      * @return Returns a new CDD which is not created through {@link CDDLib#copy(long)} but with a pointer copy.

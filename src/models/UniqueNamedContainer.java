@@ -50,7 +50,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
      *
      * @param item item to be added to the end of this container.
      */
-    public void add(T item) {
+    public boolean add(T item) {
         T newItem = (T) item.getCopy();
 
         if (!item.isGlobal()) {
@@ -59,9 +59,11 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
                     .collect(Collectors.toList());
             if (sameName.size() != 0) {
                 List<T> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(item.getOwnerName())).collect(Collectors.toList());
-                if (sameOwner.size() != 0) { // Same name, same owner
-                    for (int i = 0; i < sameOwner.size(); i++) {
-                        sameOwner.get(i).setUniqueName(i + 1);
+                if (sameOwner.size() > 0) { // Same name, same owner
+                    // The first element would always have a unique name without an index.
+                    // Because of this, we have to set its unique name with index 1.
+                    if (sameOwner.size() == 1) {
+                        sameOwner.get(0).setUniqueName(1);
                     }
                     newItem.setUniqueName(sameOwner.size() + 1);
                 } else { //  Same name, different owner
@@ -73,11 +75,13 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
             }
         }
 
-        // If the unique name is not present in the set of items then add it
+        // If the unique name is not present in the set of items then add it.
         Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
         if (existing.isEmpty()) {
             items.add(newItem);
+            return true;
         }
+        return false;
     }
 
     private boolean sameName(UniquelyNamed item1, UniquelyNamed item2) {
@@ -105,7 +109,9 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     }
 
     /**
-     * @return the internal list representation of this container.
+     * A getter for the backing field {@link UniqueNamedContainer#items}.
+     *
+     * @return The internal list representation of this container.
      */
     public List<T> getItems() {
         return items;

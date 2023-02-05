@@ -279,19 +279,13 @@ public class Automaton {
 
                 // Calculate the enabled CDD.
                 List<Edge> edges = getEdgesFromLocationAndSignal(location, input);
-                if (!edges.isEmpty()) {
-                    for (Edge edge : edges) {
-                        CDD targetInvariant = edge.getTarget().getInvariantCdd();
-                        CDD preGuard = targetInvariant.transitionBack(edge);
-                        enabledPart = enabledPart.disjunction(preGuard);
-                    }
-
-                    if (enabledPart.isTerminal()) {
-                        continue;
-                    }
+                for (Edge edge : edges) {
+                    CDD targetInvariant = edge.getTarget().getInvariantCdd();
+                    CDD preGuard = targetInvariant.transitionBack(edge);
+                    enabledPart = enabledPart.disjunction(preGuard);
                 }
 
-                // If the enabled part is true then the disabled part will be false
+                // If the enabled part is true then the disabled part will be false.
                 if (enabledPart.isTrue()) {
                     continue;
                 }
