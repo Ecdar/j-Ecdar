@@ -772,6 +772,15 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
+
+        if (isTrue() || isFalse()) {
+            return this;
+        }
+
+        if (update.isTrue() || update.isFalse()) {
+            return this;
+        }
+
         return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
     }
 
