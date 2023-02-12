@@ -65,10 +65,7 @@ public class CDD {
      * Otherwise, {@link CDD#isUrgent()} will just return {@link CDD#isUrgent}.
      */
     private boolean isUrgent;
-
-    /**
-     *
-     */
+    
     private boolean isUnrestrained;
 
     private boolean isTrue;
