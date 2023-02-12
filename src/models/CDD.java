@@ -24,7 +24,7 @@ public class CDD {
     /**
      * If this boolean is <code>true</code> then this {@link CDD} has changed, and we should recompute the {@link Guard}.
      * Otherwise, if this boolean is false, then the already computed {@link CDD#guard} will be returned from {@link CDD#getGuard()}.
-     * Since re-computation of the {@link CDD#guard} is only performed when this {@link CDD has changed, then the guard returned is
+     * Since re-computation of the {@link CDD#guard} is only performed when this {@link CDD} has changed, then the guard returned is
      * a reference mutable from other places, and thereby it should be viewed as readonly or copied.
      */
     private boolean isGuardDirty;

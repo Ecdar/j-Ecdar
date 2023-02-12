@@ -73,13 +73,16 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
                     newItem.setUniqueName();
                 }
             }
-        }
 
-        // If the unique name is not present in the set of items then add it.
-        Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
-        if (existing.isEmpty()) {
             items.add(newItem);
             return true;
+        } else {
+            // If the unique name is not present in the set of items then add it.
+            Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
+            if (existing.isEmpty()) {
+                items.add(newItem);
+                return true;
+            }
         }
         return false;
     }
