@@ -174,6 +174,7 @@ public class CDD {
             return new TrueGuard();
         }
 
+        // Required as we don't want to alter the pointer value of "this".
         CDD copy = hardCopy();
 
         List<Guard> orParts = new ArrayList<>();
@@ -391,6 +392,7 @@ public class CDD {
         if (isFalse()) {
             result = false;
         } else if (!isBDD()) {
+            // Required as we don't want to alter the pointer value of "this".
             CDD copy = hardCopy();
 
             while (!copy.isTerminal()) {
@@ -717,6 +719,7 @@ public class CDD {
     public Federation getFederation() {
         // TODO: does not in any way take care of BDD parts (might run endless for BCDDs?)
         List<Zone> zoneList = new ArrayList<>();
+        // Required as we don't want to alter the pointer value of "this".
         CDD copy = hardCopy();
 
         while (!copy.isTerminal()) {
