@@ -790,11 +790,11 @@ public class CDD {
         guard.checkForNull();
         update.checkForNull();
 
-        if (isTrue() || isFalse()) {
+        if (isTerminal()) {
             return this;
         }
 
-        if (update.isTrue() || update.isFalse()) {
+        if (update.isTerminal()) {
             return this;
         }
 

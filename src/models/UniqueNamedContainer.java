@@ -49,42 +49,45 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
      * There is another item with a different owner and the same original name.
      *
      * @param item item to be added to the end of this container.
+     * @return returns <code>true</code> if a copy of the {@code item} was added.
      */
     public boolean add(T item) {
         T newItem = (T) item.getCopy();
 
-        if (!item.isGlobal()) {
-            List<T> sameName = items.stream()
-                    .filter(it -> sameName(it, item))
-                    .collect(Collectors.toList());
-            if (sameName.size() != 0) {
-                List<T> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(item.getOwnerName())).collect(Collectors.toList());
-                if (sameOwner.size() > 0) { // Same name, same owner
-                    // The first element would always have a unique name without an index.
-                    // Because of this, we have to set its unique name with index 1.
-                    if (sameOwner.size() == 1) {
-                        sameOwner.get(0).setUniqueName(1);
-                    }
-                    newItem.setUniqueName(sameOwner.size() + 1);
-                } else { //  Same name, different owner
-                    for (int i = 0; i < sameName.size(); i++) {
-                        sameName.get(i).setUniqueName();
-                    }
-                    newItem.setUniqueName();
-                }
-            }
-
-            items.add(newItem);
-            return true;
-        } else {
+        // Global items should only be added if it does not exist already:
+        if (item.isGlobal()) {
             // If the unique name is not present in the set of items then add it.
             Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
             if (existing.isEmpty()) {
                 items.add(newItem);
                 return true;
             }
+            return false;
         }
-        return false;
+
+        // Local items should always be added but with a unique name:
+        List<T> sameName = items.stream()
+                .filter(it -> sameName(it, item))
+                .collect(Collectors.toList());
+        if (sameName.size() != 0) {
+            List<T> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(item.getOwnerName())).collect(Collectors.toList());
+            if (sameOwner.size() > 0) { // Same name, same owner
+                // The first element would always have a unique name without an index.
+                // Because of this, we have to set its unique name with index 1.
+                if (sameOwner.size() == 1) {
+                    sameOwner.get(0).setUniqueName(1);
+                }
+                newItem.setUniqueName(sameOwner.size() + 1);
+            } else { //  Same name, different owner
+                for (int i = 0; i < sameName.size(); i++) {
+                    sameName.get(i).setUniqueName();
+                }
+                newItem.setUniqueName();
+            }
+        }
+
+        items.add(newItem);
+        return true;
     }
 
     private boolean sameName(UniquelyNamed item1, UniquelyNamed item2) {
