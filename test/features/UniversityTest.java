@@ -1,6 +1,7 @@
 package features;
 
 import log.Log;
+import log.Urgency;
 import logic.*;
 import models.*;
 import parser.*;
@@ -191,11 +192,7 @@ public class UniversityTest {
         SimpleTransitionSystem lhs = new SimpleTransitionSystem(new Quotient(getSpec(), getResearcher()).getAutomaton());
         Quotient rhs = new Quotient(getSpec(), getResearcher());
         Refinement refinement = new Refinement(lhs, rhs);
-
-        XMLFileWriter.toXML("testOutput/quotient.xml", lhs);
-        boolean refines = refinement.check();
-
-        assertTrue(refines);
+        assertTrue(refinement.check());
     }
 
     @Test
@@ -217,13 +214,6 @@ public class UniversityTest {
 
         TransitionSystem rightAut = new Conjunction(new SimpleTransitionSystem(right1.getAutomaton()), new SimpleTransitionSystem(right2.getAutomaton()));
         Log.trace(rightAut.getOutputs());
-
-        XMLFileWriter.toXML("testOutput/right.xml",right.getAutomaton());
-        XMLFileWriter.toXML("testOutput/right1.xml",right1.getAutomaton());
-        XMLFileWriter.toXML("testOutput/right2.xml",right2.getAutomaton());
-        XMLFileWriter.toXML("testOutput/rightAut.xml",rightAut.getAutomaton());
-
-        XMLFileWriter.toXML("testOutput/left.xml",left.getAutomaton());
 
         Refinement refinement1 = new Refinement(left,rightAut);
         boolean refines1 = refinement1.check(true);
@@ -289,6 +279,7 @@ public class UniversityTest {
 
         assertFalse(refines);
     }
+
     @Test
     public void doubleQuotientTest1() {
         // refinement: res <= spec \ adm2 \ machine
@@ -314,7 +305,6 @@ public class UniversityTest {
 
         assertFalse(refines);
     }
-
     @Test
     public void doubleQuotientTest3() {
         // refinement: res <= spec \ adm2 \ machine
@@ -357,10 +347,7 @@ public class UniversityTest {
         Composition lhs = new Composition(getMachine(), getResearcher());
         Quotient rhs = new Quotient(getSpec(), getAdm());
         Refinement refinement = new Refinement(lhs, rhs);
-
-        boolean refines = refinement.check();
-
-        assertTrue(refines);
+        assertTrue(refinement.check());
     }
 
     @Test
@@ -752,6 +739,9 @@ public class UniversityTest {
 
         Refinement refinement1 = new Refinement(composition1, composition2);
         Refinement refinement2 = new Refinement(composition2, composition1);
+
+        new SimpleTransitionSystem(composition1.getAutomaton()).toXML("testOutput/comp1.xml");
+        new SimpleTransitionSystem(composition2.getAutomaton()).toXML("testOutput/comp2.xml");
 
         boolean refines1 = refinement1.check();
         boolean refines2 = refinement2.check();

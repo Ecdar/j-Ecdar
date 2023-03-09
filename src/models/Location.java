@@ -127,7 +127,7 @@ public final class Location {
         return create(name, invariant, isInitial, isUrgent, isUniversal, isInconsistent, 0, 0);
     }
 
-    public static Location createFromState(State state, List<Clock> clocks) {
+    public static Location createFromState(State state) {
         Location location = state.getLocation();
         return location.copy();
     }
@@ -140,6 +140,11 @@ public final class Location {
             boolean isInconsistent
     ) {
         return create(name, invariant, true, isUrgent, isUniversal, isInconsistent);
+    }
+
+    public static Location createFromState(State state, List<Clock> clocks) {
+        Location location = state.getLocation();
+        return location.copy();
     }
 
     public static Location createComposition(List<Location> children) {
@@ -219,11 +224,12 @@ public final class Location {
             boolean isInitial,
             boolean isUrgent,
             int x,
-            int y
+            int y,
+            Clock clock
     ) {
         return new Location(
             name,
-            new FalseGuard(),
+            new ClockGuard(clock, 0, Relation.LESS_EQUAL),
             null,
             null,
             isInitial,
@@ -236,8 +242,8 @@ public final class Location {
         );
     }
 
-    public static Location createInconsistentLocation(String name, int x, int y) {
-        return Location.createInconsistentLocation(name, false, false, x, y);
+    public static Location createInconsistentLocation(String name, int x, int y, Clock clock) {
+        return Location.createInconsistentLocation(name, false, false, x, y, clock);
     }
 
     public static Location createSimple(Location child) {

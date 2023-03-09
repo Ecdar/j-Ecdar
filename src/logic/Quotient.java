@@ -18,7 +18,7 @@ public class Quotient extends AggregatedTransitionSystem {
         this.s = s;
 
         // Clocks should contain the clocks of t, s, and the new clock.
-        Optional<Clock> existingClock = clocks.findFirstWithOriginalName("quo_new");
+        Optional<Clock> existingClock = clocks.findAnyWithOriginalName("quo_new");
         if (existingClock.isPresent()) {
             newClock = existingClock.get();
         } else {
@@ -58,7 +58,7 @@ public class Quotient extends AggregatedTransitionSystem {
     @Override
     public List<Move> getNextMoves(Location location, Channel a) {
         Location univ = Location.createUniversalLocation("universal", 0, 0);
-        Location inc = Location.createInconsistentLocation("inconsistent", 0, 0);
+        Location inc = Location.createInconsistentLocation("inconsistent", 0, 0, newClock);
 
         List<Move> resultMoves = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class Quotient extends AggregatedTransitionSystem {
             // Rule 1 (cartesian product)
             if (in(a, intersect(s.getActions(), t.getActions()))) {
                 Log.debug("Rule 1");
-                List<Move> moveProduct = moveProduct(t_moves, s_moves, true,true);
+                List<Move> moveProduct = moveProduct(t_moves, s_moves, true, true);
                 for (Move move : moveProduct) {
                     move.conjunctCDD(move.getEnabledPart());
                 }
@@ -105,7 +105,7 @@ public class Quotient extends AggregatedTransitionSystem {
             if (in(a, difference(s.getActions(), t.getActions()))) {
                 Log.debug("Rule 2");
                 List<Move> movesLeft = new ArrayList<>();
-                movesLeft.add(new Move(lt,lt, new ArrayList<>()));
+                movesLeft.add(new Move(lt, lt, new ArrayList<>()));
 
                 List<Move> moveProduct = moveProduct(movesLeft, s_moves, true, true);
                 for (Move move : moveProduct) {
@@ -176,8 +176,8 @@ public class Quotient extends AggregatedTransitionSystem {
             if (in(a, difference(t.getActions(), s.getActions()))) {
                 Log.debug("Rule 8");
                 List<Move> movesRight = new ArrayList<>();
-                movesRight.add(new Move(ls,ls,new ArrayList<>()));
-                List<Move> moveProduct = moveProduct(t_moves, movesRight, true,true);
+                movesRight.add(new Move(ls, ls, new ArrayList<>()));
+                List<Move> moveProduct = moveProduct(t_moves, movesRight, true, true);
                 for (Move move : moveProduct) {
                     move.conjunctCDD(move.getEnabledPart());
                 }

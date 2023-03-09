@@ -1,5 +1,7 @@
 package models;
 
+import models.UniquelyNamed;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,7 +12,7 @@ import java.util.stream.Collectors;
  * for this reason this container does not ensure that the unique names are
  * in fact unique to the collection. This is handled by the implementation of {@link UniquelyNamed}
  * which must utilise that the unique index provided to the renaming function.
- *
+ * <p>
  * Global items on the other hand are never renamed and only a singe instance
  * with the same unique name can be in the container. This is used for clocks
  * like the "quo_new" which are reused between quotients.
@@ -26,7 +28,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
     /**
      * Constructs a container with an initial set of items.
      *
-     * @param items The initial set of items.
+     * @param items the initial set of items.
      */
     public UniqueNamedContainer(List<T> items) {
         this.items = items;
@@ -41,63 +43,64 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
 
     /**
      * Adds the specified element to the end of this container.
-     *
+     * <p>
      * For non singleton items renaming of its unique name will happen when:
-     *   There is another item with the same owner and the same original name.
-     *   There is another item with a different owner and the same original name.
+     * There is another item with the same owner and the same original name.
+     * There is another item with a different owner and the same original name.
      *
-     * @param item Item to be added to the end of this container.
+     * @param item item to be added to the end of this container.
+     * @return returns <code>true</code> if a copy of the {@code item} was added.
      */
-    public void add(T item) {
+    public boolean add(T item) {
         T newItem = (T) item.getCopy();
 
+        // Global items should only be added if it does not exist already:
         if (item.isGlobal()) {
-            // We only want to add global items it if its unique name is not present.
-            Optional<T> existing = findFirstWithUniqueName(newItem.getUniqueName());
+            // If the unique name is not present in the set of items then add it.
+            Optional<T> existing = findFirstByUniqueName(newItem.getUniqueName());
             if (existing.isEmpty()) {
                 items.add(newItem);
+                return true;
             }
-        } else {
-            // Unique name naming rules:
-            //   Same owner and different name: keep it as is.
-            //   Different owner and name: keep it as is.
-            //   Different or the same owner and the same original name: add owner to name "owner.n.name" where n is a counter value.
-            // Motivation: Machine <= Machine || Machine. Here the owner is Machine but their clocks are different.
-            List<T> sameOriginalName = items.stream()
-                    .filter(current -> Objects.equals(current.getOriginalName(), newItem.getOriginalName()))
-                    .collect(Collectors.toList());
+            return false;
+        }
 
-            if (!sameOriginalName.isEmpty()) {
-
-                List<T> sameOwner = sameOriginalName.stream()
-                        .filter(current -> Objects.equals(current.getOwnerName(), newItem.getOwnerName()))
-                        .collect(Collectors.toList());
-
+        // Local items should always be added but with a unique name:
+        List<T> sameName = items.stream()
+                .filter(it -> sameName(it, item))
+                .collect(Collectors.toList());
+        if (sameName.size() != 0) {
+            List<T> sameOwner = sameName.stream().filter(c -> c.getOwnerName().equals(item.getOwnerName())).collect(Collectors.toList());
+            if (sameOwner.size() > 0) { // Same name, same owner
+                // The first element would always have a unique name without an index.
+                // Because of this, we have to set its unique name with index 1.
                 if (sameOwner.size() == 1) {
                     sameOwner.get(0).setUniqueName(1);
                 }
-
-                if (!sameOwner.isEmpty()) {
-                    newItem.setUniqueName(sameOwner.size() + 1);
-                } else {
-                    for (T current : sameOriginalName) {
-                        current.setUniqueName();
-                    }
-                    newItem.setUniqueName();
+                newItem.setUniqueName(sameOwner.size() + 1);
+            } else { //  Same name, different owner
+                for (int i = 0; i < sameName.size(); i++) {
+                    sameName.get(i).setUniqueName();
                 }
+                newItem.setUniqueName();
             }
-
-            items.add(newItem);
         }
+
+        items.add(newItem);
+        return true;
+    }
+
+    private boolean sameName(UniquelyNamed item1, UniquelyNamed item2) {
+        return item1.getOriginalName().equals(item2.getOriginalName());
     }
 
     /**
      * Finds the first item in this container with the specified unique name.
      *
      * @param uniqueName The unique name to look for.
-     * @return An optional item which is present if an item with the unique name is found.
+     * @return An optional item which is empty if an item with the unique name could not be found.
      */
-    private Optional<T> findFirstWithUniqueName(String uniqueName) {
+    private Optional<T> findFirstByUniqueName(String uniqueName) {
         return items.stream().filter(item -> Objects.equals(item.getUniqueName(), uniqueName)).findFirst();
     }
 
@@ -107,11 +110,13 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
      * @param originalName The original name to look for.
      * @return An optional item which is empty if an item with the original name could not be found.
      */
-    public Optional<T> findFirstWithOriginalName(String originalName) {
+    public Optional<T> findAnyWithOriginalName(String originalName) {
         return items.stream().filter(item -> Objects.equals(item.getOriginalName(), originalName)).findFirst();
     }
 
     /**
+     * A getter for the backing field {@link UniqueNamedContainer#items}.
+     *
      * @return The internal list representation of this container.
      */
     public List<T> getItems() {
@@ -120,7 +125,7 @@ public class UniqueNamedContainer<T extends UniquelyNamed> {
 
     /**
      * Appends all the elements in the specified iterable to the end of this container,
-     * in the order that they are returned by the supplied collection's iterator.
+     * in the order that they are returned by the specified collection's iterator.
      *
      * @param items The iterable with items which should be added to this container.
      */

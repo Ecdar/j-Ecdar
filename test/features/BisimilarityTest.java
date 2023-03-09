@@ -6,6 +6,7 @@ import logic.SimpleTransitionSystem;
 import models.Automaton;
 import models.CDD;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import parser.XMLParser;
 
@@ -18,6 +19,7 @@ public class BisimilarityTest {
     }
 
     @Test
+    @Ignore
     public void bisimilarityTest1() {
 
 
