@@ -51,6 +51,7 @@ public class CDD {
      * The bottom part of a {@link CDD} are BDD nodes. If this boolean is true then we are within that part of the {@link CDD}.
      */
     private boolean isBdd;
+    private boolean isBddDirty;
 
     /**
      * The bottom most nodes labeled either <code>true</code> or <code>false</code> are called terminal nodes.
@@ -59,20 +60,29 @@ public class CDD {
      * If this is the case, then this {@link CDD} is a BDD ({@link CDD#isBdd} is <code>true</code>).
      */
     private boolean isTerminal;
+    private boolean isTerminalDirty;
 
     /**
      * If {@link CDD#isGuardDirty} is true then this {@link CDD} has changed, and {@link CDD#isUrgent()} will be recompute.
      * Otherwise, {@link CDD#isUrgent()} will just return {@link CDD#isUrgent}.
      */
     private boolean isUrgent;
+    private boolean isUrgentDirty;
 
     private boolean isUnrestrained;
+    private boolean isUnrestrainedDirty;
 
     private boolean isTrue;
+    private boolean isTrueDirty;
+
     private boolean isFalse;
+    private boolean isFalseDirty;
 
     private boolean canDelayIndefinitely;
+    private boolean isCanDelayIndefinitelyDirty;
+
     private boolean hasRemovedNegatives;
+
 
     private CddExtractionResult extraction;
 
@@ -142,6 +152,13 @@ public class CDD {
         isDelayedDirty = true;
         isDelayedInvariantDirty = true;
         isPastDirty = true;
+        isBddDirty = true;
+        isTerminalDirty = true;
+        isUrgentDirty = true;
+        isUnrestrainedDirty = true;
+        isTrueDirty = true;
+        isFalseDirty = true;
+        isCanDelayIndefinitelyDirty = true;
         hasRemovedNegatives = false;
     }
 
@@ -276,7 +293,7 @@ public class CDD {
     public boolean isBDD()
             throws NullPointerException {
         checkForNull();
-        if (isGuardDirty) {
+        if (isBddDirty) {
             // CDDLib.isBDD does not recognise cddFalse and cddTrue as BDDs
             isBdd = isFalse() || isTrue() || CDDLib.isBDD(this.pointer);
         }
@@ -289,7 +306,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
 
-        if (isGuardDirty) {
+        if (isTerminalDirty) {
             isTerminal = CDDLib.isTerminal(pointer);
         }
 
@@ -297,7 +314,7 @@ public class CDD {
     }
 
     public boolean isUnrestrained() {
-        if (isGuardDirty) {
+        if (isUnrestrainedDirty) {
             isUnrestrained = this.equiv(cddTrue());
         }
 
@@ -311,7 +328,7 @@ public class CDD {
     public boolean isFalse()
             throws NullPointerException {
         checkForNull();
-        if (isGuardDirty) {
+        if (isFalseDirty) {
             isFalse = CDDLib.cddEquiv(this.pointer, cddFalse().pointer);
         }
 
@@ -327,7 +344,7 @@ public class CDD {
     public boolean isTrue()
             throws NullPointerException {
         checkForNull();
-        if (isGuardDirty) {
+        if (isTrueDirty) {
             isTrue = CDDLib.cddEquiv(this.pointer, cddTrue().pointer);
         }
 
@@ -380,7 +397,7 @@ public class CDD {
     }
 
     public boolean canDelayIndefinitely() {
-        if (!isGuardDirty) {
+        if (!isCanDelayIndefinitelyDirty) {
             return canDelayIndefinitely;
         }
 
@@ -408,7 +425,7 @@ public class CDD {
     }
 
     public boolean isUrgent() {
-        if (!isGuardDirty) {
+        if (!isUrgentDirty) {
             return isUrgent;
         }
 
