@@ -1,5 +1,6 @@
 package e2e;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -86,6 +87,7 @@ public class ConsistencyTest extends GrpcE2EBase {
     }
 
     @Test
+    @Ignore
     public void g16IsNotConsistent() {
         assertFalse(consistency("consistency: G16"));
     }

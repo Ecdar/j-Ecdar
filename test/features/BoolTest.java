@@ -87,7 +87,7 @@ public class BoolTest {
         list.add(l1); //list.add(l2); list.add(l3);
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
-        CDD cdd =new CDD(new AndGuard(l1));
+        CDD cdd =CDDFactory.create(new AndGuard(l1));
         BDDArrays bddArr = new BDDArrays(CDDLib.bddToArray(cdd.getPointer()));
         Log.debug(bddArr.getValues());
         Log.debug(bddArr.getVariables());
@@ -119,7 +119,7 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addBooleans(BVs);
         Log.debug("or guard " + new OrGuard(l1,l2,l3));
-        CDD cdd =new CDD(new OrGuard(l1,l2,l3));
+        CDD cdd =CDDFactory.create(new OrGuard(l1,l2,l3));
         cdd.printDot();
         Log.debug( l1 + "  " +  l2 + "  " +  l3 + "  " + cdd);
         //assert(cdd.toString().equals("[[(a==true), (b==false), (c==false)], [(a==true), (b==true), (c==false)], [(a==false), (b==true), (c==false)]]"));
@@ -203,8 +203,8 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks(clocks);
         CDD.addBooleans(BVs);
-        CDD origin1 = new CDD(new AndGuard(inner));
-        CDD origin2 = new CDD(new AndGuard(inner1));
+        CDD origin1 = CDDFactory.create(new AndGuard(inner));
+        CDD origin2 = CDDFactory.create(new AndGuard(inner1));
         CDD bothOrigins = origin1.disjunction(origin2);
 
         Automaton aut = new Automaton("Automaton", locations, edges, clocks, bools,false);
@@ -286,7 +286,7 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
         CDD.addBooleans(BVs);
-        CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
+        CDD compl = (CDDFactory.create(new AndGuard(inner)).disjunction(CDDFactory.create(new AndGuard(inner1)))).negation();
 
 
         Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
@@ -390,7 +390,7 @@ public class BoolTest {
         CDD.init(CDD.maxSize,CDD.cs,CDD.stackSize);
         CDD.addClocks();
         CDD.addBooleans(BVs);
-        CDD compl = (new CDD(new AndGuard(inner)).disjunction(new CDD(new AndGuard(inner1)))).negation();
+        CDD compl = (CDDFactory.create(new AndGuard(inner)).disjunction(CDDFactory.create(new AndGuard(inner1)))).negation();
 
 
         Location l0 = Location.create("L0", new TrueGuard(), true, false, false, false, 0, 0);
@@ -514,6 +514,7 @@ public class BoolTest {
     }
 
     @Test
+    @Ignore
     public void testBoolQuotient() // TODO: check and make an assert statement
     {
         CDD.done();

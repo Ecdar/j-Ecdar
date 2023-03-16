@@ -55,7 +55,7 @@ public class CDDTest {
         guardList.add(g3);
         guardList.add(g4);
 
-        Log.debug(new CDD(new AndGuard(guardList)).getGuard(clocks));
+        Log.debug(CDDFactory.create(new AndGuard(guardList)).getGuard(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         cdd1.free();
@@ -289,7 +289,7 @@ public class CDDTest {
         //  g1.add(new AndGuard(e2_g1, e2_g3));
         g1.add(e2_g1);
         g1.add(e2_g2);
-        CDD res = new CDD(new OrGuard(g1));
+        CDD res = CDDFactory.create(new OrGuard(g1));
         //res.printDot();
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));

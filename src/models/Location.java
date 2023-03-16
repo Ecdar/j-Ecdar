@@ -367,7 +367,9 @@ public final class Location {
 
     public CDD getInvariantCdd() {
         if (isSimple()) {
-            return new CDD(children.get(0).getInvariantGuard());
+            return CDDFactory.create(
+                    children.get(0).getInvariantGuard()
+            );
         }
 
         if (invariantCdd == null) {
@@ -381,7 +383,7 @@ public final class Location {
                     this.invariantCdd = this.invariantCdd.conjunction(location.getInvariantCdd());
                 }
             } else {
-                invariantCdd = new CDD(getInvariantGuard());
+                invariantCdd = CDDFactory.create(getInvariantGuard());
             }
         }
 
