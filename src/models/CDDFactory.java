@@ -81,7 +81,7 @@ public class CDDFactory {
         return cdd;
     }
 
-    public static CDD create(List<Update> updates) {
+    public static CDD create(List<Update> updates) throws IllegalArgumentException {
         CDD res = CDD.cddTrue();
         for (Update update : updates) {
             if (update instanceof ClockUpdate) {
@@ -90,6 +90,8 @@ public class CDDFactory {
             } else if (update instanceof BoolUpdate) {
                 CDD clockUpdate = singleton.create((BoolUpdate) update);
                 res = res.conjunction(clockUpdate);
+            } else {
+                throw new IllegalArgumentException("Update instance of class '" + update.getClass().getName() + "' is not supported ");
             }
         }
         return res.removeNegative().reduce();
