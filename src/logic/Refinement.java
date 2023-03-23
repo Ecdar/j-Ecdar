@@ -1,6 +1,5 @@
 package logic;
 
-import lib.CDDLib;
 import log.Log;
 import models.*;
 
@@ -134,7 +133,7 @@ public class Refinement {
         if (!checkPreconditions())
             return false;
 
-        boolean initialisedCdd = CDD.tryInit(allClocks, allBVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(allClocks, allBVs);
 
         // the first states we look at are the initial ones
         waiting.push(getInitialStatePair());
@@ -185,7 +184,7 @@ public class Refinement {
             if (!holds0) {
                 Log.info("Delay violation");
                 if (initialisedCdd) {
-                    CDD.done();
+                    CDDRuntime.done();
                 }
                 return false;
             }
@@ -196,7 +195,7 @@ public class Refinement {
 
                 Log.info("Output violation");
                 if (initialisedCdd) {
-                    CDD.done();
+                    CDDRuntime.done();
                 }
                 return false;
             }
@@ -207,7 +206,7 @@ public class Refinement {
                 //assert(false); // assuming everything is input enabled
                 Log.info("Input violation");
                 if (initialisedCdd) {
-                    CDD.done();
+                    CDDRuntime.done();
                 }
                 return false;
             }
@@ -215,7 +214,7 @@ public class Refinement {
 
         // if we got here it means refinement property holds
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
         return true;
     }
@@ -266,7 +265,7 @@ public class Refinement {
 
         // check if there is a part of the CDD where both leader and follower are enabled, abort otherwise
         leaderTarget.applyGuards(followerTransition.getGuardCDD());
-        if (leaderTarget.getInvariant().isFalse()) {
+        if (leaderTarget.getInvariant().equivFalse()) {
             return null;
         }
 
@@ -275,11 +274,11 @@ public class Refinement {
 
         // check target invariants to see if transitions are actually enabled
         CDD leaderTargetInvariant = leaderTransition.getTarget().getLocationInvariant();
-        if (leaderTarget.getInvariant().conjunction(leaderTargetInvariant).isFalse())
+        if (leaderTarget.getInvariant().conjunction(leaderTargetInvariant).equivFalse())
             return null;
 
         CDD followerTargetInvariant = followerTransition.getTarget().getLocationInvariant();
-        if (leaderTarget.getInvariant().conjunction(followerTargetInvariant).isFalse())
+        if (leaderTarget.getInvariant().conjunction(followerTargetInvariant).equivFalse())
             return null;
 
         // forward explored both transitions, reaching the new target states
@@ -317,7 +316,7 @@ public class Refinement {
             rightCDD = rightCDD.disjunction(c);
 
         // If trans2 does not satisfy all solution of trans1, return empty list which should result in refinement failure
-        if (!isInput && leftCDD.minus(rightCDD).isNotFalse()) {
+        if (!isInput && leftCDD.minus(rightCDD).isNotEquivFalse()) {
             Log.info("trans 2 does not satisfiy all solutions of trans 1");
             Log.debug("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
             Log.debug(leftCDD);
@@ -326,7 +325,7 @@ public class Refinement {
             return false;
         }
 
-        if (isInput && rightCDD.minus(leftCDD).isNotFalse()) {
+        if (isInput && rightCDD.minus(leftCDD).isNotEquivFalse()) {
             Log.info("trans 2 does not satisfiy all solutions of trans 1");
 //            Log.debug("trans 2 does not satisfiy all solutions " + trans2.get(0).getEdges().get(0).getChan());
             Log.debug(leftCDD);

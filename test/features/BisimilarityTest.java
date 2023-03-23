@@ -5,6 +5,7 @@ import logic.Bisimilarity;
 import logic.SimpleTransitionSystem;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class BisimilarityTest {
     @Test
     public void bisimilarityUntimedTestNotBisim() {
 
-        CDD.done();
+        CDDRuntime.done();
 
         Automaton[] auts = XMLParser.parse("./samples/xml/quotient/example_critical_sections_final_versions_pruned.xml", false);
         Automaton aut = Bisimilarity.checkBisimilarity(auts[10]);

@@ -4,6 +4,7 @@ import log.Log;
 import logic.*;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -21,7 +22,7 @@ public class ConsistencyTest {
 
     @AfterClass
     public static void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass

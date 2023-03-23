@@ -23,7 +23,7 @@ public class VariousTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass
@@ -90,8 +90,8 @@ public class VariousTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);
         clocks.add(y);
-        CDD.init(100,100,100);
-        CDD.addClocks(clocks);
+        CDDRuntime.init();
+        CDDRuntime.addClocks(clocks);
 
         CDD origin1 = CDDFactory.create(new AndGuard(inner));
 
@@ -119,8 +119,8 @@ public class VariousTest {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);
         clocks.add(y);
-        CDD.init(100,100,100);
-        CDD.addClocks(clocks);
+        CDDRuntime.init();
+        CDDRuntime.addClocks(clocks);
 
         CDD origin1 = CDDFactory.create(new AndGuard(inner));
 
@@ -221,12 +221,12 @@ public class VariousTest {
 
     @Test
     public void testCDDAllocateInterval() throws CddAlreadyRunningException, CddNotRunningException  {
-        CDD.init(100,100,100);
+        CDDRuntime.init();
         Clock x = new Clock("x","Aut");
         Clock y = new Clock("y", "Aut");
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);clocks.add(y);
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
         CDD test = CDD.createInterval(1,0,2,true,3,true);
         Log.debug(test.getGuard(clocks));
         test.printDot();
@@ -237,13 +237,13 @@ public class VariousTest {
     public void testCompOfCompRefinesSpec() throws CddAlreadyRunningException, CddNotRunningException {
         Automaton[] aut2 = XMLParser.parse("samples/xml/university-slice.xml", true);
 
-        CDD.init(1000,1000,1000);
+        CDDRuntime.init();
         List<Clock> clocks = new ArrayList<>();
         clocks.addAll(aut2[0].getClocks());
         clocks.addAll(aut2[1].getClocks());
         clocks.addAll(aut2[2].getClocks());
         clocks.addAll(aut2[3].getClocks());
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         SimpleTransitionSystem adm = new SimpleTransitionSystem((aut2[3]));
         SimpleTransitionSystem machine = new SimpleTransitionSystem((aut2[0]));

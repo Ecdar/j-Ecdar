@@ -9,6 +9,7 @@ import io.grpc.stub.StreamObserver;
 import logic.Controller;
 import logic.query.Query;
 import models.CDD;
+import models.CDDRuntime;
 
 import java.util.List;
 
@@ -86,7 +87,8 @@ public class EcdarService extends EcdarBackendGrpc.EcdarBackendImplBase {
     private String tryEnsureDone(Throwable e) {
         String description = e.getClass().getName() + ": " + e.getMessage();
 
-        try {CDD.ensureDone(); }
+        try {
+            CDDRuntime.ensureDone(); }
         catch (Throwable ee) {
             description += "\n" + ee.getClass().getName() + ": " + ee.getMessage();
         }

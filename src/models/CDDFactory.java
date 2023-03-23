@@ -41,16 +41,16 @@ public class CDDFactory {
     }
 
     private CDD create(ClockGuard clockGuard) {
-        Zone zone = new Zone(CDD.numClocks, true);
+        Zone zone = new Zone(CDDRuntime.getNumberOfClocks(), true);
         zone.init();
-        zone.buildConstraintsForGuard(clockGuard, CDD.getClocks());
-        CDD cdd = CDD.createFromDbm(zone.getDbm(), CDD.numClocks);
+        zone.buildConstraintsForGuard(clockGuard, CDDRuntime.getAllClocks());
+        CDD cdd = CDD.createFromDbm(zone.getDbm(), CDDRuntime.getNumberOfClocks());
         cdd.setGuard(clockGuard);
         return cdd;
     }
 
     private CDD create(BoolGuard boolGuard) {
-        int level = CDD.bddStartLevel + CDD.indexOf(boolGuard.getVar());
+        int level = CDDRuntime.getBddStartLevel() + CDDRuntime.indexOf(boolGuard.getVar());
         CDD cdd;
         if (boolGuard.getValue()) {
             cdd = new CDD(CDDLib.cddBddvar(level));
@@ -98,7 +98,7 @@ public class CDDFactory {
     }
 
     private CDD create(ClockUpdate clockUpdate) {
-        return CDD.createInterval(CDD.indexOf(clockUpdate.getClock()), 0, clockUpdate.getValue(), true, clockUpdate.getValue(), true);
+        return CDD.createInterval(CDDRuntime.indexOf(clockUpdate.getClock()), 0, clockUpdate.getValue(), true, clockUpdate.getValue(), true);
     }
 
     private CDD create(BoolUpdate boolUpdate) {

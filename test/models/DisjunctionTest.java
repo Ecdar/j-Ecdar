@@ -26,7 +26,7 @@ public class DisjunctionTest {
 
     @After
     public void afterEachTest() {
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass
@@ -51,14 +51,14 @@ public class DisjunctionTest {
 
         Automaton[] automata1 = XMLParser.parse("testOutput/D1_test.xml", false);
         Automaton[] automata2 = XMLParser.parse("testOutput/D2_test.xml", false);
-        CDD.done();
-        CDD.init(100, 100, 100);
+        CDDRuntime.done();
+        CDDRuntime.init();
         List<Clock> clocks = new ArrayList<>();
         //clocks.addAll(D1.getClocks());
         //clocks.addAll(D2.getClocks());
         clocks.addAll(automata1[0].getClocks());
         clocks.addAll(automata2[0].getClocks());
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         D1 = new SimpleTransitionSystem(automata1[0]);
         D2 = new SimpleTransitionSystem(automata2[0]);
@@ -95,11 +95,11 @@ public class DisjunctionTest {
         Guard dis3 = new AndGuard(disj3);
 
 
-        CDD.done();
-        CDD.init(1000, 1000, 1000);
+        CDDRuntime.done();
+        CDDRuntime.init();
         List<Clock> clocks = new ArrayList<>();
         clocks.add(x);
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD disjunctedGuards = CDD.cddFalse();
         disjunctedGuards = disjunctedGuards.disjunction(CDDFactory.create(dis1));

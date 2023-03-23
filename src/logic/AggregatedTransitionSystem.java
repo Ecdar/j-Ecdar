@@ -64,14 +64,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
             automata[i] = systems[i].getAutomaton();
         }
 
-        /* We utilise a try-finally such that we can correctly clean up whilst still immediately
-         *   rethrow the exceptions as we can't handle a failure (most likely from the CDD).
-         *   This especially helps increase the meaning of failing tests */
-        try {
-            resultant = aggregate(automata);
-        } finally {
-            CDD.done();
-        }
+        resultant = aggregate(automata);
 
         return resultant;
     }
@@ -142,7 +135,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     private Automaton aggregate(Automaton[] automata) {
-        boolean initialisedCdd = CDD.tryInit(getClocks(), BVs.getItems());
+        boolean initialisedCdd = CDDRuntime.tryInit(getClocks(), BVs.getItems());
 
         String name = getName();
 
@@ -217,7 +210,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         Automaton resAut = new Automaton(name, updatedLocations, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
 
         return resAut;

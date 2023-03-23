@@ -23,7 +23,7 @@ public class Pruning {
         Set<Location> inconsistentLocations;
         Map<Location, CDD> passedInconsistentStates;
 
-        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
 
         for (Location l : locations) {
@@ -86,7 +86,7 @@ public class Pruning {
         }
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
 
         Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), true);
@@ -299,7 +299,7 @@ public class Pruning {
         // apply updates as guard
         //incCDD = CDD.applyReset(incCDD,e.getUpdates());
 
-        if (incCDD.isFalse()) {
+        if (incCDD.equivFalse()) {
             // Checking for satisfiability after clocks were reset (only a problem because target invariant might now be x>4)
             // if unsatisfiable => keep edge // todo: is return the right thing here?
             if (printComments)
@@ -315,7 +315,7 @@ public class Pruning {
 
 
         // if the inconsistent part cannot be reached, we can ignore the edge e, and go on
-        if (incCDD.isFalse()) {
+        if (incCDD.equivFalse()) {
             if (printComments)
                 Log.debug("could not reach inconsistent part, fed is empty");
         } else {
@@ -369,7 +369,7 @@ public class Pruning {
         if (printComments)
             Log.debug("Invariants done");
 
-        if (incCDD.isNotFalse()) {
+        if (incCDD.isNotEquivFalse()) {
             if (printComments)
                 Log.debug("Inconsistent part is reachable with this transition. ");
         } else {
@@ -408,7 +408,7 @@ public class Pruning {
         testForSatEdgeCDD = testForSatEdgeCDD.minus(e.getSource().getInconsistentPart());
 
 
-        if (!testForSatEdgeCDD.isNotFalse()) {
+        if (!testForSatEdgeCDD.isNotEquivFalse()) {
             edges.remove(e);
         }
         if (printComments)
@@ -421,7 +421,7 @@ public class Pruning {
         // If that federation is unsatisfiable, we can just ignore the transition to inc, and be done,
         // so we check for that, zone by zone. Only one zone needs to be sat.
 
-        if (incCDD.isFalse())
+        if (incCDD.equivFalse())
         {
             if (printComments)
                 Log.debug("Did not add a new inconsistent part");
@@ -473,7 +473,7 @@ public class Pruning {
 
             // constrain it by the guards and invariants  of the "good transition". TODO: IMPORTANT: Check if the order of doing the target invariant first, freeing, etc. is the correct one
 
-            if (goodCDD.isNotFalse()) {
+            if (goodCDD.isNotEquivFalse()) {
                 goodCDD = goodCDD.transitionBack(otherEdge);
                 //goodCDD = CDD.applyReset(goodCDD, otherEdge.getUpdates());
 
