@@ -21,7 +21,7 @@ public class InputEnablednessTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass

@@ -121,6 +121,11 @@ public class OrGuard extends Guard {
     }
 
     @Override
+    public <T> T accept(GuardVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
     public String prettyPrint() {
         return Guard.compositePrettyPrint(guards, "||");
     }

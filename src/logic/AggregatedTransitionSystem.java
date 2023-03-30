@@ -70,7 +70,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         try {
             resultant = aggregate(automata);
         } finally {
-            CDD.done();
+            CDDRuntime.done();
         }
 
         return resultant;
@@ -142,7 +142,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
     }
 
     private Automaton aggregate(Automaton[] automata) {
-        boolean initialisedCdd = CDD.tryInit(getClocks(), BVs.getItems());
+        boolean initialisedCdd = CDDRuntime.tryInit(getClocks(), BVs.getItems());
 
         String name = getName();
 
@@ -217,7 +217,7 @@ public abstract class AggregatedTransitionSystem extends TransitionSystem {
         Automaton resAut = new Automaton(name, updatedLocations, edgesWithNewClocks, clocks.getItems(), BVs.getItems(), false);
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
 
         return resAut;
