@@ -3,8 +3,6 @@ package models;
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import lib.CDDLib;
-import log.Log;
-import log.Urgency;
 import util.DeferredProperty;
 
 import java.util.ArrayList;
@@ -835,21 +833,6 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
-
-        Log.setUrgency(Urgency.All);
-        CDD exist = exist(boolResets, clockResets);
-        Log.debug("Clock resets", clockResets.length, ":", clockResets);
-        Log.debug("Boolean resets", boolResets.length, ":", boolResets);
-        Log.debug("This", getGuard(), "Terminal?", isTerminal(), "isTrue?", isTrue(), "isFalse", isFalse(), "equivTrue?", equivTrue(), "equivFalse?", equivFalse());
-        Log.debug("Guard", guard.getGuard(), "Terminal?", guard.isTerminal(), "isTrue?", guard.isTrue(), "isFalse", guard.isFalse(), "equivTrue?", guard.equivTrue(), "equivFalse?", guard.equivFalse());
-        Log.debug("Update", update.getGuard(), "Terminal?", update.isTerminal(), "isTrue?", update.isTrue(), "isFalse", update.isFalse(), "equivTrue?", update.equivTrue(), "equivFalse?", update.equivFalse());
-        Log.debug("Exist", exist.getGuard(), "Terminal?", exist.isTerminal(), "isTrue?", exist.isTrue(), "isFalse", exist.isFalse(), "equivTrue?", exist.equivTrue(), "equivFalse?", exist.equivFalse());
-
-
-        Log.setUrgency(Urgency.Off);
-
-
-
 
         return new CDD(CDDLib.transitionBack(getPointer(), guard.getPointer(), update.getPointer(), clockResets, boolResets));
     }
