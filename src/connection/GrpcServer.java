@@ -42,7 +42,7 @@ public class GrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run(){
-                Log.error("Shutting down gRPX server");
+                Log.error("Shutting down gRPC server");
                 try {
                     GrpcServer.this.stop();
                 } catch (InterruptedException e){
