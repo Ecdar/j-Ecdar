@@ -1,0 +1,67 @@
+name: Generate Native Executables
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  native-compile:
+    name: Generate native executable for - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-2019]
+        graalvm-version: ['22.3.0']
+        java-version: ['11']
+        include:
+          - os: ubuntu-20.04
+            executable-suffix: ''
+            native-build-args: --verbose -J-Xmx10g
+            jcdd-artifact: jcdd-linux
+
+          - os: macos-latest
+            executable-suffix: ''
+            native-build-args: --verbose -J-Xmx13g
+            jcdd-artifact: jcdd-linux
+
+          - os: windows-2019
+            executable-suffix: '.exe'
+            native-build-args: --verbose -J-Xmx10g
+            jcdd-artifact: jcdd-windows
+
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Fetch JCDD
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ci.yml
+          workflow_conclusion: success
+          branch: main
+          name: ${{ matrix.jcdd-artifact }}
+          path: ${{ github.workspace }}/lib
+
+      - name: Set up GraalVM (Java ${{ matrix.java-version }})
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: '${{ matrix.graalvm-version }}'
+          java-version: '${{ matrix.java-version }}'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+          
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        
+      - name: Build j-Ecdar_${{ github.event.release.tag_name || github.sha }}_${{ runner.os }}-x86_64
+        run: ./gradlew nativeCompile
+        
+      - name: Archive binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: j-Ecdar_${{ github.event.release.tag_name || github.sha }}_${{ runner.os }}-x86_64
+          path: ${{ github.workspace }}/build/native/nativeCompile/j-Ecdar${{ matrix.executable-suffix }}

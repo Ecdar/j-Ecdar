@@ -4,10 +4,12 @@ plugins {
     id 'java-library'
     id 'com.google.protobuf' version '0.8.17'
     id 'antlr'
+    id 'org.graalvm.buildtools.native' version '0.9.14'
 }
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 java{
@@ -15,15 +17,12 @@ java{
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-mainClassName = "JECDAR"
-
-
-
 dependencies {
     testImplementation "junit:junit:4.12"
     implementation 'io.grpc:grpc-netty-shaded:1.42.0'
     implementation 'io.grpc:grpc-protobuf:1.42.0'
     implementation 'io.grpc:grpc-stub:1.42.0'
+    implementation 'com.google.cloud:native-image-support:0.14.1'
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
     implementation 'commons-cli:commons-cli:1.4'
     implementation 'org.jdom:jdom2:2.0.6'
@@ -31,6 +30,17 @@ dependencies {
     antlr "org.antlr:antlr4:4.10.1"
     implementation 'org.antlr:antlr4-runtime:4.10.1'
     implementation files('lib/jcdd.jar')
+}
+
+graalvmNative {
+    binaries {
+        main {
+            imageName = 'j-Ecdar'
+            mainClass = 'JECDAR'
+            useFatJar = true
+            sharedLibrary = false
+        }
+    }
 }
 
 protobuf {
