@@ -7,6 +7,7 @@ import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class ConjunctionTest {
 
     @AfterClass
     public static void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     private static TransitionSystem t1, t1Copy, t2, t2Copy, t3, t3Copy, t4, t4Copy, t5, t5Copy, t6, t7, t8, t9, t10, t11, t12;
@@ -187,7 +188,7 @@ public class ConjunctionTest {
 
     @Test
     public void test1NestedConjRefinesT12Aut() {
-        CDD.done();
+        CDDRuntime.done();
         SimpleTransitionSystem ts1 = new SimpleTransitionSystem(new Conjunction(t9, t10).getAutomaton());
         Refinement ref = new Refinement(ts1, new Conjunction(t9, t10));
         ref.check();

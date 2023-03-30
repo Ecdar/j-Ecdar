@@ -8,6 +8,7 @@ import logic.Refinement;
 import logic.SimpleTransitionSystem;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -23,7 +24,7 @@ public class PruningTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass

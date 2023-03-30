@@ -29,4 +29,9 @@ public class FalseGuard extends Guard {
     public int hashCode() {
         return Objects.hash(false);
     }
+
+    @Override
+    public <T> T accept(GuardVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }

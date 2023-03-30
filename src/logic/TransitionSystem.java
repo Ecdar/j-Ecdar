@@ -28,7 +28,7 @@ public abstract class TransitionSystem {
         // Create a CDD for the initial values of the boolean variables
         CDD bdd = CDD.cddTrue();
         for (BoolVar variable : variables) {
-            int level = CDD.bddStartLevel + CDD.indexOf(variable);
+            int level = CDDRuntime.getBddStartLevel() + CDDRuntime.indexOf(variable);
             bdd = bdd.conjunction(
                     CDD.createBddNode(level, variable.getInitialValue())
             );
@@ -52,7 +52,7 @@ public abstract class TransitionSystem {
     }
 
     public State getInitialState(CDD guard) {
-        State state = getInitialState(CDD.BVs);
+        State state = getInitialState(CDDRuntime.getAllBooleanVariables());
         state.applyGuards(guard);
         return state;
     }
@@ -85,7 +85,7 @@ public abstract class TransitionSystem {
          *   that the edge guard is false and thereby the conjunction
          *   (Applying the edge guard) will result in a contradiction. */
         CDD guardCDD = CDD.cddFalse();
-        if (!edgeGuard.isFalse()) {
+        if (!edgeGuard.equivFalse()) {
             guardCDD = state.getInvariant().conjunction(edgeGuard);
         }
 
@@ -118,7 +118,7 @@ public abstract class TransitionSystem {
             Transition transition = createNewTransition(state, move);
 
             // Check if it is unreachable and if so then ignore it
-            if (transition.getTarget().getInvariant().isFalse()) {
+            if (transition.getTarget().getInvariant().equivFalse()) {
                 continue;
             }
 
@@ -130,7 +130,7 @@ public abstract class TransitionSystem {
 
     public boolean isDeterministic() {
 
-        boolean initialisedCdd = CDD.tryInit(getClocks(), getBVs());
+        boolean initialisedCdd = CDDRuntime.tryInit(getClocks(), getBVs());
 
         boolean isDeterministic = true;
         List<String> nondetermTs = new ArrayList<>();
@@ -147,7 +147,7 @@ public abstract class TransitionSystem {
         if (!isDeterministic) buildErrMessage(nondetermTs, "non-deterministic");
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
         return isDeterministic;
     }
@@ -164,7 +164,7 @@ public abstract class TransitionSystem {
         boolean isDeterm = isDeterministic();
         boolean isConsistent = true;
 
-        boolean initialisedCdd = CDD.tryInit(getClocks(), getBVs());
+        boolean initialisedCdd = CDDRuntime.tryInit(getClocks(), getBVs());
 
         List<String> inconsistentTs = new ArrayList<>();
         for (SimpleTransitionSystem system : getSystems()) {
@@ -176,7 +176,7 @@ public abstract class TransitionSystem {
         if (!isConsistent) buildErrMessage(inconsistentTs, "inconsistent");
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
 
         return isConsistent && isDeterm;
@@ -185,7 +185,7 @@ public abstract class TransitionSystem {
     public boolean isImplementation() {
         boolean isCons = isFullyConsistent();
 
-        boolean initialisedCdd = CDD.tryInit(getClocks(), getBVs());
+        boolean initialisedCdd = CDDRuntime.tryInit(getClocks(), getBVs());
 
         boolean isImpl = true;
         List<String> nonImpl = new ArrayList<>();
@@ -200,7 +200,7 @@ public abstract class TransitionSystem {
             buildErrMessage(nonImpl, "not output urgent");
         }
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
         return isImpl && isCons;
     }
