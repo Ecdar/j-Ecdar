@@ -102,9 +102,9 @@ public class DisjunctionTest {
         CDD.addClocks(clocks);
 
         CDD disjunctedGuards = CDD.cddFalse();
-        disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis1));
-        disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis2));
-        disjunctedGuards = disjunctedGuards.disjunction(new CDD(dis3));
+        disjunctedGuards = disjunctedGuards.disjunction(CDDFactory.create(dis1));
+        disjunctedGuards = disjunctedGuards.disjunction(CDDFactory.create(dis2));
+        disjunctedGuards = disjunctedGuards.disjunction(CDDFactory.create(dis3));
         CDD neg = disjunctedGuards.negation();
         Guard out = neg.getGuard(clocks);
 

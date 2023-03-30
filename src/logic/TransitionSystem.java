@@ -85,7 +85,7 @@ public abstract class TransitionSystem {
          *   that the edge guard is false and thereby the conjunction
          *   (Applying the edge guard) will result in a contradiction. */
         CDD guardCDD = CDD.cddFalse();
-        if (!edgeGuard.isFalse()) {
+        if (!edgeGuard.equivFalse()) {
             guardCDD = state.getInvariant().conjunction(edgeGuard);
         }
 
@@ -118,7 +118,7 @@ public abstract class TransitionSystem {
             Transition transition = createNewTransition(state, move);
 
             // Check if it is unreachable and if so then ignore it
-            if (transition.getTarget().getInvariant().isFalse()) {
+            if (transition.getTarget().getInvariant().equivFalse()) {
                 continue;
             }
 
