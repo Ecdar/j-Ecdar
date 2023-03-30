@@ -266,7 +266,7 @@ public class Automaton {
     }
 
     public void makeInputEnabled() {
-        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
         for (Location location : getLocations()) {
             CDD invariant = location.getInvariantCdd();
@@ -304,12 +304,12 @@ public class Automaton {
         }
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
     }
 
     public void addTargetInvariantToEdges() {
-        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
         for (Edge edge : getEdges()) {
             CDD targetCDD = CDDFactory.create(
@@ -321,7 +321,7 @@ public class Automaton {
         }
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
     }
 }

@@ -327,7 +327,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
     public SimpleTransitionSystem pruneReachTimed(){
-        boolean initialisedCdd = CDD.tryInit(clocks.getItems(), BVs.getItems());
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks.getItems(), BVs.getItems());
 
         //TODO: this function is not correct yet. // FIXED: 05.1.2021
         // In the while loop, we should collect all edges associated to transitions (not just all locations associated to states), and remove all that were never associated
@@ -389,7 +389,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
         Automaton aut = new Automaton(getName(), locations, edges, getClocks(),getAutomaton().getBVs(), false);
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
         return new SimpleTransitionSystem(aut);
     }

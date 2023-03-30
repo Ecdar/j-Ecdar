@@ -23,7 +23,7 @@ public class Pruning {
         Set<Location> inconsistentLocations;
         Map<Location, CDD> passedInconsistentStates;
 
-        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
 
         for (Location l : locations) {
@@ -86,7 +86,7 @@ public class Pruning {
         }
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
 
         Automaton resAut = new Automaton(aut.getName(), locations, edges, clocks, aut.getBVs(), true);

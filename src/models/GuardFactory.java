@@ -14,7 +14,7 @@ public class GuardFactory {
     }
 
     public static Guard createFrom(CDD cdd) {
-        return singleton.create(cdd, CDD.getClocks());
+        return singleton.create(cdd, CDDRuntime.getAllClocks());
     }
 
     public static Guard createFrom(CDD cdd, List<Clock> relevantClocks) {
@@ -22,7 +22,7 @@ public class GuardFactory {
     }
 
     public Guard create(CDD cdd) {
-        return create(cdd, CDD.getClocks());
+        return create(cdd, CDDRuntime.getAllClocks());
     }
 
     public Guard create(CDD cdd, List<Clock> relevantClocks) {
@@ -49,7 +49,7 @@ public class GuardFactory {
 
                 int index = arrays.getVariables().get(i).get(j);
                 if (index >= 0) {
-                    BoolVar var = CDD.BVs.get(index - CDD.bddStartLevel);
+                    BoolVar var = CDDRuntime.getAllBooleanVariables().get(index - CDDRuntime.getBddStartLevel());
                     boolean val = arrays.getValues().get(i).get(j) == 1;
                     BoolGuard bg = new BoolGuard(var, Relation.EQUAL, val);
 
@@ -71,7 +71,7 @@ public class GuardFactory {
 
             // Create clock guards.
             Zone zone = new Zone(extraction.getDbm());
-            Guard clockGuard = zone.buildGuardsFromZone(CDD.getClocks(), relevantClocks);
+            Guard clockGuard = zone.buildGuardsFromZone(CDDRuntime.getAllClocks(), relevantClocks);
 
             // Create boolean guards.
             CDD bdd = extraction.getBddPart();

@@ -155,17 +155,6 @@ public class CDD {
             canDelayIndefinitelyProperty, removeNegativeMarker, extractionProperty,
             nodeCountProperty, rootNodeProperty, reduceMarker
     );
-    private static boolean cddIsRunning;
-    private static List<Clock> clocks = new ArrayList<>();
-
-    // includes the + 1 for initial clock
-    public static int numClocks;
-    public static int maxSize = 1000;
-    public static int cs = 1000;
-    public static int stackSize = 1000;
-    public static int numBools;
-    public static int bddStartLevel;
-    public static List<BoolVar> BVs = new ArrayList<>();
 
     public CDD(long pointer) {
         setPointer(pointer);
@@ -184,7 +173,9 @@ public class CDD {
     }
 
     public Guard getGuard() {
-        return getGuard(clocks);
+        return getGuard(
+                CDDRuntime.getAllClocks()
+        );
     }
 
     public void setGuard(Guard guard) {
@@ -333,13 +324,13 @@ public class CDD {
         for (Update up : list) {
             if (up instanceof ClockUpdate) {
                 ClockUpdate u = (ClockUpdate) up;
-                clockResets[cl] = indexOf(u.getClock());
+                clockResets[cl] = CDDRuntime.indexOf(u.getClock());
                 clockValues[cl] = u.getValue();
                 cl++;
             }
             if (up instanceof BoolUpdate) {
                 BoolUpdate u = (BoolUpdate) up;
-                boolResets[bl] = bddStartLevel + indexOf(u.getBV());
+                boolResets[bl] = CDDRuntime.getBddStartLevel() + CDDRuntime.indexOf(u.getBV());
                 boolValues[bl] = u.getValue() ? 1 : 0;
                 bl++;
             }
@@ -693,13 +684,13 @@ public class CDD {
         for (Update update : e.getUpdates()) {
             if (update instanceof ClockUpdate) {
                 ClockUpdate clockUpdate = (ClockUpdate) update;
-                int clockIndex = indexOf(clockUpdate.getClock());
+                int clockIndex = CDDRuntime.indexOf(clockUpdate.getClock());
                 clockResets.add(clockIndex);
                 int clockValue = clockUpdate.getValue();
                 clockValues.add(clockValue);
             } else if (update instanceof BoolUpdate) {
                 BoolUpdate boolUpdate = (BoolUpdate) update;
-                int boolIndex = bddStartLevel + indexOf(boolUpdate.getBV());
+                int boolIndex = CDDRuntime.getBddStartLevel() + CDDRuntime.indexOf(boolUpdate.getBV());
                 boolResets.add(boolIndex);
                 int boolValue = boolUpdate.getValue() ? 1 : 0;
                 boolValues.add(boolValue);
@@ -738,11 +729,11 @@ public class CDD {
         for (Update update : updates) {
             if (update instanceof ClockUpdate) {
                 ClockUpdate clockUpdate = (ClockUpdate) update;
-                int clockIndex = indexOf(clockUpdate.getClock());
+                int clockIndex = CDDRuntime.indexOf(clockUpdate.getClock());
                 clockUpdates.add(clockIndex);
             } else if (update instanceof BoolUpdate) {
                 BoolUpdate boolUpdate = (BoolUpdate) update;
-                int boolIndex = bddStartLevel + indexOf(boolUpdate.getBV());
+                int boolIndex = CDDRuntime.getBddStartLevel() + CDDRuntime.indexOf(boolUpdate.getBV());
                 boolUpdates.add(boolIndex);
             }
         }
@@ -802,139 +793,14 @@ public class CDD {
     }
 
     public static CDD cddZero() {
-        Zone zone = new Zone(numClocks, false);
-        return CDD.createFromDbm(zone.getDbm(), numClocks);
+        Zone zone = new Zone(CDDRuntime.getNumberOfClocks(), false);
+        return CDD.createFromDbm(zone.getDbm(), CDDRuntime.getNumberOfClocks());
     }
 
     public static CDD cddZeroDelayed() {
-        Zone zone = new Zone(numClocks, false);
+        Zone zone = new Zone(CDDRuntime.getNumberOfClocks(), false);
         zone.delay();
-        return CDD.createFromDbm(zone.getDbm(), numClocks);
-    }
-
-    public static boolean isRunning() {
-        return cddIsRunning;
-    }
-
-    public static int indexOf(Clock clock)
-            throws IllegalArgumentException {
-        for (int i = 0; i < clocks.size(); i++) {
-            if (clock.hashCode() == clocks.get(i).hashCode()) {
-                return i + 1;
-            }
-        }
-        return -1;
-    }
-
-    public static int indexOf(BoolVar bv)
-            throws IllegalArgumentException {
-        for (int i = 0; i < BVs.size(); i++) {
-            if (bv.equals(BVs.get(i))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public static List<Clock> getClocks() {
-        return clocks;
-    }
-
-    public static int init(int maxSize, int cs, int stackSize)
-            throws CddAlreadyRunningException {
-        if (cddIsRunning) {
-            throw new CddAlreadyRunningException("Can't initialize when already running");
-        }
-        cddIsRunning = true;
-        return CDDLib.cddInit(maxSize, cs, stackSize);
-    }
-
-    public static int init(int maxSize, int cs, int stackSize, List<Clock> clocks, List<BoolVar> booleans) {
-        int initialisation = init(maxSize, cs, stackSize);
-        addClocks(clocks);
-        addBooleans(booleans);
-        return initialisation;
-    }
-
-    public static int init(List<Clock> clocks, List<BoolVar> booleans) {
-        return init(maxSize, cs, stackSize, clocks, booleans);
-    }
-
-    public static boolean tryInit(int maxSize, int cs, int stackSize, List<Clock> clocks, List<BoolVar> booleans) {
-        if (cddIsRunning) {
-            return false;
-        }
-        init(maxSize, cs, stackSize, clocks, booleans);
-        return true;
-    }
-
-    public static boolean tryInit(List<Clock> clocks, List<BoolVar> booleans) {
-        return tryInit(maxSize, cs, stackSize, clocks, booleans);
-    }
-
-    public static void done() {
-        cddIsRunning = false;
-        numClocks = 0;
-        numBools = 0;
-        clocks = new ArrayList<>();
-        BVs = new ArrayList<>();
-        CDDLib.cddDone();
-    }
-
-    public static void ensureDone() {
-        if (cddIsRunning) {
-            done();
-        }
-    }
-
-    @SafeVarargs
-    public static void addClocks(List<Clock>... clocks) {
-        checkIfNotRunning();
-        for (List<Clock> list : clocks) {
-            CDD.clocks.addAll(list);
-        }
-        numClocks = CDD.clocks.size() + 1;
-        CDDLib.cddAddClocks(numClocks);
-    }
-
-    public static void addClocks(Clock... clocks) {
-        addClocks(
-                Arrays.asList(clocks)
-        );
-    }
-
-    public static void addClocks() {
-        addClocks(
-                new ArrayList<>()
-        );
-    }
-
-    @SafeVarargs
-    public static int addBooleans(List<BoolVar>... BVs) {
-        checkIfNotRunning();
-        for (List<BoolVar> list : BVs) {
-            CDD.BVs.addAll(list);
-        }
-
-        numBools = CDD.BVs.size();
-        if (numBools > 0) {
-            bddStartLevel = CDDLib.addBddvar(numBools);
-        } else {
-            bddStartLevel = 0;
-        }
-        return bddStartLevel;
-    }
-
-    public static int addBooleans(BoolVar... BVs) {
-        return addBooleans(
-                Arrays.asList(BVs)
-        );
-    }
-
-    public static int addBooleans() {
-        return addBooleans(
-                new ArrayList<>()
-        );
+        return CDD.createFromDbm(zone.getDbm(), CDDRuntime.getNumberOfClocks());
     }
 
     public static CDD createInterval(int i, int j, int lower, boolean lower_included, int upper, boolean upper_included) {
@@ -977,7 +843,7 @@ public class CDD {
     }
 
     private static void checkIfNotRunning() {
-        if (!cddIsRunning) {
+        if (!CDDRuntime.isRunning()) {
             throw new CddNotRunningException("CDD.init() has not been called");
         }
     }

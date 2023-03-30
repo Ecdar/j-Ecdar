@@ -3,6 +3,7 @@ package features;
 import logic.*;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class ConjunctionXMLTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass

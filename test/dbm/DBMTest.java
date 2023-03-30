@@ -25,7 +25,7 @@ public class DBMTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass
@@ -38,8 +38,8 @@ public class DBMTest {
         z = new Clock("z", "AUT");
 
         clockList.addAll(Arrays.asList(x, y,z));
-        CDD.init(100,100,100);
-        CDD.addClocks(clockList);
+        CDDRuntime.init(100,100,100);
+        CDDRuntime.addClocks(clockList);
         // STATES----------------------
         // From 0 to inf
         Zone z1 = new Zone(new int[]{1, 1, 10, 20});
@@ -70,7 +70,7 @@ public class DBMTest {
 
         g5 = new ClockGuard(x, 505, Relation.GREATER_EQUAL);
         g6 = new ClockGuard(y, 8, Relation.GREATER_EQUAL);
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @Test
@@ -106,11 +106,11 @@ public class DBMTest {
 
     @Test
     public void testExtrapolate() {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clockList = new ArrayList<>();
         clockList.add(x);
         clockList.add(y);
-        CDD.addClocks(clockList);
+        CDDRuntime.addClocks(clockList);
         HashMap<Clock,Integer> map = new HashMap<>();
         map.put(x,12);
         map.put(y,10);
@@ -126,7 +126,7 @@ public class DBMTest {
         state1.extrapolateMaxBounds(map,clockList);
         Log.trace(state1);
         assertEquals("{L1, (y<=2 && y-x<=2)}", state1.toString());
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @Test

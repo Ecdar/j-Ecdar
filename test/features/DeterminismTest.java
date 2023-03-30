@@ -8,6 +8,7 @@ import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import models.Clock;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -29,7 +30,7 @@ public class DeterminismTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @BeforeClass

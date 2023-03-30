@@ -133,7 +133,7 @@ public class Refinement {
         if (!checkPreconditions())
             return false;
 
-        boolean initialisedCdd = CDD.tryInit(allClocks, allBVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(allClocks, allBVs);
 
         // the first states we look at are the initial ones
         waiting.push(getInitialStatePair());
@@ -184,7 +184,7 @@ public class Refinement {
             if (!holds0) {
                 Log.info("Delay violation");
                 if (initialisedCdd) {
-                    CDD.done();
+                    CDDRuntime.done();
                 }
                 return false;
             }
@@ -195,7 +195,7 @@ public class Refinement {
 
                 Log.info("Output violation");
                 if (initialisedCdd) {
-                    CDD.done();
+                    CDDRuntime.done();
                 }
                 return false;
             }
@@ -206,7 +206,7 @@ public class Refinement {
                 //assert(false); // assuming everything is input enabled
                 Log.info("Input violation");
                 if (initialisedCdd) {
-                    CDD.done();
+                    CDDRuntime.done();
                 }
                 return false;
             }
@@ -214,7 +214,7 @@ public class Refinement {
 
         // if we got here it means refinement property holds
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
         return true;
     }
