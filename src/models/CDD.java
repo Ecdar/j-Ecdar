@@ -3,6 +3,9 @@ package models;
 import exceptions.CddAlreadyRunningException;
 import exceptions.CddNotRunningException;
 import lib.CDDLib;
+import log.Log;
+import log.Urgency;
+import util.DeferredProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,47 +14,34 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CDD {
-    /**
-     * The pointer used in the {@link CDDLib} to represent this {@link CDD}.
-     */
-    private long pointer;
 
     /**
      * This {@link CDD} converted to a {@link Guard}.
      */
-    private Guard guard;
-
-    /**
-     * If this boolean is <code>true</code> then this {@link CDD} has changed, and we should recompute the {@link Guard}.
-     * Otherwise, if this boolean is false, then the already computed {@link CDD#guard} will be returned from {@link CDD#getGuard()}.
-     * Since re-computation of the {@link CDD#guard} is only performed when this {@link CDD} has changed, then the guard returned is
-     * a reference mutable from other places, and thereby it should be viewed as readonly or copied.
-     */
-    private boolean isGuardDirty;
+    private final DeferredProperty<Guard> guardProperty = new DeferredProperty<>();
 
     /**
      * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#delay()} will call {@link CDDLib#delay(long)} with this {@link CDD#pointer}.
      * Otherwise, {@link CDD#delayInvar(CDD)} will just return <code>this</code>.
      */
-    private boolean isDelayedDirty;
+    private final DeferredProperty<?> isDelayedMarker = new DeferredProperty<>();
 
     /**
      * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#delayInvar(CDD)}} will call {@link CDDLib#delayInvar(long, long)} with this {@link CDD#pointer} and the argument.
      * Otherwise, {@link CDD#delayInvar(CDD)} will just return <code>this</code>.
      */
-    private boolean isDelayedInvariantDirty;
+    private final DeferredProperty<?> isDelayedInvariantMarker = new DeferredProperty<>();
 
     /**
      * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#past()}} will call {@link CDDLib#past(long)} with this {@link CDD#pointer}.
      * Otherwise, {@link CDD#past()} will just return <code>this</code>.
      */
-    private boolean isPastDirty;
+    private final DeferredProperty<?> isPastMarker = new DeferredProperty<>();
 
     /**
      * The bottom part of a {@link CDD} are BDD nodes. If this boolean is true then we are within that part of the {@link CDD}.
      */
-    private boolean isBdd;
-    private boolean isBddDirty;
+    private final DeferredProperty<Boolean> isBddProperty = new DeferredProperty<>();
 
     /**
      * The bottom most nodes labeled either <code>true</code> or <code>false</code> are called terminal nodes.
@@ -59,38 +49,36 @@ public class CDD {
      * If this boolean is true, then the {@link CDD#pointer} points at one of these terminal nodes.
      * If this is the case, then this {@link CDD} is a BDD ({@link CDD#isBdd} is <code>true</code>).
      */
-    private boolean isTerminal;
-    private boolean isTerminalDirty;
+    private final DeferredProperty<Boolean> isTerminalProperty = new DeferredProperty<>();
 
     /**
      * If {@link CDD#isGuardDirty} is true then this {@link CDD} has changed, and {@link CDD#isUrgent()} will be recompute.
      * Otherwise, {@link CDD#isUrgent()} will just return {@link CDD#isUrgent}.
      */
-    private boolean isUrgent;
-    private boolean isUrgentDirty;
+    private final DeferredProperty<Boolean> isUrgentProperty = new DeferredProperty<>();
 
-    private boolean isUnrestrained;
-    private boolean isUnrestrainedDirty;
+    private final DeferredProperty<Boolean> isUnrestrainedProperty = new DeferredProperty<>();
 
-    private boolean isTrue;
-    private boolean isTrueDirty;
+    private final DeferredProperty<Boolean> isEquivTrueProperty = new DeferredProperty<>();
 
-    private boolean isFalse;
-    private boolean isFalseDirty;
+    private final DeferredProperty<Boolean> isEquivFalseProperty = new DeferredProperty<>();
 
-    private boolean canDelayIndefinitely;
-    private boolean isCanDelayIndefinitelyDirty;
+    private final DeferredProperty<Boolean> canDelayIndefinitelyProperty = new DeferredProperty<>();
 
-    private boolean hasRemovedNegatives;
+    private final DeferredProperty<?> removeNegativeMarker = new DeferredProperty<>();
 
-
-    private CddExtractionResult extraction;
+    private final DeferredProperty<CddExtractionResult> extractionProperty = new DeferredProperty<>();
 
     /**
-     * If this boolean is <code>true</code> then this {@link CDD} has changed, and {@link CDD#extract()} will call {@link CDDLib#extractBddAndDbm(long)} with this {@link CDD#pointer}.
-     * Otherwise, {@link CDD#extract()} will just return the stored {@link CDD#extraction}.
+     * The pointer used in the {@link CDDLib} to represent this {@link CDD}.
      */
-    private boolean isExtractionDirty;
+    private final DeferredProperty<Long> pointerProperty = new DeferredProperty<>(
+            0L,
+            guardProperty, isDelayedMarker, isDelayedInvariantMarker,
+            isPastMarker, isBddProperty, isTerminalProperty, isUrgentProperty,
+            isUnrestrainedProperty, isEquivTrueProperty, isEquivFalseProperty,
+            canDelayIndefinitelyProperty, removeNegativeMarker, extractionProperty
+    );
 
     private static boolean cddIsRunning;
     private static List<Clock> clocks = new ArrayList<>();
@@ -104,15 +92,12 @@ public class CDD {
     public static int bddStartLevel;
     public static List<BoolVar> BVs = new ArrayList<>();
 
-    public CDD() {
-        checkIfNotRunning();
-        this.pointer = CDDLib.allocateCdd();
-        setDirty();
+    public CDD(long pointer) {
+        setPointer(pointer);
     }
 
-    public CDD(long pointer) {
-        this.pointer = pointer;
-        setDirty();
+    public CDD() {
+        this(CDDLib.allocateCdd());
     }
 
     public CDD(Guard guard)
@@ -142,33 +127,20 @@ public class CDD {
         } else {
             throw new IllegalArgumentException("Guard instance is not supported");
         }
-        this.pointer = cdd.pointer;
-        this.guard = guard;
+        guardProperty.set(guard);
+        setPointer(cdd.getPointer());
     }
 
-    private void setDirty() {
-        isGuardDirty = true;
-        isExtractionDirty = true;
-        isDelayedDirty = true;
-        isDelayedInvariantDirty = true;
-        isPastDirty = true;
-        isBddDirty = true;
-        isTerminalDirty = true;
-        isUrgentDirty = true;
-        isUnrestrainedDirty = true;
-        isTrueDirty = true;
-        isFalseDirty = true;
-        isCanDelayIndefinitelyDirty = true;
-        hasRemovedNegatives = false;
+    private void markAsDirty() {
+        pointerProperty.markAsDirty();
     }
 
     public Guard getGuard(List<Clock> relevantClocks) {
-        if (isGuardDirty) {
-            guard = isBDD() ? toBoolGuards() : toClockGuards(relevantClocks);
-            isGuardDirty = false;
-        }
-
-        return guard;
+        // Only if the guard property is dirty do we compute a new value.
+        // Always, do we return the current value of the property.
+        return guardProperty.trySet(
+                () -> isBDD() ? toBoolGuards() : toClockGuards(relevantClocks)
+        );
     }
 
     public Guard getGuard() {
@@ -260,65 +232,62 @@ public class CDD {
     }
 
     public long getPointer() {
-        return pointer;
+        // We have to use getValue as we don't want to return null if the pointer property is dirty.
+        return pointerProperty.getValue();
+    }
+
+    private void setPointer(long newPointer) {
+        pointerProperty.set(newPointer);
+        markAsDirty();
     }
 
     public int getNodeCount()
             throws NullPointerException {
         checkForNull();
-        return CDDLib.cddNodeCount(pointer);
+        return CDDLib.cddNodeCount(getPointer());
     }
 
     public CDDNode getRoot()
             throws NullPointerException {
         checkForNull();
-        long nodePointer = CDDLib.getRootNode(this.pointer);
+        long nodePointer = CDDLib.getRootNode(getPointer());
         return new CDDNode(nodePointer);
     }
 
     public CddExtractionResult extract()
             throws NullPointerException, CddNotRunningException {
-        if (isExtractionDirty) {
+        return extractionProperty.trySet(() -> {
             checkIfNotRunning();
             checkForNull();
-            extraction = new CddExtractionResult(
-                    CDDLib.extractBddAndDbm(pointer)
+            return new CddExtractionResult(
+                    CDDLib.extractBddAndDbm(getPointer())
             );
-            isExtractionDirty = false;
-        }
-
-        return extraction;
+        });
     }
 
     public boolean isBDD()
             throws NullPointerException {
-        checkForNull();
-        if (isBddDirty) {
-            // CDDLib.isBDD does not recognise cddFalse and cddTrue as BDDs
-            isBdd = isFalse() || isTrue() || CDDLib.isBDD(this.pointer);
-        }
-
-        return isBdd;
+        return isBddProperty.trySet(() -> {
+            checkForNull();
+            checkIfNotRunning();
+            // TODO: Make this terminal checks.
+            return isFalse() || isTrue() || CDDLib.isBDD(getPointer());
+        });
     }
 
     public boolean isTerminal()
             throws NullPointerException, CddNotRunningException {
-        checkIfNotRunning();
-        checkForNull();
-
-        if (isTerminalDirty) {
-            isTerminal = CDDLib.isTerminal(pointer);
-        }
-
-        return isTerminal;
+        return isTerminalProperty.trySet(() -> {
+            checkIfNotRunning();
+            checkForNull();
+            return CDDLib.isTerminal(getPointer());
+        });
     }
 
     public boolean isUnrestrained() {
-        if (isUnrestrainedDirty) {
-            isUnrestrained = this.equiv(cddTrue());
-        }
-
-        return isUnrestrained;
+        return isUnrestrainedProperty.trySet(
+                this.equiv(cddTrue())
+        );
     }
 
     public boolean isNotFalse() {
@@ -327,12 +296,11 @@ public class CDD {
 
     public boolean isFalse()
             throws NullPointerException {
-        checkForNull();
-        if (isFalseDirty) {
-            isFalse = CDDLib.cddEquiv(this.pointer, cddFalse().pointer);
-        }
-
-        return isFalse;
+        return isEquivFalseProperty.trySet(() -> {
+            checkIfNotRunning();
+            checkForNull();
+            return CDDLib.cddEquiv(getPointer(), cddFalse().getPointer());
+        });
     }
 
     public boolean isNotTrue()
@@ -343,19 +311,18 @@ public class CDD {
 
     public boolean isTrue()
             throws NullPointerException {
-        checkForNull();
-        if (isTrueDirty) {
-            isTrue = CDDLib.cddEquiv(this.pointer, cddTrue().pointer);
-        }
-
-        return isTrue;
+        return isEquivTrueProperty.trySet(() -> {
+            checkIfNotRunning();
+            checkForNull();
+            return CDDLib.cddEquiv(getPointer(), cddTrue().getPointer());
+        });
     }
 
     public void free()
             throws NullPointerException {
         checkForNull();
-        CDDLib.freeCdd(pointer);
-        pointer = 0;
+        CDDLib.freeCdd(getPointer());
+        setPointer(0);
     }
 
     public CDD applyReset(List<Update> list) {
@@ -397,44 +364,45 @@ public class CDD {
     }
 
     public boolean canDelayIndefinitely() {
-        if (!isCanDelayIndefinitelyDirty) {
-            return canDelayIndefinitely;
-        }
+        return canDelayIndefinitelyProperty.trySet(() -> {
+            if (isTrue()) {
+                return true;
+            }
+            if (isFalse()) {
+                return false;
+            }
+            if (isBDD()) {
+                return true;
+            }
 
-        boolean result = true;
-
-        if (isFalse()) {
-            result = false;
-        } else if (!isBDD()) {
-            // Required as we don't want to alter the pointer value of "this".
             CDD copy = hardCopy();
-
             while (!copy.isTerminal()) {
                 CddExtractionResult extraction = copy.removeNegative().reduce().extract();
                 copy = extraction.getCddPart().removeNegative().reduce();
                 Zone zone = new Zone(extraction.getDbm());
 
                 if (!zone.canDelayIndefinitely()) {
-                    result = false;
-                    break;
+                    return false;
                 }
             }
-        }
-
-        return canDelayIndefinitely = result;
+            // found no states that cannot delay indefinitely
+            return true;
+        });
     }
 
     public boolean isUrgent() {
-        if (!isUrgentDirty) {
-            return isUrgent;
-        }
+        return isUrgentProperty.trySet(() -> {
+            if (isTrue()) {
+                return false;
+            }
+            if (isFalse()) {
+                return true;
+            }
+            if (isBDD()) {
+                return false;
+            }
 
-        boolean result = !isBDD();
-
-        if (isFalse()) {
-            result = true;
-        } else {
-            // Required as we don't want to alter the pointer value of "this".
+            // Required as we don't want to alter the pointer value of "this"
             CDD copy = hardCopy();
 
             while (!copy.isTerminal()) {
@@ -442,13 +410,11 @@ public class CDD {
                 Zone zone = new Zone(res.getDbm());
                 copy = res.getCddPart().removeNegative().reduce();
                 if (!zone.isUrgent()) {
-                    result = false;
-                    break;
+                    return false;
                 }
             }
-        }
-
-        return isUrgent = result;
+            return true;
+        });
     }
 
     /**
@@ -462,40 +428,33 @@ public class CDD {
      * @return Returns a new CDD which is not created through {@link CDDLib#copy(long)} but with a pointer copy.
      */
     public CDD hardCopy() {
-        return new CDD(pointer);
+        return new CDD(getPointer());
     }
 
     public CDD copy()
             throws NullPointerException, CddNotRunningException {
         checkIfNotRunning();
         checkForNull();
-        return new CDD(CDDLib.copy(pointer));
+        return new CDD(CDDLib.copy(getPointer()));
     }
 
     public CDD delay()
             throws NullPointerException, CddNotRunningException {
-        if (isDelayedDirty) {
+        isDelayedMarker.clean(() -> {
             checkIfNotRunning();
             checkForNull();
-
-            pointer = CDDLib.delay(pointer);
-            isDelayedDirty = false;
-        }
-
+            setPointer(CDDLib.delay(getPointer()));
+        });
         return this;
     }
 
     public CDD delayInvar(CDD invariant)
             throws NullPointerException, CddNotRunningException {
-
-        if (isDelayedInvariantDirty) {
+        isDelayedInvariantMarker.clean(() -> {
             checkIfNotRunning();
             checkForNull();
-
-            pointer = CDDLib.delayInvar(pointer, invariant.pointer);
-            isDelayedInvariantDirty = false;
-        }
-
+            setPointer(CDDLib.delayInvar(getPointer(), invariant.getPointer()));
+        });
         return this;
     }
 
@@ -503,37 +462,28 @@ public class CDD {
             throws NullPointerException, CddNotRunningException {
         checkIfNotRunning();
         checkForNull();
-        pointer = CDDLib.exist(pointer, levels, clocks);
-        setDirty();
+        setPointer(CDDLib.exist(getPointer(), levels, clocks));
         return this;
     }
 
     public CDD past()
             throws NullPointerException, CddNotRunningException {
         // TODO: make sure this is used at the correct spots everywhere, might have been confused with delay
-
-        if (isPastDirty) {
+        isPastMarker.clean(() -> {
             checkIfNotRunning();
             checkForNull();
-
-            pointer = CDDLib.past(pointer);
-            setDirty();
-        }
-
+            setPointer(CDDLib.past(getPointer()));
+        });
         return this;
     }
 
     public CDD removeNegative()
             throws NullPointerException, CddNotRunningException {
-
-        if (!hasRemovedNegatives) {
+        removeNegativeMarker.clean(() -> {
             checkIfNotRunning();
             checkForNull();
-
-            pointer = CDDLib.removeNegative(pointer);
-            hasRemovedNegatives = true;
-        }
-
+            setPointer(CDDLib.removeNegative(getPointer()));
+        });
         return this;
     }
 
@@ -548,9 +498,10 @@ public class CDD {
             throw new IllegalArgumentException("The amount of boolean resets and values must be the same");
         }
 
-        pointer = CDDLib.applyReset(pointer, clockResets, clockValues, boolResets, boolValues);
+        setPointer(
+                CDDLib.applyReset(getPointer(), clockResets, clockValues, boolResets, boolValues)
+        );
         removeNegative().reduce();
-        setDirty();
         return this;
     }
 
@@ -559,9 +510,10 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         guard.checkForNull();
-        pointer = CDDLib.transition(pointer, guard.pointer, clockResets, clockValues, boolResets, boolValues);
+        setPointer(
+                CDDLib.transition(getPointer(), guard.getPointer(), clockResets, clockValues, boolResets, boolValues)
+        );
         removeNegative().reduce();
-        setDirty();
         return this;
     }
 
@@ -571,8 +523,9 @@ public class CDD {
         checkForNull();
         guard.checkForNull();
         update.checkForNull();
-        pointer = CDDLib.transitionBackPast(pointer, guard.pointer, update.pointer, clockResets, boolResets);
-        setDirty();
+        setPointer(
+                CDDLib.transitionBackPast(getPointer(), guard.getPointer(), update.getPointer(), clockResets, boolResets)
+        );
         return this;
     }
 
@@ -585,8 +538,7 @@ public class CDD {
             return this;
         }
 
-        pointer = CDDLib.reduce(pointer);
-        setDirty();
+        setPointer(CDDLib.reduce(getPointer()));
         return this;
     }
 
@@ -594,8 +546,7 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
         safe.checkForNull();
-        pointer = CDDLib.predt(pointer, safe.pointer);
-        setDirty();
+        setPointer(CDDLib.predt(getPointer(), safe.getPointer()));
         return this;
     }
 
@@ -605,7 +556,7 @@ public class CDD {
         checkForNull();
         other.checkForNull();
 
-        if (isFalse() || other.isFalse()) {
+        /*if (isFalse() || other.isFalse()) {
             return this;
         }
 
@@ -615,9 +566,9 @@ public class CDD {
 
         if (other.pointer == pointer) {
             return cddFalse();
-        }
+        }*/
 
-        return new CDD(CDDLib.minus(pointer, other.pointer)).removeNegative().reduce();
+        return new CDD(CDDLib.minus(getPointer(), other.getPointer())).removeNegative().reduce();
     }
 
     public CDD negation()
@@ -625,16 +576,15 @@ public class CDD {
         checkIfNotRunning();
         checkForNull();
 
-        if (isFalse()) {
+        /*if (isFalse()) {
             return cddTrue();
         }
 
         if (isTrue()) {
             return cddFalse();
-        }
+        }*/
 
-        long resultPointer = CDDLib.negation(pointer);
-        return new CDD(resultPointer);
+        return new CDD(CDDLib.negation(getPointer()));
     }
 
     public CDD conjunction(CDD other)
@@ -643,7 +593,7 @@ public class CDD {
         checkForNull();
         other.checkForNull();
 
-        if (isFalse()) {
+        /*if (isFalse()) {
             return cddFalse();
         }
 
@@ -661,10 +611,9 @@ public class CDD {
 
         if (other.pointer == pointer) {
             return hardCopy();
-        }
+        }*/
 
-        long resultPointer = CDDLib.conjunction(pointer, other.pointer);
-        return new CDD(resultPointer).reduce().removeNegative();
+        return new CDD(CDDLib.conjunction(getPointer(), other.getPointer())).reduce().removeNegative();
     }
 
     public CDD disjunction(CDD other)
@@ -673,7 +622,7 @@ public class CDD {
         checkForNull();
         other.checkForNull();
 
-        if (isFalse()) {
+        /*if (isFalse()) {
             return other.hardCopy();
         }
 
@@ -691,10 +640,9 @@ public class CDD {
 
         if (other.pointer == pointer) {
             return hardCopy();
-        }
+        }*/
 
-        long resultPointer = CDDLib.disjunction(pointer, other.pointer);
-        return new CDD(resultPointer);
+        return new CDD(CDDLib.disjunction(getPointer(), other.getPointer()));
     }
 
     public boolean intersects(CDD other) {
@@ -709,23 +657,23 @@ public class CDD {
     public boolean equiv(CDD that)
             throws NullPointerException {
         checkForNull();
-        return CDDLib.cddEquiv(this.pointer, that.pointer);
+        return CDDLib.cddEquiv(this.getPointer(), that.getPointer());
     }
 
     public void printDot()
             throws NullPointerException {
         checkForNull();
-        CDDLib.cddPrintDot(pointer);
+        CDDLib.cddPrintDot(getPointer());
     }
 
     public void printDot(String filePath)
             throws NullPointerException {
         checkForNull();
-        CDDLib.cddPrintDot(pointer, filePath);
+        CDDLib.cddPrintDot(getPointer(), filePath);
     }
 
     private void checkForNull() {
-        if (pointer == 0) {
+        if (getPointer() == 0) {
             throw new NullPointerException("CDD object is null");
         }
     }
@@ -798,7 +746,7 @@ public class CDD {
             return this;
         }
 
-        return new CDD(CDDLib.transitionBack(pointer, guard.pointer, update.pointer, clockResets, boolResets)).removeNegative().reduce();
+        return new CDD(CDDLib.transitionBack(getPointer(), guard.getPointer(), update.getPointer(), clockResets, boolResets)).removeNegative().reduce();
     }
 
     private CDD transitionBack(CDD guard, List<Update> updates) {
@@ -853,12 +801,12 @@ public class CDD {
         }
 
         CDD other = (CDD) obj;
-        return pointer == other.pointer;
+        return getPointer() == other.getPointer();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pointer);
+        return Objects.hash(getPointer());
     }
 
     public static CDD create(List<Update> updates) {
