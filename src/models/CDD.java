@@ -176,42 +176,11 @@ public class CDD {
         this(CDDLib.allocateCdd());
     }
 
-    public CDD(Guard guard)
-            throws IllegalArgumentException {
-        CDD cdd;
-        if (guard instanceof FalseGuard) {
-            cdd = cddFalse();
-        } else if (guard instanceof TrueGuard) {
-            cdd = cddTrue();
-        } else if (guard instanceof ClockGuard) {
-            Zone zone = new Zone(numClocks, true);
-            zone.init();
-            zone.buildConstraintsForGuard((ClockGuard) guard, clocks);
-            cdd = CDD.createFromDbm(zone.getDbm(), numClocks);
-        } else if (guard instanceof BoolGuard) {
-            cdd = create((BoolGuard) guard);
-        } else if (guard instanceof AndGuard) {
-            cdd = cddTrue();
-            for (Guard g : ((AndGuard) guard).getGuards()) {
-                cdd = cdd.conjunction(new CDD(g));
-            }
-        } else if (guard instanceof OrGuard) {
-            cdd = cddFalse();
-            for (Guard g : ((OrGuard) guard).getGuards()) {
-                cdd = cdd.disjunction(new CDD(g));
-            }
-        } else {
-            throw new IllegalArgumentException("Guard instance is not supported");
-        }
-        guardProperty.set(guard);
-        setPointer(cdd.getPointer());
-    }
-
     public Guard getGuard(List<Clock> relevantClocks) {
         // Only if the guard property is dirty do we compute a new value.
         // Always, do we return the current value of the property.
         return guardProperty.trySet(
-                () -> isBDD() ? toBoolGuards() : toClockGuards(relevantClocks)
+                GuardFactory.createFrom(this, relevantClocks)
         );
     }
 
@@ -219,51 +188,8 @@ public class CDD {
         return getGuard(clocks);
     }
 
-    private Guard toClockGuards(List<Clock> relevantClocks)
-            throws IllegalArgumentException {
-        if (isBDD()) {
-            throw new IllegalArgumentException("CDD is a BDD");
-        }
-
-        if (equivFalse()) {
-            return new FalseGuard();
-        }
-        if (equivTrue()) {
-            return new TrueGuard();
-        }
-
-        // Required as we don't want to alter the pointer value of "this".
-        CDD copy = hardCopy();
-
-        List<Guard> orParts = new ArrayList<>();
-        while (!copy.isTerminal()) {
-            copy.reduce().removeNegative();
-            CddExtractionResult extraction = copy.extract();
-            copy = extraction.getCddPart().reduce().removeNegative();
-
-            Zone zone = new Zone(extraction.getDbm());
-            CDD bdd = extraction.getBddPart();
-
-            List<Guard> andParts = new ArrayList<>();
-            // Adds normal guards and diagonal constraints
-            andParts.add(
-                    zone.buildGuardsFromZone(clocks, relevantClocks)
-            );
-            // Adds boolean constraints (var == val)
-            andParts.add(
-                    bdd.toBoolGuards()
-            );
-            // Removes all TrueGuards
-            andParts = andParts.stream()
-                    .filter(guard -> !(guard instanceof TrueGuard))
-                    .collect(Collectors.toList());
-
-            orParts.add(
-                    new AndGuard(andParts)
-            );
-        }
-
-        return new OrGuard(orParts);
+    public void setGuard(Guard guard) {
+        guardProperty.set(guard);
     }
 
     private Guard toBoolGuards()
@@ -863,7 +789,8 @@ public class CDD {
         int[] arrClockUpdates = clockUpdates.stream().mapToInt(Integer::intValue).toArray();
         int[] arrBoolUpdates = boolUpdates.stream().mapToInt(Integer::intValue).toArray();
 
-        return transitionBack(guard, create(updates), arrClockUpdates, arrBoolUpdates).removeNegative().reduce();
+        CDD update = CDDFactory.create(updates);
+        return transitionBack(guard, update, arrClockUpdates, arrBoolUpdates).removeNegative().reduce();
     }
 
     public CDD transitionBack(Edge e) {
@@ -895,29 +822,6 @@ public class CDD {
     @Override
     public int hashCode() {
         return Objects.hash(getPointer());
-    }
-
-    public static CDD create(List<Update> updates) {
-        CDD res = cddTrue();
-        for (Update up : updates) {
-            if (up instanceof ClockUpdate) {
-                ClockUpdate u = (ClockUpdate) up;
-                res = res.conjunction(CDD.createInterval(indexOf(u.getClock()), 0, u.getValue(), true, u.getValue(), true));
-            }
-            if (up instanceof BoolUpdate) {
-                BoolUpdate u = (BoolUpdate) up;
-                BoolGuard bg = new BoolGuard(u.getBV(), Relation.EQUAL, u.getValue());
-                res = res.conjunction(CDD.create(bg));
-            }
-        }
-        return res.removeNegative().reduce();
-    }
-
-    public static CDD create(BoolGuard guard) {
-        if (guard.getValue()) {
-            return createBddNode(bddStartLevel + indexOf(guard.getVar()));
-        }
-        return createNegatedBddNode(bddStartLevel + indexOf(guard.getVar()));
     }
 
     public static CDD cddUnrestrained() {
