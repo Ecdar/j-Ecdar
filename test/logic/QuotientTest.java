@@ -1,7 +1,5 @@
 package logic;
 
-import log.Log;
-import log.Urgency;
 import models.*;
 import org.junit.Test;
 

@@ -199,7 +199,6 @@ public class VariousTest {
     }
 
     @Test
-    @Ignore // Passes but fails on the CI
     public void testFromFramework4() throws FileNotFoundException {
         SimpleTransitionSystem C1,C2;
         Automaton[] list = JSONParser.parse("samples/json/DelayAdd",true);

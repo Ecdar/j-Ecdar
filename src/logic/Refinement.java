@@ -432,8 +432,9 @@ public class Refinement {
                     Log.debug("create pairs failed");
                     if (RET_REF)
                     {
-                        Location ll = Location.createInconsistentLocation("inconsistent", 0, 0);
-                        Location rl = Location.createInconsistentLocation("inconsistent", 0, 0);
+                        Clock inconsistentClock = new Clock("inconsistent clock", "refinement");
+                        Location ll = Location.createInconsistentLocation("inconsistent", 0, 0, inconsistentClock);
+                        Location rl = Location.createInconsistentLocation("inconsistent", 0, 0, inconsistentClock);
                         StatePair refViolationStates = new StatePair(new State(ll,CDD.cddTrue()), new State(rl, CDD.cddTrue()));
                         currNode.constructSuccessor(refViolationStates, leaderEdges, followerEdges);
                     }
