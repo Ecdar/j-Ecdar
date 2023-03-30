@@ -67,7 +67,7 @@ public class Edge {
     }
 
     public CDD getGuardCDD() {
-        return new CDD(guard);
+        return CDDFactory.create(guard);
     }
 
     public int getMaxConstant(Clock clock) {

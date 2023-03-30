@@ -266,7 +266,7 @@ public class Automaton {
     }
 
     public void makeInputEnabled() {
-        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
         for (Location location : getLocations()) {
             CDD invariant = location.getInvariantCdd();
@@ -286,17 +286,17 @@ public class Automaton {
                 }
 
                 // If the enabled part is true then the disabled part will be false.
-                if (enabledPart.isTrue()) {
+                if (enabledPart.equivTrue()) {
                     continue;
                 }
 
                 // If there is any solution to the enabled CDD then subtract it from the invariant.
-                if (enabledPart.isNotFalse()) {
+                if (enabledPart.notEquivFalse()) {
                     disabledPart = disabledPart.minus(enabledPart);
                 }
 
                 // If there is any solution to the disabled CDD then create an edge.
-                if (disabledPart.isNotFalse()) {
+                if (disabledPart.notEquivFalse()) {
                     Edge newEdge = new Edge(location, location, input, true, disabledPart.getGuard(), new ArrayList<>());
                     getEdges().add(newEdge);
                 }
@@ -304,22 +304,24 @@ public class Automaton {
         }
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
     }
 
     public void addTargetInvariantToEdges() {
-        boolean initialisedCdd = CDD.tryInit(clocks, BVs);
+        boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
         for (Edge edge : getEdges()) {
-            CDD targetCDD = new CDD(edge.getTarget().getInvariantGuard());
+            CDD targetCDD = CDDFactory.create(
+                    edge.getTarget().getInvariantGuard()
+            );
             CDD past = targetCDD.transitionBack(edge);
             if (!past.equiv(CDD.cddTrue()))
                 edge.setGuard(past.conjunction(edge.getGuardCDD()).getGuard(getClocks()));
         }
 
         if (initialisedCdd) {
-            CDD.done();
+            CDDRuntime.done();
         }
     }
 }

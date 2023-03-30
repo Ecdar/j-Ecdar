@@ -7,6 +7,7 @@ import logic.SimpleTransitionSystem;
 import logic.TransitionSystem;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import models.Location;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -21,7 +22,7 @@ public class CompositionTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
     private static TransitionSystem adm, admCopy, machine, machineCopy, researcher, researcherCopy, spec, specCopy,

@@ -5,10 +5,7 @@ import exceptions.CddNotRunningException;
 import log.Log;
 import log.Urgency;
 import logic.*;
-import models.Automaton;
-import models.CDD;
-import models.Clock;
-import models.Location;
+import models.*;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -30,7 +27,7 @@ public class UniversitySimpleTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 
 

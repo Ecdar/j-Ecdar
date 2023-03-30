@@ -4,6 +4,7 @@ import log.Log;
 import logic.*;
 import models.Automaton;
 import models.CDD;
+import models.CDDRuntime;
 import org.junit.*;
 import parser.XMLFileWriter;
 import parser.XMLParser;
@@ -21,7 +22,7 @@ public class DelayRefinementTest {
 
     @After
     public void afterEachTest(){
-        CDD.done();
+        CDDRuntime.done();
     }
 //Class
 

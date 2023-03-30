@@ -20,23 +20,23 @@ public class CDDTest {
     @After
     public void afterEachTest(){
 
-        CDD.done();
+        CDDRuntime.done();
     }
 
     @Test
     public void testCddInit() throws CddAlreadyRunningException {
-        assertEquals(0, CDD.init(0,0,0));
+        assertEquals(0, CDDRuntime.init(0,0,0));
     }
 
     @Test
     public void testConjunctionSameTypeWithOverlap() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         Clock a = new Clock("a", "A");
         Clock b = new Clock("b", "B");
         clocks.add(a);
         clocks.add(b);
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
         CDD cdd1 = CDD.createInterval(2,1,3, true,5, true);
         CDD cdd2 = CDD.createInterval(2,1,4,true,6, true);
 
@@ -55,7 +55,7 @@ public class CDDTest {
         guardList.add(g3);
         guardList.add(g4);
 
-        Log.debug(new CDD(new AndGuard(guardList)).getGuard(clocks));
+        Log.debug(CDDFactory.create(new AndGuard(guardList)).getGuard(clocks));
         // TODO: Make sense of how exactly the interval works, and make a good asser statement
 
         cdd1.free();
@@ -65,11 +65,11 @@ public class CDDTest {
 
     @Test
     public void testDisjunction() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
         clocks.add(new Clock("b", "B"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
         CDD cdd1 = CDD.createInterval(2,1,3, true,5,true);
         CDD cdd2 = CDD.createInterval(2,1,4,true,6,true);
 
@@ -86,10 +86,10 @@ public class CDDTest {
 
     @Test
     public void getCorrectBounds() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
         CDD cdd1 = CDD.createInterval(1,0,30, true,50,true);
         CDDNode node = cdd1.getRoot();
         List<Segment> bounds = new ArrayList<>();
@@ -104,10 +104,10 @@ public class CDDTest {
 
     @Test
     public void cddTrue_RootNodeIsTrueNode() throws CddAlreadyRunningException, CddNotRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD trueNode = CDD.cddTrue();
 
@@ -118,10 +118,10 @@ public class CDDTest {
 
     @Test
     public void cddFalse_RootNodeIsFalseNode() throws CddAlreadyRunningException, CddNotRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD falseNode = CDD.cddFalse();
 
@@ -132,10 +132,10 @@ public class CDDTest {
 
     @Test
     public void isTerminal_trueNodeShouldBeTerminal() throws CddAlreadyRunningException, CddNotRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD trueNode = CDD.cddTrue();
 
@@ -146,11 +146,11 @@ public class CDDTest {
 
     @Test
     public void isTerminal_shouldNotBeTerminal() throws CddAlreadyRunningException, CddNotRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
         clocks.add(new Clock("b", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD cdd1 = CDD.createInterval(2,1,3, true,5,true);
         CDD cdd2 = CDD.createInterval(2,1,4,true,6,true);
@@ -166,10 +166,10 @@ public class CDDTest {
 
     @Test
     public void createCddFromDbm() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD cdd1 = CDD.createFromDbm(new int[]{1, 0, 80, 1}, 2);
         CDDNode node = cdd1.getRoot();
@@ -188,36 +188,36 @@ public class CDDTest {
     public void addClocksWithoutInitializing() throws CddNotRunningException {
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
     }
 
     @Test(expected = CddAlreadyRunningException.class)
     public void initializeAlreadyRunningCDD() throws CddAlreadyRunningException {
-        CDD.init(1000,1000,1000);
+        CDDRuntime.init(1000,1000,1000);
 
-        CDD.init(1000,1000,1000);
+        CDDRuntime.init(1000,1000,1000);
     }
 
     @Test(expected = NullPointerException.class)
     public void cddReducingNullCDD() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
         cdd.free();
 
         cdd = cdd.reduce();
-        cdd.isNotFalse();
+        cdd.notEquivFalse();
     }
 
     @Test(expected = NullPointerException.class)
     public void cddFreeingNullCDD() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD cdd = CDD.createFromDbm(new int[]{1, 1, 11, 1}, 2);
         cdd.free();
@@ -227,10 +227,10 @@ public class CDDTest {
 
     @Test
     public void cddLowerBound() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         CDD cdd = CDD.createLower(1,0,3, true);
         CDDNode node = cdd.getRoot();
@@ -246,11 +246,11 @@ public class CDDTest {
 
     @Test
     public void cddUpperBound() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
         clocks.add(new Clock("b", "B"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         //CDD interval = CDD.allocateInterval(1,0,3, true,7, true);
         CDD cdd = CDD.createUpper(1,0,6,true);
@@ -272,13 +272,13 @@ public class CDDTest {
 
     @Test
     public void guardToCDDTest() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         Clock x = new Clock("x", "X");
         Clock y = new Clock("y", "Y");
         clocks.add(x);
         clocks.add(y);
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
 
         Guard e2_g1 = new ClockGuard(x, null, 3,  Relation.GREATER_EQUAL);
@@ -289,7 +289,7 @@ public class CDDTest {
         //  g1.add(new AndGuard(e2_g1, e2_g3));
         g1.add(e2_g1);
         g1.add(e2_g2);
-        CDD res = new CDD(new OrGuard(g1));
+        CDD res = CDDFactory.create(new OrGuard(g1));
         //res.printDot();
         CDD exp = CDD.cddTrue();
         exp = exp.conjunction(CDD.createInterval(1, 0, 3, true, CDD_INF/2, false));
@@ -307,10 +307,10 @@ public class CDDTest {
 
     @Test
     public void cddAddBddvar() throws CddNotRunningException, CddAlreadyRunningException {
-        CDD.init(100,100,100);
+        CDDRuntime.init(100,100,100);
         List<Clock> clocks = new ArrayList<>();
         clocks.add(new Clock("a", "A"));
-        CDD.addClocks(clocks);
+        CDDRuntime.addClocks(clocks);
 
         List<BoolVar> BVs = new ArrayList<>();
         BVs.add(new BoolVar("a", "aut", true));
@@ -318,12 +318,12 @@ public class CDDTest {
         BVs.add(new BoolVar("d", "aut", true));
         BVs.add(new BoolVar("c", "aut", true));
         BVs.add(new BoolVar("e", "aut", true));
-        int level = CDD.addBooleans(BVs);
+        int level = CDDRuntime.addBooleanVariables(BVs);
         assertEquals(1, level);
         BVs.clear();
         BVs.add(new BoolVar("f", "aut", true));
         BVs.add(new BoolVar("g", "aut", true));
-        level = CDD.addBooleans(BVs);
+        level = CDDRuntime.addBooleanVariables(BVs);
         assertEquals(6, level);
     }
 
