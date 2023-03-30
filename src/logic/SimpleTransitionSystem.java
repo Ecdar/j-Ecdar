@@ -123,7 +123,7 @@ public class SimpleTransitionSystem extends TransitionSystem{
 
 
 
-                if (state1.getInvariant().isNotFalse() && state2.getInvariant().isNotFalse()) {
+                if (state1.getInvariant().notEquivFalse() && state2.getInvariant().notEquivFalse()) {
                     if(state1.getInvariant().intersects(state2.getInvariant())) {
                         Log.debug(trans.get(i).getGuardCDD().getGuard(clocks.getItems()));
                         Log.debug(trans.get(j).getGuardCDD().getGuard(clocks.getItems()));
