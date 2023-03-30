@@ -1,6 +1,8 @@
 package log;
 
 import javax.annotation.Nullable;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,6 +11,7 @@ import java.util.function.Supplier;
 
 public class Log {
     private static Urgency urgency = Urgency.All;
+    private static final PrintStream printStream = System.out;
 
     public static void setUrgency(Urgency urgency) {
         Log.urgency = urgency;
@@ -240,6 +243,17 @@ public class Log {
         trace("");
     }
 
+    public static void exception(Exception exception) {
+        Log.exception(exception, Urgency.Error);
+    }
+
+    public static void exception(Exception exception, Urgency urgency) {
+        if (willPrint(urgency)) {
+            LogPrintStream logPrintStream = new Log.LogPrintStream(Log.printStream, urgency);
+            exception.printStackTrace(logPrintStream);
+        }
+    }
+
     public static boolean willPrint(Urgency other) {
         return urgency.level >= other.level;
     }
@@ -301,6 +315,28 @@ public class Log {
     }
 
     private static void out(String message) {
-        System.out.println(message);
+        printStream.println(message);
     }
+
+    private static class LogPrintStream extends PrintStream {
+        private final Urgency urgency;
+
+        public LogPrintStream(OutputStream out, Urgency urgency) {
+            super(out);
+            this.urgency = urgency;
+        }
+
+        @Override
+        public void println(Object x) {
+            switch (urgency) {
+                case Fatal: Log.fatal(x); break;
+                case Error: Log.error(x); break;
+                case Warn: Log.warn(x); break;
+                case Info: Log.info(x); break;
+                case Debug: Log.debug(x); break;
+                case Trace: Log.trace(x); break;
+            }
+        }
+    }
+
 }
