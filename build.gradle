@@ -90,7 +90,7 @@ task fatJar(type: Jar) {
                 'Main-Class': 'connection.Main',
         )
     }
-    classifier = 'fat'
+    archiveClassifier = 'fat'
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     } {
@@ -124,3 +124,4 @@ task unpack_with_dll(type:Copy, dependsOn: 'unpack_without_dll') {
     into outputDir
     group 'distribution'
 }
+
