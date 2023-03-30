@@ -60,7 +60,7 @@ public class AndGuard extends Guard {
     }
 
     public AndGuard(Guard... guards) {
-        this(Arrays.asList(guards));
+        this(Arrays.stream(guards).collect(Collectors.toList()));
     }
 
     public AndGuard(AndGuard copy, List<Clock> newClocks, List<Clock> oldClocks, List<BoolVar> newBVs, List<BoolVar> oldBVs) {
@@ -117,6 +117,11 @@ public class AndGuard extends Guard {
     @Override
     public int hashCode() {
         return Objects.hash(guards);
+    }
+
+    @Override
+    public <T> T accept(GuardVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

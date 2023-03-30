@@ -93,7 +93,7 @@ public class VariousTest {
         CDDRuntime.init(100,100,100);
         CDDRuntime.addClocks(clocks);
 
-        CDD origin1 = CDDFactory.create(new AndGuard(inner));
+        CDD origin1 = CDDFactory.createFrom(new AndGuard(inner));
 
 
         origin1 = origin1.delay();
@@ -122,7 +122,7 @@ public class VariousTest {
         CDDRuntime.init(100,100,100);
         CDDRuntime.addClocks(clocks);
 
-        CDD origin1 = CDDFactory.create(new AndGuard(inner));
+        CDD origin1 = CDDFactory.createFrom(new AndGuard(inner));
 
         Guard origin1Guards = origin1.getGuard(clocks);
         Log.debug(origin1Guards);

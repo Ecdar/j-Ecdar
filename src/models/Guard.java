@@ -18,6 +18,8 @@ public abstract class Guard {
     @Override
     public abstract int hashCode();
 
+    public abstract <T> T accept(GuardVisitor<T> visitor);
+
     public String prettyPrint() {
         return toString();
     }

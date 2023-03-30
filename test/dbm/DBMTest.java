@@ -120,7 +120,7 @@ public class DBMTest {
         Guard initialZone = new AndGuard(g2,g3);
 
         Location l1 = Location.create("L1",new TrueGuard(),true,false,false,false, 0, 0);
-        State state1 = new State(l1.copy(), CDDFactory.create(initialZone));
+        State state1 = new State(l1.copy(), CDDFactory.createFrom(initialZone));
         //state1.delay();
         Log.trace(state1);
         state1.extrapolateMaxBounds(map,clockList);

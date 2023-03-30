@@ -6,7 +6,6 @@ import lib.CDDLib;
 import util.DeferredProperty;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -253,6 +252,21 @@ public class CDD {
         return isUnrestrainedProperty.trySet(
                 this.equiv(cddTrue())
         );
+    }
+
+    /**
+     * Checks if this {@link CDD} implies the <code>other</code>.
+     * This is done by constructing "This ∧ ¬other" and checking unsatisfiability.
+     *
+     * @param other The one to check implication for.
+     * @return <code>True</code> if <code>this</code> implies <code>other</code>.
+     */
+    public boolean implies(CDD other) {
+        // Construct: "This ∧ ¬other"
+        CDD negation = other.negation();
+        CDD conjunction = conjunction(negation);
+        // If there is no solution then they are completely disjoint.
+        return conjunction.equivFalse();
     }
 
     public boolean notEquivFalse() {
@@ -742,7 +756,7 @@ public class CDD {
         int[] arrClockUpdates = clockUpdates.stream().mapToInt(Integer::intValue).toArray();
         int[] arrBoolUpdates = boolUpdates.stream().mapToInt(Integer::intValue).toArray();
 
-        CDD update = CDDFactory.create(updates);
+        CDD update = CDDFactory.createFrom(updates);
         return transitionBack(guard, update, arrClockUpdates, arrBoolUpdates).removeNegative().reduce();
     }
 

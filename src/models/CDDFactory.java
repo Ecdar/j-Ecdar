@@ -11,36 +11,40 @@ public class CDDFactory {
         CDDFactory.singleton = new CDDFactory();
     }
 
-    public static CDD create(Guard guard) throws IllegalArgumentException {
+    public static CDD createFrom(Guard guard) throws IllegalArgumentException {
+        return CDDFactory.singleton.create(guard);
+    }
+
+    public CDD create(Guard guard) throws IllegalArgumentException {
         if (guard instanceof FalseGuard) {
-            return singleton.create((FalseGuard) guard);
+            return singleton.createFrom((FalseGuard) guard);
         } else if (guard instanceof TrueGuard) {
-            return singleton.create((TrueGuard) guard);
+            return singleton.createFrom((TrueGuard) guard);
         } else if (guard instanceof ClockGuard) {
-            return singleton.create((ClockGuard) guard);
+            return singleton.createFrom((ClockGuard) guard);
         } else if (guard instanceof BoolGuard) {
-            return singleton.create((BoolGuard) guard);
+            return singleton.createFrom((BoolGuard) guard);
         } else if (guard instanceof AndGuard) {
-            return singleton.create((AndGuard) guard);
+            return singleton.createFrom((AndGuard) guard);
         } else if (guard instanceof OrGuard) {
-            return singleton.create((OrGuard) guard);
+            return singleton.createFrom((OrGuard) guard);
         }
         throw new IllegalArgumentException("Guard instance of class '" + guard.getClass().getName() + "' is not supported ");
     }
 
-    private CDD create(FalseGuard falseGuard) {
+    private CDD createFrom(FalseGuard falseGuard) {
         CDD cdd = CDD.cddFalse();
         cdd.setGuard(falseGuard);
         return cdd;
     }
 
-    private CDD create(TrueGuard trueGuard) {
+    private CDD createFrom(TrueGuard trueGuard) {
         CDD cdd = CDD.cddTrue();
         cdd.setGuard(trueGuard);
         return cdd;
     }
 
-    private CDD create(ClockGuard clockGuard) {
+    private CDD createFrom(ClockGuard clockGuard) {
         Zone zone = new Zone(CDDRuntime.getNumberOfClocks(), true);
         zone.init();
         zone.buildConstraintsForGuard(clockGuard, CDDRuntime.getAllClocks());
@@ -49,7 +53,7 @@ public class CDDFactory {
         return cdd;
     }
 
-    private CDD create(BoolGuard boolGuard) {
+    private CDD createFrom(BoolGuard boolGuard) {
         int level = CDDRuntime.getBddStartLevel() + CDDRuntime.indexOf(boolGuard.getVar());
         CDD cdd;
         if (boolGuard.getValue()) {
@@ -61,34 +65,34 @@ public class CDDFactory {
         return cdd;
     }
 
-    private CDD create(AndGuard andGuard) {
+    private CDD createFrom(AndGuard andGuard) {
         CDD cdd = CDD.cddTrue();
         for (Guard guard : andGuard.getGuards()) {
-            CDD guardCdd = create(guard);
+            CDD guardCdd = createFrom(guard);
             cdd = cdd.conjunction(guardCdd);
         }
         cdd.setGuard(andGuard);
         return cdd;
     }
 
-    private CDD create(OrGuard orGuard) {
+    private CDD createFrom(OrGuard orGuard) {
         CDD cdd = CDD.cddFalse();
         for (Guard guard : orGuard.getGuards()) {
-            CDD guardCdd = create(guard);
+            CDD guardCdd = createFrom(guard);
             cdd = cdd.disjunction(guardCdd);
         }
         cdd.setGuard(orGuard);
         return cdd;
     }
 
-    public static CDD create(List<Update> updates) throws IllegalArgumentException {
+    public static CDD createFrom(List<Update> updates) throws IllegalArgumentException {
         CDD res = CDD.cddTrue();
         for (Update update : updates) {
             if (update instanceof ClockUpdate) {
-                CDD clockUpdate = singleton.create((ClockUpdate) update);
+                CDD clockUpdate = singleton.createFrom((ClockUpdate) update);
                 res = res.conjunction(clockUpdate);
             } else if (update instanceof BoolUpdate) {
-                CDD clockUpdate = singleton.create((BoolUpdate) update);
+                CDD clockUpdate = singleton.createFrom((BoolUpdate) update);
                 res = res.conjunction(clockUpdate);
             } else {
                 throw new IllegalArgumentException("Update instance of class '" + update.getClass().getName() + "' is not supported ");
@@ -97,11 +101,11 @@ public class CDDFactory {
         return res.removeNegative().reduce();
     }
 
-    private CDD create(ClockUpdate clockUpdate) {
+    private CDD createFrom(ClockUpdate clockUpdate) {
         return CDD.createInterval(CDDRuntime.indexOf(clockUpdate.getClock()), 0, clockUpdate.getValue(), true, clockUpdate.getValue(), true);
     }
 
-    private CDD create(BoolUpdate boolUpdate) {
-        return create(new BoolGuard(boolUpdate.getBV(), Relation.EQUAL, boolUpdate.getValue()));
+    private CDD createFrom(BoolUpdate boolUpdate) {
+        return createFrom(new BoolGuard(boolUpdate.getBV(), Relation.EQUAL, boolUpdate.getValue()));
     }
 }

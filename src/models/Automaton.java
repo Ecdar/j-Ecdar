@@ -312,7 +312,7 @@ public class Automaton {
         boolean initialisedCdd = CDDRuntime.tryInit(clocks, BVs);
 
         for (Edge edge : getEdges()) {
-            CDD targetCDD = CDDFactory.create(
+            CDD targetCDD = CDDFactory.createFrom(
                     edge.getTarget().getInvariantGuard()
             );
             CDD past = targetCDD.transitionBack(edge);
