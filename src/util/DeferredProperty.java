@@ -157,6 +157,15 @@ public class DeferredProperty<T> {
     }
 
     /**
+     * Used to check if this instance is _not_ marked as dirty.
+     *
+     * @return True if this instance is not dirty.
+     */
+    public boolean isClean() {
+        return !isDirty();
+    }
+
+    /**
      * Set the {@link DeferredProperty#value} and cleans this instance by not marking it as dirty.
      * Calling this function when this instance is not dirty will just set {@link DeferredProperty#value}.
      *
