@@ -122,6 +122,10 @@ public class CDDRuntime {
 
     @SafeVarargs
     public static void addClocks(List<Clock>... listOfClockLists) {
+        if (getNumberOfBooleanVariable() > 0) {
+            throw new IllegalArgumentException("Cannot add clocks to the CDDRuntime after boolean variables");
+        }
+
         if (!isRunning()) {
             throw new CddNotRunningException("Cannot add clocks to an uninitialised CDD runtime.");
         }
