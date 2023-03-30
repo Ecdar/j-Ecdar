@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class CDD {
 
@@ -190,43 +189,6 @@ public class CDD {
 
     public void setGuard(Guard guard) {
         guardProperty.set(guard);
-    }
-
-    private Guard toBoolGuards()
-            throws IllegalArgumentException {
-        if (!isBDD()) {
-            throw new IllegalArgumentException("CDD is not a BDD");
-        }
-
-        if (equivFalse()) {
-            return new FalseGuard();
-        }
-        if (equivTrue()) {
-            return new TrueGuard();
-        }
-
-        long ptr = getPointer();
-        BDDArrays arrays = new BDDArrays(CDDLib.bddToArray(ptr));
-
-        List<Guard> orParts = new ArrayList<>();
-        for (int i = 0; i < arrays.traceCount; i++) {
-
-            List<Guard> andParts = new ArrayList<>();
-            for (int j = 0; j < arrays.booleanCount; j++) {
-
-                int index = arrays.getVariables().get(i).get(j);
-                if (index >= 0) {
-                    BoolVar var = BVs.get(index - bddStartLevel);
-                    boolean val = arrays.getValues().get(i).get(j) == 1;
-                    BoolGuard bg = new BoolGuard(var, Relation.EQUAL, val);
-
-                    andParts.add(bg);
-                }
-            }
-
-            orParts.add(new AndGuard(andParts));
-        }
-        return new OrGuard(orParts);
     }
 
     public long getPointer() {
