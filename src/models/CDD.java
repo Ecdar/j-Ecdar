@@ -540,17 +540,17 @@ public class CDD {
         checkForNull();
         other.checkForNull();
 
-        /*if (isFalse() || other.isFalse()) {
+        if (equivFalse() || other.equivFalse()) {
             return this;
         }
 
-        if (other.isTrue()) {
+        if (other.equivTrue()) {
             return cddFalse();
         }
 
-        if (other.pointer == pointer) {
+        if (other.getPointer() == getPointer()) {
             return cddFalse();
-        }*/
+        }
 
         return new CDD(CDDLib.minus(getPointer(), other.getPointer())).removeNegative().reduce();
     }
