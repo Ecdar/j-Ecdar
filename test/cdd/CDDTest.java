@@ -209,7 +209,7 @@ public class CDDTest {
         cdd.free();
 
         cdd = cdd.reduce();
-        cdd.isNotFalse();
+        cdd.notEquivFalse();
     }
 
     @Test(expected = NullPointerException.class)
