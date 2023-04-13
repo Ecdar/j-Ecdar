@@ -105,18 +105,19 @@ public class DeferredProperty<T> {
      */
     public boolean markAsDirty() {
         // Only when this instance is clean do we want to make it dirty.
-        if (isClean()) {
-            isDirty = true;
-
-            // Mark the observers as dirty as they inherit it from this instance.
-            // As it is impossible to add observers after construction, a livelock would never happen.
-            for (DeferredProperty<?> property : observers) {
-                property.markAsDirty();
-            }
-
-            return true;
+        if (isDirty()) {
+            return false;
         }
-        return false;
+
+        isDirty = true;
+
+        // Mark the observers as dirty as they inherit it from this instance.
+        // As it is impossible to add observers after construction, a livelock would never happen.
+        for (DeferredProperty<?> property : observers) {
+            property.markAsDirty();
+        }
+
+        return true;
     }
 
     /**
