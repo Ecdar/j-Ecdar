@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 public class DeferredProperty<T> {
     /**
-     * The temporary stored value of the property
+     * The temporarily stored value of the property.
      */
     private T value;
 
@@ -17,7 +17,7 @@ public class DeferredProperty<T> {
     private boolean isDirty;
 
     /**
-     * The supplier used to autoamtically compute {@link DeferredProperty#value} when {@link DeferredProperty#isDirty} is true.
+     * The supplier used to automatically compute {@link DeferredProperty#value} when {@link DeferredProperty#isDirty} is true.
      */
     private final Supplier<T> supplier;
 
@@ -28,8 +28,8 @@ public class DeferredProperty<T> {
 
     /**
      * Constructs an instance of a {@link DeferredProperty<T>}.
-     * If no initial value is provided (i.e. <code>null</code> value) then this instance will start of as dirty.
-     * Otherwise, if a none <code>null</code> value is provided then it will start of clean.
+     * If the provided initial value is {@code null}, then this instance will start of as dirty.
+     * Otherwise, it will start clean with the provided initial value.
      *
      * @param value The initial value of this property.
      * @param supplier The non-parametric factory method for updating this property value automatically.
@@ -82,7 +82,7 @@ public class DeferredProperty<T> {
     }
 
     /**
-     * Constructs an instance of a {@link DeferredProperty<T>} with an initial value of <code>null</code> and no observers.
+     * Constructs an instance of a {@link DeferredProperty<T>} with an initial value of {@code null} and no observers.
      */
     public DeferredProperty() {
         this(null, new ArrayList<>());
@@ -100,7 +100,7 @@ public class DeferredProperty<T> {
     /**
      * Marks this instance as dirty and only if this instance was initially marked as dirty do we propagate this to its {@link DeferredProperty#observers}.
      *
-     * @return <code>True</code> if we marked this instance as dirty.
+     * @return {@code True} if this instance changed its classification from clean to dirty, and {@code False} if nothing changed, i.e., this instance was already classified as dirty.
      */
     public boolean markAsDirty() {
         // Only when this instance is clean do we want to make it dirty.
@@ -108,7 +108,7 @@ public class DeferredProperty<T> {
             isDirty = true;
 
             // Mark the observers as dirty as they inherit it from this instance.
-            // As it is impossible to add observers after construction then a livelock would never happen.
+            // As it is impossible to add observers after construction, a livelock would never happen.
             for (DeferredProperty<?> property : observers) {
                 property.markAsDirty();
             }
@@ -119,25 +119,23 @@ public class DeferredProperty<T> {
     }
 
     /**
-     * Sets the dirty flag as <code>false</code>. If this instance was dirty then true si removed to indicate the dirty flag change from <code>true</code> to <code>false</code>.
+     * Sets the dirty flag as {@code false}.
      * Unlike {@link DeferredProperty#markAsDirty()} this does not propagate the cleaning to its observers. For this reason, observers that are dirty will not be cleaned.
      *
-     * @return <code>True</code> if the dirty flag changed to <code>true</code> from <code>false</code>.
+     * @return {@code true} if the dirty flag changed to {@code false}, and {@code false} if instance was already clean.
      */
     public boolean clean() {
-        if (isDirty()) {
-            isDirty = false;
-            return true;
-        }
-        return false;
+        boolean change = isDirty();
+        isDirty = false;
+        return change;
     }
 
     /**
-     * If this instance {@link DeferredProperty#isDirty} then we run the {@link Runnable} and then {@link DeferredProperty#clean()}
+     * If this instance {@link DeferredProperty#isDirty} then we run the {@link Runnable} and then {@link DeferredProperty#clean()}.
      * This should be useed if the dirty state of this instance can be controled by performing an operation rather than setting a new {@link DeferredProperty#value}.
      *
      * @param runnable The runnable which is run if we cleaned the object.
-     * @return <code>True</code> if the dirty flag changed to <code>true</code> from <code>false</code>.
+     * @return {@code true} if the dirty flag changed to {@code false}, and {@code false} if instance was already clean.
      */
     public boolean clean(Runnable runnable) {
         boolean cleaned = clean();
@@ -148,9 +146,9 @@ public class DeferredProperty<T> {
     }
 
     /**
-     * Used to check if this instance is marked as dirty.
+     * Checks if this instance is marked as dirty.
      *
-     * @return True if this instance is dirty.
+     * @return {@code true} if this instance is dirty.
      */
     public boolean isDirty() {
         return isDirty;
@@ -159,18 +157,18 @@ public class DeferredProperty<T> {
     /**
      * Used to check if this instance is _not_ marked as dirty.
      *
-     * @return True if this instance is not dirty.
+     * @return {@code true} if this instance is not dirty.
      */
     public boolean isClean() {
         return !isDirty();
     }
 
     /**
-     * Set the {@link DeferredProperty#value} and cleans this instance by not marking it as dirty.
+     * Sets the {@link DeferredProperty#value} and cleans this instance by marking it as not dirty.
      * Calling this function when this instance is not dirty will just set {@link DeferredProperty#value}.
      *
      * @param value The value to set this property {@link DeferredProperty#value} to.
-     * @return Returns <code>true</code> if the instance was cleaned by marking it as no longer dirty.
+     * @return {@code true} if the instance was cleaned.
      */
     public boolean set(T value) {
         this.value = value;
@@ -183,7 +181,7 @@ public class DeferredProperty<T> {
      * However, the current value of this property will always be returned.
      *
      * @param value The value to set this property {@link DeferredProperty#value} to.
-     * @return Returns the value of this instance value even if no new assignment was made.
+     * @return The value of this instance even if no new assignment was made.
      */
     public T trySet(T value) {
         if (isDirty()) {
@@ -194,20 +192,20 @@ public class DeferredProperty<T> {
 
     /**
      * Sets the {@link DeferredProperty#value} but only if this is dirty.
-     * The new {@link DeferredProperty#value} would be the one returned by the <code>supplier</code>.
+     * The new {@link DeferredProperty#value} would be the one returned by the {@code supplier}.
      * Calling this function when this instance is not dirty will not set the value.
      * However, the current value of this property will always be returned.
      *
      * @param supplier The supplier that returns the new value of {@link DeferredProperty#value}.
-     * @return Returns the value of this instance value even if no new assignment was made.
+     * @return The value of this instance value even if no new assignment was made.
      */
     public T trySet(Supplier<T> supplier) {
         return trySet(supplier.get());
     }
 
     /**
-     * If a supplier has be assigned and this is dirty then a new value is calcalted and returned.
-     * {@link Optional<T>} is used to highlight that if this instance is dirty then {@link Optional#empty()} is returned instead of <code>null</code>.
+     * If a supplier has be assigned and this is dirty, then a new value is calculated and returned.
+     * {@link Optional<T>} is used to highlight that if this instance is dirty then {@link Optional#empty()} is returned instead of {@code null}.
      *
      * @return If dirty then {@link Optional#empty()} else {@link Optional#of(Object)} with {@link DeferredProperty#value}.
      */
@@ -223,7 +221,7 @@ public class DeferredProperty<T> {
     /**
      * Calls {@link DeferredProperty#tryCompute()} and returns null if the {@link Optional#isEmpty()}.
      *
-     * @return Returns <code>null</code> if this is dirty and no supplier exists.
+     * @return {@code null} if this is dirty and no supplier exists.
      */
     public T get() {
         return tryCompute().orElse(null);
