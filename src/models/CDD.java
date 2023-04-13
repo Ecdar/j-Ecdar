@@ -19,19 +19,19 @@ public class CDD {
     private final DeferredProperty<Guard> guardProperty = new DeferredProperty<>();
 
     /**
-     * The {@link DeferredProperty} used as a marker to see if {@link CDD#delay()} should skip the
+     * The marker to see if {@link CDD#delay()} should skip the
      * {@link CDDLib#delay(long)} call, as it won't change the current {@link CDD#pointerProperty} value.
      */
     private final DeferredProperty<?> isDelayedMarker = new DeferredProperty<>();
 
     /**
-     * The {@link DeferredProperty} used as a marker to see if {@link CDD#delayInvar(CDD)} should skip the
+     * The marker to see if {@link CDD#delayInvar(CDD)} should skip the
      * {@link CDDLib#delayInvar(long, long)} call, as it won't change the current {@link CDD#pointerProperty} value.
      */
     private final DeferredProperty<?> isDelayedInvariantMarker = new DeferredProperty<>();
 
     /**
-     * The {@link DeferredProperty} used as a marker to see if {@link CDD#past()} should skip the
+     * The marker to see if {@link CDD#past()} should skip the
      * {@link CDDLib#past(long)} call, as it won't change the current {@link CDD#pointerProperty} value.
      */
     private final DeferredProperty<?> isPastMarker = new DeferredProperty<>();
@@ -41,7 +41,7 @@ public class CDD {
      * then we are within the BDD part of the {@link CDD}.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
-     * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
+     * needs to be re-computed, which is the case if {@link DeferredProperty#isDirty()} returns {@code true}.
      */
     private final DeferredProperty<Boolean> isBddProperty = new DeferredProperty<>();
 
@@ -57,7 +57,7 @@ public class CDD {
     private final DeferredProperty<Boolean> isTerminalProperty = new DeferredProperty<>();
 
     /**
-     * This property is <code>true</code> if this {@link CDD} is urgent. Otherwise, it is not urgent.
+     * This property is {@code true} if this {@link CDD} is urgent. Otherwise, it is not urgent.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
@@ -65,7 +65,7 @@ public class CDD {
     private final DeferredProperty<Boolean> isUrgentProperty = new DeferredProperty<>();
 
     /**
-     * This property is <code>true</code> if this {@link CDD} is unrestrained (I.e., {@link CDD#equivTrue()} is <code>true</code>).
+     * This property is {@code true} if this {@link CDD} is unrestrained (I.e., {@link CDD#equivTrue()} is {@code true}).
      * Otherwise, it is not unrestrained.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
@@ -74,7 +74,7 @@ public class CDD {
     private final DeferredProperty<Boolean> isUnrestrainedProperty = new DeferredProperty<>();
 
     /**
-     * This property is <code>true</code> if this {@link CDD} is equivalent to the {@link CDD#cddTrue()}.
+     * This property is {@code true} if this {@link CDD} is equivalent to the {@link CDD#cddTrue()}.
      * However, if this {@link CDD} is not equivalent to {@link CDD#cddTrue()} then it is not guaranteed that it
      * is equivalent to {@link CDD#cddFalse()}.
      *
@@ -84,7 +84,7 @@ public class CDD {
     private final DeferredProperty<Boolean> isEquivTrueProperty = new DeferredProperty<>();
 
     /**
-     * This property is <code>true</code> if this {@link CDD} is equivalent to the {@link CDD#cddFalse()}.
+     * This property is {@code true} if this {@link CDD} is equivalent to the {@link CDD#cddFalse()}.
      * However, if this {@link CDD} is not equivalent to {@link CDD#cddFalse()} then it is not guaranteed that it
      * is equivalent to {@link CDD#cddTrue()}.
      *
@@ -94,8 +94,8 @@ public class CDD {
     private final DeferredProperty<Boolean> isEquivFalseProperty = new DeferredProperty<>();
 
     /**
-     * This property is <code>true</code> if this {@link CDD} can indefinitely be delayed.
-     * Otherwise, if <code>false</code> it cannot be indefinitely delayed.
+     * This property is {@code true} if this {@link CDD} can indefinitely be delayed.
+     * Otherwise, if {@code false} it cannot be indefinitely delayed.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
@@ -103,14 +103,14 @@ public class CDD {
     private final DeferredProperty<Boolean> canDelayIndefinitelyProperty = new DeferredProperty<>();
 
     /**
-     * The {@link DeferredProperty} used as a marker to see if {@link CDD#removeNegative()} should skip the
+     * The marker to see if {@link CDD#removeNegative()} should skip the
      * {@link CDDLib#removeNegative(long)} call, as it won't change the current {@link CDD#pointerProperty} value.
      */
     private final DeferredProperty<?> removeNegativeMarker = new DeferredProperty<>();
 
     /**
-     * This property stored the {@link CddExtractionResult} if this {@link CDD} has made a {@link CDD#extract()} call before {@link CDD#setPointer(long)}.
-     * Otherwise, it is dirty and returns <code>null</code>.
+     * This property stores the {@link CddExtractionResult} if this {@link CDD} has made a {@link CDD#extract()} call before {@link CDD#setPointer(long)}.
+     * Otherwise, it is dirty and returns {@code null}.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
@@ -118,7 +118,7 @@ public class CDD {
     private final DeferredProperty<CddExtractionResult> extractionProperty = new DeferredProperty<>();
 
     /**
-     * This property stores the node count of this {@link CDD}.
+     * The node count of this {@link CDD}.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
@@ -126,7 +126,7 @@ public class CDD {
     private final DeferredProperty<Integer> nodeCountProperty = new DeferredProperty<>();
 
     /**
-     * This property stores the {@link CDDNode} for the root node.
+     * The {@link CDDNode} for the root node.
      *
      * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
@@ -134,7 +134,7 @@ public class CDD {
     private final DeferredProperty<CDDNode> rootNodeProperty = new DeferredProperty<>();
 
     /**
-     * The {@link DeferredProperty} used as a marker to see if {@link CDD#reduce()} should skip the
+     * The marker to see if {@link CDD#reduce()} should skip the
      * {@link CDDLib#reduce(long)} call, as it won't change the current {@link CDD#pointerProperty} value.
      */
     private final DeferredProperty<?> reduceMarker = new DeferredProperty<>();
@@ -142,7 +142,7 @@ public class CDD {
     /**
      * The pointer used in the {@link CDDLib} to represent this {@link CDD}.
      *
-     * The pointer is the root {@link DeferredProperty} meaning that it manages all the observers which are
+     * The pointer is the root {@link DeferredProperty} meaning that it manages all the observers that are
      * {@link DeferredProperty DeferredProperties} that should be marked as dirty as soon as their parent property
      * has been marked as dirty.
      *
@@ -209,7 +209,7 @@ public class CDD {
 
     public Guard getGuard(List<Clock> relevantClocks) {
         // Only if the guard property is dirty do we compute a new value.
-        // Always, do we return the current value of the property.
+        // We do always return the latest value of the property.
         return guardProperty.trySet(
                 () -> isBDD() ? toBoolGuards() : toClockGuards(relevantClocks)
         );
@@ -480,7 +480,7 @@ public class CDD {
                     return false;
                 }
             }
-            // found no states that cannot delay indefinitely
+            // Found no states that cannot delay indefinitely.
             return true;
         });
     }
@@ -497,7 +497,7 @@ public class CDD {
                 return false;
             }
 
-            // Required as we don't want to alter the pointer value of "this"
+            // Required as we don't want to alter the pointer value of "this".
             CDD copy = hardCopy();
 
             while (!copy.isTerminal()) {
