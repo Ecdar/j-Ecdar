@@ -403,7 +403,7 @@ public class Pruning {
         testForSatEdgeCDD = testForSatEdgeCDD.minus(e.getSource().getInconsistentPart());
 
 
-        if (!testForSatEdgeCDD.notEquivFalse()) {
+        if (testForSatEdgeCDD.equivFalse()) {
             edges.remove(e);
         }
         if (printComments)
