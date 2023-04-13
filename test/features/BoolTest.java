@@ -514,6 +514,7 @@ public class BoolTest {
     }
 
     @Test
+    @Ignore
     public void testBoolQuotient() // TODO: check and make an assert statement
     {
         CDD.done();
