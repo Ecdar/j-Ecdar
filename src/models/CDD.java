@@ -342,7 +342,6 @@ public class CDD {
         return isBddProperty.trySet(() -> {
             checkForNull();
             checkIfNotRunning();
-            // TODO: Make this terminal checks.
             return isTrue() || isFalse() || CDDLib.isBDD(getPointer());
         });
     }
