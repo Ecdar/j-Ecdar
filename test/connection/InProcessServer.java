@@ -2,6 +2,7 @@ package connection;
 
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessServerBuilder;
+import log.Log;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -29,9 +30,9 @@ public class InProcessServer<T extends io.grpc.BindableService> {
             @Override
             public void run() {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+                Log.error("*** shutting down gRPC server since JVM is shutting down");
                 InProcessServer.this.stop();
-                System.err.println("*** server shut down");
+                Log.error("*** server shut down");
             }
         });
     }

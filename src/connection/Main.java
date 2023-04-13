@@ -115,7 +115,6 @@ public class Main {
             Log.fatal(e.getMessage());
             printHelp(formatter,options);
         }
-
     }
 
     private static void printHelp(HelpFormatter formatter, Options options){

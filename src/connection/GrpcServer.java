@@ -2,6 +2,7 @@ package connection;
 
 import io.grpc.Server;
 import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
+import log.Log;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,11 +42,11 @@ public class GrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run(){
-                System.err.println("Shutting down gRPC server");
+                Log.error("Shutting down gRPC server");
                 try {
                     GrpcServer.this.stop();
                 } catch (InterruptedException e){
-                    e.printStackTrace(System.err);
+                    Log.exception(e);
                 }
             }
         });

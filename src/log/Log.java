@@ -1,14 +1,17 @@
 package log;
 
 import javax.annotation.Nullable;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 public class Log {
     private static Urgency urgency = Urgency.All;
+    private static final PrintStream printStream = System.out;
 
     public static void setUrgency(Urgency urgency) {
         Log.urgency = urgency;
@@ -37,7 +40,7 @@ public class Log {
     }
 
     public static void fatal(String message) {
-        if (urgency.level >= Urgency.Fatal.level) {
+        if (willPrint(Urgency.Fatal)) {
             out(format(message, Urgency.Fatal));
         }
     }
@@ -60,12 +63,18 @@ public class Log {
         );
     }
 
+    public static <T> void fatal(Supplier<T> supplier) {
+        if (willPrint(Urgency.Fatal)) {
+            fatal(supplier.get());
+        }
+    }
+
     public static void fatal() {
         fatal("");
     }
 
     public static void error(String message) {
-        if (urgency.level >= Urgency.Error.level) {
+        if (willPrint(Urgency.Error)) {
             out(format(message, Urgency.Error));
         }
     }
@@ -88,12 +97,18 @@ public class Log {
         );
     }
 
+    public static <T> void error(Supplier<T> supplier) {
+        if (willPrint(Urgency.Error)) {
+            error(supplier.get());
+        }
+    }
+
     public static void error() {
         error("");
     }
 
     public static void warn(String message) {
-        if (urgency.level >= Urgency.Warn.level) {
+        if (willPrint(Urgency.Warn)) {
             out(format(message, Urgency.Warn));
         }
     }
@@ -116,12 +131,18 @@ public class Log {
         );
     }
 
+    public static <T> void warn(Supplier<T> supplier) {
+        if (willPrint(Urgency.Warn)) {
+            warn(supplier.get());
+        }
+    }
+
     public static void warn() {
         warn("");
     }
 
     public static void info(String message) {
-        if (urgency.level >= Urgency.Info.level) {
+        if (willPrint(Urgency.Info)) {
             out(format(message, Urgency.Info));
         }
     }
@@ -144,12 +165,18 @@ public class Log {
         );
     }
 
+    public static <T> void info(Supplier<T> supplier) {
+        if (willPrint(Urgency.Info)) {
+            info(supplier.get());
+        }
+    }
+
     public static void info() {
         info("");
     }
 
     public static void debug(String message) {
-        if (urgency.level >= Urgency.Debug.level) {
+        if (willPrint(Urgency.Debug)) {
             out(format(message, Urgency.Debug));
         }
     }
@@ -172,12 +199,18 @@ public class Log {
         );
     }
 
+    public static <T> void debug(Supplier<T> supplier) {
+        if (willPrint(Urgency.Debug)) {
+            debug(supplier.get());
+        }
+    }
+
     public static void debug() {
         debug("");
     }
 
     public static void trace(String message) {
-        if (urgency.level >= Urgency.Trace.level) {
+        if (willPrint(Urgency.Trace)) {
             out(format(message, Urgency.Trace));
         }
     }
@@ -200,8 +233,29 @@ public class Log {
         );
     }
 
+    public static <T> void trace(Supplier<T> supplier) {
+        if (willPrint(Urgency.Trace)) {
+            trace(supplier.get());
+        }
+    }
+
     public static void trace() {
         trace("");
+    }
+
+    public static void exception(Exception exception) {
+        Log.exception(exception, Urgency.Error);
+    }
+
+    public static void exception(Exception exception, Urgency urgency) {
+        if (willPrint(urgency)) {
+            LogPrintStream logPrintStream = new Log.LogPrintStream(Log.printStream, urgency);
+            exception.printStackTrace(logPrintStream);
+        }
+    }
+
+    public static boolean willPrint(Urgency other) {
+        return urgency.level >= other.level;
     }
 
     private static StackTraceElement getCaller() {
@@ -261,6 +315,30 @@ public class Log {
     }
 
     private static void out(String message) {
-        System.out.println(message);
+        printStream.println(message);
     }
+
+    private static class LogPrintStream extends PrintStream {
+        private final Urgency urgency;
+
+        public LogPrintStream(OutputStream out, Urgency urgency) {
+            super(out);
+            this.urgency = urgency;
+        }
+
+        @Override
+        public void println(Object x) {
+            switch (urgency) {
+                case Fatal: Log.fatal(x); break;
+                case Error: Log.error(x); break;
+                case Warn: Log.warn(x); break;
+                case Info: Log.info(x); break;
+                case Debug: Log.debug(x); break;
+                case Trace: Log.trace(x); break;
+                default:
+                    throw new IllegalArgumentException("Urgency is not supported");
+            }
+        }
+    }
+
 }
