@@ -37,10 +37,10 @@ public class CDD {
     private final DeferredProperty<?> isPastMarker = new DeferredProperty<>();
 
     /**
-     * The bottom part of a {@link CDD} are BDD nodes. If {@link DeferredProperty#get()} returns  <code>true</code>
+     * The bottom part of a {@link CDD} are BDD nodes. If {@link DeferredProperty#getValue()} returns  <code>true</code>
      * then we are within the BDD part of the {@link CDD}.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> isBddProperty = new DeferredProperty<>();
@@ -48,10 +48,10 @@ public class CDD {
     /**
      * The bottom most nodes labeled either <code>true</code> or <code>false</code> are called terminal nodes.
      * These nodes have only ingoing edges and no outgoing.
-     * If {@link DeferredProperty#get()} returns <code>true</code>, then the {@link CDD#getPointer()} points at one of these terminal nodes.
+     * If {@link DeferredProperty#getValue()} returns <code>true</code>, then the {@link CDD#getPointer()} points at one of these terminal nodes.
      * If this is the case, then this {@link CDD} is a BDD ({@link CDD#isBDD()} is <code>true</code>).
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> isTerminalProperty = new DeferredProperty<>();
@@ -59,7 +59,7 @@ public class CDD {
     /**
      * This property is <code>true</code> if this {@link CDD} is urgent. Otherwise, it is not urgent.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> isUrgentProperty = new DeferredProperty<>();
@@ -68,7 +68,7 @@ public class CDD {
      * This property is <code>true</code> if this {@link CDD} is unrestrained (I.e., {@link CDD#equivTrue()} is <code>true</code>).
      * Otherwise, it is not unrestrained.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> isUnrestrainedProperty = new DeferredProperty<>();
@@ -78,7 +78,7 @@ public class CDD {
      * However, if this {@link CDD} is not equivalent to {@link CDD#cddTrue()} then it is not guaranteed that it
      * is equivalent to {@link CDD#cddFalse()}.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> isEquivTrueProperty = new DeferredProperty<>();
@@ -88,7 +88,7 @@ public class CDD {
      * However, if this {@link CDD} is not equivalent to {@link CDD#cddFalse()} then it is not guaranteed that it
      * is equivalent to {@link CDD#cddTrue()}.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> isEquivFalseProperty = new DeferredProperty<>();
@@ -97,7 +97,7 @@ public class CDD {
      * This property is <code>true</code> if this {@link CDD} can indefinitely be delayed.
      * Otherwise, if <code>false</code> it cannot be indefinitely delayed.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Boolean> canDelayIndefinitelyProperty = new DeferredProperty<>();
@@ -112,7 +112,7 @@ public class CDD {
      * This property stored the {@link CddExtractionResult} if this {@link CDD} has made a {@link CDD#extract()} call before {@link CDD#setPointer(long)}.
      * Otherwise, it is dirty and returns <code>null</code>.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<CddExtractionResult> extractionProperty = new DeferredProperty<>();
@@ -120,7 +120,7 @@ public class CDD {
     /**
      * This property stores the node count of this {@link CDD}.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<Integer> nodeCountProperty = new DeferredProperty<>();
@@ -128,7 +128,7 @@ public class CDD {
     /**
      * This property stores the {@link CDDNode} for the root node.
      *
-     * If {@link DeferredProperty#get()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
+     * If {@link DeferredProperty#getValue()} returns <code>null</code> then it is likely that the {@link DeferredProperty}
      * needs to be re-computed which is the case if {@link DeferredProperty#isDirty()} returns <code>true</code>.
      */
     private final DeferredProperty<CDDNode> rootNodeProperty = new DeferredProperty<>();
@@ -305,7 +305,7 @@ public class CDD {
 
     public long getPointer() {
         // We have to use getValue as we don't want to return null if the pointer property is dirty.
-        return pointerProperty.getValue();
+        return pointerProperty.getUncheckedValue();
     }
 
     private void setPointer(long newPointer) {

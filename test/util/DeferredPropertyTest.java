@@ -23,7 +23,7 @@ public class DeferredPropertyTest {
         property = new DeferredProperty<>(value);
 
         // Assert
-        assertEquals(property.get(), value);
+        assertEquals(property.getValue(), value);
         assertFalse(property.isDirty());
     }
 
@@ -38,11 +38,11 @@ public class DeferredPropertyTest {
 
         // Act
         property.markAsDirty();
-        int first = property.get();
+        int first = property.getValue();
         property.markAsDirty();
-        int second = property.get();
+        int second = property.getValue();
         property.markAsDirty();
-        int third = property.get();
+        int third = property.getValue();
 
         // Assert
         assertEquals("0123", instance);
@@ -99,7 +99,7 @@ public class DeferredPropertyTest {
         property.set(expected);
 
         // Act
-        Integer actual = property.get();
+        Integer actual = property.getValue();
 
         // Assert
         assertEquals(expected, actual);

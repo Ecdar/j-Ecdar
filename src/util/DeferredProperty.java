@@ -93,18 +93,19 @@ public class DeferredProperty<T> {
      *
      * @return The current value of {@link DeferredProperty#value}.
      */
-    public T getValue() {
+    public T getUncheckedValue() {
         return value;
     }
 
     /**
-     * Marks this instance as dirty and only if this instance was initially marked as dirty do we propagate this to its {@link DeferredProperty#observers}.
+     * Marks this instance as dirty if it was clean before the call and propagates the change to its {@link DeferredProperty#observers}.
+     * If this instance was dirty before the call then no change and propagation will be made.
      *
      * @return {@code True} if this instance changed its classification from clean to dirty, and {@code False} if nothing changed, i.e., this instance was already classified as dirty.
      */
     public boolean markAsDirty() {
         // Only when this instance is clean do we want to make it dirty.
-        if (!isDirty()) {
+        if (isClean()) {
             isDirty = true;
 
             // Mark the observers as dirty as they inherit it from this instance.
@@ -131,8 +132,8 @@ public class DeferredProperty<T> {
     }
 
     /**
-     * If this instance {@link DeferredProperty#isDirty} then we run the {@link Runnable} and then {@link DeferredProperty#clean()}.
-     * This should be useed if the dirty state of this instance can be controled by performing an operation rather than setting a new {@link DeferredProperty#value}.
+     * Sets the dirty flag as {@code false} by calling {@link DeferredProperty#clean()} if it cleaned this instance then we run the {@link Runnable}.
+     * This should be used if the dirty state of this instance can be controlled by performing an operation rather than setting a new {@link DeferredProperty#value}.
      *
      * @param runnable The runnable which is run if we cleaned the object.
      * @return {@code true} if the dirty flag changed to {@code false}, and {@code false} if instance was already clean.
@@ -155,7 +156,7 @@ public class DeferredProperty<T> {
     }
 
     /**
-     * Used to check if this instance is _not_ marked as dirty.
+     * Checks if this instance is _not_ marked as dirty.
      *
      * @return {@code true} if this instance is not dirty.
      */
@@ -178,7 +179,7 @@ public class DeferredProperty<T> {
     /**
      * Sets the {@link DeferredProperty#value} but only if this is dirty.
      * Calling this function when this instance is not dirty will not set the value.
-     * However, the current value of this property will always be returned.
+     * However, the value of this property before this call will always be returned.
      *
      * @param value The value to set this property {@link DeferredProperty#value} to.
      * @return The value of this instance even if no new assignment was made.
@@ -187,14 +188,14 @@ public class DeferredProperty<T> {
         if (isDirty()) {
             set(value);
         }
-        return get();
+        return getUncheckedValue();
     }
 
     /**
      * Sets the {@link DeferredProperty#value} but only if this is dirty.
      * The new {@link DeferredProperty#value} would be the one returned by the {@code supplier}.
      * Calling this function when this instance is not dirty will not set the value.
-     * However, the current value of this property will always be returned.
+     * However, the value of this property before this call will always be returned.
      *
      * @param supplier The supplier that returns the new value of {@link DeferredProperty#value}.
      * @return The value of this instance value even if no new assignment was made.
@@ -204,7 +205,7 @@ public class DeferredProperty<T> {
     }
 
     /**
-     * If a supplier has be assigned and this is dirty, then a new value is calculated and returned.
+     * Sets a new value computed by the supplier if this instance is dirty.
      * {@link Optional<T>} is used to highlight that if this instance is dirty then {@link Optional#empty()} is returned instead of {@code null}.
      *
      * @return If dirty then {@link Optional#empty()} else {@link Optional#of(Object)} with {@link DeferredProperty#value}.
@@ -223,7 +224,7 @@ public class DeferredProperty<T> {
      *
      * @return {@code null} if this is dirty and no supplier exists.
      */
-    public T get() {
+    public T getValue() {
         return tryCompute().orElse(null);
     }
 }
