@@ -335,6 +335,8 @@ public class Log {
                 case Info: Log.info(x); break;
                 case Debug: Log.debug(x); break;
                 case Trace: Log.trace(x); break;
+                default:
+                    throw new IllegalArgumentException("Urgency is not supported");
             }
         }
     }
