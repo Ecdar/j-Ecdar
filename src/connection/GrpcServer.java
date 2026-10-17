@@ -8,6 +8,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import log.Log;
+
 public class GrpcServer {
 
     private Server server;
@@ -41,11 +43,12 @@ public class GrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run(){
-                System.err.println("Shutting down gRPC server");
+                Log.fatal("Shutting down gRPC server");
                 try {
                     GrpcServer.this.stop();
                 } catch (InterruptedException e){
-                    e.printStackTrace(System.err);
+                    Log.error("Interrupted while shutting down gRPC server: " + e);
+                    Thread.currentThread().interrupt();
                 }
             }
         });
