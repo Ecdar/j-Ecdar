@@ -28,10 +28,10 @@ public class InProcessServer<T extends io.grpc.BindableService> {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+                // Prefer java.util.logging; falls back gracefully if JUL is reset during shutdown.
+                logger.warning("*** shutting down gRPC server since JVM is shutting down");
                 InProcessServer.this.stop();
-                System.err.println("*** server shut down");
+                logger.info("*** server shut down");
             }
         });
     }
